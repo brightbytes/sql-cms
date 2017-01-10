@@ -1,6 +1,5 @@
 *.rbc
 capybara-*.html
-.rspec
 
 # Ignore all logfiles and tempfiles.
 *.log
