@@ -1,10 +1,17 @@
 *.rbc
 capybara-*.html
 .rspec
+
+# Ignore all logfiles and tempfiles.
+*.log
 /log
+!/log/.keep
 /tmp
+
+# Ignore the default SQLite database.
 /db/*.sqlite3
 /db/*.sqlite3-journal
+
 /public/system
 /coverage/
 /spec/tmp
@@ -24,6 +31,9 @@ config/secrets.yml
 /.bundle
 /vendor/bundle
 
+# Ignore bundler config
+/.bundle
+
 # these should all be checked in to normalize the environment:
 # Gemfile.lock, .ruby-version, .ruby-gemset
 
@@ -35,8 +45,44 @@ config/secrets.yml
 *.bowerrc
 bower.json
 
+# Ignore locally compiled assets
+/public/assets/*
+!/public/assets/manifest.yml
+config/assets_manifests/staging/sources_manifest.yml
+config/assets_manifests/qa/sources_manifest.yml
+
+# Ignore Apple turds
+.DS_Store
+
+# Ignore swp files
+*.swp
+*.swo
+
+# Ignore emacs turds
+.\#*
+*.*~
+
+# ignore Ctags
+tags
+
+# ignore RubyMine files
+.idea/*
+
 # Ignore pow environment settings
-.powenv
+/.powrc
+/.powenv
 
 # Ignore Byebug command history file.
 .byebug_history
+
+# Ignore paperclip uploads
+/public/uploads
+
+# Redis temporary file
+dump.rdb
+
+# RBENV file
+.rbenv-version
+
+# Vagrant directory
+/.vagrant
