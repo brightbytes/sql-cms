@@ -1,8 +1,7 @@
 Rails.application.routes.draw do
-  devise_for :users
-  # devise_for :users, ActiveAdmin::Devise.config
+  devise_for :users, ActiveAdmin::Devise.config
 
-  # ActiveAdmin.routes(self)
+  ActiveAdmin.routes(self)
 
-  # root 'admin/dashboard#index'
+  root 'admin/dashboard#index'
 end

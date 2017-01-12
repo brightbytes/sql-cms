@@ -29,11 +29,17 @@ class User < ApplicationRecord
 
   # Can't use the memoize gem here, because the gem gags on both explicit flushing (e.g. User.admin(true)) and implicit flushing (i.e. User.flush_cache).  Lame.
 
-  USER_NAME_EMAIL_PAIRS = [
-    ['aaron', 'aaron@brightbytes.net']
-  ].freeze
+  USERS = [
+    {
+      email: 'aaron@brightbytes.net',
+      first_name: 'Aaron',
+      last_name: 'Cohen'
+    }
+  ]
 
-  USER_NAME_EMAIL_PAIRS.each do |(name, email)|
+  USERS.each do |hash|
+    name = hash[:first_name].downcase
+    email = hash[:email]
     instance_eval %[
       def #{name}
         @#{name} ||= User.find_by(email: '#{email}')
@@ -41,11 +47,24 @@ class User < ApplicationRecord
     ]
   end
 
-  USER_NAMES = USER_NAME_EMAIL_PAIRS.map(&:first)
+  USER_NAMES = USERS.map { |hash| hash[:first_name].downcase }
 
-  def self.flush_cache
-    # Ugly ... but automatic ...
-    USER_NAMES.each { |name| instance_variable_set("@#{name}", nil) }
+  class << self
+
+    def flush_cache
+      # Ugly ... but automatic ...
+      USER_NAMES.each { |name| instance_variable_set("@#{name}", nil) }
+    end
+
+    def seed
+      env_password = ENV['UI_ADMIN_PASSWORD'] || 'password'
+      USERS.each do |h|
+        h[:password] = h[:password_confirmation] = env_password
+        # NOTE - WE CAN'T USE find_or_create_by! HERE B/C DEVISE WILL PUKE ON IT; SEE:
+        #        http://stackoverflow.com/questions/25497473/rails-4-1-devise-3-3-column-users-password-does-not-exist
+        User.create!(h) unless User.where(email: h[:email]).exists?
+      end
+    end
+
   end
-
 end

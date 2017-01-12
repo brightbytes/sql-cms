@@ -63,7 +63,7 @@ group :test do
   gem 'rspec-mocks'#, '~> 2.14'
   gem 'shoulda'
 
-  # gem 'database_cleaner'
+  gem 'database_cleaner'
   gem 'timecop'
 
   # gem 'fakeredis'

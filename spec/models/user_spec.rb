@@ -67,4 +67,35 @@ describe User do
 
   end
 
+  describe "class methods" do
+
+    context "#seed" do
+
+      it "should have 1 memoized user, and a flush method" do
+        expect(User.aaron).to be_nil
+        expect { User.seed }.to_not raise_error
+
+        aaron = User.aaron
+        expect(aaron).to be_a(User)
+        expect(User.instance_variable_get(:"@aaron")).to eq(aaron)
+
+        User.flush_cache
+        expect(User.instance_variable_get(:"@aaron")).to be_nil
+      end
+
+      it "should idempotently create some users" do
+        # Fucking DatabaseCleaner doesn't work
+        User.delete_all
+        expect(User.count).to eq(0)
+        expect { User.seed }.to_not raise_error
+        count = User.count
+        expect(count).to be > 0
+        expect { User.seed }.to_not raise_error
+        new_count = User.count
+        expect(new_count).to eq(count)
+      end
+    end
+
+  end
+
 end
