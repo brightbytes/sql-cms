@@ -18,6 +18,7 @@ gem "pg" # Postgres
 gem 'immigrant' # FK constraints
 gem 'postgres-copy' # bulk import
 gem 'postgresql_cursor' # postgres cursors!!
+gem 'acts_as_paranoid' # logical delete
 
 # K/V store
 # gem "redis"
@@ -87,7 +88,7 @@ gem "sidekiq"
 gem "newrelic_rpm"
 
 # Exception reporting
-gem "sentry-raven"
+# gem "sentry-raven"
 
 # Admin
 gem 'inherited_resources', github: 'activeadmin/inherited_resources' # required to install AA with Rails 5
