@@ -53,6 +53,8 @@ group :development do
 end
 
 group :test do
+  gem 'acts_as_fu' # active record tests
+
   # CI is puking all over the place on a later version of this, so we're downgrading.
   gem 'simplecov' #, '~> 0.7.1', require: false
 
@@ -95,7 +97,7 @@ gem 'inherited_resources', github: 'activeadmin/inherited_resources' # required 
 gem 'activeadmin', github: 'activeadmin'
 
 gem 'factory_girl_rails'
-gem 'faker'
+gem 'ffaker'
 
 # For prompting users in scripts
 gem "highline"
