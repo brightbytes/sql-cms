@@ -1,28 +1,98 @@
-ActiveAdmin.register User do
-  permit_params :email, :password, :password_confirmation
+ActiveAdmin.register User, sort_order: "id_asc" do
+
+  menu priority: 100 # Put this at the far right of the display
+
+  scope "All", :with_deleted
+  # For some reason, this doesn't use AR.all ...
+  # scope "Undeleted Only", :all
+  # ... hence this:
+  scope "Undeleted Only", :sans_deleted, default: true
+  scope "Deleted Only", :only_deleted
+
+  filter :email
+  filter :first_name
+  filter :last_name
 
   index do
     selectable_column
     id_column
-    column :email
+    column(:full_name, sortable: :full_name) { |user| auto_link(user) }
+    column(:email, sortable: :email) { |user| mail_to user.email }
     column :current_sign_in_at
     column :sign_in_count
-    column :created_at
-    actions
+    column :deleted_at
   end
 
-  filter :email
-  filter :current_sign_in_at
-  filter :sign_in_count
-  filter :created_at
+  show title: :full_name do
+    attributes_table do
+      row :id
+      row :first_name
+      row :last_name
+      row(:email) { mail_to(user.email) }
+      # If we add Devise confirmable
+      # row(:unconfirmed_email) { mail_to(user.unconfirmed_email) }
+      # row("Enabled?") { user.enabled? ? "Yes" : "<span style='color: red'>No</span>".html_safe }
+      row :reset_password_sent_at
+      row :remember_created_at
+      row :sign_in_count
+      row :current_sign_in_at
+      row :current_sign_in_ip
+      row :last_sign_in_at
+      row :last_sign_in_ip
+
+      row :created_at
+      row :updated_at
+      row :deleted_at
+    end
+
+    active_admin_comments
+  end
+
+  permit_params :email, :first_name, :last_name, :password, :password_confirmation
 
   form do |f|
     f.inputs "Admin Details" do
+      f.input :first_name
+      f.input :last_name
       f.input :email
       f.input :password
-      f.input :password_confirmation
+      f.input :password_confirmation, required: true
     end
     f.actions
+  end
+
+  controller do
+
+    def find_resource
+      User.with_deleted.find_by(id: params[:id])
+    end
+
+    def action_methods
+      result = super
+      # Don't show the destroy button if the User is already destroyed, since a 2nd destroy will physically nuke the record
+      result -= ['destroy'] if action_name == 'show' && resource.deleted?
+      result
+    end
+
+    def update
+      user_params = params[:user]
+      if user_params[:password].blank?
+        user_params.delete(:password)
+        user_params.delete(:password_confirmation)
+      end
+      super
+    end
+
+  end
+
+  config.add_action_item :undelete, only: :show, if: proc { resource.deleted? } do
+    link_to "Undelete", undelete_user_path(resource), method: :put
+  end
+
+  member_action :undelete, method: :put do
+    resource.recover
+    flash[:notice] = "User Restored!"
+    redirect_to user_path(resource)
   end
 
 end
