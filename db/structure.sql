@@ -35,7 +35,7 @@ SET default_with_oids = false;
 
 CREATE TABLE active_admin_comments (
     id integer NOT NULL,
-    namespace character varying DEFAULT 'admin'::character varying NOT NULL,
+    namespace character varying DEFAULT 'f'::character varying NOT NULL,
     resource_id integer NOT NULL,
     resource_type character varying NOT NULL,
     author_id integer NOT NULL,
