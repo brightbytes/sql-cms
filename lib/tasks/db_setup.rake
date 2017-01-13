@@ -4,11 +4,6 @@ require "#{Rails.root}/lib/tasks/task_helper"
 
 namespace :db do
 
-  def blur_user_passwords!
-    dputs "Setting all User passwords to 'password' ..."
-    User.all.each { |u| u.update_attributes(password: 'password', password_confirmation: 'password') }
-  end
-
   include TaskHelper
 
   desc 'Drop and recreate the local, dev DB'
@@ -43,8 +38,6 @@ namespace :db do
       dputs "Loading PostgreSQL for DPL CMS Application ..."
 
       run("PGPASSWORD=#{DB_CONFIG["password"]} pg_restore -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} #{FULL_DUMP_PATH}")
-
-      blur_user_passwords! # bullet-proofing, just in case somehow this wasn't done earlier
     end
 
   end

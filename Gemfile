@@ -23,7 +23,7 @@ gem 'acts_as_paranoid' # logical delete
 # K/V store
 # gem "redis"
 
-# # Versioning
+# Versioning
 gem 'paper_trail'
 
 group :development, :test do
@@ -118,3 +118,6 @@ gem 'jquery-rails'
 gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
+
+# Stop annoying jbuilder error from appearing:
+gem 'thor', '0.19.1'

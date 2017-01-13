@@ -45,6 +45,10 @@ ActiveAdmin.register User, sort_order: "id_asc" do
       row :deleted_at
     end
 
+    panel "History" do
+      render partial: 'admin/shared/history', locals: { context: self, associated: user }
+    end
+
     active_admin_comments
   end
 
