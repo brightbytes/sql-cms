@@ -30,5 +30,6 @@ module DplCms
 
     config.autoload_paths += %w(#{config.root}/app/validators/)
 
+    config.active_job.queue_adapter = :sidekiq
   end
 end

@@ -1,0 +1,9 @@
+---
+:concurrency: 25
+:logfile: ./log/sidekiq.log
+:queues:
+  - high
+  - default
+  - low
+production:
+  pool: 25
