@@ -53,6 +53,22 @@ class ApplicationTables < ActiveRecord::Migration
     add_foreign_key :workflows, :workflows, column: :copied_from_workflow_id
 
 
+    create_table :notifications do |t|
+      t.with_options(null: false) do |tt|
+        tt.integer :user_id
+        tt.integer :workflow_id
+        tt.string :notify_on, default: :all
+        tt.timestamps
+      end
+    end
+
+    add_index :notifications, :user_id
+    add_index :notifications, [:workflow_id, :user_id], unique: true
+
+    add_foreign_key :notifications, :users
+    add_foreign_key :notifications, :workflows
+
+
     create_table :transforms do |t|
       t.with_options(null: false) do |tt|
         tt.string :name
@@ -62,6 +78,8 @@ class ApplicationTables < ActiveRecord::Migration
         tt.text :sql
         tt.timestamps
       end
+      t.text :transcompiled_source
+      t.string :transcompiled_source_language
       t.integer :data_file_id
       t.integer :copied_from_transform_id
     end
@@ -96,6 +114,8 @@ class ApplicationTables < ActiveRecord::Migration
         tt.text :sql
         tt.timestamps
       end
+      t.text :transcompiled_source
+      t.string :transcompiled_source_language
     end
 
     execute "CREATE UNIQUE INDEX index_validations_on_lowercase_name ON validations USING btree (lower(name))"
@@ -123,11 +143,16 @@ class ApplicationTables < ActiveRecord::Migration
         tt.text :sql
         tt.timestamps
       end
+      t.text :transcompiled_source
+      t.string :transcompiled_source_language
+      t.integer :copied_from_data_quality_check_id
     end
 
     add_index :data_quality_checks, :workflow_id
+    add_index :data_quality_checks, :copied_from_data_quality_check_id
 
     add_foreign_key :data_quality_checks, :workflows
+    add_foreign_key :data_quality_checks, :data_quality_checks, column: :copied_from_data_quality_check_id
 
 
     create_table :runs do |t|

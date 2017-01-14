@@ -160,7 +160,10 @@ CREATE TABLE data_quality_checks (
     sql_params jsonb DEFAULT '"{}"'::jsonb NOT NULL,
     sql text NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    transcompiled_source text,
+    transcompiled_source_language character varying,
+    copied_from_data_quality_check_id integer
 );
 
 
@@ -181,6 +184,39 @@ CREATE SEQUENCE data_quality_checks_id_seq
 --
 
 ALTER SEQUENCE data_quality_checks_id_seq OWNED BY data_quality_checks.id;
+
+
+--
+-- Name: notifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE notifications (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    workflow_id integer NOT NULL,
+    notify_on character varying DEFAULT 'all'::character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE notifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE notifications_id_seq OWNED BY notifications.id;
 
 
 --
@@ -338,6 +374,8 @@ CREATE TABLE transforms (
     sql text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
+    transcompiled_source text,
+    transcompiled_source_language character varying,
     data_file_id integer,
     copied_from_transform_id integer
 );
@@ -415,7 +453,9 @@ CREATE TABLE validations (
     immutable boolean DEFAULT false NOT NULL,
     sql text NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    transcompiled_source text,
+    transcompiled_source_language character varying
 );
 
 
@@ -540,6 +580,13 @@ ALTER TABLE ONLY data_quality_checks ALTER COLUMN id SET DEFAULT nextval('data_q
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY notifications ALTER COLUMN id SET DEFAULT nextval('notifications_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY runs ALTER COLUMN id SET DEFAULT nextval('runs_id_seq'::regclass);
 
 
@@ -637,6 +684,14 @@ ALTER TABLE ONLY data_files
 
 ALTER TABLE ONLY data_quality_checks
     ADD CONSTRAINT data_quality_checks_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY notifications
+    ADD CONSTRAINT notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -769,10 +824,31 @@ CREATE UNIQUE INDEX index_data_files_on_lowercase_name ON data_files USING btree
 
 
 --
+-- Name: index_data_quality_checks_on_copied_from_data_quality_check_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_data_quality_checks_on_copied_from_data_quality_check_id ON data_quality_checks USING btree (copied_from_data_quality_check_id);
+
+
+--
 -- Name: index_data_quality_checks_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_data_quality_checks_on_workflow_id ON data_quality_checks USING btree (workflow_id);
+
+
+--
+-- Name: index_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_notifications_on_user_id ON notifications USING btree (user_id);
+
+
+--
+-- Name: index_notifications_on_workflow_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_notifications_on_workflow_id_and_user_id ON notifications USING btree (workflow_id, user_id);
 
 
 --
@@ -970,6 +1046,14 @@ ALTER TABLE ONLY runs
 
 
 --
+-- Name: fk_rails_56d6267752; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY notifications
+    ADD CONSTRAINT fk_rails_56d6267752 FOREIGN KEY (workflow_id) REFERENCES workflows(id);
+
+
+--
 -- Name: fk_rails_666d7f2016; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1026,11 +1110,27 @@ ALTER TABLE ONLY runs
 
 
 --
+-- Name: fk_rails_b080fb4855; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY notifications
+    ADD CONSTRAINT fk_rails_b080fb4855 FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
 -- Name: fk_rails_c7401a3370; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY step_logs
     ADD CONSTRAINT fk_rails_c7401a3370 FOREIGN KEY (run_id) REFERENCES runs(id);
+
+
+--
+-- Name: fk_rails_d8aa98daf5; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY data_quality_checks
+    ADD CONSTRAINT fk_rails_d8aa98daf5 FOREIGN KEY (copied_from_data_quality_check_id) REFERENCES data_quality_checks(id);
 
 
 --
