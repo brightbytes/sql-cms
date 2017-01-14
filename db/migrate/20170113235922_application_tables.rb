@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class ApplicationTables < ActiveRecord::Migration[5.0]
+class ApplicationTables < ActiveRecord::Migration
   def change
 
     create_table :customers do |t|
@@ -11,8 +11,8 @@ class ApplicationTables < ActiveRecord::Migration[5.0]
       t.datetime :deleted_at
     end
 
-    execute "CREATE UNIQUE INDEX index_customers_on_lowercase_name ON customers USING btree (lower(name));"
-    execute "CREATE UNIQUE INDEX index_customers_on_lowercase_slug ON customers USING btree (lower(slug));"
+    execute "CREATE UNIQUE INDEX index_customers_on_lowercase_name ON customers USING btree (lower(name))"
+    execute "CREATE UNIQUE INDEX index_customers_on_lowercase_slug ON customers USING btree (lower(slug))"
 
     create_table :data_files do |t|
       t.with_options(null: false) do |tt|
@@ -29,7 +29,7 @@ class ApplicationTables < ActiveRecord::Migration[5.0]
       t.datetime :deleted_at
     end
 
-    execute "CREATE UNIQUE INDEX index_data_files_on_lowercase_name ON data_files USING btree (lower(name));"
+    execute "CREATE UNIQUE INDEX index_data_files_on_lowercase_name ON data_files USING btree (lower(name))"
     add_index :data_files, :customer_id
     add_index :data_files, :creator_id
 
@@ -46,8 +46,8 @@ class ApplicationTables < ActiveRecord::Migration[5.0]
       t.integer :copied_from_workflow_id
     end
 
-    execute "CREATE UNIQUE INDEX index_workflows_on_lowercase_name ON workflows USING btree (lower(name));"
-    execute "CREATE UNIQUE INDEX index_workflows_on_lowercase_schema_base_name ON workflows USING btree (lower(schema_base_name));"
+    execute "CREATE UNIQUE INDEX index_workflows_on_lowercase_name ON workflows USING btree (lower(name))"
+    execute "CREATE UNIQUE INDEX index_workflows_on_lowercase_schema_base_name ON workflows USING btree (lower(schema_base_name))"
     add_index :workflows, :copied_from_workflow_id
 
     add_foreign_key :workflows, :workflows, column: :copied_from_workflow_id
@@ -66,7 +66,7 @@ class ApplicationTables < ActiveRecord::Migration[5.0]
       t.integer :copied_from_transform_id
     end
 
-    execute "CREATE UNIQUE INDEX index_transforms_on_lowercase_name ON transforms USING btree (lower(name));"
+    execute "CREATE UNIQUE INDEX index_transforms_on_lowercase_name ON transforms USING btree (lower(name))"
     add_index :transforms, :workflow_id
     add_index :transforms, :data_file_id
     add_index :transforms, :copied_from_transform_id
@@ -98,7 +98,7 @@ class ApplicationTables < ActiveRecord::Migration[5.0]
       end
     end
 
-    execute "CREATE UNIQUE INDEX index_validations_on_lowercase_name ON validations USING btree (lower(name));"
+    execute "CREATE UNIQUE INDEX index_validations_on_lowercase_name ON validations USING btree (lower(name))"
 
     create_table :transform_validations do |t|
       t.with_options(null: false) do |tt|

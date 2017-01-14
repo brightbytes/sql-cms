@@ -31,7 +31,6 @@ group :development, :test do
   gem 'thin' # appserver
 
   gem 'annotate'
-  # gem 'acts_as_fu'
 
   gem 'pry-rails'
 
