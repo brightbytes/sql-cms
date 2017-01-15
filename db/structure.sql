@@ -523,6 +523,7 @@ CREATE TABLE workflows (
     name character varying NOT NULL,
     schema_base_name character varying NOT NULL,
     dbms character varying DEFAULT 'postgres'::character varying NOT NULL,
+    customer_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     copied_from_workflow_id integer
@@ -985,6 +986,13 @@ CREATE INDEX index_workflows_on_copied_from_workflow_id ON workflows USING btree
 
 
 --
+-- Name: index_workflows_on_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_workflows_on_customer_id ON workflows USING btree (customer_id);
+
+
+--
 -- Name: index_workflows_on_lowercase_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1043,6 +1051,14 @@ ALTER TABLE ONLY transforms
 
 ALTER TABLE ONLY runs
     ADD CONSTRAINT fk_rails_404232665a FOREIGN KEY (workflow_id) REFERENCES workflows(id);
+
+
+--
+-- Name: fk_rails_5040d0e343; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflows
+    ADD CONSTRAINT fk_rails_5040d0e343 FOREIGN KEY (customer_id) REFERENCES customers(id);
 
 
 --

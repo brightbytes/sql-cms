@@ -41,6 +41,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.string :name
         tt.string :schema_base_name
         tt.string :dbms, default: :postgres
+        tt.integer :customer_id
         tt.timestamps
       end
       t.integer :copied_from_workflow_id
@@ -48,9 +49,11 @@ class ApplicationTables < ActiveRecord::Migration
 
     execute "CREATE UNIQUE INDEX index_workflows_on_lowercase_name ON workflows USING btree (lower(name))"
     execute "CREATE UNIQUE INDEX index_workflows_on_lowercase_schema_base_name ON workflows USING btree (lower(schema_base_name))"
+    add_index :workflows, :customer_id
     add_index :workflows, :copied_from_workflow_id
 
     add_foreign_key :workflows, :workflows, column: :copied_from_workflow_id
+    add_foreign_key :workflows, :customers
 
 
     create_table :notifications do |t|
