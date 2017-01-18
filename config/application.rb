@@ -29,6 +29,7 @@ module DplCms
     config.active_record.schema_format = :sql
 
     config.autoload_paths += %w(#{config.root}/app/validators/)
+    config.autoload_paths += %w(#{config.root}/app/factories/)
 
     config.active_job.queue_adapter = :sidekiq
   end

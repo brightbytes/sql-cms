@@ -54,12 +54,11 @@ end
 group :test do
   gem 'acts_as_fu' # active record tests
 
-  # CI is puking all over the place on a later version of this, so we're downgrading.
-  gem 'simplecov' #, '~> 0.7.1', require: false
+  gem 'simplecov'
 
-  gem 'rspec'#, '~> 2.14'
-  gem 'rspec-rails'#, '~> 2.14'
-  gem 'rspec-mocks'#, '~> 2.14'
+  gem 'rspec'
+  gem 'rspec-rails'
+  gem 'rspec-mocks'
   gem 'shoulda'
 
   gem 'database_cleaner'
@@ -115,8 +114,8 @@ gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails'
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem 'turbolinks', '~> 5'
+
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
-
-# Stop annoying jbuilder error from appearing:
+# Pin thor to stop an annoying jbuilder error from appearing:
 gem 'thor', '0.19.1'
