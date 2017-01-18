@@ -9,8 +9,11 @@
 #  updated_at :datetime         not null
 #  deleted_at :datetime
 #
-
-
+# Indexes
+#
+#  index_customers_on_lowercase_name  (lower((name)::text)) UNIQUE
+#  index_customers_on_lowercase_slug  (lower((slug)::text)) UNIQUE
+#
 
 class Customer < ActiveRecord::Base
 

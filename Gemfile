@@ -30,7 +30,7 @@ group :development, :test do
 
   gem 'thin' # appserver
 
-  gem 'annotate'
+  gem 'annotate' # , github: 'ctran/annotate_models', ref: "d108ba8bdec760ded4c8c786b1d7cc72cadba4df"
 
   gem 'pry-rails'
 
