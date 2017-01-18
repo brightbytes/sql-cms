@@ -1,13 +1,3 @@
-
-FactoryGirl.define do
-
-  factory :customer do
-    sequence(:name) { FFaker::Name.name }
-    # slug will be auto-set
-  end
-
-end
-
 # == Schema Information
 #
 # Table name: customers
@@ -24,3 +14,12 @@ end
 #  index_customers_on_lowercase_name  (lower((name)::text)) UNIQUE
 #  index_customers_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
+
+FactoryGirl.define do
+
+  factory :customer do
+    sequence(:name) { FFaker::Name.name }
+    # slug will be auto-set
+  end
+
+end

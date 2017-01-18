@@ -46,6 +46,13 @@ class User < ApplicationRecord
 
   scope :sans_deleted, -> { where(deleted_at: nil) }
 
+  # Associations
+
+  with_options(foreign_key: :creator_id, inverse_of: :creator) do |o|
+    o.has_many :data_files
+    # o.has_many :runs
+  end
+
   # Instance Methods
 
   def full_name

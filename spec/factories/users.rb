@@ -27,12 +27,10 @@
 
 FactoryGirl.define do
 
-  sequence(:email) { FFaker::Internet.email }
-
   factory :user do
     sequence(:first_name) { FFaker::Name.first_name }
     sequence(:last_name) { FFaker::Name.last_name }
-    email
+    sequence(:email) { FFaker::Internet.email }
     sequence(:password) { |n| "password#{n}" }
   end
 

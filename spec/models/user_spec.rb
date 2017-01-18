@@ -59,6 +59,11 @@ describe User do
 
   end
 
+  describe "associations" do
+    it { should have_many(:data_files) }
+    # it { should have_many(:runs) }
+  end
+
   describe "instance methods" do
 
     it "should have a #full_name method that concats the first and last names" do

@@ -42,7 +42,7 @@ class Customer < ActiveRecord::Base
   # Associations
 
   # has_many :workflows, inverse_of: :customer
-  # has_many :data_files, inverse_of: :customer
+  has_many :data_files, inverse_of: :customer
 
   # Scopes
 
