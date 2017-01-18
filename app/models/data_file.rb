@@ -27,6 +27,11 @@
 #  fk_rails_...  (customer_id => customers.id)
 #
 
+# NOTE - We will use PaperClip differently here than in the `pipeline` repo.  Here, we will build a browser for files already on S3, using this example:
+#          https://www.topdan.com/ruby-on-rails/aws-s3-browser.html
+#        Then, we will associate the PaperClip class with the selected already-existing file on S3, using this example:
+#          http://stackoverflow.com/questions/3961107/using-paperclip-with-files-already-on-amazon-s3
+#        ... though the browser isn't necessary if a queued message arrives with the relevant data.
 class DataFile < ActiveRecord::Base
 
   acts_as_paranoid
