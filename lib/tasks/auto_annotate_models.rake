@@ -6,6 +6,8 @@ if Rails.env.development?
     # You can override any of these by setting an environment variable of the
     # same name.
     Annotate.set_defaults(
+      # We set this to false while using the latest `annotate` master because route annotation crashes
+      # (We need the latest master so that model annotation works on custom indexes, rather than skipping annotation of the whole file when a custom index is present)
       'routes'                  => 'false',
       'position_in_routes'      => 'after',
       'position_in_class'       => 'before',
