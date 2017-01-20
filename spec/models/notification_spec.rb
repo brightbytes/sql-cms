@@ -44,6 +44,6 @@ describe Notification do
 
   describe 'instance methods' do
 
-
   end
+
 end

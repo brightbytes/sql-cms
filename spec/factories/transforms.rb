@@ -38,4 +38,9 @@ FactoryGirl.define do
     association :workflow
   end
 
+  factory :transform_dependency do
+    association :prerequisite_transform, factory: :transform
+    association :postrequisite_transform, factory: :transform
+  end
+
 end
