@@ -59,6 +59,9 @@ class Transform < ActiveRecord::Base
 
   belongs_to :data_file, inverse_of: :transforms
 
+  belongs_to :copied_from_transform, class_name: 'Transform', inverse_of: :copied_to_transforms
+  has_many :copied_to_transforms, class_name: 'Transform', foreign_key: :copied_from_transform_id, inverse_of: :copied_from_transform
+
   # has_many :transform_validations, inverse_of: :transform, dependent: :destroy
   # has_many :validations, through: :transform_validations
 
