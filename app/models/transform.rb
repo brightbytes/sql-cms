@@ -31,6 +31,8 @@
 
 class Transform < ActiveRecord::Base
 
+  include Concerns::SqlParamsInterpolator
+
   auto_normalize
 
   # Validations
@@ -68,7 +70,13 @@ class Transform < ActiveRecord::Base
 
   # Instance Methods
 
-  # FIXME - MOVE TO SERVICE LAYER
+  # FIXME - MOVE TO SERVICE LAYER AS Runner, WITH strategy classes
+  #
+  # From PipelineTransform
+  # def run(run)
+  #   run.with_run_status_tracking(self) { transform.send(:run, run: run, pipeline_transform: self) } &&
+  #     Run.all_succeeded?(transform_validations.map { |transform_validation| transform_validation.run(run) })
+  # end
   # This is private because Transforms should always be invoked through PipelineTransform#run (which delegates to this) since it adds run status tracking
   # private def run(run:, pipeline_transform:)
   #   # This default implementation works for everything except CopyFrom and CopyTo, which both require interaction with an IO object
