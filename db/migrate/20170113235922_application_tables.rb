@@ -71,7 +71,7 @@ class ApplicationTables < ActiveRecord::Migration
     create_table :transforms do |t|
       t.with_options(null: false) do |tt|
         tt.string :name
-        tt.string :transform_type
+        tt.string :runner
         tt.integer :workflow_id
         tt.jsonb :sql_params, default: '{}'
         tt.text :sql

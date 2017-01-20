@@ -31,16 +31,11 @@
 
 FactoryGirl.define do
 
-  # This isn't intended to be instantiated.
   factory :transform do
     sequence(:name) { |n| "Transform #{n}" }
+    runner 'CopyFrom'
+    sequence(:sql)  { |n| "COPY tmp_#{n} (id, stringy) FROM STDIN WITH CSV HEADER" }
     association :workflow
   end
-
-  # factory :copy_from_transform, parent: :transform, class: 'Transform::CopyFrom' do
-  #   transform_type 'Transform::CopyFrom'
-  #   sequence(:sql)  { |n| "COPY tmp_#{n} (id, stringy) FROM STDIN WITH CSV HEADER" }
-  # end
-
 
 end

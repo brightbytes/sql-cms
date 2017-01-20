@@ -4,7 +4,7 @@
 #
 #  id                            :integer          not null, primary key
 #  name                          :string           not null
-#  transform_type                :string           not null
+#  runner                        :string           not null
 #  workflow_id                   :integer          not null
 #  sql_params                    :jsonb            not null
 #  sql                           :text             not null
@@ -36,15 +36,16 @@ describe Transform do
   end
 
   describe "validations" do
-    [:name, :transform_type, :sql, :workflow].each do |att|
+    [:name, :runner, :sql, :workflow].each do |att|
       it { should validate_presence_of(att) }
     end
 
-    # context "with a transform already extant" do
-    #   let!(:subject) { create(:copy_from_transform) }
-    #   it { should validate_uniqueness_of(:name).case_insensitive }
-    #   it { should validate_uniqueness_of(:data_file).scoped_to(:workflow_id) }
-    # end
+    context "with a transform already extant" do
+      let!(:subject) { create(:transform) }
+      it { should validate_uniqueness_of(:name).case_insensitive }
+      # Doesn't work
+      # it { should validate_uniqueness_of(:data_file).scoped_to(:workflow_id).allow_nil }
+    end
 
   end
 

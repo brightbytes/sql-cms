@@ -15,8 +15,8 @@
 #
 # Foreign Keys
 #
-#  fk_rails_56d6267752  (workflow_id => workflows.id)
-#  fk_rails_b080fb4855  (user_id => users.id)
+#  fk_rails_...  (user_id => users.id)
+#  fk_rails_...  (workflow_id => workflows.id)
 #
 
 class Notification < ActiveRecord::Base

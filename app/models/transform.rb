@@ -4,7 +4,7 @@
 #
 #  id                            :integer          not null, primary key
 #  name                          :string           not null
-#  transform_type                :string           not null
+#  runner                        :string           not null
 #  workflow_id                   :integer          not null
 #  sql_params                    :jsonb            not null
 #  sql                           :text             not null
@@ -31,13 +31,11 @@
 
 class Transform < ActiveRecord::Base
 
-  # self.inheritance_column = :transform_type
-
   auto_normalize
 
   # Validations
 
-  validates :transform_type, :sql, :workflow, presence: true
+  validates :runner, :sql, :workflow, presence: true
 
   validates :data_file, uniqueness: { scope: :workflow_id }, allow_nil: true
 
