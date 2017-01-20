@@ -57,7 +57,6 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.integer :user_id
         tt.integer :workflow_id
-        tt.string :notify_on, default: :all
         tt.timestamps
       end
     end

@@ -54,6 +54,9 @@ class Workflow < ActiveRecord::Base
   belongs_to :copied_from_workflow, class_name: 'Workflow', inverse_of: :copied_to_workflows
   has_many :copied_to_workflows, class_name: 'Workflow', foreign_key: :copied_from_workflow_id, inverse_of: :copied_from_workflow
 
+  has_many :notifications, inverse_of: :workflow
+  has_many :notified_users, through: :notifications, source: :user
+
   # has_many :transforms, inverse_of: :workflow
 
   # has_many :data_quality_checks, inverse_of: :workflow

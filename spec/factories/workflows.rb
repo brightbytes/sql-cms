@@ -24,7 +24,6 @@
 #  fk_rails_...  (customer_id => customers.id)
 #
 FactoryGirl.define do
-
   factory :workflow do
     sequence(:name) { |n| "Workflow #{n}" }
     sequence(:schema_base_name) { |n| "workflow_#{n}" }
