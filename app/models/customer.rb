@@ -17,6 +17,8 @@
 
 class Customer < ActiveRecord::Base
 
+  include Concerns::SqlHelpers
+
   acts_as_paranoid
 
   auto_normalize
@@ -41,8 +43,9 @@ class Customer < ActiveRecord::Base
 
   # Associations
 
-  # has_many :workflows, inverse_of: :customer
   has_many :data_files, inverse_of: :customer
+
+  has_many :workflows, inverse_of: :customer
 
   # Scopes
 
@@ -59,7 +62,7 @@ class Customer < ActiveRecord::Base
   # Instance Methods
 
   def slug=(val)
-    super(val.presence && val.downcase.gsub(/[^a-z0-9]+/, '_'))
+    super(to_sql_identifier(val))
   end
 
   def to_s

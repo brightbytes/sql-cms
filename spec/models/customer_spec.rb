@@ -28,23 +28,15 @@ describe Customer do
       it { should validate_uniqueness_of(:slug).case_insensitive }
     end
 
-    context "slug validation" do
-      it "shouldn't allow updating once set" do
-        subject.slug = "foobar"
-        expect(subject).to_not be_valid
-        expect(subject.errors[:slug]).to_not be_nil
-      end
-
-      it "shouldn't allow an illegal identifier" do
-        customer = build(:customer, slug: "0foo") # a leading number is all we can sneak past coercion
-        expect(customer).to_not be_valid
-        expect(customer.errors[:slug]).to_not be_nil
-      end
+    it "shouldn't allow slug updating once set" do
+      subject.slug = "foobar"
+      expect(subject).to_not be_valid
+      expect(subject.errors[:slug]).to_not be_nil
     end
   end
 
   describe "associations" do
-    # it { should have_many(:workflows) }
+    it { should have_many(:workflows) }
     it { should have_many(:data_files) }
   end
 
@@ -59,7 +51,7 @@ describe Customer do
   describe "instance methods" do
     it "should coerce invalid slugs to valid slugs on set" do
       customer = build(:customer, slug: "0foo 1$BAR_")
-      expect(customer.slug).to eq("0foo_1_bar_")
+      expect(customer.slug).to eq("_foo_1_bar_")
       customer = build(:customer, slug: "foo 123 %@#_")
       expect(customer.slug).to eq("foo_123_")
     end

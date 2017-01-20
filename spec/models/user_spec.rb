@@ -60,7 +60,6 @@ describe User do
   end
 
   describe "associations" do
-    it { should have_many(:data_files) }
     # it { should have_many(:runs) }
   end
 

@@ -19,7 +19,6 @@ class ApplicationTables < ActiveRecord::Migration
         tt.string :name
         tt.jsonb :metadata, default: '{}'
         tt.integer :customer_id
-        tt.integer :creator_id
         tt.string :upload_file_name
         tt.string :upload_content_type
         tt.integer :upload_file_size
@@ -31,10 +30,8 @@ class ApplicationTables < ActiveRecord::Migration
 
     execute "CREATE UNIQUE INDEX index_data_files_on_lowercase_name ON data_files USING btree (lower(name))"
     add_index :data_files, :customer_id
-    add_index :data_files, :creator_id
 
     add_foreign_key :data_files, :customers
-    add_foreign_key :data_files, :users, column: :creator_id
 
     create_table :workflows do |t|
       t.with_options(null: false) do |tt|

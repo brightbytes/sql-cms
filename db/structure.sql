@@ -119,7 +119,6 @@ CREATE TABLE data_files (
     name character varying NOT NULL,
     metadata jsonb DEFAULT '"{}"'::jsonb NOT NULL,
     customer_id integer NOT NULL,
-    creator_id integer NOT NULL,
     upload_file_name character varying NOT NULL,
     upload_content_type character varying NOT NULL,
     upload_file_size integer NOT NULL,
@@ -804,13 +803,6 @@ CREATE UNIQUE INDEX index_customers_on_lowercase_slug ON customers USING btree (
 
 
 --
--- Name: index_data_files_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_data_files_on_creator_id ON data_files USING btree (creator_id);
-
-
---
 -- Name: index_data_files_on_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1107,14 +1099,6 @@ ALTER TABLE ONLY versions
 
 ALTER TABLE ONLY data_files
     ADD CONSTRAINT fk_rails_98b72d517e FOREIGN KEY (customer_id) REFERENCES customers(id);
-
-
---
--- Name: fk_rails_a1709200fa; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY data_files
-    ADD CONSTRAINT fk_rails_a1709200fa FOREIGN KEY (creator_id) REFERENCES users(id);
 
 
 --

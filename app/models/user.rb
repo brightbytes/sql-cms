@@ -48,10 +48,7 @@ class User < ApplicationRecord
 
   # Associations
 
-  with_options(foreign_key: :creator_id, inverse_of: :creator) do |o|
-    o.has_many :data_files
-    # o.has_many :runs
-  end
+  # o.has_many :runs, foreign_key: :creator_id, inverse_of: :creator
 
   # Instance Methods
 

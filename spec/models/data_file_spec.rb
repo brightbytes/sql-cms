@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 # == Schema Information
 #
-# Table name: public.data_files
+# Table name: data_files
 #
 #  id                  :integer          not null, primary key
 #  name                :string           not null
 #  metadata            :jsonb            not null
-#  creator_id          :integer          not null
+#  customer_id         :integer          not null
 #  upload_file_name    :string           not null
 #  upload_content_type :string           not null
 #  upload_file_size    :integer          not null
@@ -17,11 +17,12 @@
 #
 # Indexes
 #
-#  index_data_files_on_creator_id  (creator_id)
+#  index_data_files_on_customer_id     (customer_id)
+#  index_data_files_on_lowercase_name  (lower((name)::text)) UNIQUE
 #
 # Foreign Keys
 #
-#  fk_rails_a1709200fa  (creator_id => users.id)
+#  fk_rails_...  (customer_id => customers.id)
 #
 describe DataFile do
 
@@ -30,7 +31,7 @@ describe DataFile do
   end
 
   describe "validations" do
-    [:name, :creator].each do |att|
+    [:name, :customer].each do |att|
       it { should validate_presence_of(att) }
     end
 
@@ -105,7 +106,6 @@ describe DataFile do
 
   describe "associations" do
     it { should belong_to(:customer) }
-    it { should belong_to(:creator) }
     # it { should have_many(:transforms) }
     # it { should have_many(:workflows) }
   end

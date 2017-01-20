@@ -6,7 +6,6 @@
 #  name                :string           not null
 #  metadata            :jsonb            not null
 #  customer_id         :integer          not null
-#  creator_id          :integer          not null
 #  upload_file_name    :string           not null
 #  upload_content_type :string           not null
 #  upload_file_size    :integer          not null
@@ -17,13 +16,11 @@
 #
 # Indexes
 #
-#  index_data_files_on_creator_id      (creator_id)
 #  index_data_files_on_customer_id     (customer_id)
 #  index_data_files_on_lowercase_name  (lower((name)::text)) UNIQUE
 #
 # Foreign Keys
 #
-#  fk_rails_...  (creator_id => users.id)
 #  fk_rails_...  (customer_id => customers.id)
 #
 
@@ -47,7 +44,7 @@ class DataFile < ActiveRecord::Base
 
   # Validations
 
-  validates :creator, presence: true
+  validates :customer, presence: true
 
   validate :metadata_not_null
 
@@ -75,8 +72,6 @@ class DataFile < ActiveRecord::Base
   # Associations
 
   belongs_to :customer, inverse_of: :data_files
-
-  belongs_to :creator, class_name: 'User', inverse_of: :data_files
 
   # has_many :transforms, inverse_of: :data_file
   # has_many :workflows, through: :transforms
