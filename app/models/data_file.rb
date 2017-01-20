@@ -73,8 +73,8 @@ class DataFile < ActiveRecord::Base
 
   belongs_to :customer, inverse_of: :data_files
 
-  # has_many :transforms, inverse_of: :data_file
-  # has_many :workflows, through: :transforms
+  has_many :transforms, inverse_of: :data_file
+  has_many :workflows, through: :transforms
 
   # Instance Methods
 

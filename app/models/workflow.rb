@@ -57,7 +57,7 @@ class Workflow < ActiveRecord::Base
   has_many :notifications, inverse_of: :workflow
   has_many :notified_users, through: :notifications, source: :user
 
-  # has_many :transforms, inverse_of: :workflow
+  has_many :transforms, inverse_of: :workflow
 
   # has_many :data_quality_checks, inverse_of: :workflow
 

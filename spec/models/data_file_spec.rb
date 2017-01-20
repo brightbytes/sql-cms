@@ -106,7 +106,7 @@ describe DataFile do
 
   describe "associations" do
     it { should belong_to(:customer) }
-    # it { should have_many(:transforms) }
-    # it { should have_many(:workflows) }
+    it { should have_many(:transforms) }
+    it { should have_many(:workflows) }
   end
 end

@@ -84,7 +84,7 @@ class ApplicationTables < ActiveRecord::Migration
     end
 
     execute "CREATE UNIQUE INDEX index_transforms_on_lowercase_name ON transforms USING btree (lower(name))"
-    add_index :transforms, :workflow_id
+    add_index :transforms, [:workflow_id, :data_file_id], unique: true
     add_index :transforms, :data_file_id
     add_index :transforms, :copied_from_transform_id
 

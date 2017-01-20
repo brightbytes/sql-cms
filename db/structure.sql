@@ -921,10 +921,10 @@ CREATE UNIQUE INDEX index_transforms_on_lowercase_name ON transforms USING btree
 
 
 --
--- Name: index_transforms_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_transforms_on_workflow_id_and_data_file_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_transforms_on_workflow_id ON transforms USING btree (workflow_id);
+CREATE UNIQUE INDEX index_transforms_on_workflow_id_and_data_file_id ON transforms USING btree (workflow_id, data_file_id);
 
 
 --
