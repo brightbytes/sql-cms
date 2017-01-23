@@ -68,8 +68,8 @@ class Transform < ActiveRecord::Base
   has_many :postrequisite_dependencies, class_name: 'TransformDependency', foreign_key: :prerequisite_transform_id
   has_many :postrequisite_transforms, through: :postrequisite_dependencies, source: :postrequisite_transform
 
-  # has_many :transform_validations, inverse_of: :transform, dependent: :destroy
-  # has_many :validations, through: :transform_validations
+  has_many :transform_validations, inverse_of: :transform, dependent: :destroy
+  has_many :validations, through: :transform_validations
 
   # Instance Methods
 

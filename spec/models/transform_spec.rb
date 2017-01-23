@@ -56,14 +56,16 @@ describe Transform do
   describe "associations" do
     it { should belong_to(:workflow) }
     it { should belong_to(:data_file) }
+
     it { should belong_to(:copied_from_transform) }
     it { should have_many(:copied_to_transforms) }
+
     it { should have_many(:prerequisite_dependencies) }
     it { should have_many(:prerequisite_transforms) }
     it { should have_many(:postrequisite_dependencies) }
     it { should have_many(:postrequisite_transforms) }
 
-    # it { should have_many(:transform_validations) }
-    # it { should have_many(:validations) }
+    it { should have_many(:transform_validations) }
+    it { should have_many(:validations) }
   end
 end
