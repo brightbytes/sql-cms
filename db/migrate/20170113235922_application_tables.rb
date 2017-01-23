@@ -134,7 +134,7 @@ class ApplicationTables < ActiveRecord::Migration
     add_foreign_key :transform_validations, :transforms
     add_foreign_key :transform_validations, :validations
 
-    create_table :data_quality_checks do |t|
+    create_table :data_quality_reports do |t|
       t.with_options(null: false) do |tt|
         tt.integer :workflow_id
         tt.string :name
@@ -144,14 +144,14 @@ class ApplicationTables < ActiveRecord::Migration
       end
       t.text :transcompiled_source
       t.string :transcompiled_source_language
-      t.integer :copied_from_data_quality_check_id
+      t.integer :copied_from_data_quality_report_id
     end
 
-    add_index :data_quality_checks, :workflow_id
-    add_index :data_quality_checks, :copied_from_data_quality_check_id
+    add_index :data_quality_reports, :workflow_id
+    add_index :data_quality_reports, :copied_from_data_quality_report_id, name: :idx_data_quality_reports_on_copied_from_data_quality_report_id
 
-    add_foreign_key :data_quality_checks, :workflows
-    add_foreign_key :data_quality_checks, :data_quality_checks, column: :copied_from_data_quality_check_id
+    add_foreign_key :data_quality_reports, :workflows
+    add_foreign_key :data_quality_reports, :data_quality_reports, column: :copied_from_data_quality_report_id
 
 
     create_table :runs do |t|

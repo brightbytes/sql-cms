@@ -1,2 +1,5 @@
 PaperTrail.enabled = false
-User.seed
+
+UserSeeder.seed
+CustomerSeeder.seed
+ValidationSeeder.seed

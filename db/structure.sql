@@ -149,10 +149,10 @@ ALTER SEQUENCE data_files_id_seq OWNED BY data_files.id;
 
 
 --
--- Name: data_quality_checks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: data_quality_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE data_quality_checks (
+CREATE TABLE data_quality_reports (
     id integer NOT NULL,
     workflow_id integer NOT NULL,
     name character varying NOT NULL,
@@ -162,15 +162,15 @@ CREATE TABLE data_quality_checks (
     updated_at timestamp without time zone NOT NULL,
     transcompiled_source text,
     transcompiled_source_language character varying,
-    copied_from_data_quality_check_id integer
+    copied_from_data_quality_report_id integer
 );
 
 
 --
--- Name: data_quality_checks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: data_quality_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE data_quality_checks_id_seq
+CREATE SEQUENCE data_quality_reports_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -179,10 +179,10 @@ CREATE SEQUENCE data_quality_checks_id_seq
 
 
 --
--- Name: data_quality_checks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: data_quality_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE data_quality_checks_id_seq OWNED BY data_quality_checks.id;
+ALTER SEQUENCE data_quality_reports_id_seq OWNED BY data_quality_reports.id;
 
 
 --
@@ -572,7 +572,7 @@ ALTER TABLE ONLY data_files ALTER COLUMN id SET DEFAULT nextval('data_files_id_s
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY data_quality_checks ALTER COLUMN id SET DEFAULT nextval('data_quality_checks_id_seq'::regclass);
+ALTER TABLE ONLY data_quality_reports ALTER COLUMN id SET DEFAULT nextval('data_quality_reports_id_seq'::regclass);
 
 
 --
@@ -678,11 +678,11 @@ ALTER TABLE ONLY data_files
 
 
 --
--- Name: data_quality_checks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: data_quality_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY data_quality_checks
-    ADD CONSTRAINT data_quality_checks_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY data_quality_reports
+    ADD CONSTRAINT data_quality_reports_pkey PRIMARY KEY (id);
 
 
 --
@@ -774,6 +774,13 @@ ALTER TABLE ONLY workflows
 
 
 --
+-- Name: idx_data_quality_reports_on_copied_from_data_quality_report_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX idx_data_quality_reports_on_copied_from_data_quality_report_id ON data_quality_reports USING btree (copied_from_data_quality_report_id);
+
+
+--
 -- Name: index_active_admin_comments_on_author_id_and_author_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -816,17 +823,10 @@ CREATE UNIQUE INDEX index_data_files_on_lowercase_name ON data_files USING btree
 
 
 --
--- Name: index_data_quality_checks_on_copied_from_data_quality_check_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_data_quality_reports_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_data_quality_checks_on_copied_from_data_quality_check_id ON data_quality_checks USING btree (copied_from_data_quality_check_id);
-
-
---
--- Name: index_data_quality_checks_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_data_quality_checks_on_workflow_id ON data_quality_checks USING btree (workflow_id);
+CREATE INDEX index_data_quality_reports_on_workflow_id ON data_quality_reports USING btree (workflow_id);
 
 
 --
@@ -1021,14 +1021,6 @@ ALTER TABLE ONLY workflows
 
 
 --
--- Name: fk_rails_3b8c3a799b; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY data_quality_checks
-    ADD CONSTRAINT fk_rails_3b8c3a799b FOREIGN KEY (workflow_id) REFERENCES workflows(id);
-
-
---
 -- Name: fk_rails_3f13522448; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1042,6 +1034,14 @@ ALTER TABLE ONLY transforms
 
 ALTER TABLE ONLY runs
     ADD CONSTRAINT fk_rails_404232665a FOREIGN KEY (workflow_id) REFERENCES workflows(id);
+
+
+--
+-- Name: fk_rails_4ec34a7d94; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY data_quality_reports
+    ADD CONSTRAINT fk_rails_4ec34a7d94 FOREIGN KEY (copied_from_data_quality_report_id) REFERENCES data_quality_reports(id);
 
 
 --
@@ -1109,6 +1109,14 @@ ALTER TABLE ONLY runs
 
 
 --
+-- Name: fk_rails_ae1a0fa57c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY data_quality_reports
+    ADD CONSTRAINT fk_rails_ae1a0fa57c FOREIGN KEY (workflow_id) REFERENCES workflows(id);
+
+
+--
 -- Name: fk_rails_b080fb4855; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1122,14 +1130,6 @@ ALTER TABLE ONLY notifications
 
 ALTER TABLE ONLY step_logs
     ADD CONSTRAINT fk_rails_c7401a3370 FOREIGN KEY (run_id) REFERENCES runs(id);
-
-
---
--- Name: fk_rails_d8aa98daf5; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY data_quality_checks
-    ADD CONSTRAINT fk_rails_d8aa98daf5 FOREIGN KEY (copied_from_data_quality_check_id) REFERENCES data_quality_checks(id);
 
 
 --

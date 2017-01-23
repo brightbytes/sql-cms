@@ -42,7 +42,7 @@ describe Validation do
     end
 
     it "should prevent bulk-updates" do
-      expect { Validation.delete_all }.to raise_error("You may not bypass callbacks delete all the Validation that exist, since some may be inviolate.")
+      expect { Validation.delete_all }.to raise_error("You may not bypass callbacks to delete all the Validation that exist, since some may be inviolate.")
       expect { Validation.update_all(sql: "/* Blah */") }.to raise_error("You may not bypass callbacks to update all the Validation that exist, since some may be inviolate.")
     end
   end

@@ -57,20 +57,4 @@ module ValidationSeeder
     )
   end
 
-  # These don't fit the pattern ^^ ... so they need to be Data Quality Checks.
-
-  # def conditional_presence
-  #   Validation.where(name: 'Conditional Presence').first_or_create!(
-  #     immutable: true,
-  #     sql: 'SELECT 1 FROM NULLIF((SELECT COUNT(1) FROM :table_name WHERE :column_name :where), 0) table_empty WHERE table_empty IS NULL'
-  #   )
-  # end
-
-  # def not_empty_table
-  #   Validation.where(name: 'Table not empty').first_or_create!(
-  #     immutable: true,
-  #     sql: "SELECT TRUE AS :table_name_is_empty FROM NULLIF((SELECT count(1) FROM :table_name), 0) table_empty WHERE table_empty IS NULL"
-  #   )
-  # end
-
 end
