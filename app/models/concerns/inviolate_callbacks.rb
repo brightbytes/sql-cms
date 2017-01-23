@@ -27,7 +27,7 @@ module Concerns::InviolateCallbacks
               raise("You may not bypass callbacks to delete a #{self}.")
             end
             def delete_all
-              raise("You may not bypass callbacks delete all the #{self} that exist, since some may be inviolate.")
+              raise("You may not bypass callbacks to delete all the #{self} that exist, since some may be inviolate.")
             end
           ]
         end

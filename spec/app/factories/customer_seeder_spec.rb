@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 describe CustomerSeeder do
 
   describe "#seed" do
