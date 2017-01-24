@@ -34,7 +34,7 @@ describe Run do
   end
 
   describe "associations" do
-    # it { should have_many(:step_logs) }
+    it { should have_many(:run_step_logs) }
     it { should belong_to(:creator) }
     it { should belong_to(:workflow) }
     it { should have_many(:transforms) }

@@ -172,22 +172,22 @@ class ApplicationTables < ActiveRecord::Migration
     add_foreign_key :runs, :workflows
     add_foreign_key :runs, :users, column: :creator_id
 
-    create_table :transform_run_log do |t|
+    create_table :run_step_logs do |t|
       t.with_options(null: false) do |tt|
         tt.integer :run_id
         tt.integer :step_id
         tt.string :step_type
         tt.string :step_name # Denormalization to ease debugging
         tt.boolean :completed_successfully, default: false
-        tt.jsonb :errors, default: '{}'
+        tt.jsonb :step_errors, default: '{}'
         tt.timestamps
       end
     end
 
-    add_index :transform_run_log, [:run_id, :step_id, :step_type], unique: true
-    add_index :transform_run_log, [:step_id, :step_type]
+    add_index :run_step_logs, [:run_id, :step_id, :step_type], unique: true
+    add_index :run_step_logs, [:step_id, :step_type]
 
-    add_foreign_key :transform_run_log, :runs
+    add_foreign_key :run_step_logs, :runs
 
   end
 end

@@ -46,7 +46,7 @@ class Run < ActiveRecord::Base
 
   # Associations
 
-  # has_many :step_logs, inverse_of: :run, dependent: :delete_all
+  has_many :run_step_logs, inverse_of: :run, dependent: :delete_all
 
   belongs_to :creator, class_name: 'User', inverse_of: :runs
 

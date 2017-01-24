@@ -6,9 +6,9 @@ FactoryGirl.define do
     execution_plan { { bogus: :plan } }
   end
 
-  factory :step_log do
+  factory :run_step_log do
     association :run
-    step { create(:pipeline_transform, pipeline: run.pipeline) }
+    step { create(:transform, workflow: run.workflow) }
   end
 
 

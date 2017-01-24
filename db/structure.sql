@@ -218,6 +218,42 @@ ALTER SEQUENCE notifications_id_seq OWNED BY notifications.id;
 
 
 --
+-- Name: run_step_logs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE run_step_logs (
+    id integer NOT NULL,
+    run_id integer NOT NULL,
+    step_id integer NOT NULL,
+    step_type character varying NOT NULL,
+    step_name character varying NOT NULL,
+    completed_successfully boolean DEFAULT false NOT NULL,
+    step_errors jsonb DEFAULT '"{}"'::jsonb NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: run_step_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE run_step_logs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: run_step_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE run_step_logs_id_seq OWNED BY run_step_logs.id;
+
+
+--
 -- Name: runs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -289,42 +325,6 @@ CREATE SEQUENCE transform_dependencies_id_seq
 --
 
 ALTER SEQUENCE transform_dependencies_id_seq OWNED BY transform_dependencies.id;
-
-
---
--- Name: transform_run_log; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE transform_run_log (
-    id integer NOT NULL,
-    run_id integer NOT NULL,
-    step_id integer NOT NULL,
-    step_type character varying NOT NULL,
-    step_name character varying NOT NULL,
-    completed_successfully boolean DEFAULT false NOT NULL,
-    errors jsonb DEFAULT '"{}"'::jsonb NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: transform_run_log_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE transform_run_log_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: transform_run_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE transform_run_log_id_seq OWNED BY transform_run_log.id;
 
 
 --
@@ -587,6 +587,13 @@ ALTER TABLE ONLY notifications ALTER COLUMN id SET DEFAULT nextval('notification
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY run_step_logs ALTER COLUMN id SET DEFAULT nextval('run_step_logs_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY runs ALTER COLUMN id SET DEFAULT nextval('runs_id_seq'::regclass);
 
 
@@ -595,13 +602,6 @@ ALTER TABLE ONLY runs ALTER COLUMN id SET DEFAULT nextval('runs_id_seq'::regclas
 --
 
 ALTER TABLE ONLY transform_dependencies ALTER COLUMN id SET DEFAULT nextval('transform_dependencies_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY transform_run_log ALTER COLUMN id SET DEFAULT nextval('transform_run_log_id_seq'::regclass);
 
 
 --
@@ -695,6 +695,14 @@ ALTER TABLE ONLY notifications
 
 
 --
+-- Name: run_step_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY run_step_logs
+    ADD CONSTRAINT run_step_logs_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: runs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -716,14 +724,6 @@ ALTER TABLE ONLY schema_migrations
 
 ALTER TABLE ONLY transform_dependencies
     ADD CONSTRAINT transform_dependencies_pkey PRIMARY KEY (id);
-
-
---
--- Name: transform_run_log_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY transform_run_log
-    ADD CONSTRAINT transform_run_log_pkey PRIMARY KEY (id);
 
 
 --
@@ -852,6 +852,20 @@ CREATE UNIQUE INDEX index_notifications_on_workflow_id_and_user_id ON notificati
 
 
 --
+-- Name: index_run_step_logs_on_run_id_and_step_id_and_step_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_run_step_logs_on_run_id_and_step_id_and_step_type ON run_step_logs USING btree (run_id, step_id, step_type);
+
+
+--
+-- Name: index_run_step_logs_on_step_id_and_step_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_run_step_logs_on_step_id_and_step_type ON run_step_logs USING btree (step_id, step_type);
+
+
+--
 -- Name: index_runs_on_creator_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -877,20 +891,6 @@ CREATE INDEX index_transform_dependencies_on_prerequisite_transform_id ON transf
 --
 
 CREATE UNIQUE INDEX index_transform_dependencies_on_unique_transform_ids ON transform_dependencies USING btree (postrequisite_transform_id, prerequisite_transform_id);
-
-
---
--- Name: index_transform_run_log_on_run_id_and_step_id_and_step_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_transform_run_log_on_run_id_and_step_id_and_step_type ON transform_run_log USING btree (run_id, step_id, step_type);
-
-
---
--- Name: index_transform_run_log_on_step_id_and_step_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_transform_run_log_on_step_id_and_step_type ON transform_run_log USING btree (step_id, step_type);
 
 
 --
@@ -1078,14 +1078,6 @@ ALTER TABLE ONLY transform_dependencies
 
 
 --
--- Name: fk_rails_6daa254f0d; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY transform_run_log
-    ADD CONSTRAINT fk_rails_6daa254f0d FOREIGN KEY (run_id) REFERENCES runs(id);
-
-
---
 -- Name: fk_rails_8a742645db; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1131,6 +1123,14 @@ ALTER TABLE ONLY data_quality_reports
 
 ALTER TABLE ONLY notifications
     ADD CONSTRAINT fk_rails_b080fb4855 FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: fk_rails_bcd9d373c4; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY run_step_logs
+    ADD CONSTRAINT fk_rails_bcd9d373c4 FOREIGN KEY (run_id) REFERENCES runs(id);
 
 
 --
