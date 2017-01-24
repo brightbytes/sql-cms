@@ -51,7 +51,7 @@ describe Run do
         expect(run.schema_exists?).to eq(false)
 
         run = create(:run)
-        run.create_schema_and_tables!
+        run.create_schema
         expect(run.schema_exists?).to eq(true)
 
         run.destroy

@@ -39,7 +39,7 @@ describe Run::PostgresSchema do
 
       ar_result = run.select_all_in_schema("SELECT * FROM silly ORDER BY id")
       expect(ar_result.columns).to eq(%w(id stringy))
-      expect(ar_result.rows).to eq([['1', 'FOOBAR!'], ['2', 'BARFOO!']])
+      expect(ar_result.rows).to eq([[1, 'FOOBAR!'], [2, 'BARFOO!']])
     end
   end
 
