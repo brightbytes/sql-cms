@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: data_files
+# Table name: public.data_files
 #
 #  id                  :integer          not null, primary key
 #  name                :string           not null

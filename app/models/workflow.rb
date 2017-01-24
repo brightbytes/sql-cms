@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: workflows
+# Table name: public.workflows
 #
 #  id                      :integer          not null, primary key
 #  name                    :string           not null

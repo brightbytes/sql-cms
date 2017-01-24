@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: transforms
+# Table name: public.transforms
 #
 #  id                            :integer          not null, primary key
 #  name                          :string           not null

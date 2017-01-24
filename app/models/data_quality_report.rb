@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # == Schema Information
 #
-# Table name: data_quality_reports
+# Table name: public.data_quality_reports
 #
 #  id                                 :integer          not null, primary key
 #  workflow_id                        :integer          not null
@@ -25,7 +25,6 @@
 #  fk_rails_...  (copied_from_data_quality_report_id => data_quality_reports.id)
 #  fk_rails_...  (workflow_id => workflows.id)
 #
-
 
 class DataQualityReport < ActiveRecord::Base
 

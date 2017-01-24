@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # == Schema Information
 #
-# Table name: transform_validations
+# Table name: public.transform_validations
 #
 #  id            :integer          not null, primary key
 #  transform_id  :integer          not null

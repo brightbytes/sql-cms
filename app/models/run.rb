@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: runs
+# Table name: public.runs
 #
 #  id             :integer          not null, primary key
 #  workflow_id    :integer          not null
@@ -20,7 +20,6 @@
 #  fk_rails_...  (creator_id => users.id)
 #  fk_rails_...  (workflow_id => workflows.id)
 #
-
 
 # The point of this class is to execute a Workflow in an isolated namespace (think "separate DB context")
 class Run < ActiveRecord::Base
