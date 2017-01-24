@@ -4,9 +4,8 @@
 
 if Rails.env.development?
 
-
-
   def AnnotateModels.retrieve_indexes_from_table(klass)
+    # This is the patched line:
     table_name = klass.table_name.sub('public.', '')
     return [] unless table_name
 
@@ -29,6 +28,7 @@ if Rails.env.development?
     return '' unless klass.connection.respond_to?(:supports_foreign_keys?) &&
                      klass.connection.supports_foreign_keys? && klass.connection.respond_to?(:foreign_keys)
 
+    # This is the patched line:
     foreign_keys = klass.connection.foreign_keys(klass.table_name.sub('public.', ''))
     return '' if foreign_keys.empty?
 
