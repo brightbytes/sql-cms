@@ -54,7 +54,7 @@ describe Workflow do
     it { should have_many(:notified_users).through(:notifications).source(:user) }
     it { should have_many(:transforms) }
     it { should have_many(:data_quality_reports) }
-    # it { should have_many(:runs) }
+    it { should have_many(:runs) }
   end
 
   describe 'instance methods' do

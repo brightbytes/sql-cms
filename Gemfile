@@ -19,6 +19,7 @@ gem 'immigrant' # FK constraints
 gem 'postgres-copy' # bulk import
 gem 'postgresql_cursor' # postgres cursors!!
 gem 'acts_as_paranoid' # logical delete
+gem 'apartment' # multi-tenancy (i.e. Postgres Schemas)
 
 # K/V store
 # gem "redis"

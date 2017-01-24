@@ -161,7 +161,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.integer :workflow_id
         tt.integer :creator_id
         tt.jsonb :execution_plan
-        tt.string :status
+        tt.string :status, default: :unstarted
         tt.timestamps
       end
     end
@@ -172,7 +172,7 @@ class ApplicationTables < ActiveRecord::Migration
     add_foreign_key :runs, :workflows
     add_foreign_key :runs, :users, column: :creator_id
 
-    create_table :step_logs do |t|
+    create_table :transform_run_log do |t|
       t.with_options(null: false) do |tt|
         tt.integer :run_id
         tt.integer :step_id
@@ -184,10 +184,10 @@ class ApplicationTables < ActiveRecord::Migration
       end
     end
 
-    add_index :step_logs, [:run_id, :step_id, :step_type], unique: true
-    add_index :step_logs, [:step_id, :step_type]
+    add_index :transform_run_log, [:run_id, :step_id, :step_type], unique: true
+    add_index :transform_run_log, [:step_id, :step_type]
 
-    add_foreign_key :step_logs, :runs
+    add_foreign_key :transform_run_log, :runs
 
   end
 end

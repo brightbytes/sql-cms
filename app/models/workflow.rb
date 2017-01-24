@@ -61,7 +61,7 @@ class Workflow < ActiveRecord::Base
 
   has_many :data_quality_reports, inverse_of: :workflow
 
-  # has_many :runs, inverse_of: :workflow
+  has_many :runs, inverse_of: :workflow
 
   # Instance Methods
 

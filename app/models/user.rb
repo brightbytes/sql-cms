@@ -51,7 +51,7 @@ class User < ApplicationRecord
   has_many :notifications, inverse_of: :user
   has_many :observed_workflows, through: :notifications, source: :workflow
 
-  # has_many :runs, foreign_key: :creator_id, inverse_of: :creator
+  has_many :runs, foreign_key: :creator_id, inverse_of: :creator
 
   # Instance Methods
 
