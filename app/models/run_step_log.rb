@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: run_step_logs
+# Table name: public.run_step_logs
 #
 #  id                     :integer          not null, primary key
 #  run_id                 :integer          not null
