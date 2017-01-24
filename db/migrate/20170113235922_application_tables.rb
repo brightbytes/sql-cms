@@ -128,6 +128,7 @@ class ApplicationTables < ActiveRecord::Migration
       end
     end
 
+    # This probably doesn't work as I'd want it to
     add_index :transform_validations, [:transform_id, :validation_id, :sql_params], unique: true, name: :index_transform_validations_on_transform_validation_params
     add_index :transform_validations, :validation_id
 
@@ -147,6 +148,7 @@ class ApplicationTables < ActiveRecord::Migration
       t.integer :copied_from_data_quality_report_id
     end
 
+    execute "CREATE UNIQUE INDEX index_data_quality_reports_on_lowercase_name ON data_quality_reports USING btree (lower(name))"
     add_index :data_quality_reports, :workflow_id
     add_index :data_quality_reports, :copied_from_data_quality_report_id, name: :idx_data_quality_reports_on_copied_from_data_quality_report_id
 
@@ -159,6 +161,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.integer :workflow_id
         tt.integer :creator_id
         tt.jsonb :execution_plan
+        tt.string :status
         tt.timestamps
       end
     end

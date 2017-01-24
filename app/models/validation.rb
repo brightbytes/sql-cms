@@ -19,7 +19,8 @@
 
 class Validation < ActiveRecord::Base
 
-  # Validations are Data Quality Checks for specific Transforms
+  # Validations are SQL Data Quality Checks run after Transforms with which they are associated, and validate that the transformed data isn't corrupt
+  # A Validation returns the ID(s) of any record(s) that fail the validation
 
   auto_normalize
 

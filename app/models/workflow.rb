@@ -59,7 +59,7 @@ class Workflow < ActiveRecord::Base
 
   has_many :transforms, inverse_of: :workflow
 
-  # has_many :data_quality_checks, inverse_of: :workflow
+  has_many :data_quality_reports, inverse_of: :workflow
 
   # has_many :runs, inverse_of: :workflow
 

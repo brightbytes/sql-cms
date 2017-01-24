@@ -38,6 +38,15 @@ describe TransformValidation do
       # it { should validate_uniqueness_of(:transform).scoped_to([:validation_id, :sql_params]) }
     end
 
+    it "should validate that sql_params is not null, but allow blank" do
+      transform_validation = create(:transform_validation)
+      transform_validation.sql_params = nil
+      expect(transform_validation.valid?).to be false
+
+      transform_validation.sql_params = {}
+      expect(transform_validation.valid?).to be true
+    end
+
   end
 
   describe "associations" do

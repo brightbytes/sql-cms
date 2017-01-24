@@ -226,6 +226,7 @@ CREATE TABLE runs (
     workflow_id integer NOT NULL,
     creator_id integer NOT NULL,
     execution_plan jsonb NOT NULL,
+    status character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -820,6 +821,13 @@ CREATE INDEX index_data_files_on_customer_id ON data_files USING btree (customer
 --
 
 CREATE UNIQUE INDEX index_data_files_on_lowercase_name ON data_files USING btree (lower((name)::text));
+
+
+--
+-- Name: index_data_quality_reports_on_lowercase_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_data_quality_reports_on_lowercase_name ON data_quality_reports USING btree (lower((name)::text));
 
 
 --

@@ -47,6 +47,14 @@ describe Transform do
       # it { should validate_uniqueness_of(:data_file).scoped_to(:workflow_id).allow_nil }
     end
 
+    it "should validate that sql_params is not null, but allow blank" do
+      transform = create(:transform)
+      transform.sql_params = nil
+      expect(transform.valid?).to be false
+
+      transform.sql_params = {}
+      expect(transform.valid?).to be true
+    end
   end
 
   describe "callbacks" do
