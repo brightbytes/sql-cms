@@ -12,8 +12,6 @@ namespace :db do
 
   desc 'Drops and recreates the dev and test DBs, loads, migrates, reannotates, and seeds the dev DB, runs all specs'
 
-  # NOTE - Since the local dev DB can (and now does) contain all the data from a staging or prod dump, we can load the dump before the migration here.
-  #        (This is not possible in larger repos, making `one_ring` far more of a pain to maintain there.  But, here, it can shine in all its intended glory.)
   task init: ['db:recreate', 'db:data:load_dump', 'db:migrate', 'db:seed', 'db:test:prepare', :spec]
 
   namespace :data do
