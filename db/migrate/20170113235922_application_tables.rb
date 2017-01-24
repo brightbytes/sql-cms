@@ -129,7 +129,7 @@ class ApplicationTables < ActiveRecord::Migration
     end
 
     # This probably doesn't work as I'd want it to
-    add_index :transform_validations, [:transform_id, :validation_id, :sql_params], unique: true, name: :index_transform_validations_on_transform_validation_params
+    # add_index :transform_validations, [:transform_id, :validation_id, :sql_params], unique: true, name: :index_transform_validations_on_transform_validation_params
     add_index :transform_validations, :validation_id
 
     add_foreign_key :transform_validations, :transforms

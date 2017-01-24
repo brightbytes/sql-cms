@@ -12,8 +12,7 @@
 #
 # Indexes
 #
-#  index_transform_validations_on_transform_validation_params  (transform_id,validation_id,sql_params) UNIQUE
-#  index_transform_validations_on_validation_id                (validation_id)
+#  index_transform_validations_on_validation_id  (validation_id)
 #
 # Foreign Keys
 #
@@ -28,10 +27,7 @@ class TransformValidation < ActiveRecord::Base
   # Validations
 
   # Note that here, sql_params can never be {}, unlike other JSONB columns.
-  validates :validation, :sql_params, presence: true
-
-  # Not sure that I can just toss-in a JSONB column (that's a hash!) in a uniqueness constraint like this
-  validates :transform, presence: true, uniqueness: { scope: [:validation_id, :sql_params] }
+  validates :validation, :transform, :sql_params, presence: true
 
   # Associations
 

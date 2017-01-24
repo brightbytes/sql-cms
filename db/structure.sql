@@ -894,13 +894,6 @@ CREATE UNIQUE INDEX index_transform_dependencies_on_unique_transform_ids ON tran
 
 
 --
--- Name: index_transform_validations_on_transform_validation_params; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_transform_validations_on_transform_validation_params ON transform_validations USING btree (transform_id, validation_id, sql_params);
-
-
---
 -- Name: index_transform_validations_on_validation_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
