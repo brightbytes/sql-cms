@@ -29,11 +29,12 @@ class Customer < ActiveRecord::Base
 
   validates :slug, presence: true, uniqueness: { case_sensitive: false }
 
-  validate :slug_not_updatable, if: :slug_changed?
+  # This doesn't matter, and probably never will
+  # validate :slug_not_updatable, if: :slug_changed?
 
-  def slug_not_updatable
-    errors.add(:slug, "is not updatable once set") if slug_was.present?
-  end
+  # def slug_not_updatable
+  #   errors.add(:slug, "is not updatable once set") if slug_was.present?
+  # end
 
   validate :slug_valid_sql_identifier
 

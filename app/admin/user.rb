@@ -45,11 +45,11 @@ ActiveAdmin.register User, sort_order: "id_asc" do
       row :deleted_at
     end
 
+    active_admin_comments
+
     panel "History" do
       render partial: 'admin/shared/history', locals: { context: self, associated: user }
     end
-
-    active_admin_comments
   end
 
   permit_params :email, :first_name, :last_name, :password, :password_confirmation
