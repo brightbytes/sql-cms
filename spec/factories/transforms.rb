@@ -6,7 +6,7 @@
 #  name                          :string           not null
 #  transform_type                :string           not null
 #  workflow_id                   :integer          not null
-#  sql_params                    :jsonb            not null
+#  params                    :jsonb            not null
 #  sql                           :text             not null
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null

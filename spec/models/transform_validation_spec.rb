@@ -6,13 +6,13 @@
 #  id            :integer          not null, primary key
 #  transform_id  :integer          not null
 #  validation_id :integer          not null
-#  sql_params    :jsonb            not null
+#  params    :jsonb            not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #
 # Indexes
 #
-#  index_transform_validations_on_transform_validation_params  (transform_id,validation_id,sql_params) UNIQUE
+#  index_transform_validations_on_transform_validation_params  (transform_id,validation_id,params) UNIQUE
 #  index_transform_validations_on_validation_id                (validation_id)
 #
 # Foreign Keys
@@ -28,7 +28,7 @@ describe TransformValidation do
   end
 
   describe "validations" do
-    [:transform, :sql_params, :validation].each do |att|
+    [:transform, :params, :validation].each do |att|
       it { should validate_presence_of(att) }
     end
 
@@ -55,7 +55,7 @@ describe TransformValidation do
 
     #     let!(:pipeline_transform) { create(:pipeline_transform, pipeline: pipeline, transform: transform) }
 
-    #     let!(:transform_validation) { create(:transform_validation, :presence, transform: transform, sql_params: { table_name: :test_table, column_name: :test_column }) }
+    #     let!(:transform_validation) { create(:transform_validation, :presence, transform: transform, params: { table_name: :test_table, column_name: :test_column }) }
 
     #     let!(:run) { create(:run, pipeline: pipeline).tap(&:create_schema_and_tables!) }
 
@@ -86,7 +86,7 @@ describe TransformValidation do
 
     #     let!(:pipeline_transform) { create(:pipeline_transform, pipeline: pipeline, transform: transform) }
 
-    #     let!(:transform_validation) { create(:transform_validation, :not_null, transform: transform, sql_params: { table_name: :test_table, column_name: :test_column }) }
+    #     let!(:transform_validation) { create(:transform_validation, :not_null, transform: transform, params: { table_name: :test_table, column_name: :test_column }) }
 
     #     let!(:run) { create(:run, pipeline: pipeline).tap(&:create_schema_and_tables!) }
 
@@ -117,7 +117,7 @@ describe TransformValidation do
 
     #     let!(:pipeline_transform) { create(:pipeline_transform, pipeline: pipeline, transform: transform) }
 
-    #     let!(:transform_validation) { create(:transform_validation, :uniqueness, transform: transform, sql_params: { table_name: :test_table, column_name: :test_column }) }
+    #     let!(:transform_validation) { create(:transform_validation, :uniqueness, transform: transform, params: { table_name: :test_table, column_name: :test_column }) }
 
     #     let!(:run) { create(:run, pipeline: pipeline).tap(&:create_schema_and_tables!) }
 
@@ -148,7 +148,7 @@ describe TransformValidation do
 
     #     let!(:pipeline_transform) { create(:pipeline_transform, pipeline: pipeline, transform: transform) }
 
-    #     let!(:transform_validation) { create(:transform_validation, :greater_than_zero_validation, transform: transform, sql_params: { table_name: :test_table, column_name: :test_column }) }
+    #     let!(:transform_validation) { create(:transform_validation, :greater_than_zero_validation, transform: transform, params: { table_name: :test_table, column_name: :test_column }) }
 
     #     let!(:run) { create(:run, pipeline: pipeline).tap(&:create_schema_and_tables!) }
 
@@ -179,7 +179,7 @@ describe TransformValidation do
 
     #     let!(:pipeline_transform) { create(:pipeline_transform, pipeline: pipeline, transform: transform) }
 
-    #     let!(:transform_validation) { create(:transform_validation, :greater_than_or_equal_to_zero_validation, transform: transform, sql_params: { table_name: :test_table, column_name: :test_column }) }
+    #     let!(:transform_validation) { create(:transform_validation, :greater_than_or_equal_to_zero_validation, transform: transform, params: { table_name: :test_table, column_name: :test_column }) }
 
     #     let!(:run) { create(:run, pipeline: pipeline).tap(&:create_schema_and_tables!) }
 
@@ -210,7 +210,7 @@ describe TransformValidation do
 
     #     let!(:pipeline_transform) { create(:pipeline_transform, pipeline: pipeline, transform: transform) }
 
-    #     let!(:transform_validation) { create(:transform_validation, :fk, transform: transform, sql_params: { fk_table_name: :test_fact_table, fk_column_name: :test_mapping_id, pk_table_name: :test_mappings, pk_column_name: :id }) }
+    #     let!(:transform_validation) { create(:transform_validation, :fk, transform: transform, params: { fk_table_name: :test_fact_table, fk_column_name: :test_mapping_id, pk_table_name: :test_mappings, pk_column_name: :id }) }
 
     #     let!(:run) { create(:run, pipeline: pipeline).tap(&:create_schema_and_tables!) }
 
@@ -241,7 +241,7 @@ describe TransformValidation do
 
     #     let!(:pipeline_transform) { create(:pipeline_transform, pipeline: pipeline, transform: transform) }
 
-    #     let!(:transform_validation) { create(:transform_validation, :no_overlap, transform: transform, sql_params: { table_name: :test_table, low_column_name: :low_val, high_column_name: :high_val }) }
+    #     let!(:transform_validation) { create(:transform_validation, :no_overlap, transform: transform, params: { table_name: :test_table, low_column_name: :low_val, high_column_name: :high_val }) }
 
     #     let!(:run) { create(:run, pipeline: pipeline).tap(&:create_schema_and_tables!) }
 

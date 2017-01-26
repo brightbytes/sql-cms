@@ -6,7 +6,7 @@
 #  name                          :string           not null
 #  runner                        :string           not null
 #  workflow_id                   :integer          not null
-#  sql_params                    :jsonb            not null
+#  params                    :jsonb            not null
 #  sql                           :text             not null
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
@@ -47,12 +47,12 @@ describe Transform do
       # it { should validate_uniqueness_of(:data_file).scoped_to(:workflow_id).allow_nil }
     end
 
-    it "should validate that sql_params is not null, but allow blank" do
+    it "should validate that params is not null, but allow blank" do
       transform = create(:transform)
-      transform.sql_params = nil
+      transform.params = nil
       expect(transform.valid?).to be false
 
-      transform.sql_params = {}
+      transform.params = {}
       expect(transform.valid?).to be true
     end
   end

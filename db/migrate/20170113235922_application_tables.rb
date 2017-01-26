@@ -73,7 +73,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.string :name
         tt.string :runner
         tt.integer :workflow_id
-        tt.jsonb :sql_params, default: '{}'
+        tt.jsonb :params, default: '{}'
         tt.text :sql
         tt.timestamps
       end
@@ -123,13 +123,13 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.integer :transform_id
         tt.integer :validation_id
-        tt.jsonb :sql_params, default: '{}'
+        tt.jsonb :params, default: '{}'
         tt.timestamps
       end
     end
 
     # This probably doesn't work as I'd want it to
-    # add_index :transform_validations, [:transform_id, :validation_id, :sql_params], unique: true, name: :index_transform_validations_on_transform_validation_params
+    # add_index :transform_validations, [:transform_id, :validation_id, :params], unique: true, name: :index_transform_validations_on_transform_validation_params
     add_index :transform_validations, :validation_id
 
     add_foreign_key :transform_validations, :transforms
@@ -139,7 +139,7 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.integer :workflow_id
         tt.string :name
-        tt.jsonb :sql_params, default: '{}'
+        tt.jsonb :params, default: '{}'
         tt.text :sql
         tt.timestamps
       end

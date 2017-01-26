@@ -6,7 +6,7 @@
 #  id                                 :integer          not null, primary key
 #  workflow_id                        :integer          not null
 #  name                               :string           not null
-#  sql_params                         :jsonb            not null
+#  params                             :jsonb            not null
 #  sql                                :text             not null
 #  created_at                         :datetime         not null
 #  updated_at                         :datetime         not null
@@ -38,10 +38,10 @@ class DataQualityReport < ActiveRecord::Base
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
-  validate :sql_params_not_null
+  validate :params_not_null
 
-  def sql_params_not_null
-    errors.add(:sql_params, 'may not be null') unless sql_params # {} is #blank?, hence this hair
+  def params_not_null
+    errors.add(:params, 'may not be null') unless params # {} is #blank?, hence this hair
   end
 
   # Associations

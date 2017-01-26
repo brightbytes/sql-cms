@@ -6,7 +6,7 @@
 #  id            :integer          not null, primary key
 #  transform_id  :integer          not null
 #  validation_id :integer          not null
-#  sql_params    :jsonb            not null
+#  params        :jsonb            not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #
@@ -26,8 +26,8 @@ class TransformValidation < ActiveRecord::Base
 
   # Validations
 
-  # Note that here, sql_params can never be {}, unlike other JSONB columns.
-  validates :validation, :transform, :sql_params, presence: true
+  # Note that here, params can never be {}, unlike other JSONB columns.
+  validates :validation, :transform, :params, presence: true
 
   # Associations
 

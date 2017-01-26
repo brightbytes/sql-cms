@@ -14,12 +14,12 @@ describe DataQualityReport do
       it { should validate_uniqueness_of(:name).case_insensitive }
     end
 
-    it "should validate that sql_params is not null, but allow blank" do
+    it "should validate that params is not null, but allow blank" do
       dqr = create(:data_quality_report)
-      dqr.sql_params = nil
+      dqr.params = nil
       expect(dqr.valid?).to be false
 
-      dqr.sql_params = {}
+      dqr.params = {}
       expect(dqr.valid?).to be true
     end
 

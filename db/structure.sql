@@ -156,7 +156,7 @@ CREATE TABLE data_quality_reports (
     id integer NOT NULL,
     workflow_id integer NOT NULL,
     name character varying NOT NULL,
-    sql_params jsonb DEFAULT '"{}"'::jsonb NOT NULL,
+    params jsonb DEFAULT '"{}"'::jsonb NOT NULL,
     sql text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -336,7 +336,7 @@ CREATE TABLE transform_validations (
     id integer NOT NULL,
     transform_id integer NOT NULL,
     validation_id integer NOT NULL,
-    sql_params jsonb DEFAULT '"{}"'::jsonb NOT NULL,
+    params jsonb DEFAULT '"{}"'::jsonb NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -370,7 +370,7 @@ CREATE TABLE transforms (
     name character varying NOT NULL,
     runner character varying NOT NULL,
     workflow_id integer NOT NULL,
-    sql_params jsonb DEFAULT '"{}"'::jsonb NOT NULL,
+    params jsonb DEFAULT '"{}"'::jsonb NOT NULL,
     sql text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,

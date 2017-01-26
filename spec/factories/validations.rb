@@ -44,7 +44,7 @@ FactoryGirl.define do
   factory :transform_validation do
     association :transform
     association :validation
-    sequence(:sql_params) { |n| { column_name: :stringy, table_name: "tmp_#{n}" } }
+    sequence(:params) { |n| { column_name: :stringy, table_name: "tmp_#{n}" } }
 
     trait :presence do
       association :validation, :presence
