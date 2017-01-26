@@ -160,6 +160,7 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.integer :workflow_id
         tt.integer :creator_id
+        tt.string :schema_prefix
         tt.jsonb :execution_plan
         tt.string :status, default: :unstarted
         tt.timestamps

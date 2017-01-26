@@ -42,6 +42,16 @@ describe Run do
   end
 
   describe "callbacks" do
+
+    context "before_validation on: :create" do
+      it "should set the schema_prefix" do
+        run = build(:run)
+        expect(run.schema_prefix).to be_nil
+        expect(run.valid?).to eq(true)
+        expect(run.schema_prefix).to eq("#{run.workflow}_run_")
+      end
+    end
+
     context "after_destroy" do
       it "should nuke any schema that was created" do
         run = create(:run)

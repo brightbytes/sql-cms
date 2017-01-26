@@ -5,6 +5,7 @@
 #  id             :integer          not null, primary key
 #  workflow_id    :integer          not null
 #  creator_id     :integer          not null
+#  schema_prefix  :string           not null
 #  execution_plan :jsonb            not null
 #  status         :string           default("unstarted"), not null
 #  created_at     :datetime         not null
@@ -37,11 +38,18 @@ class Run < ActiveRecord::Base
 
   # Validations
 
-  validates :workflow, :creator, :execution_plan, :status, presence: true
+  validates :workflow, :creator, :execution_plan, :status, :schema_prefix, presence: true
 
   # Callbacks
 
-  # From Run::PostgresSchema
+  before_validation :generate_schema_prefix, on: :create
+
+  def generate_schema_prefix
+    self.schema_prefix ||= "#{workflow}_run_".freeze
+  end
+
+
+  # From Run::PostgresSchema; consider removing to Observer or Service
   after_destroy :drop_schema
 
   # Associations
@@ -59,8 +67,8 @@ class Run < ActiveRecord::Base
   # Instance Methods
 
   def schema_name
-    return if new_record?
-    @schema_name ||= "#{workflow}_run_#{id}".freeze
+    return unless schema_prefix.present?
+    @schema_name ||= "#{schema_prefix}#{id}"
   end
 
 

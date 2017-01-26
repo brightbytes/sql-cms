@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: public.run_step_logs
+#
+#  id                     :integer          not null, primary key
+#  run_id                 :integer          not null
+#  step_id                :integer          not null
+#  step_type              :string           not null
+#  step_name              :string           not null
+#  completed_successfully :boolean          default(FALSE), not null
+#  step_errors            :jsonb            not null
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#
+# Indexes
+#
+#  index_run_step_logs_on_run_id_and_step_id_and_step_type  (run_id,step_id,step_type) UNIQUE
+#  index_run_step_logs_on_step_id_and_step_type             (step_id,step_type)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (run_id => runs.id)
+#
 
 describe RunStepLog do
 

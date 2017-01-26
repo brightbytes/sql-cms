@@ -261,6 +261,7 @@ CREATE TABLE runs (
     id integer NOT NULL,
     workflow_id integer NOT NULL,
     creator_id integer NOT NULL,
+    schema_prefix character varying NOT NULL,
     execution_plan jsonb NOT NULL,
     status character varying DEFAULT 'unstarted'::character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
