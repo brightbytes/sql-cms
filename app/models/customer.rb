@@ -72,9 +72,5 @@ class Customer < ActiveRecord::Base
 
   # Class Methods
 
-  # Once seeding has been set up, maybe:
-  # Define class-level predicates (e.g. Customer.duval?)
-  # Define class-level loader methods (e.g. Customer.duval)
-
 
 end
