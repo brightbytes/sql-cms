@@ -8,8 +8,6 @@ require 'rspec/rails'
 require 'simplecov'
 SimpleCov.start
 
-require 'paperclip/matchers'
-
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -48,11 +46,6 @@ RSpec.configure do |config|
   config.before :each, versioning: true do
     PaperTrail.enabled = true
   end
-
-  # Paperclip-related stuff
-  config.include Paperclip::Shoulda::Matchers
-  config.include ActionDispatch::TestProcess
-  config.fixture_path = "#{::Rails.root}/spec/fixtures/"
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false

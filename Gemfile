@@ -21,14 +21,13 @@ gem 'postgresql_cursor' # postgres cursors!!
 gem 'acts_as_paranoid' # logical delete
 gem 'apartment' # multi-tenancy (i.e. Postgres Schemas)
 
+gem 'fast_blank' # for fast calls to String#blank? and String#present?
+
 # K/V store
 # gem "redis"
 
 # Versioning
 gem 'paper_trail'
-
-# Uploads
-gem 'paperclip' # Uploads
 
 # AWS ... duh :-)
 gem 'aws-sdk'
