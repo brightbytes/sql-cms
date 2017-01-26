@@ -1,0 +1,3 @@
+module WorkflowSerializer
+
+end
