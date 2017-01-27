@@ -6,6 +6,7 @@
 #  name           :string           not null
 #  metadata       :jsonb            not null
 #  customer_id    :integer          not null
+#  file_type      :string           default("import"), not null
 #  s3_bucket_name :string           not null
 #  s3_file_name   :string           not null
 #  created_at     :datetime         not null
@@ -34,6 +35,10 @@ class DataFile < ActiveRecord::Base
   # Validations
 
   validates :customer, :s3_bucket_name, :s3_file_name, presence: true
+
+  FILE_TYPES = %w(import export).freeze
+
+  validates :file_type, presence: true, inclusion: { in: FILE_TYPES }
 
   validate :metadata_not_null
 
@@ -66,6 +71,10 @@ class DataFile < ActiveRecord::Base
 
   has_many :transforms, inverse_of: :data_file
   has_many :workflows, through: :transforms
+
+  # Scopes
+
+  scope :sans_deleted, -> { where(deleted_at: nil) }
 
   # Instance Methods
 

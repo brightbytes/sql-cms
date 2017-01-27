@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 # == Schema Information
 #
 # Table name: public.data_files
@@ -7,6 +6,7 @@
 #  name           :string           not null
 #  metadata       :jsonb            not null
 #  customer_id    :integer          not null
+#  file_type      :string           default("import"), not null
 #  s3_bucket_name :string           not null
 #  s3_file_name   :string           not null
 #  created_at     :datetime         not null
@@ -22,7 +22,6 @@
 #
 #  fk_rails_...  (customer_id => customers.id)
 #
-
 describe DataFile do
 
   describe 'versioned by PaperTrail' do
@@ -30,7 +29,7 @@ describe DataFile do
   end
 
   describe "validations" do
-    [:name, :customer, :s3_bucket_name, :s3_file_name].each do |att|
+    [:name, :customer, :file_type, :s3_bucket_name, :s3_file_name].each do |att|
       it { should validate_presence_of(att) }
     end
 
