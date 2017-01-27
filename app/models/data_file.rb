@@ -26,8 +26,6 @@
 # For storing a reference to a CSV/TSV/any-tabularly-formatted-file on S3, for the purpose of loading/unloading data to/from the DB
 class DataFile < ActiveRecord::Base
 
-  # FIXME - Build a browser for files already on S3, using this example: https://www.topdan.com/ruby-on-rails/aws-s3-browser.html
-
   acts_as_paranoid
 
   auto_normalize
@@ -91,7 +89,8 @@ class DataFile < ActiveRecord::Base
       end
   end
 
-  # FIXME - ADD METHOD FOR ACCEPTING UPLOAD STREAM FROM DB, TO CREATE AN S3 FILE THAT DOESN'T ALREADY EXIST
+  # FIXME - ADD METHOD FOR PROVIDING AN UPLOAD STREAM SYNC TO BE LOADED BY THE CLIENT FROM THE DB, TO CREATE AN S3 FILE THAT DOESN'T ALREADY EXIST
+  #         THIS WILL REQUIRE ADDING AN EXTRA `"run_#{run.id}"` PARENT DIRECTORY TO THE SUPPLIED FILE NAME.  MEH.
 
   # Class Methods
 
