@@ -62,12 +62,19 @@ ActiveAdmin.register DataFile do
     inputs 'Details' do
       # This might be useful elsewhere; keep it around
       # semantic_errors *f.object.errors.keys
+
       input :customer, as: :select, collection: Customer.order(:slug).all
       input :name, as: :string
+
       input :file_type, as: :select, collection: DataFile::FILE_TYPES
-      # FIXME - MAKE THIS WORK
-      # input :metadata, as: :string # probably YML instead would be better; unimportant now
+      # FIXME: Only show this when :file_type is :import ...
       input :supplied_s3_url, label: "S3 File URL", hint: "You may use either https:// format or s3:// format for this URL"
+      # FIXME: When :file_type is :export, show these instead:
+      # input :s3_bucket_name, as: :string
+      # input :s3_file_name, as: :string
+
+      # FIXME - MAKE THIS WORK USING YML~JSON INTERCONVERSION LIKE Customer#config IN dpl-conductor
+      # input :metadata, as: :string
     end
     actions
   end
