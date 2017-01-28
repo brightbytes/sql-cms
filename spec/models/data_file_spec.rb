@@ -33,6 +33,8 @@ describe DataFile do
       it { should validate_presence_of(att) }
     end
 
+    it { should validate_inclusion_of(:file_type).in_array(described_class::FILE_TYPES) }
+
     it "should validate that metadata is not null, but allow blank" do
       pt = create(:data_file)
       pt.metadata = nil

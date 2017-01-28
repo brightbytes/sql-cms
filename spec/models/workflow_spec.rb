@@ -34,6 +34,8 @@ describe Workflow do
       it { should validate_presence_of(att) }
     end
 
+    it { should validate_inclusion_of(:dbms).in_array(described_class::DBMS_TYPES) }
+
     context 'with a workflow already extant' do
       let!(:subject) { create(:workflow) }
       it { should validate_uniqueness_of(:name).case_insensitive }
