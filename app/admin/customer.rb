@@ -1,5 +1,7 @@
 ActiveAdmin.register Customer do
 
+  menu priority: 10
+
   scope "All", :with_deleted
   # For some reason, this doesn't use AR.all ...
   # scope "Undeleted Only", :all
@@ -36,6 +38,16 @@ ActiveAdmin.register Customer do
       row :created_at
       row :updated_at
       row :deleted_at
+    end
+
+    panel 'Data Files' do
+      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
+      table_for(resource.data_files.order(sort), sortable: true) do
+        column(:name, sortable: :name) { |data_file| auto_link(data_file) }
+        column(:file_type, sortable: :file_type)
+        column(:s3_bucket_name, sortable: :s3_bucket_name)
+        column(:s3_file_name, sortable: :s3_file_name)
+      end
     end
 
     active_admin_comments

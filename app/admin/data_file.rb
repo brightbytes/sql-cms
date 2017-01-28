@@ -1,5 +1,7 @@
 ActiveAdmin.register DataFile do
 
+  menu priority: 20
+
   scope "All", :with_deleted
   # For some reason, this doesn't use AR.all ...
   # scope "Undeleted Only", :all
@@ -73,7 +75,7 @@ ActiveAdmin.register DataFile do
   controller do
 
     def scoped_collection
-      DataFile.joins(:customer)
+      super.joins(:customer)
     end
 
     def find_resource
