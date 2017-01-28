@@ -1,4 +1,4 @@
-PaperTrail.enabled = false
+# PaperTrail.enabled = false
 
 UserSeeder.seed
 CustomerSeeder.seed

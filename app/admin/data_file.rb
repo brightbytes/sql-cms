@@ -51,9 +51,7 @@ ActiveAdmin.register DataFile do
 
     active_admin_comments
 
-    panel "History" do
-      render partial: 'admin/shared/history', locals: { context: self, associated: data_file }
-    end
+    render partial: 'admin/shared/history'
   end
 
   # FIXME - Build a browser for files already on S3, from which to select, perhaps using this example: https://www.topdan.com/ruby-on-rails/aws-s3-browser.html

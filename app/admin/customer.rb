@@ -40,9 +40,7 @@ ActiveAdmin.register Customer do
 
     active_admin_comments
 
-    panel "History" do
-      render partial: 'admin/shared/history', locals: { context: self, associated: customer }
-    end
+    render partial: 'admin/shared/history'
   end
 
   form do |f|

@@ -47,9 +47,7 @@ ActiveAdmin.register User, sort_order: "id_asc" do
 
     active_admin_comments
 
-    panel "History" do
-      render partial: 'admin/shared/history', locals: { context: self, associated: user }
-    end
+    render partial: 'admin/shared/history'
   end
 
   permit_params :email, :first_name, :last_name, :password, :password_confirmation
