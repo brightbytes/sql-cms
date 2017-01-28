@@ -26,7 +26,7 @@
 #  fk_rails_...  (workflow_id => workflows.id)
 #
 
-class DataQualityReport < ActiveRecord::Base
+class DataQualityReport < ApplicationRecord
 
   include Concerns::SqlParamsInterpolator
 

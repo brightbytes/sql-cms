@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 # Provides methods to "normalize" String attributes (via squishing) before persistence to the DB
-# This module is mixed in to ActiveRecord::Base to provide the normalization methods as declarations on AR model objects
+# This module is mixed in to ApplicationRecord to provide the normalization methods as declarations on AR model objects
 module Concerns::NormalizationMethods
 
   extend ActiveSupport::Concern

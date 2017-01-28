@@ -26,13 +26,6 @@ class PaperTrail::Version < ActiveRecord::Base
   end
 end
 
-begin
-  all_classes = Dir['app/models/*.rb'].map { |f| File.basename(f, '.*').camelize.constantize }
-  (all_classes - [PaperTrail::Version]).
-    select { |klass| klass.ancestors.include?(ActiveRecord::Base) }.
-    each(&:has_paper_trail)
-end
-
 module PaperTrail::CleanupHook
   def self.included(base)
     base.prepend_after_action :cleanup_paper_trail_info

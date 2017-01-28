@@ -29,7 +29,7 @@
 #  fk_rails_...  (workflow_id => workflows.id)
 #
 
-class Transform < ActiveRecord::Base
+class Transform < ApplicationRecord
 
   include Concerns::SqlParamsInterpolator
 

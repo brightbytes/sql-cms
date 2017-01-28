@@ -15,7 +15,7 @@
 #  index_customers_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 
-class Customer < ActiveRecord::Base
+class Customer < ApplicationRecord
 
   include Concerns::SqlHelpers
 

@@ -13,7 +13,7 @@ ActiveAdmin.register DataFile do
     link_to "Undelete", undelete_data_file_path(resource), method: :put
   end
 
-  permit_params :name, :metadata, :customer_id, :file_type, :s3_bucket_name, :s3_file_name
+  permit_params :name, :metadata, :customer_id, :file_type, :supplied_s3_url #:s3_bucket_name, :s3_file_name
 
   filter :name, as: :string
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
@@ -21,17 +21,56 @@ ActiveAdmin.register DataFile do
   filter :s3_bucket_name, as: :select
 
   # This may not work
-  config.sort_order = 'customer.name_asc'
+  config.sort_order = 'customers.name_asc'
 
   index download_links: false do
-
-    column :customer do |customer|
-      link_to customer.name, customer_path(customer)
-    end
-
+    # id_column
+    column(:name) { |data_file| auto_link(data_file) }
+    column(:customer)
+    column(:file_type)
+    column(:s3_bucket_name)
+    column(:s3_file_name)
   end
 
-  # FIXME - Build a browser for files already on S3, using this example: https://www.topdan.com/ruby-on-rails/aws-s3-browser.html
+  show do
+    attributes_table do
+      row :id
+      row :name
+      row :customer
+
+      row :file_type
+      row :metadata
+
+      row :s3_bucket_name
+      row :s3_file_name
+
+      row :created_at
+      row :updated_at
+      row :deleted_at
+    end
+
+    active_admin_comments
+
+    panel "History" do
+      render partial: 'admin/shared/history', locals: { context: self, associated: data_file }
+    end
+  end
+
+  # FIXME - Build a browser for files already on S3, from which to select, perhaps using this example: https://www.topdan.com/ruby-on-rails/aws-s3-browser.html
+
+  form do |f|
+    inputs 'Details' do
+      # This might be useful elsewhere; keep it around
+      # semantic_errors *f.object.errors.keys
+      input :customer, as: :select, collection: Customer.order(:slug).all
+      input :name, as: :string
+      input :file_type, as: :select, collection: DataFile::FILE_TYPES
+      # FIXME - MAKE THIS WORK
+      # input :metadata, as: :string # probably YML instead would be better; unimportant now
+      input :supplied_s3_url, label: "S3 File URL", hint: "You may use either https:// format or s3:// format for this URL"
+    end
+    f.actions
+  end
 
   controller do
 
@@ -52,5 +91,10 @@ ActiveAdmin.register DataFile do
 
   end
 
+  member_action :undelete, method: :put do
+    resource.recover
+    flash[:notice] = "DataFile Restored!"
+    redirect_to data_file_path(resource)
+  end
 
 end

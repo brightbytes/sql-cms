@@ -22,7 +22,7 @@
 #  fk_rails_...  (run_id => runs.id)
 #
 
-class RunStepLog < ActiveRecord::Base
+class RunStepLog < ApplicationRecord
 
   # Validations
 

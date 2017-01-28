@@ -19,7 +19,7 @@
 #  fk_rails_...  (workflow_id => workflows.id)
 #
 
-class Notification < ActiveRecord::Base
+class Notification < ApplicationRecord
 
   # Validations
 

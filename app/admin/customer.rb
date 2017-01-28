@@ -19,9 +19,10 @@ ActiveAdmin.register Customer do
 
   config.sort_order = 'slug_asc'
 
-  index download_links: false do
+  index(download_links: false) do
+    id_column
     column :customer do |customer|
-      link_to customer.name, customer_path(customer)
+      link_to(customer.name, customer_path(customer))
     end
     column :slug
   end

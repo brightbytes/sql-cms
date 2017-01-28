@@ -20,7 +20,7 @@
 #  fk_rails_...  (validation_id => validations.id)
 #
 
-class TransformValidation < ActiveRecord::Base
+class TransformValidation < ApplicationRecord
 
   include Concerns::SqlParamsInterpolator
 

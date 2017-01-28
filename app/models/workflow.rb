@@ -24,7 +24,7 @@
 #  fk_rails_...  (customer_id => customers.id)
 #
 
-class Workflow < ActiveRecord::Base
+class Workflow < ApplicationRecord
 
   # This class represents a particular configuration of an SQL Workflow at a particular point in time.
   # Its name and schema_base_name are case-insensitively unique, here and in the DB.

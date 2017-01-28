@@ -13,14 +13,14 @@ ActiveAdmin.register User, sort_order: "id_asc" do
   filter :first_name
   filter :last_name
 
-  index do
-    selectable_column
+  index(download_links: false) do
+    # selectable_column
     id_column
-    column(:full_name, sortable: :full_name) { |user| auto_link(user) }
+    column(:full_name, sortable: :first_name) { |user| auto_link(user) }
     column(:email, sortable: :email) { |user| mail_to user.email }
     column :current_sign_in_at
     column :sign_in_count
-    column :deleted_at
+    # column :deleted_at
   end
 
   show title: :full_name do

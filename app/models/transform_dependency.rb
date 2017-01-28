@@ -18,7 +18,7 @@
 #  fk_rails_...  (prerequisite_transform_id => transforms.id)
 #
 
-class TransformDependency < ActiveRecord::Base
+class TransformDependency < ApplicationRecord
 
   # Validations
 

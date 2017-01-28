@@ -24,7 +24,7 @@
 #
 
 # For storing a reference to a CSV/TSV/any-tabularly-formatted-file on S3, for the purpose of loading/unloading data to/from the DB
-class DataFile < ActiveRecord::Base
+class DataFile < ApplicationRecord
 
   acts_as_paranoid
 
@@ -45,6 +45,13 @@ class DataFile < ActiveRecord::Base
   end
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
+
+  validate :supplied_s3_url_is_not_hosed
+
+  def supplied_s3_url_is_not_hosed
+    errors.add(:supplied_s3_url, "must be provided") if supplied_s3_url.blank? && s3_bucket_name.blank? && s3_file_name.blank?
+    errors.add(:supplied_s3_url, "is not a valid S3 URL") if supplied_s3_url.present? && s3_bucket_name.blank? && s3_file_name.blank?
+  end
 
   # Callbacks
 
@@ -86,6 +93,15 @@ class DataFile < ActiveRecord::Base
         s3_bucket = self.class.s3.bucket(s3_bucket_name)
         s3_object = s3_bucket.object(s3_file_name)
         @s3_presigned_url = s3_object.presigned_url(:get) if s3_object.exists?
+      end
+  end
+
+  def s3_public_url
+    @s3_public_url ||
+      begin
+        s3_bucket = self.class.s3.bucket(s3_bucket_name)
+        s3_object = s3_bucket.object(s3_file_name)
+        @s3_public_url = s3_object.public_url if s3_object.exists?
       end
   end
 

@@ -17,7 +17,7 @@
 #  index_validations_on_lowercase_name  (lower((name)::text)) UNIQUE
 #
 
-class Validation < ActiveRecord::Base
+class Validation < ApplicationRecord
 
   # Validations are SQL Data Quality Checks run after Transforms with which they are associated, and validate that the transformed data isn't corrupt
   # A Validation returns the ID(s) of any record(s) that fail the validation
