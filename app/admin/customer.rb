@@ -48,7 +48,7 @@ ActiveAdmin.register Customer do
       input :name, as: :string
       input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated."
     end
-    f.actions
+    actions
   end
 
   controller do

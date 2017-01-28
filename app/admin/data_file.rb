@@ -67,7 +67,7 @@ ActiveAdmin.register DataFile do
       # input :metadata, as: :string # probably YML instead would be better; unimportant now
       input :supplied_s3_url, label: "S3 File URL", hint: "You may use either https:// format or s3:// format for this URL"
     end
-    f.actions
+    actions
   end
 
   controller do

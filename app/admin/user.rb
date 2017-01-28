@@ -53,14 +53,14 @@ ActiveAdmin.register User, sort_order: "id_asc" do
   permit_params :email, :first_name, :last_name, :password, :password_confirmation
 
   form do |f|
-    f.inputs "Admin Details" do
-      f.input :first_name
-      f.input :last_name
-      f.input :email
-      f.input :password
-      f.input :password_confirmation, required: true
+    inputs "Admin Details" do
+      input :first_name
+      input :last_name
+      input :email
+      input :password
+      input :password_confirmation, required: true
     end
-    f.actions
+    actions
   end
 
   controller do
