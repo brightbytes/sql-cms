@@ -5,7 +5,6 @@
 #  id                      :integer          not null, primary key
 #  name                    :string           not null
 #  schema_base_name        :string           not null
-#  dbms                    :string           default("postgres"), not null
 #  customer_id             :integer          not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
@@ -36,10 +35,6 @@ class Workflow < ApplicationRecord
   # Validations
 
   validates :customer, presence: true
-
-  DBMS_TYPES = %w(postgres redshift).freeze
-
-  validates :dbms, presence: true, inclusion: { in: DBMS_TYPES }
 
   validates :name, :schema_base_name, presence: true, uniqueness: { case_sensitive: false }
 

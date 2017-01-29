@@ -5,7 +5,6 @@
 #  id                      :integer          not null, primary key
 #  name                    :string           not null
 #  schema_base_name        :string           not null
-#  dbms                    :string           default("postgres"), not null
 #  customer_id             :integer          not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
@@ -30,11 +29,9 @@ describe Workflow do
   end
 
   describe 'validations' do
-    [:name, :dbms, :schema_base_name, :customer].each do |att|
+    [:name, :schema_base_name, :customer].each do |att|
       it { should validate_presence_of(att) }
     end
-
-    it { should validate_inclusion_of(:dbms).in_array(described_class::DBMS_TYPES) }
 
     context 'with a workflow already extant' do
       let!(:subject) { create(:workflow) }

@@ -4,7 +4,9 @@ ActiveAdmin.register Workflow do
 
   actions :all
 
+  # Validations
 
+  
 
 
 end

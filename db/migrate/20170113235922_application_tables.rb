@@ -37,7 +37,6 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.string :name
         tt.string :schema_base_name
-        tt.string :dbms, default: :postgres
         tt.integer :customer_id
         tt.timestamps
       end

@@ -5,7 +5,6 @@
 #  id                      :integer          not null, primary key
 #  name                    :string           not null
 #  schema_base_name        :string           not null
-#  dbms                    :string           default("postgres"), not null
 #  customer_id             :integer          not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null

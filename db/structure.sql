@@ -522,7 +522,6 @@ CREATE TABLE workflows (
     id integer NOT NULL,
     name character varying NOT NULL,
     schema_base_name character varying NOT NULL,
-    dbms character varying DEFAULT 'postgres'::character varying NOT NULL,
     customer_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
