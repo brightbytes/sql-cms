@@ -60,7 +60,7 @@ ActiveAdmin.register DataFile do
 
   form do |f|
     inputs 'Details' do
-      input :customer, as: :select, collection: Customer.order(:slug).all
+      input :customer, as: :select, collection: proc { Customer.order(:slug).map { |c| [c.name, c.id, selected: (c.id == params[:customer_id].to_i)] } }.call
       input :name, as: :string
 
       input :file_type, as: :select, collection: DataFile::FILE_TYPES

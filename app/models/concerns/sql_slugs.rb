@@ -10,7 +10,7 @@ module Concerns::SqlSlugs
 
     # Callbacks
 
-    before_validation :maybe_set_slug_from_name, if: :new_record?
+    before_validation :maybe_set_slug_from_name
   end
 
   def slug_valid_sql_identifier

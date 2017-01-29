@@ -23,10 +23,8 @@ ActiveAdmin.register Customer do
 
   index(download_links: false) do
     id_column
-    column :customer do |customer|
-      link_to(customer.name, customer_path(customer))
-    end
-    column :slug
+    column(:name, sortable: :slug) { |customer| auto_link(customer) }
+    # column :slug
   end
 
   show do
@@ -40,11 +38,23 @@ ActiveAdmin.register Customer do
       row :deleted_at
     end
 
+    panel 'Workflows' do
+      text_node link_to("Create New Workflow", new_workflow_path(customer_id: customer.id))
+
+      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
+      table_for(resource.workflows.order(sort), sortable: true) do
+        column(:name, sortable: :name) { |workflow| auto_link(workflow) }
+      end
+    end
+
     panel 'Data Files' do
+      text_node link_to("Create New Data File", new_data_file_path(customer_id: customer.id))
+
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.data_files.order(sort), sortable: true) do
         column(:name, sortable: :name) { |data_file| auto_link(data_file) }
         column(:file_type, sortable: :file_type)
+        column(:s3_region_name, sortable: :s3_region_name)
         column(:s3_bucket_name, sortable: :s3_bucket_name)
         column(:s3_file_name, sortable: :s3_file_name)
       end
