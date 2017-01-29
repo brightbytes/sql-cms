@@ -27,13 +27,6 @@ describe Customer do
       it { should validate_uniqueness_of(:name).case_insensitive }
       it { should validate_uniqueness_of(:slug).case_insensitive }
     end
-
-    # This doesn't matter, and probably never will
-    # it "shouldn't allow slug updating once set" do
-    #   subject.slug = "foobar"
-    #   expect(subject).to_not be_valid
-    #   expect(subject.errors[:slug]).to_not be_nil
-    # end
   end
 
   describe "associations" do

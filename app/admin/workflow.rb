@@ -22,7 +22,6 @@ ActiveAdmin.register Workflow do
       row :id
       row :customer
       row :name
-      row :schema_base_name
       row :copied_from_workflow
       row :created_at
       row :updated_at
@@ -44,10 +43,13 @@ ActiveAdmin.register Workflow do
   end
 
   form do |f|
+    # For debugging:
+    semantic_errors *f.object.errors.keys
     inputs 'Details' do
       input :customer, as: :select, collection: Customer.order(:slug).all
       input :name, as: :string
     end
+    actions
   end
 
 

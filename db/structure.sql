@@ -521,7 +521,7 @@ ALTER SEQUENCE versions_id_seq OWNED BY versions.id;
 CREATE TABLE workflows (
     id integer NOT NULL,
     name character varying NOT NULL,
-    schema_base_name character varying NOT NULL,
+    slug character varying NOT NULL,
     customer_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -992,10 +992,10 @@ CREATE UNIQUE INDEX index_workflows_on_lowercase_name ON workflows USING btree (
 
 
 --
--- Name: index_workflows_on_lowercase_schema_base_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_workflows_on_lowercase_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_workflows_on_lowercase_schema_base_name ON workflows USING btree (lower((schema_base_name)::text));
+CREATE UNIQUE INDEX index_workflows_on_lowercase_slug ON customers USING btree (lower((slug)::text));
 
 
 --

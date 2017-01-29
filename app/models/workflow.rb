@@ -4,7 +4,7 @@
 #
 #  id                      :integer          not null, primary key
 #  name                    :string           not null
-#  schema_base_name        :string           not null
+#  slug                    :string           not null
 #  customer_id             :integer          not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
@@ -12,10 +12,9 @@
 #
 # Indexes
 #
-#  index_workflows_on_copied_from_workflow_id     (copied_from_workflow_id)
-#  index_workflows_on_customer_id                 (customer_id)
-#  index_workflows_on_lowercase_name              (lower((name)::text)) UNIQUE
-#  index_workflows_on_lowercase_schema_base_name  (lower((schema_base_name)::text)) UNIQUE
+#  index_workflows_on_copied_from_workflow_id  (copied_from_workflow_id)
+#  index_workflows_on_customer_id              (customer_id)
+#  index_workflows_on_lowercase_name           (lower((name)::text)) UNIQUE
 #
 # Foreign Keys
 #
@@ -26,9 +25,11 @@
 class Workflow < ApplicationRecord
 
   # This class represents a particular configuration of an SQL Workflow at a particular point in time.
-  # Its name and schema_base_name are case-insensitively unique, here and in the DB.
+  # Its name and slug case-insensitively unique, here and in the DB.
 
   include Concerns::SqlHelpers
+
+  include Concerns::SqlSlugs
 
   auto_normalize
 
@@ -36,11 +37,15 @@ class Workflow < ApplicationRecord
 
   validates :customer, presence: true
 
-  validates :name, :schema_base_name, presence: true, uniqueness: { case_sensitive: false }
+  validates :name, presence: true, uniqueness: { case_sensitive: false }
 
-  # Callbacks
+  validates :slug, presence: true, uniqueness: { case_sensitive: false }
 
+  validate :slug_valid_sql_identifier
 
+  def slug_valid_sql_identifier
+    errors.add(:slug, "Is not a valid SQL identifier") unless slug =~ /^[a-z_]([a-z0-9_])*$/
+  end
 
   # Associations
 
@@ -60,12 +65,8 @@ class Workflow < ApplicationRecord
 
   # Instance Methods
 
-  def schema_base_name=(val)
-    super(to_sql_identifier(val))
-  end
-
   def to_s
-    "#{customer.slug}_#{schema_base_name}".freeze
+    "#{customer.slug}_#{slug}".freeze
   end
 
 end

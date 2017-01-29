@@ -13,11 +13,14 @@
 #
 #  index_customers_on_lowercase_name  (lower((name)::text)) UNIQUE
 #  index_customers_on_lowercase_slug  (lower((slug)::text)) UNIQUE
+#  index_workflows_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 
 class Customer < ApplicationRecord
 
   include Concerns::SqlHelpers
+
+  include Concerns::SqlSlugs
 
   acts_as_paranoid
 
@@ -26,21 +29,6 @@ class Customer < ApplicationRecord
   # Validations
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
-
-  validates :slug, presence: true, uniqueness: { case_sensitive: false }
-
-  # This doesn't matter, and probably never will
-  # validate :slug_not_updatable, if: :slug_changed?
-
-  # def slug_not_updatable
-  #   errors.add(:slug, "is not updatable once set") if slug_was.present?
-  # end
-
-  validate :slug_valid_sql_identifier
-
-  def slug_valid_sql_identifier
-    errors.add(:slug, "Is not a valid SQL identifier") unless slug =~ /^[a-z_]([a-z0-9_])*$/
-  end
 
   # Associations
 
@@ -52,19 +40,7 @@ class Customer < ApplicationRecord
 
   scope :sans_deleted, -> { where(deleted_at: nil) }
 
-  # Callbacks
-
-  before_validation :maybe_set_slug_from_name, if: :new_record?
-
-  def maybe_set_slug_from_name
-    self.slug = name unless slug.present?
-  end
-
   # Instance Methods
-
-  def slug=(val)
-    super(to_sql_identifier(val))
-  end
 
   def to_s
     slug

@@ -4,7 +4,6 @@
 #
 #  id                      :integer          not null, primary key
 #  name                    :string           not null
-#  schema_base_name        :string           not null
 #  customer_id             :integer          not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
@@ -15,7 +14,6 @@
 #  index_workflows_on_copied_from_workflow_id     (copied_from_workflow_id)
 #  index_workflows_on_customer_id                 (customer_id)
 #  index_workflows_on_lowercase_name              (lower((name)::text)) UNIQUE
-#  index_workflows_on_lowercase_schema_base_name  (lower((schema_base_name)::text)) UNIQUE
 #
 # Foreign Keys
 #
@@ -29,18 +27,14 @@ describe Workflow do
   end
 
   describe 'validations' do
-    [:name, :schema_base_name, :customer].each do |att|
+    [:name, :customer, :slug].each do |att|
       it { should validate_presence_of(att) }
     end
 
     context 'with a workflow already extant' do
       let!(:subject) { create(:workflow) }
       it { should validate_uniqueness_of(:name).case_insensitive }
-    end
-
-    context 'with a workflow already extant' do
-      let!(:subject) { create(:workflow) }
-      it { should validate_uniqueness_of(:schema_base_name).case_insensitive }
+      it { should validate_uniqueness_of(:slug).case_insensitive }
     end
 
   end
@@ -58,18 +52,18 @@ describe Workflow do
 
   describe 'instance methods' do
 
-    it "should coerce invalid schema_base_names to valid schema_base_names on set" do
-      workflow = build(:workflow, schema_base_name: "0foo 1$BAR_")
-      expect(workflow.schema_base_name).to eq("_foo_1_bar_")
-      workflow = build(:workflow, schema_base_name: "foo 123 %@#_")
-      expect(workflow.schema_base_name).to eq("foo_123_")
+    it "should coerce invalid slugs to valid slugs on set" do
+      workflow = build(:workflow, slug: "0foo 1$BAR_")
+      expect(workflow.slug).to eq("_foo_1_bar_")
+      workflow = build(:workflow, slug: "foo 123 %@#_")
+      expect(workflow.slug).to eq("foo_123_")
     end
 
     context "#to_s" do
       let!(:subject) { create(:workflow) }
 
-      it "should return the concatenation of the customer slug, an underscore, and the schema base name" do
-        expect(subject.to_s).to eq("#{subject.customer.slug}_#{subject.schema_base_name}")
+      it "should return the concatenation of the customer slug, an underscore, and the slug" do
+        expect(subject.to_s).to eq("#{subject.customer.slug}_#{subject.slug}")
       end
     end
 

@@ -36,7 +36,7 @@ class ApplicationTables < ActiveRecord::Migration
     create_table :workflows do |t|
       t.with_options(null: false) do |tt|
         tt.string :name
-        tt.string :schema_base_name
+        tt.string :slug
         tt.integer :customer_id
         tt.timestamps
       end
@@ -44,7 +44,7 @@ class ApplicationTables < ActiveRecord::Migration
     end
 
     execute "CREATE UNIQUE INDEX index_workflows_on_lowercase_name ON workflows USING btree (lower(name))"
-    execute "CREATE UNIQUE INDEX index_workflows_on_lowercase_schema_base_name ON workflows USING btree (lower(schema_base_name))"
+    execute "CREATE UNIQUE INDEX index_workflows_on_lowercase_slug ON customers USING btree (lower(slug))"
     add_index :workflows, :customer_id
     add_index :workflows, :copied_from_workflow_id
 
