@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: notifications
+# Table name: public.notifications
 #
 #  id          :integer          not null, primary key
 #  user_id     :integer          not null

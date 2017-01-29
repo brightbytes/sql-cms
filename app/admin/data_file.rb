@@ -60,9 +60,6 @@ ActiveAdmin.register DataFile do
 
   form do |f|
     inputs 'Details' do
-      # This might be useful elsewhere; keep it around
-      # semantic_errors *f.object.errors.keys
-
       input :customer, as: :select, collection: Customer.order(:slug).all
       input :name, as: :string
 

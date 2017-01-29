@@ -59,6 +59,12 @@ class User < ApplicationRecord
     "#{first_name} #{last_name}".squish
   end
 
+  def full_name_and_email
+    "#{full_name} <#{email}>".squish
+  end
+
+  alias_method :to_s, :full_name_and_email
+
   # Class Methods
 
   # Can't use the memoize gem here, because the gem gags on both explicit flushing (e.g. User.admin(true)) and implicit flushing (i.e. User.flush_cache).  Lame.

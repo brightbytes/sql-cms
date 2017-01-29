@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: transform_dependencies
+# Table name: public.transform_dependencies
 #
 #  id                         :integer          not null, primary key
 #  prerequisite_transform_id  :integer          not null
@@ -14,8 +14,8 @@
 #
 # Foreign Keys
 #
-#  fk_rails_689b9ffda6  (postrequisite_transform_id => transforms.id)
-#  fk_rails_fc2f9284ca  (prerequisite_transform_id => transforms.id)
+#  fk_rails_...  (postrequisite_transform_id => transforms.id)
+#  fk_rails_...  (prerequisite_transform_id => transforms.id)
 #
 
 describe TransformDependency do

@@ -3,22 +3,24 @@
 #
 # Table name: public.runs
 #
-#  id            :integer          not null, primary key
-#  pipeline_id   :integer          not null
-#  creator_id    :integer          not null
-#  current_phase :string           default("unstarted"), not null
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
+#  id             :integer          not null, primary key
+#  workflow_id    :integer          not null
+#  creator_id     :integer          not null
+#  schema_prefix  :string           not null
+#  execution_plan :jsonb            not null
+#  status         :string           default("unstarted"), not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
 #
 # Indexes
 #
 #  index_runs_on_creator_id   (creator_id)
-#  index_runs_on_pipeline_id  (pipeline_id)
+#  index_runs_on_workflow_id  (workflow_id)
 #
 # Foreign Keys
 #
-#  fk_rails_04ef897c56  (pipeline_id => pipelines.id)
-#  fk_rails_a46b8f09db  (creator_id => users.id)
+#  fk_rails_...  (creator_id => users.id)
+#  fk_rails_...  (workflow_id => workflows.id)
 #
 
 describe Run do
