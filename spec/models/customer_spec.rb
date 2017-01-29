@@ -21,7 +21,6 @@ describe Customer do
 
   describe "validations" do
     it { should validate_presence_of(:name) }
-    it { should validate_presence_of(:slug) }
 
     context "with a Customer already extant" do
       it { should validate_uniqueness_of(:name).case_insensitive }
