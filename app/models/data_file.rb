@@ -7,6 +7,7 @@
 #  metadata       :jsonb            not null
 #  customer_id    :integer          not null
 #  file_type      :string           default("import"), not null
+#  s3_region_name :string           default("us-west-2"), not null
 #  s3_bucket_name :string           not null
 #  s3_file_name   :string           not null
 #  created_at     :datetime         not null
@@ -32,7 +33,7 @@ class DataFile < ApplicationRecord
 
   # Validations
 
-  validates :customer, :s3_bucket_name, :s3_file_name, presence: true
+  validates :customer, :s3_region_name, :s3_bucket_name, :s3_file_name, presence: true
 
   FILE_TYPES = %w(import export).freeze
 
@@ -59,9 +60,10 @@ class DataFile < ApplicationRecord
 
   def parse_supplied_s3_url
     if supplied_s3_url.present?
-      if (http_match = %r{\Ahttp(?:s)?://.+?/([-\w]+)/(.{10,})\Z}.match(supplied_s3_url))
-        self.s3_bucket_name = http_match[1]
-        self.s3_file_name = http_match[2]
+      if (http_match = %r{\Ahttp(?:s)?://s3-([-\w]+).amazonaws.com/([-\w]+)/(.{10,})\Z}.match(supplied_s3_url))
+        self.s3_region_name = http_match[1]
+        self.s3_bucket_name = http_match[2]
+        self.s3_file_name = http_match[3]
       end
       if (s3_match = %r{\As3://([-\w]+)/(.{10,})\Z}.match(supplied_s3_url))
         self.s3_bucket_name = s3_match[1]
@@ -90,7 +92,7 @@ class DataFile < ApplicationRecord
   def s3_presigned_url
     @s3_presigned_url ||
       begin
-        s3_bucket = self.class.s3.bucket(s3_bucket_name)
+        s3_bucket = s3.bucket(s3_bucket_name)
         s3_object = s3_bucket.object(s3_file_name)
         @s3_presigned_url = s3_object.presigned_url(:get) if s3_object.exists?
       end
@@ -99,7 +101,7 @@ class DataFile < ApplicationRecord
   def s3_public_url
     @s3_public_url ||
       begin
-        s3_bucket = self.class.s3.bucket(s3_bucket_name)
+        s3_bucket = s3.bucket(s3_bucket_name)
         s3_object = s3_bucket.object(s3_file_name)
         @s3_public_url = s3_object.public_url if s3_object.exists?
       end
@@ -108,10 +110,12 @@ class DataFile < ApplicationRecord
   # FIXME - ADD METHOD FOR PROVIDING AN UPLOAD STREAM SYNC TO BE LOADED BY THE CLIENT FROM THE DB, TO CREATE AN S3 FILE THAT DOESN'T ALREADY EXIST
   #         THIS WILL REQUIRE ADDING AN EXTRA `"run_#{run.id}"` PARENT DIRECTORY TO THE SUPPLIED FILE NAME.  MEH.
 
-  # Class Methods
+  private
 
-  def self.s3
-    @s3 ||= Aws::S3::Resource.new(region: 'us-west-2')
+  def s3
+    @s3 ||= Aws::S3::Resource.new(region: s3_region_name)
   end
+
+  # Class Methods
 
 end

@@ -120,6 +120,7 @@ CREATE TABLE data_files (
     metadata jsonb DEFAULT '"{}"'::jsonb NOT NULL,
     customer_id integer NOT NULL,
     file_type character varying DEFAULT 'import'::character varying NOT NULL,
+    s3_region_name character varying DEFAULT 'us-west-2'::character varying NOT NULL,
     s3_bucket_name character varying NOT NULL,
     s3_file_name character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,

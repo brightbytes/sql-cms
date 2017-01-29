@@ -20,6 +20,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.jsonb :metadata, default: '{}'
         tt.integer :customer_id
         tt.string :file_type, default: :import
+        tt.string :s3_region_name, default: 'us-west-2'
         tt.string :s3_bucket_name
         tt.string :s3_file_name
         tt.timestamps

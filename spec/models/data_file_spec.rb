@@ -29,7 +29,7 @@ describe DataFile do
   end
 
   describe "validations" do
-    [:name, :customer, :file_type, :s3_bucket_name, :s3_file_name].each do |att|
+    [:name, :customer, :file_type, :s3_region_name, :s3_bucket_name, :s3_file_name].each do |att|
       it { should validate_presence_of(att) }
     end
 
@@ -57,6 +57,7 @@ describe DataFile do
         df = build(:data_file, s3_bucket_name: nil, s3_file_name: nil)
         df.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-pipeline-production-rawdata/ca_pleasant_valley_sis/v_2_201610212151_custom/calendars_2017.tsv/part_0000.tsv"
         expect(df.valid?).to eq(true)
+        expect(df.s3_region_name).to eq('us-west-2')
         expect(df.s3_bucket_name).to eq('bb-pipeline-production-rawdata')
         expect(df.s3_file_name).to eq('ca_pleasant_valley_sis/v_2_201610212151_custom/calendars_2017.tsv/part_0000.tsv')
 

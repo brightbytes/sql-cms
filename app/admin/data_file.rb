@@ -1,6 +1,6 @@
 ActiveAdmin.register DataFile do
 
-  menu priority: 20
+  menu priority: 15
 
   scope "All", :with_deleted
   # For some reason, this doesn't use AR.all ...
