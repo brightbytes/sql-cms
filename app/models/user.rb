@@ -55,6 +55,8 @@ class User < ApplicationRecord
 
   # Instance Methods
 
+  accepts_nested_attributes_for :notifications, allow_destroy: true
+
   def full_name
     "#{first_name} #{last_name}".squish
   end
