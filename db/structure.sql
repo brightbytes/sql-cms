@@ -193,8 +193,7 @@ CREATE TABLE notifications (
     id integer NOT NULL,
     user_id integer NOT NULL,
     workflow_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone NOT NULL
 );
 
 

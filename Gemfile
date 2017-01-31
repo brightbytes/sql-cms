@@ -37,7 +37,7 @@ group :development, :test do
   gem 'thin' # appserver
 
   # The newer stuff fixes model annotations with funky indexes, but breaks route annotation.  FML
-  gem 'annotate', github: 'ctran/annotate_models', ref: "d108ba8bdec760ded4c8c786b1d7cc72cadba4df"
+  gem 'annotate'#, github: 'ctran/annotate_models', ref: "d108ba8bdec760ded4c8c786b1d7cc72cadba4df"
 
   gem 'pry-rails'
 

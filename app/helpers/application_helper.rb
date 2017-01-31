@@ -1,3 +1,4 @@
+# FIXME - AA DOESN'T AUTO-RELOAD THIS FILE
 module ApplicationHelper
 
   def pretty_print_as_json(json)
@@ -7,6 +8,46 @@ module ApplicationHelper
   # Kinda lame, but whatever
   def pretty_print_json(json)
     pretty_print_as_json(JSON.parse(json))
+  end
+
+
+  def workflows_with_preselect
+    param_val = params[:workflow_id].to_i
+    Workflow.order(:slug).map { |c| (c.id == param_val) ? [c.name, c.id, selected: true] : [c.name, c.id] }
+  end
+
+  def workflow_id_param_val
+    params[:workflow_id] || resource.workflow.try(:id)
+  end
+
+  def notification_workflow
+    resource.workflow || Workflow.find_by(id: params[:workflow_id])
+  end
+
+  def parent_workflow_path
+    workflow_path(id: workflow_id_param_val)
+  end
+
+  def notifiable_user_ids(workflow)
+    User.pluck(:id) - workflow.notifications.pluck(:user_id)
+  end
+
+  def any_notifiable_users?(workflow)
+    notifiable_user_ids(workflow).present?
+  end
+
+  def users_sans_preselected(workflow)
+    User.where(id: notifiable_user_ids(workflow)).order(:first_name, :last_name)
+  end
+
+  def users_with_preselect
+    param_val = params[:user_id].to_i
+    User.order(:first_name, :last_name).map { |c| (c.id == param_val) ? [c.full_name, c.id, selected: true] : [c.full_name, c.id] }
+  end
+
+  def customers_with_preselect
+    param_val = params[:customer_id].to_i
+    Customer.order(:slug).map { |c| (c.id == param_val) ? [c.name, c.id, selected: true] : [c.name, c.id] }
   end
 
 end

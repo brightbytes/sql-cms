@@ -56,7 +56,7 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.integer :user_id
         tt.integer :workflow_id
-        tt.timestamps
+        tt.datetime :created_at
       end
     end
 

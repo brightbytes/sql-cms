@@ -6,7 +6,6 @@
 #  user_id     :integer          not null
 #  workflow_id :integer          not null
 #  created_at  :datetime         not null
-#  updated_at  :datetime         not null
 #
 # Indexes
 #

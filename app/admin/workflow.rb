@@ -30,11 +30,11 @@ ActiveAdmin.register Workflow do
     end
 
     panel 'Notifications' do
-      text_node link_to("Create New Notification", )
+      text_node link_to("Create New Notification", new_notification_path(workflow_id: resource.id)) if any_notifiable_users?(workflow)
 
-      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :first_name
-      table_for(resource.notified_users.order(sort), sortable: true) do
-        column(:user, sortable: :first_name) { |user| auto_link(user) }
+      table_for(resource.notifications.joins(:user).order('users.first_name, users.last_name')) do
+        column(:user) { |notification| auto_link(notification.user) }
+        column(:action) { |notification| link_to("Delete", notification_path(notification), method: :delete) }
       end
     end
 
@@ -47,7 +47,7 @@ ActiveAdmin.register Workflow do
     # For debugging:
     # semantic_errors *f.object.errors.keys
     inputs 'Details' do
-      input :customer, as: :select, collection: proc { Customer.order(:slug).map { |c| [c.name, c.id, selected: (c.id == params[:customer_id].to_i)] } }.call
+      input :customer, as: :select, collection: customers_with_preselect
       input :name, as: :string
       input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated."
     end

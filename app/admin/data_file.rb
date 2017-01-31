@@ -22,7 +22,6 @@ ActiveAdmin.register DataFile do
   filter :file_type, as: :select, collection: DataFile::FILE_TYPES
   filter :s3_bucket_name, as: :select
 
-  # This may not work
   config.sort_order = 'customers.name_asc'
 
   index download_links: false do
@@ -60,7 +59,7 @@ ActiveAdmin.register DataFile do
 
   form do |f|
     inputs 'Details' do
-      input :customer, as: :select, collection: proc { Customer.order(:slug).map { |c| [c.name, c.id, selected: (c.id == params[:customer_id].to_i)] } }.call
+      input :customer, as: :select, collection: customers_with_preselect
       input :name, as: :string
 
       input :file_type, as: :select, collection: DataFile::FILE_TYPES
