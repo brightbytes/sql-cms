@@ -29,6 +29,16 @@ ActiveAdmin.register Workflow do
       row :updated_at
     end
 
+    panel 'Transforms' do
+      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id))
+
+      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
+      table_for(resource.transforms.order(sort), sortable: true) do
+        column(:name, sortable: :name) { |transform| auto_link(transform) }
+        column(:runner, sortable: :runner) { |transform| transform.runner }
+      end
+    end
+
     panel 'Notifications' do
       text_node link_to("Create New Notification", new_notification_path(workflow_id: resource.id)) if any_notifiable_users?(workflow)
 

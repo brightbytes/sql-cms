@@ -17,7 +17,13 @@ module UserSeeder
       email: 'aaron@brightbytes.net',
       first_name: 'Aaron',
       last_name: 'Cohen'
+    },
+    {
+      email: 'buckley@brightbytes.net',
+      first_name: 'Buckley',
+      last_name: 'Robinson'
     }
+
   ]
 
 end

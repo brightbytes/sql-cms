@@ -20,8 +20,17 @@ module ApplicationHelper
     params[:workflow_id] || resource.workflow.try(:id)
   end
 
-  def notification_workflow
-    resource.workflow || Workflow.find_by(id: params[:workflow_id])
+  def resource_workflow
+    @resource_workflow ||= resource.workflow || Workflow.find_by(id: params[:workflow_id])
+  end
+
+  def data_files_for_workflow
+    @data_files_for_workflow ||=
+      if resource_workflow
+        DataFile.where(customer_id: resource_workflow.customer_id)
+      else
+        []
+      end
   end
 
   def parent_workflow_path

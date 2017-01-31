@@ -55,6 +55,9 @@ describe Transform do
       transform.params = {}
       expect(transform.valid?).to be true
     end
+
+    it { should validate_inclusion_of(:runner).in_array(described_class::RUNNERS) }
+    it { should validate_inclusion_of(:transcompiled_source_language).in_array(described_class::TRANSCOMPILED_LANGUAGES).allow_nil }
   end
 
   describe "callbacks" do

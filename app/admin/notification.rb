@@ -12,7 +12,7 @@ ActiveAdmin.register Notification do
     inputs 'Details' do
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
       input :workflow, as: :select, collection: workflows_with_preselect, input_html: { disabled: true }
-      input :user, as: :select, collection: users_sans_preselected(notification_workflow)
+      input :user, as: :select, collection: users_sans_preselected(resource_workflow)
     end
     actions do
       action(:submit)

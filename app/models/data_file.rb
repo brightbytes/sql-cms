@@ -87,6 +87,14 @@ class DataFile < ApplicationRecord
 
   alias_attribute :to_s, :name
 
+  def metadata_yaml
+    metadata.to_yaml if metadata.present?
+  end
+
+  def metadata_yaml=(val)
+    self.metadata = (val.blank? ? {} : YAML.load(val))
+  end
+
   attr_accessor :supplied_s3_url
 
   def s3_presigned_url

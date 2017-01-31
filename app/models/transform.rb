@@ -37,7 +37,15 @@ class Transform < ApplicationRecord
 
   # Validations
 
-  validates :runner, :sql, :workflow, presence: true
+  validates :sql, :workflow, presence: true
+
+  RUNNERS = %w(CopyFrom Sql CopyTo)
+
+  validates :runner, presence: true, inclusion: { in: RUNNERS }
+
+  TRANSCOMPILED_LANGUAGES = %w(RailsMigration)
+
+  validates :transcompiled_source_language, allow_nil: true, inclusion: { in: TRANSCOMPILED_LANGUAGES }
 
   validates :data_file, uniqueness: { scope: :workflow_id }, allow_nil: true
 
@@ -72,6 +80,15 @@ class Transform < ApplicationRecord
   has_many :validations, through: :transform_validations
 
   # Instance Methods
+
+  def params_yaml
+    params.to_yaml if params.present?
+  end
+
+  def params_yaml=(val)
+    self.params = (val.blank? ? {} : YAML.load(val))
+  end
+
 
   # FIXME - MOVE TO SERVICE LAYER AS Runner, WITH strategy classes
   #

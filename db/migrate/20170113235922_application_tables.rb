@@ -17,7 +17,7 @@ class ApplicationTables < ActiveRecord::Migration
     create_table :data_files do |t|
       t.with_options(null: false) do |tt|
         tt.string :name
-        tt.jsonb :metadata, default: '{}'
+        tt.jsonb :metadata, default: {}
         tt.integer :customer_id
         tt.string :file_type, default: :import
         tt.string :s3_region_name, default: 'us-west-2'
@@ -72,7 +72,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.string :name
         tt.string :runner
         tt.integer :workflow_id
-        tt.jsonb :params, default: '{}'
+        tt.jsonb :params, default: {}
         tt.text :sql
         tt.timestamps
       end
@@ -122,7 +122,7 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.integer :transform_id
         tt.integer :validation_id
-        tt.jsonb :params, default: '{}'
+        tt.jsonb :params, default: {}
         tt.timestamps
       end
     end
@@ -138,7 +138,7 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.integer :workflow_id
         tt.string :name
-        tt.jsonb :params, default: '{}'
+        tt.jsonb :params, default: {}
         tt.text :sql
         tt.timestamps
       end
@@ -179,7 +179,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.string :step_type
         tt.string :step_name # Denormalization to ease debugging
         tt.boolean :completed_successfully, default: false
-        tt.jsonb :step_errors, default: '{}'
+        tt.jsonb :step_errors, default: {}
         tt.timestamps
       end
     end
