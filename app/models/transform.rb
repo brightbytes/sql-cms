@@ -65,6 +65,8 @@ class Transform < ApplicationRecord
 
   belongs_to :workflow, inverse_of: :transforms
 
+  has_one :customer, through: :workflow
+
   belongs_to :data_file, inverse_of: :transforms
 
   belongs_to :copied_from_transform, class_name: 'Transform', inverse_of: :copied_to_transforms

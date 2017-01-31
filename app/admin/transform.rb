@@ -19,6 +19,7 @@ ActiveAdmin.register Transform do
   index(download_links: false) do
     column(:name) { |transform| auto_link(transform) }
     column(:workflow, sortable: 'workflows.slug')
+    column(:customer, sortable: 'customers.slug')
     column(:runner)
   end
 
@@ -27,6 +28,7 @@ ActiveAdmin.register Transform do
       row :id
       row :name
       row :workflow
+      row :customer
 
       row :runner
       row(:params) { code(pretty_print_as_json(resource.params)) }
@@ -47,7 +49,9 @@ ActiveAdmin.register Transform do
 
   form do |f|
     inputs 'Details' do
-      input :workflow, as: :select, collection: workflows_with_preselect
+      input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
+      input :workflow, as: :select, collection: workflows_with_preselect(editing), input_html: { disabled: editing }
+
       input :name, as: :string
       input :runner, as: :select, collection: Transform::RUNNERS
 
@@ -63,13 +67,16 @@ ActiveAdmin.register Transform do
 
       input :data_file, as: :select, collection: data_files_for_workflow
     end
-    actions
+    actions do
+      action(:submit)
+      cancel_link(f.object.new_record? ? transforms_path : transform_path(f.object))
+    end
   end
 
   controller do
 
     def scoped_collection
-      super.joins(:workflow)
+      super.joins(workflow: :customer)
     end
 
   end

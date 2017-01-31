@@ -21,13 +21,16 @@ module ApplicationHelper
 
   # Workflow stuff
 
-  def workflows_with_preselect
-    param_val = params[:workflow_id].to_i
-    Workflow.order(:slug).map { |c| (c.id == param_val) ? [c.name, c.id, selected: true] : [c.name, c.id] }
+  def workflows_with_preselect(disabled = false)
+    if disabled
+      [[resource_workflow.name, resource_workflow.id, selected: true]]
+    else
+      Workflow.order(:slug).map { |c| (c.id == workflow_id_param_val) ? [c.name, c.id, selected: true] : [c.name, c.id] }
+    end
   end
 
   def workflow_id_param_val
-    @workflow_id_param_val ||= params[:workflow_id] || resource.workflow.try(:id)
+    @workflow_id_param_val ||= params[:workflow_id]&.to_i || resource.workflow.try(:id)
   end
 
   def resource_workflow

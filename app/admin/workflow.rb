@@ -12,7 +12,6 @@ ActiveAdmin.register Workflow do
   config.sort_order = 'customers.slug_asc,slug_asc'
 
   index(download_links: false) do
-    # id_column
     column(:name, sortable: :slug) { |workflow| auto_link(workflow) }
     column(:customer, sortable: 'customers.slug')
     # column :slug
@@ -62,7 +61,7 @@ ActiveAdmin.register Workflow do
     end
     actions do
       action(:submit)
-      cancel_link(workflow_path(f.object))
+      cancel_link(f.object.new_record? ? workflows_path : workflow_path(f.object))
     end
   end
 
