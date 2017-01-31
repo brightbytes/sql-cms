@@ -69,6 +69,6 @@ class Workflow < ApplicationRecord
     "#{customer.slug}_#{slug}".freeze
   end
 
-  accepts_nested_attributes_for :notified_users, allow_destroy: true
+  accepts_nested_attributes_for :notified_users
 
 end

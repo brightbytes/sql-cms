@@ -4,7 +4,7 @@ ActiveAdmin.register Transform do
 
   actions :all
 
-  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :transcompiled_source, :transcompiled_source_language, :data_file_id
+  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :transcompiled_source, :transcompiled_source_language, :data_file_id, prerequisite_transform_ids: []
 
   filter :name, as: :string
   filter :runner, as: :select, collection: Transform::RUNNERS
@@ -49,6 +49,8 @@ ActiveAdmin.register Transform do
 
   form do |f|
     inputs 'Details' do
+      editing = action_name.in?(%w(edit update))
+      input :customer_id, as: :hidden, input_html: { value: transform_customer_id_param_val }
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
       input :workflow, as: :select, collection: workflows_with_preselect(editing), input_html: { disabled: editing }
 
@@ -67,6 +69,11 @@ ActiveAdmin.register Transform do
 
       input :data_file, as: :select, collection: data_files_for_workflow
     end
+
+    inputs 'Dependencies' do
+      input :prerequisite_transforms, as: :check_boxes, collection: f.object.available_prerequisite_transforms
+    end
+
     actions do
       action(:submit)
       cancel_link(f.object.new_record? ? transforms_path : transform_path(f.object))

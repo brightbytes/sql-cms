@@ -37,10 +37,14 @@ module ApplicationHelper
     @resource_workflow ||= resource.workflow || Workflow.find_by(id: params[:workflow_id])
   end
 
+  def transform_customer_id_param_val
+    @transform_customer_id_param_val ||= params[:customer_id]&.to_i || resource_workflow.customer_id
+  end
+
   def data_files_for_workflow
     @data_files_for_workflow ||=
-      if resource_workflow
-        DataFile.where(customer_id: resource_workflow.customer_id)
+      if transform_customer_id_param_val
+        DataFile.where(customer_id: transform_customer_id_param_val)
       else
         []
       end

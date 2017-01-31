@@ -83,12 +83,38 @@ class Transform < ApplicationRecord
 
   # Instance Methods
 
+  accepts_nested_attributes_for :prerequisite_transforms
+
   def params_yaml
     params.to_yaml if params.present?
   end
 
   def params_yaml=(val)
     self.params = (val.blank? ? {} : YAML.load(val))
+  end
+
+  # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite and is not already a prerequisite of this Transform
+  #  is itself available as a prerequisite. This is how we avoid cycles in the Transform Dependency graph.
+  def available_prerequisite_transforms
+    base_arel = Transform.where(workflow_id: workflow_id).order(:name)
+    if new_record?
+      base_arel.all
+    else
+      eligible_transforms =
+        base_arel.
+        where("id <> #{id}").  # skip this Transform
+        where("NOT EXISTS (SELECT 1 FROM transform_dependencies td WHERE td.postrequisite_transform_id = #{id})"). # skip Transforms that are already prereqs of this Transform
+        where("NOT EXISTS (SELECT 1 FROM transform_dependencies td WHERE td.prerequisite_transform_id = #{id})"). # skip Transforms that already depend upon this Transform
+        all
+      # Where's that graph DB when you need it?
+      eligible_transforms.reject { |eligible_transform| indirectly_dependent?(eligible_transform) }
+    end
+  end
+
+  private def indirectly_dependent?(transform)
+    dependents = transform.prerequisite_transforms
+    return false if dependents.empty?
+    dependents.any? { |dependent_transform| indirectly_dependent?(dependent_transform) }
   end
 
 

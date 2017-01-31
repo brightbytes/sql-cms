@@ -29,7 +29,7 @@ ActiveAdmin.register Workflow do
     end
 
     panel 'Transforms' do
-      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id))
+      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id))
 
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.transforms.order(sort), sortable: true) do
@@ -57,6 +57,8 @@ ActiveAdmin.register Workflow do
       input :customer, as: :select, collection: customers_with_preselect
       input :name, as: :string
       input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated."
+    end
+    inputs 'Run Notifications' do
       input :notified_users, as: :check_boxes
     end
     actions do
