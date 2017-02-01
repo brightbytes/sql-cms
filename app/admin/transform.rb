@@ -42,6 +42,20 @@ ActiveAdmin.register Transform do
       row :updated_at
     end
 
+    panel 'Transform Validations' do
+      text_node link_to("Add New Transform Validation", new_transform_validation_path(transform_id: resource.id))
+
+      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
+      table_for(resource.transform_validations.includes(:validation).order('validations.name'), sortable: true) do
+        column(:transform_validation, sortable: :name) { |tv| auto_link(tv) }
+        # Doesn't work, FML
+        # column(:params) { |tv| code(tv.params) }
+        column(:params) { |tv| tv.params }
+        column(:validation_immutable) { |tv| yes_no(tv.validation.immutable?) }
+        column(:action) { |tv| link_to("Delete", transform_validation_path(tv), method: :delete) }
+      end
+    end
+
     panel 'Prerequisite Transforms' do
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.prerequisite_dependencies.includes(:prerequisite_transform).order('transforms.name'), sortable: true) do

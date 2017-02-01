@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: customers
+# Table name: public.customers
 #
 #  id         :integer          not null, primary key
 #  name       :string           not null
@@ -13,6 +13,7 @@
 #
 #  index_customers_on_lowercase_name  (lower((name)::text)) UNIQUE
 #  index_customers_on_lowercase_slug  (lower((slug)::text)) UNIQUE
+#  index_workflows_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 
 describe Customer do

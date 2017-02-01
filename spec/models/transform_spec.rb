@@ -1,12 +1,12 @@
 # == Schema Information
 #
-# Table name: transforms
+# Table name: public.transforms
 #
 #  id                            :integer          not null, primary key
 #  name                          :string           not null
 #  runner                        :string           not null
 #  workflow_id                   :integer          not null
-#  params                    :jsonb            not null
+#  params                        :jsonb            not null
 #  sql                           :text             not null
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null

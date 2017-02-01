@@ -7,6 +7,7 @@
 #  metadata       :jsonb            not null
 #  customer_id    :integer          not null
 #  file_type      :string           default("import"), not null
+#  s3_region_name :string           default("us-west-2"), not null
 #  s3_bucket_name :string           not null
 #  s3_file_name   :string           not null
 #  created_at     :datetime         not null
@@ -22,6 +23,7 @@
 #
 #  fk_rails_...  (customer_id => customers.id)
 #
+
 describe DataFile do
 
   describe 'versioned by PaperTrail' do

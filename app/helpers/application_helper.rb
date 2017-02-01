@@ -1,6 +1,22 @@
 # FIXME - AA DOESN'T AUTO-RELOAD THIS FILE
 module ApplicationHelper
 
+  def yes_no(val, options = {})
+    if val
+      if color = options[:yes_color]
+        "<span style='color: #{color}'>Yes</span>".html_safe
+      else
+        "Yes"
+      end
+    else
+      if color = options[:no_color]
+        "<span style='color: #{color}'>No</span>".html_safe
+      else
+        "No"
+      end
+    end
+  end
+
   # JSON stuff
 
   def pretty_print_as_json(json)
@@ -38,7 +54,7 @@ module ApplicationHelper
   end
 
   def transform_customer_id_param_val
-    @transform_customer_id_param_val ||= params[:customer_id]&.to_i || resource_workflow.customer_id
+    @transform_customer_id_param_val ||= params[:customer_id]&.to_i || resource_workflow&.customer_id
   end
 
   def data_files_for_workflow
@@ -68,7 +84,7 @@ module ApplicationHelper
     if disabled
       [[resource_transform.name, resource_transform.id, selected: true]]
     else
-      Transform.order(:slug).map { |c| (c.id == transform_id_param_val) ? [c.name, c.id, selected: true] : [c.name, c.id] }
+      Transform.order(:name).map { |c| (c.id == transform_id_param_val) ? [c.name, c.id, selected: true] : [c.name, c.id] }
     end
   end
 

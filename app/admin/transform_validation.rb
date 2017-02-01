@@ -2,15 +2,26 @@ ActiveAdmin.register TransformValidation do
 
   menu false
 
-  actions :destroy
+  actions :new, :create, :show, :destroy
 
-  actions :new, :create, :destroy
+  permit_params :transform_id, :validation_id, :params_yaml
 
-  permit_params :transform_id, :validation_id, :params
+  show do
+    attributes_table do
+      row :id
+      row :transform
+      row :validation
+      row(:validation_sql) { resource.validation.sql }
+      row(:validation_immutable) { yes_no(resource.validation.immutable) }
+      row(:params) { code(pretty_print_as_json(resource.params)) }
+      row :created_at
+      row :updated_at
+    end
+  end
 
   form do |f|
     # For debugging:
-    # semantic_errors *f.object.errors.keys
+    semantic_errors *f.object.errors.keys
     inputs 'Details' do
       input :transform_id, as: :hidden, input_html: { value: transform_id_param_val }
       input :transform, as: :select, collection: transforms_with_preselect, input_html: { disabled: true }

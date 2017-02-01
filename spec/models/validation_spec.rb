@@ -10,6 +10,10 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# Indexes
+#
+#  index_validations_on_lowercase_name  (lower((name)::text)) UNIQUE
+#
 
 describe Validation do
 
