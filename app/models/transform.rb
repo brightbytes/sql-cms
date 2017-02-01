@@ -72,13 +72,13 @@ class Transform < ApplicationRecord
   belongs_to :copied_from_transform, class_name: 'Transform', inverse_of: :copied_to_transforms
   has_many :copied_to_transforms, class_name: 'Transform', foreign_key: :copied_from_transform_id, inverse_of: :copied_from_transform
 
-  has_many :prerequisite_dependencies, class_name: 'TransformDependency', foreign_key: :postrequisite_transform_id
+  has_many :prerequisite_dependencies, class_name: 'TransformDependency', foreign_key: :postrequisite_transform_id, dependent: :delete_all
   has_many :prerequisite_transforms, through: :prerequisite_dependencies, source: :prerequisite_transform
 
-  has_many :postrequisite_dependencies, class_name: 'TransformDependency', foreign_key: :prerequisite_transform_id
+  has_many :postrequisite_dependencies, class_name: 'TransformDependency', foreign_key: :prerequisite_transform_id, dependent: :delete_all
   has_many :postrequisite_transforms, through: :postrequisite_dependencies, source: :postrequisite_transform
 
-  has_many :transform_validations, inverse_of: :transform, dependent: :destroy
+  has_many :transform_validations, inverse_of: :transform, dependent: :delete_all
   has_many :validations, through: :transform_validations
 
   # Instance Methods

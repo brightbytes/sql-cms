@@ -66,10 +66,6 @@ module ApplicationHelper
       end
   end
 
-  def parent_workflow_path
-    @parent_workflow_path ||= workflow_path(id: workflow_id_param_val)
-  end
-
   # TranformValidations stuff
 
   def transform_id_param_val

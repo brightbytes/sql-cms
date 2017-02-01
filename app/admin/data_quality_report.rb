@@ -39,6 +39,12 @@ ActiveAdmin.register DataQualityReport do
     render partial: 'admin/shared/history'
   end
 
+  sidebar("Actions", only: :show) do
+    ul do
+      li link_to("Copy to Another Workflow")
+    end
+  end
+
   form do |f|
     inputs 'Details' do
       editing = action_name.in?(%w(edit update))
@@ -57,7 +63,8 @@ ActiveAdmin.register DataQualityReport do
 
     actions do
       action(:submit)
-      cancel_link(f.object.new_record? ? data_quality_reports_path : data_quality_report_path(f.object))
+      path = (params[:source] == 'workflow' ? workflow_path(params[:workflow_id]) : f.object.new_record? ? data_quality_reports_path : data_quality_report_path(f.object))
+      cancel_link(path)
     end
   end
 
@@ -65,6 +72,14 @@ ActiveAdmin.register DataQualityReport do
 
     def scoped_collection
       super.joins(workflow: :customer)
+    end
+
+    def destroy
+      super do |success, failure|
+        success.html do
+          redirect_to(params[:source] == 'workflow' ? workflow_path(resource.workflow) : data_quality_reports_path)
+        end
+      end
     end
 
   end

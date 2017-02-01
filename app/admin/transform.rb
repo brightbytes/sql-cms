@@ -79,6 +79,12 @@ ActiveAdmin.register Transform do
     render partial: 'admin/shared/history'
   end
 
+  sidebar("Actions", only: :show) do
+    ul do
+      li link_to("Copy to Another Workflow")
+    end
+  end
+
   form do |f|
     inputs 'Details' do
       editing = action_name.in?(%w(edit update))
@@ -96,7 +102,7 @@ ActiveAdmin.register Transform do
       input :sql, as: :text
 
       # If this is set, hide the :sql field and show the transcompiled_source, if it's unset, hide the transcompiled_source field and show the :sql field
-      input :transcompiled_source_language, as: :select, collection: Transform::TRANSCOMPILED_LANGUAGES
+      input :transcompiled_source_language, required: false, as: :select, collection: Transform::TRANSCOMPILED_LANGUAGES
       input :transcompiled_source, as: :text
 
       input :data_file, as: :select, collection: data_files_for_workflow
@@ -108,7 +114,8 @@ ActiveAdmin.register Transform do
 
     actions do
       action(:submit)
-      cancel_link(f.object.new_record? ? transforms_path : transform_path(f.object))
+      path = (params[:source] == 'workflow' ? workflow_path(params[:workflow_id]) : f.object.new_record? ? transforms_path : transform_path(f.object))
+      cancel_link(path)
     end
   end
 
@@ -116,6 +123,14 @@ ActiveAdmin.register Transform do
 
     def scoped_collection
       super.joins(workflow: :customer)
+    end
+
+    def destroy
+      super do |success, failure|
+        success.html do
+          redirect_to(params[:source] == 'workflow' ? workflow_path(resource.workflow) : transforms_path)
+        end
+      end
     end
 
   end

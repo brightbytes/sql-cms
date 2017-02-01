@@ -29,12 +29,23 @@ ActiveAdmin.register Workflow do
     end
 
     panel 'Transforms' do
-      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id))
+      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
 
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.transforms.order(sort), sortable: true) do
         column(:name, sortable: :name) { |transform| auto_link(transform) }
         column(:runner, sortable: :runner) { |transform| transform.runner }
+        column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete) }
+      end
+    end
+
+    panel 'Data Quality Reports' do
+      text_node link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
+
+      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
+      table_for(resource.data_quality_reports.order(sort), sortable: true) do
+        column(:name, sortable: :name) { |dqr| auto_link(dqr) }
+        column(:action) { |dqr| link_to("Delete", data_quality_report_path(dqr, source: :workflow), method: :delete) }
       end
     end
 
@@ -48,6 +59,12 @@ ActiveAdmin.register Workflow do
     active_admin_comments
 
     render partial: 'admin/shared/history'
+  end
+
+  sidebar("Actions", only: :show) do
+    ul do
+      li link_to("Clone Workflow")
+    end
   end
 
   form do |f|
