@@ -95,9 +95,9 @@ ActiveAdmin.register Transform do
 
       input :sql, as: :text
 
-      # Not ready for these yet
-      # input :transcompiled_source_language, as: :select, collection: Transform::TRANSCOMPILED_LANGUAGES
-      # input :transcompiled_source, as: :text
+      # If this is set, hide the :sql field and show the transcompiled_source, if it's unset, hide the transcompiled_source field and show the :sql field
+      input :transcompiled_source_language, as: :select, collection: Transform::TRANSCOMPILED_LANGUAGES
+      input :transcompiled_source, as: :text
 
       input :data_file, as: :select, collection: data_files_for_workflow
     end
@@ -119,6 +119,5 @@ ActiveAdmin.register Transform do
     end
 
   end
-
 
 end

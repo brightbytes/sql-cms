@@ -27,6 +27,7 @@ describe DataQualityReport do
 
   describe "associations" do
     it { should belong_to(:workflow) }
+    it { should have_one(:customer) }
 
     it { should belong_to(:copied_from_data_quality_report) }
     it { should have_many(:copied_to_data_quality_reports) }

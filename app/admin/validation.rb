@@ -60,7 +60,7 @@ ActiveAdmin.register Validation do
 
     def action_methods
       result = super
-      result -= ['edit', 'update'] if action_name == 'show' && resource.immutable?
+      result -= ['edit', 'update', 'destroy'] if action_name == 'show' && resource.immutable?
       result
     end
 
