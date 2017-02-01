@@ -93,23 +93,23 @@ class Transform < ApplicationRecord
     self.params = (val.blank? ? {} : YAML.load(val))
   end
 
-  # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite is itself available as a prerequisite (and may already be such)
+  # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite is itself available as a prerequisite (and may already be such).
+  # This is how we avoid cycles in the Transform Dependency graph.
   def available_prerequisite_transforms
     base_arel = Transform.where(workflow_id: workflow_id).order(:name)
     if new_record?
       base_arel.all
     else
-      # This else branch is grossly inefficient.  I tried to do it with SQL for the first level, and failed.  Oh well.  Refactor later.
+      # This is grossly inefficient.  I tried to do it with SQL for the first level, and failed.  Oh well.  Refactor later.
       eligible_transforms = base_arel.where("id <> #{id}").all
       # Where's that graph DB when you need it?
-      eligible_transforms.
-        reject { |eligible_transform| already_my_postrequisite?(eligible_transform) }
-
+      eligible_transforms.reject { |eligible_transform| already_my_postrequisite?(eligible_transform) }
     end
   end
 
   # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite and is not already a prerequisite of this Transform
-  #  is itself available as a new prerequisite. This is how we avoid cycles in the Transform Dependency graph.
+  #  is itself available as a new prerequisite.
+  # Turns out we may not need this method; only #available_prerequisite_transforms is in fact necessary
   def available_unused_prerequisite_transforms
     available_prerequisite_transforms.reject { |eligible_transform| already_my_prerequisite?(eligible_transform) }
   end
