@@ -80,7 +80,8 @@ ActiveAdmin.register Workflow do
     end
     actions do
       action(:submit)
-      cancel_link(f.object.new_record? ? workflows_path : workflow_path(f.object))
+      path = (params[:source] == 'customer' ? customer_path(params[:customer_id]) : f.object.new_record? ? workflows_path : workflow_path(f.object))
+      cancel_link(path)
     end
   end
 

@@ -64,19 +64,31 @@ ActiveAdmin.register DataFile do
 
       input :file_type, as: :select, collection: DataFile::FILE_TYPES
 
-      # FIXME: Only show this when :file_type is :import ...
-      input :supplied_s3_url, label: "S3 File URL", hint: "You may use either https:// format or s3:// format for this URL"
+      if action_name.in?(['create', 'new'])
+        # FIXME: Only show this when :file_type is :import ...
+        input :supplied_s3_url, label: "S3 File URL", required: true , hint: "You may use either https:// format or s3:// format for this URL"
 
-      # FIXME: When :file_type is :export, show these instead:
-      # input :s3_region_name, as: :string
-      # input :s3_bucket_name, as: :string
-      # input :s3_file_name, as: :string
+        # FIXME: When :file_type is :export, show these instead:
+        # input :s3_region_name, as: :string
+        # input :s3_bucket_name, as: :string
+        # input :s3_file_name, as: :string
+
+      else
+        input :s3_region_name, as: :string # This should be a drop-down
+        input :s3_bucket_name, as: :string
+        input :s3_file_name, as: :string
+      end
+
 
       # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
       #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
       input :metadata_yaml, as: :text
     end
-    actions
+    actions do
+      action(:submit)
+      path = (params[:source] == 'customer' ? customer_path(params[:customer_id]) : f.object.new_record? ? data_files_path : data_file_path(f.object))
+      cancel_link(path)
+    end
   end
 
   controller do

@@ -39,7 +39,7 @@ ActiveAdmin.register Customer do
     end
 
     panel 'Workflows' do
-      text_node link_to("Create New Workflow", new_workflow_path(customer_id: customer.id))
+      text_node link_to("Create New Workflow", new_workflow_path(customer_id: customer.id, source: :customer))
 
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.workflows.order(sort), sortable: true) do
@@ -48,7 +48,7 @@ ActiveAdmin.register Customer do
     end
 
     panel 'Data Files' do
-      text_node link_to("Create New Data File", new_data_file_path(customer_id: customer.id))
+      text_node link_to("Create New Data File", new_data_file_path(customer_id: customer.id, source: :customer))
 
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.data_files.order(sort), sortable: true) do
