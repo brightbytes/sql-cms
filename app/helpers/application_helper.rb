@@ -54,23 +54,26 @@ module ApplicationHelper
     @parent_workflow_path ||= workflow_path(id: workflow_id_param_val)
   end
 
-  # Possibly reusable code, for later
+  # TranformValidations stuff
 
-  # def notifiable_user_ids(workflow)
-  #   User.pluck(:id) - workflow.notifications.pluck(:user_id)
-  # end
+  def transform_id_param_val
+    @transform_id_param_val ||= params[:transform_id]&.to_i || resource.transform.try(:id)
+  end
 
-  # def any_notifiable_users?(workflow)
-  #   notifiable_user_ids(workflow).present?
-  # end
+  def resource_transform
+    @resource_transform ||= resource.transform || Transform.find_by(id: params[:transform_id])
+  end
 
-  # def users_sans_preselected(workflow)
-  #   User.where(id: notifiable_user_ids(workflow)).order(:first_name, :last_name)
-  # end
+  def transforms_with_preselect(disabled = false)
+    if disabled
+      [[resource_transform.name, resource_transform.id, selected: true]]
+    else
+      Transform.order(:slug).map { |c| (c.id == transform_id_param_val) ? [c.name, c.id, selected: true] : [c.name, c.id] }
+    end
+  end
 
-  # def users_with_preselect
-  #   param_val = params[:user_id].to_i
-  #   User.order(:first_name, :last_name).map { |c| (c.id == param_val) ? [c.full_name, c.id, selected: true] : [c.full_name, c.id] }
-  # end
+  def parent_transform_path
+    @parent_transform_path ||= transform_path(id: transform_id_param_val)
+  end
 
 end

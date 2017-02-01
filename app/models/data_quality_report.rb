@@ -26,7 +26,7 @@
 
 class DataQualityReport < ApplicationRecord
 
-  include Concerns::SqlParamsInterpolator
+  include Concerns::ParamsHelpers
 
   auto_normalize
 

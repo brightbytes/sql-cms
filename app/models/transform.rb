@@ -31,7 +31,7 @@
 
 class Transform < ApplicationRecord
 
-  include Concerns::SqlParamsInterpolator
+  include Concerns::ParamsHelpers
 
   auto_normalize
 
@@ -84,14 +84,6 @@ class Transform < ApplicationRecord
   # Instance Methods
 
   accepts_nested_attributes_for :prerequisite_transforms
-
-  def params_yaml
-    params.to_yaml if params.present?
-  end
-
-  def params_yaml=(val)
-    self.params = (val.blank? ? {} : YAML.load(val))
-  end
 
   # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite is itself available as a prerequisite (and may already be such).
   # This is how we avoid cycles in the Transform Dependency graph.

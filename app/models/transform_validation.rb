@@ -22,7 +22,7 @@
 
 class TransformValidation < ApplicationRecord
 
-  include Concerns::SqlParamsInterpolator
+  include Concerns::ParamsHelpers
 
   # Validations
 
