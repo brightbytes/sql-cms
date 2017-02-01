@@ -41,12 +41,12 @@ module ValidationSeeder
       sql: "SELECT id FROM :table_name WHERE :column_name !~ '#{DIGIT_REGEXP}' AND :column_name NOT IN (:extras)"
     )
 
-    Validation.where(name: 'Greater Than').first_or_create!(
+    Validation.where(name: 'Field Value Greater Than').first_or_create!(
       immutable: true,
       sql: 'SELECT id from :table_name WHERE :column_name <= :value'
     )
 
-    Validation.where(name: 'Less Than').first_or_create!(
+    Validation.where(name: 'Field Value Less Than').first_or_create!(
       immutable: true,
       sql: 'SELECT id from :table_name WHERE :column_name >= :value'
     )

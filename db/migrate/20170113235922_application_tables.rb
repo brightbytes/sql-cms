@@ -112,8 +112,6 @@ class ApplicationTables < ActiveRecord::Migration
         tt.text :sql
         tt.timestamps
       end
-      t.text :transcompiled_source
-      t.string :transcompiled_source_language
     end
 
     execute "CREATE UNIQUE INDEX index_validations_on_lowercase_name ON validations USING btree (lower(name))"
@@ -142,8 +140,6 @@ class ApplicationTables < ActiveRecord::Migration
         tt.text :sql
         tt.timestamps
       end
-      t.text :transcompiled_source
-      t.string :transcompiled_source_language
       t.integer :copied_from_data_quality_report_id
     end
 

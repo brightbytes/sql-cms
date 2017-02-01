@@ -3,14 +3,12 @@
 #
 # Table name: public.validations
 #
-#  id                            :integer          not null, primary key
-#  name                          :string           not null
-#  immutable                     :boolean          default(FALSE), not null
-#  sql                           :text             not null
-#  created_at                    :datetime         not null
-#  updated_at                    :datetime         not null
-#  transcompiled_source          :text
-#  transcompiled_source_language :string
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  immutable  :boolean          default(FALSE), not null
+#  sql        :text             not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 # Indexes
 #

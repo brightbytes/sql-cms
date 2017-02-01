@@ -160,8 +160,6 @@ CREATE TABLE data_quality_reports (
     sql text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    transcompiled_source text,
-    transcompiled_source_language character varying,
     copied_from_data_quality_report_id integer
 );
 
@@ -452,9 +450,7 @@ CREATE TABLE validations (
     immutable boolean DEFAULT false NOT NULL,
     sql text NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    transcompiled_source text,
-    transcompiled_source_language character varying
+    updated_at timestamp without time zone NOT NULL
 );
 
 

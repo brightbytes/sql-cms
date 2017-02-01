@@ -10,8 +10,6 @@
 #  sql                                :text             not null
 #  created_at                         :datetime         not null
 #  updated_at                         :datetime         not null
-#  transcompiled_source               :text
-#  transcompiled_source_language      :string
 #  copied_from_data_quality_report_id :integer
 #
 # Indexes
