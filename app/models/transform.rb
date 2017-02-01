@@ -93,8 +93,7 @@ class Transform < ApplicationRecord
     self.params = (val.blank? ? {} : YAML.load(val))
   end
 
-  # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite and is not already a prerequisite of this Transform
-  #  is itself available as a prerequisite. This is how we avoid cycles in the Transform Dependency graph.
+  # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite is itself available as a prerequisite (and may already be such)
   def available_prerequisite_transforms
     base_arel = Transform.where(workflow_id: workflow_id).order(:name)
     if new_record?
@@ -104,25 +103,31 @@ class Transform < ApplicationRecord
       eligible_transforms = base_arel.where("id <> #{id}").all
       # Where's that graph DB when you need it?
       eligible_transforms.
-        reject { |eligible_transform| already_prerequisite?(eligible_transform) }.
-        reject { |eligible_transform| already_postrequisite?(eligible_transform) }
+        reject { |eligible_transform| already_my_postrequisite?(eligible_transform) }
+
     end
+  end
+
+  # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite and is not already a prerequisite of this Transform
+  #  is itself available as a new prerequisite. This is how we avoid cycles in the Transform Dependency graph.
+  def available_unused_prerequisite_transforms
+    available_prerequisite_transforms.reject { |eligible_transform| already_my_prerequisite?(eligible_transform) }
   end
 
   private
 
-  def already_prerequisite?(transform)
+  def already_my_postrequisite?(transform)
     dependents = transform.prerequisite_transforms
     return false if dependents.empty?
     return true if dependents.include?(self)
-    dependents.any? { |dependent_transform| already_prerequisite?(dependent_transform) }
+    dependents.any? { |dependent_transform| already_my_postrequisite?(dependent_transform) }
   end
 
-  def already_postrequisite?(transform)
+  def already_my_prerequisite?(transform)
     dependents = transform.postrequisite_transforms
     return false if dependents.empty?
     return true if dependents.include?(self)
-    dependents.any? { |dependent_transform| already_postrequisite?(dependent_transform) }
+    dependents.any? { |dependent_transform| already_my_prerequisite?(dependent_transform) }
   end
 
 

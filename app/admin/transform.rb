@@ -42,6 +42,15 @@ ActiveAdmin.register Transform do
       row :updated_at
     end
 
+    panel 'Prerequisite Transforms' do
+      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
+      table_for(resource.prerequisite_dependencies.includes(:prerequisite_transform).order('transforms.name'), sortable: true) do
+        column(:name, sortable: :name) { |pd| auto_link(pd.prerequisite_transform) }
+        column(:runner, sortable: :runner) { |pd| pd.prerequisite_transform.runner }
+        column(:action) { |pd| link_to("Delete", transform_dependency_path(pd), method: :delete) }
+      end
+    end
+
     active_admin_comments
 
     render partial: 'admin/shared/history'
@@ -70,7 +79,7 @@ ActiveAdmin.register Transform do
       input :data_file, as: :select, collection: data_files_for_workflow
     end
 
-    inputs 'Dependencies' do
+    inputs 'Available Additional Prerequisite Transforms' do
       input :prerequisite_transforms, as: :check_boxes, collection: f.object.available_prerequisite_transforms
     end
 
