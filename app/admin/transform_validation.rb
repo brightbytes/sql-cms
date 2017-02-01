@@ -2,7 +2,7 @@ ActiveAdmin.register TransformValidation do
 
   menu false
 
-  actions :new, :create, :show, :destroy
+  actions :all, except: :index
 
   permit_params :transform_id, :validation_id, :params_yaml
 
