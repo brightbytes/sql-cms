@@ -100,21 +100,29 @@ class Transform < ApplicationRecord
     if new_record?
       base_arel.all
     else
-      eligible_transforms =
-        base_arel.
-        where("id <> #{id}").  # skip this Transform
-        where("NOT EXISTS (SELECT 1 FROM transform_dependencies td WHERE td.postrequisite_transform_id = #{id})"). # skip Transforms that are already prereqs of this Transform
-        where("NOT EXISTS (SELECT 1 FROM transform_dependencies td WHERE td.prerequisite_transform_id = #{id})"). # skip Transforms that already depend upon this Transform
-        all
+      # This else branch is grossly inefficient.  I tried to do it with SQL for the first level, and failed.  Oh well.  Refactor later.
+      eligible_transforms = base_arel.where("id <> #{id}").all
       # Where's that graph DB when you need it?
-      eligible_transforms.reject { |eligible_transform| indirectly_dependent?(eligible_transform) }
+      eligible_transforms.
+        reject { |eligible_transform| already_prerequisite?(eligible_transform) }.
+        reject { |eligible_transform| already_postrequisite?(eligible_transform) }
     end
   end
 
-  private def indirectly_dependent?(transform)
+  private
+
+  def already_prerequisite?(transform)
     dependents = transform.prerequisite_transforms
     return false if dependents.empty?
-    dependents.any? { |dependent_transform| indirectly_dependent?(dependent_transform) }
+    return true if dependents.include?(self)
+    dependents.any? { |dependent_transform| already_prerequisite?(dependent_transform) }
+  end
+
+  def already_postrequisite?(transform)
+    dependents = transform.postrequisite_transforms
+    return false if dependents.empty?
+    return true if dependents.include?(self)
+    dependents.any? { |dependent_transform| already_postrequisite?(dependent_transform) }
   end
 
 
