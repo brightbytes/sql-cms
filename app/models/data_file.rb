@@ -12,7 +12,6 @@
 #  s3_file_name   :string           not null
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
-#  deleted_at     :datetime
 #
 # Indexes
 #
@@ -26,8 +25,6 @@
 
 # For storing a reference to a CSV/TSV/any-tabularly-formatted-file on S3, for the purpose of loading/unloading data to/from the DB
 class DataFile < ApplicationRecord
-
-  acts_as_paranoid
 
   auto_normalize
 
@@ -81,7 +78,7 @@ class DataFile < ApplicationRecord
 
   # Scopes
 
-  scope :sans_deleted, -> { where(deleted_at: nil) }
+
 
   # Instance Methods
 

@@ -25,7 +25,6 @@ class ApplicationTables < ActiveRecord::Migration
         tt.string :s3_file_name
         tt.timestamps
       end
-      t.datetime :deleted_at
     end
 
     execute "CREATE UNIQUE INDEX index_data_files_on_lowercase_name ON data_files USING btree (lower(name))"

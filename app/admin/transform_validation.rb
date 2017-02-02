@@ -29,7 +29,7 @@ ActiveAdmin.register TransformValidation do
 
       # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
       #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
-      input :params_yaml, as: :text
+      input :params_yaml, as: :text, required: true
     end
     actions do
       action(:submit)
@@ -47,8 +47,7 @@ ActiveAdmin.register TransformValidation do
 
     def destroy
       super do |success, failure|
-        # FIXME - PASS AN ARG INDICATING WHETHER TO GO BACK TO transform_path OR validation_path
-        success.html { redirect_to(transform_path(resource.postrequisite_transform)) }
+        success.html { redirect_to(parent_transform_path) }
       end
     end
   end

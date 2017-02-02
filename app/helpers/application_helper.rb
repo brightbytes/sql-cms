@@ -66,6 +66,11 @@ module ApplicationHelper
       end
   end
 
+  # The preselect doesn't work, for obvious reasons
+  # def users_with_preselect
+  #   User.order(:first_name, :last_name).map { |c| (c == current_user) ? [c.full_name, c.id, selected: true] : [c.full_name, c.id] }
+  # end
+
   # TranformValidations stuff
 
   def transform_id_param_val

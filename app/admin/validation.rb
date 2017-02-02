@@ -33,7 +33,6 @@ ActiveAdmin.register Validation do
       table_for(resource.transform_validations.includes(:transform).order('transforms.name'), sortable: true) do
         column(:name, sortable: :name) { |tv| auto_link(tv.transform) }
         column(:runner, sortable: :runner) { |tv| tv.transform.runner }
-        column(:action) { |tv| link_to("Delete", transform_validation_path(tv), method: :delete) }
       end
     end
 

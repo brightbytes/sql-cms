@@ -44,6 +44,7 @@ ActiveAdmin.register Customer do
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.workflows.order(sort), sortable: true) do
         column(:name, sortable: :name) { |workflow| auto_link(workflow) }
+        column(:action) { |workflow| link_to("Delete", workflow_path(workflow, source: :customer), method: :delete, data: { confirm: 'Are you really, really, really sure you want to nuke this Workflow?  Really???' }) }
       end
     end
 
@@ -57,6 +58,7 @@ ActiveAdmin.register Customer do
         column(:s3_region_name, sortable: :s3_region_name)
         column(:s3_bucket_name, sortable: :s3_bucket_name)
         column(:s3_file_name, sortable: :s3_file_name)
+        column(:action) { |data_file| link_to("Delete", data_file_path(data_file, source: :customer), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data File?' }) }
       end
     end
 

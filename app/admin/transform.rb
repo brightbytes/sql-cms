@@ -52,25 +52,25 @@ ActiveAdmin.register Transform do
         # column(:params) { |tv| code(tv.params) }
         column(:params) { |tv| tv.params }
         column(:validation_immutable) { |tv| yes_no(tv.validation.immutable?) }
-        column(:action) { |tv| link_to("Delete", transform_validation_path(tv), method: :delete) }
+        column(:action) { |tv| link_to("Delete", transform_validation_path(tv), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Validation?' }) }
       end
     end
 
-    panel 'Prerequisite Transforms' do
+    panel 'Prerequisite Transform Dependencies' do
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.prerequisite_dependencies.includes(:prerequisite_transform).order('transforms.name'), sortable: true) do
         column(:name, sortable: :name) { |pd| auto_link(pd.prerequisite_transform) }
         column(:runner, sortable: :runner) { |pd| pd.prerequisite_transform.runner }
-        column(:action) { |pd| link_to("Delete", transform_dependency_path(pd), method: :delete) }
+        column(:action) { |pd| link_to("Delete", transform_dependency_path(pd, source: :postrequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' }) }
       end
     end
 
-    panel 'Postrequisite Transforms' do
+    panel 'Postrequisite Transforms Dependencies' do
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.postrequisite_dependencies.includes(:postrequisite_transform).order('transforms.name'), sortable: true) do
         column(:name, sortable: :name) { |pd| auto_link(pd.postrequisite_transform) }
         column(:runner, sortable: :runner) { |pd| pd.postrequisite_transform.runner }
-        column(:action) { |pd| link_to("Delete", transform_dependency_path(pd), method: :delete) }
+        column(:action) { |pd| link_to("Delete", transform_dependency_path(pd, source: :prerequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' }) }
       end
     end
 

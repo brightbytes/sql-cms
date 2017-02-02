@@ -8,7 +8,8 @@ ActiveAdmin.register TransformDependency do
 
     def destroy
       super do |success, failure|
-        success.html { redirect_to(transform_path(resource.postrequisite_transform)) }
+        dpp params[:source]
+        success.html { redirect_to(transform_path(params[:source] == 'postrequisite_transform' ? resource.postrequisite_transform : resource.prerequisite_transform)) }
       end
     end
   end

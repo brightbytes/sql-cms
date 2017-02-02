@@ -2,24 +2,14 @@ ActiveAdmin.register DataFile do
 
   menu priority: 15
 
-  scope "All", :with_deleted
-  # For some reason, this doesn't use AR.all ...
-  # scope "Undeleted Only", :all
-  # ... hence this:
-  scope "Undeleted Only", :sans_deleted, default: true
-  scope "Deleted Only", :only_deleted
-
   actions :all
-
-  config.add_action_item :undelete, only: :show, if: proc { resource.deleted? } do
-    link_to "Undelete", undelete_data_file_path(resource), method: :put
-  end
 
   permit_params :name, :metadata_yaml, :customer_id, :file_type, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_name
 
   filter :name, as: :string
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
   filter :file_type, as: :select, collection: DataFile::FILE_TYPES
+  filter :s3_region_name, as: :select
   filter :s3_bucket_name, as: :select
 
   config.sort_order = 'customers.name_asc'
@@ -29,6 +19,7 @@ ActiveAdmin.register DataFile do
     column(:name) { |data_file| auto_link(data_file) }
     column(:customer)
     column(:file_type)
+    column(:s3_region_name)
     column(:s3_bucket_name)
     column(:s3_file_name)
   end
@@ -42,12 +33,12 @@ ActiveAdmin.register DataFile do
       row :file_type
       row(:metadata) { code(pretty_print_as_json(resource.metadata)) }
 
+      row :s3_region_name
       row :s3_bucket_name
       row :s3_file_name
 
       row :created_at
       row :updated_at
-      row :deleted_at
     end
 
     active_admin_comments
@@ -97,23 +88,12 @@ ActiveAdmin.register DataFile do
       super.joins(:customer)
     end
 
-    def find_resource
-      DataFile.with_deleted.find_by(id: params[:id])
+    def destroy
+      super do |success, failure|
+        success.html { redirect_to(params[:source] == 'customer' ? customer_path(resource.customer) : data_files_path) }
+      end
     end
 
-    def action_methods
-      result = super
-      # Don't show the destroy button if the DataFile is already destroyed, since a 2nd destroy will physically nuke the record
-      result -= ['destroy'] if action_name == 'show' && resource.deleted?
-      result
-    end
-
-  end
-
-  member_action :undelete, method: :put do
-    resource.recover
-    flash[:notice] = "DataFile Restored!"
-    redirect_to data_file_path(resource)
   end
 
 end

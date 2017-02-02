@@ -124,8 +124,7 @@ CREATE TABLE data_files (
     s3_bucket_name character varying NOT NULL,
     s3_file_name character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    deleted_at timestamp without time zone
+    updated_at timestamp without time zone NOT NULL
 );
 
 
