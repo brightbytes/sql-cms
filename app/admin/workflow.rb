@@ -63,6 +63,7 @@ ActiveAdmin.register Workflow do
 
   sidebar("Actions", only: :show) do
     ul do
+      li link_to("Run Workflow!")
       li link_to("Clone Workflow")
     end
   end

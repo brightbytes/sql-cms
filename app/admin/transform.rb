@@ -86,8 +86,9 @@ ActiveAdmin.register Transform do
   end
 
   form do |f|
+    editing = action_name.in?(%w(edit update))
+
     inputs 'Details' do
-      editing = action_name.in?(%w(edit update))
       input :customer_id, as: :hidden, input_html: { value: transform_customer_id_param_val }
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
       input :workflow, as: :select, collection: workflows_with_preselect(editing), input_html: { disabled: editing }
@@ -108,8 +109,13 @@ ActiveAdmin.register Transform do
       input :data_file, as: :select, collection: data_files_for_workflow
     end
 
-    inputs 'Dependencies' do
-      input :prerequisite_transforms, as: :check_boxes, collection: f.object.available_prerequisite_transforms
+    # We don't know the :workflow if we're creating, so we can't populate these
+    # (Yes, we do know params[:workflow_id] if we get here from the Workflow, BUT, the .save goes sideways because Rails tries to save the assn before the main obj,
+    #  and it's just not worth my time to debug.)
+    if editing
+      inputs 'Dependencies' do
+        input :prerequisite_transforms, as: :check_boxes, collection: f.object.available_prerequisite_transforms
+      end
     end
 
     actions do
