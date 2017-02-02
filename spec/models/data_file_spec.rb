@@ -26,6 +26,8 @@
 
 describe DataFile do
 
+  # S3Logic.instance_variable_set(:@client, Aws::S3::Client.new(stub_responses: true))
+
   describe 'versioned by PaperTrail' do
     it { is_expected.to be_versioned }
   end

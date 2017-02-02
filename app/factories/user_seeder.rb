@@ -22,8 +22,12 @@ module UserSeeder
       email: 'buckley@brightbytes.net',
       first_name: 'Buckley',
       last_name: 'Robinson'
+    },
+    {
+      email: 'nato@brightbytes.net',
+      first_name: 'Nato',
+      last_name: 'Powell'
     }
-
   ]
 
 end
