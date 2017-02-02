@@ -6,7 +6,6 @@
 #  id             :integer          not null, primary key
 #  workflow_id    :integer          not null
 #  creator_id     :integer          not null
-#  schema_prefix  :string           not null
 #  execution_plan :jsonb            not null
 #  status         :string           default("unstarted"), not null
 #  created_at     :datetime         not null
@@ -45,12 +44,12 @@ describe Run do
 
   describe "callbacks" do
 
-    context "before_validation on: :create" do
-      it "should set the schema_prefix" do
+    context "after_create" do
+      it "should set the schema_name" do
         run = build(:run)
-        expect(run.schema_prefix).to be_nil
-        expect(run.valid?).to eq(true)
-        expect(run.schema_prefix).to eq("#{run.workflow}_run_")
+        expect(run.schema_name).to be_nil
+        expect(run.save).to eq(true)
+        expect(run.schema_name).to eq("#{run.workflow}_run_#{run.id}")
       end
     end
 

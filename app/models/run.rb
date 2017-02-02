@@ -5,11 +5,11 @@
 #  id             :integer          not null, primary key
 #  workflow_id    :integer          not null
 #  creator_id     :integer          not null
-#  schema_prefix  :string           not null
 #  execution_plan :jsonb            not null
 #  status         :string           default("unstarted"), not null
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
+#  schema_name    :string
 #
 # Indexes
 #
@@ -38,16 +38,15 @@ class Run < ApplicationRecord
 
   # Validations
 
-  validates :workflow, :creator, :execution_plan, :status, :schema_prefix, presence: true
+  validates :workflow, :creator, :execution_plan, :status, presence: true
 
   # Callbacks
 
-  before_validation :generate_schema_prefix, on: :create
+  after_create :generate_schema_name
 
-  def generate_schema_prefix
-    self.schema_prefix ||= "#{workflow}_run_".freeze
+  def generate_schema_name
+    update_attribute(:schema_name, "#{workflow}_run_#{id}")
   end
-
 
   # From Run::PostgresSchema; consider removing to Observer or Service
   after_destroy :drop_schema
@@ -65,11 +64,6 @@ class Run < ApplicationRecord
   has_many :data_quality_reports, through: :workflow
 
   # Instance Methods
-
-  def schema_name
-    return unless schema_prefix.present?
-    @schema_name ||= "#{schema_prefix}#{id}"
-  end
 
 
   # MINOR_PHASES.each do |phase|

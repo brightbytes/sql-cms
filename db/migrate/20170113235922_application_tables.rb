@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 class ApplicationTables < ActiveRecord::Migration
+
   def change
 
     create_table :customers do |t|
@@ -154,11 +155,11 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.integer :workflow_id
         tt.integer :creator_id
-        tt.string :schema_prefix
         tt.jsonb :execution_plan
         tt.string :status, default: :unstarted
         tt.timestamps
       end
+      t.string :schema_name # Hate for this to not be required, but it requires the Run#id.  Bah.
     end
 
     add_index :runs, :workflow_id
