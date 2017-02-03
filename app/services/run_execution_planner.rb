@@ -2,6 +2,14 @@
 #  of the DependencyGroups.  Delegates part of its work to TransformDependencyGrouper
 module RunExecutionPlanner
 
-  # Gonna need serializers, baby!
+  extend self
+
+  def create_run!(workflow:, creator:)
+    # Serialize entire workflow -> execution_plan
+    plan
+    run = workflow.runs.build(creator: creator, execution_plan: plan)
+
+  end
+
 
 end

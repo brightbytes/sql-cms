@@ -21,6 +21,8 @@ gem 'postgresql_cursor' # postgres cursors!!
 gem 'acts_as_paranoid' # logical delete
 gem 'apartment' # multi-tenancy (i.e. Postgres Schemas)
 
+gem 'active_model_serializers', '~> 0.10.0'
+
 gem 'fast_blank' # for fast calls to String#blank? and String#present?
 
 # K/V store
