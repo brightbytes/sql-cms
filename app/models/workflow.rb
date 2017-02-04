@@ -79,12 +79,17 @@ class Workflow < ApplicationRecord
     # FIXME - VALIDATE GRAPH IS ACYCLICAL HERE.  (IT CAN ONLY BECOME SO IN VIRTUE OF A RACE CONDITION VIA THE UI, WHICH IS QUITE UNLIKELY GIVEN THE SMALL USER BASE.)
 
     unused_transform_ids = transforms.map(&:id)
+    return [] if unused_transform_ids.empty?
+
     groups_arr = []
 
     independent_transforms =
       transforms.
       where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)").
       to_a
+
+    raise "Your alleged DAG is a cyclical graph because it has no leaf nodes." if independent_transforms.empty?
+
     groups_arr << independent_transforms
     unused_transform_ids -= independent_transforms.map(&:id)
 
@@ -97,7 +102,7 @@ class Workflow < ApplicationRecord
       max_remaining_iterations -= 1
     end
 
-    raise "Your alleged DAG is a cyclical graph, loser." if unused_transform_ids.present?
+    raise "Your alleged DAG is a cyclical graph." if unused_transform_ids.present?
 
     groups_arr.map { |arr| Set.new(arr) }
   end

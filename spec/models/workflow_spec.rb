@@ -104,6 +104,36 @@ describe Workflow do
         end
       end
 
+      context "with a cyclical graph" do
+        let!(:workflow) { create(:workflow) }
+
+        let!(:yin_transform) { create(:transform, workflow: workflow) }
+        let!(:yang_transform) { create(:transform, workflow: workflow) }
+        let!(:dependency_1) { create(:transform_dependency, prerequisite_transform: yin_transform, postrequisite_transform: yang_transform) }
+        let!(:dependency_2) { create(:transform_dependency, prerequisite_transform: yang_transform, postrequisite_transform: yin_transform) }
+
+        it "should terminate irrespective of the cycle, and puke noisily" do
+          expect { workflow.ordered_transform_groups }.to raise_error(RuntimeError)
+        end
+
+        context "even if there is an independent transform" do
+          let!(:void_transform) { create(:transform, workflow: workflow) }
+
+          it "should terminate irrespective of the cycle, and puke noisily" do
+            expect { workflow.ordered_transform_groups }.to raise_error(RuntimeError)
+          end
+        end
+
+        context "even if the cycle is above a leaf node" do
+          let!(:mu_transform) { create(:transform, workflow: workflow) }
+          let!(:dependency_3) { create(:transform_dependency, prerequisite_transform: mu_transform, postrequisite_transform: yin_transform) }
+
+          it "should terminate irrespective of the cycle, and puke noisily" do
+            expect { workflow.ordered_transform_groups }.to raise_error(RuntimeError)
+          end
+        end
+
+      end
 
     end
 
