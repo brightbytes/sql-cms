@@ -81,18 +81,25 @@ class Workflow < ApplicationRecord
     unused_transform_ids = transforms.map(&:id)
     groups_arr = []
 
-    independent_transforms = transforms.where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id = transforms.id) AND NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)")
+    independent_transforms =
+      transforms.
+      where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)").
+      to_a
     groups_arr << independent_transforms
     unused_transform_ids -= independent_transforms.map(&:id)
 
-    # Ah, my old nemesis, the while loop, ever insidiously scheming to iterate indefinitely.  Must check for graph cycles.
-    while !unused_transform_ids.empty?
-      next_group = next_transform_group(used_transform_ids: groups_arr.flat_map(&:id), unused_transform_ids:  unused_transform_ids)
-      groups_arr << next_group
+    max_remaining_iterations = unused_transform_ids.size
+    # Ah, my old nemesis, the while loop, ever insidiously scheming to iterate indefinitely.  Must check for graph cycles, rather than the lame counter ^^.
+    while unused_transform_ids.present? && max_remaining_iterations >= 0
+      next_group = next_transform_group(used_transform_ids: groups_arr.flatten.map(&:id), unused_transform_ids: unused_transform_ids)
+dpp      groups_arr << next_group
       unused_transform_ids -= next_group.map(&:id)
+      max_remaining_iterations -= 1
     end
 
-    groups_arr
+    raise "Your alleged DAG is a cyclical graph, loser." if unused_transform_ids.present?
+
+    groups_arr.map { |arr| Set.new(arr) }
   end
 
   private
@@ -100,7 +107,10 @@ class Workflow < ApplicationRecord
   def next_transform_group(used_transform_ids:, unused_transform_ids:)
     joined_used_transform_ids = used_transform_ids.join(',')
     joined_unused_transform_ids = unused_transform_ids.join(',')
-    transforms.where("id IN (#{joined_unused_transform_ids})").where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id NOT IN (#{joined_used_transform_ids}))").to_a
+    transforms.
+      where("id IN (#{joined_unused_transform_ids})").
+      where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id NOT IN (#{joined_used_transform_ids}) AND postrequisite_transform_id = transforms.id)").
+      to_a
   end
 
 end

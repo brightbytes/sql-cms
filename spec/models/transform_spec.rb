@@ -84,26 +84,8 @@ describe Transform do
   describe "instance methods" do
 
     context "#available_prerequisite_transforms && #available_unused_prerequisite_transforms" do
-      let!(:workflow) { create(:workflow) }
 
-      let!(:most_dependent_transform) { create(:transform, workflow: workflow) }
-      let!(:first_child_transform) { create(:transform, workflow: workflow) }
-      let!(:dependency_1) { create(:transform_dependency, prerequisite_transform: first_child_transform, postrequisite_transform: most_dependent_transform) }
-
-      let!(:less_dependent_transform) { create(:transform, workflow: workflow) }
-      let!(:dependency_2) { create(:transform_dependency, prerequisite_transform: less_dependent_transform, postrequisite_transform: most_dependent_transform) }
-
-      let!(:another_less_dependent_transform) { create(:transform, workflow: workflow) }
-      let!(:dependency_3) { create(:transform_dependency, prerequisite_transform: another_less_dependent_transform, postrequisite_transform: most_dependent_transform) }
-
-      let!(:least_dependent_transform) { create(:transform, workflow: workflow) }
-      let!(:dependency_4) { create(:transform_dependency, prerequisite_transform: least_dependent_transform, postrequisite_transform: less_dependent_transform) }
-
-      let!(:dependency_5) { create(:transform_dependency, prerequisite_transform: least_dependent_transform, postrequisite_transform: another_less_dependent_transform) }
-
-      let!(:independent_transform) { create(:transform, workflow: workflow) }
-
-      let!(:another_workflow_transform) { create(:transform) }
+      include_examples 'cheesey dependency graph'
 
       it "should return the correct list of prerequisites in all cases" do
         expect(most_dependent_transform.available_unused_prerequisite_transforms).to eq([independent_transform])

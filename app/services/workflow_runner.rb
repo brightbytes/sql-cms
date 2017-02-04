@@ -1,5 +1,5 @@
 # Creates and queues for execution a new Run for the supplied Workflow.
-# Yeah, I tried to create a service.  The result is rather lame.  Bummer.
+# Yeah, I tried to create a service.  The result is rather pathetic.  Bummer.
 module WorkflowRunner
 
   extend self

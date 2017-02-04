@@ -80,5 +80,18 @@ describe Workflow do
       end
     end
 
+    context "#ordered_transform_groups" do
+
+      context "with the cheesey dependency graph" do
+        include_examples 'cheesey dependency graph'
+
+        it "should group transforms accordingly" do
+          expect(workflow.ordered_transform_groups).to eq([Set.new([independent_transform, least_dependent_transform, first_child_transform]), Set.new([less_dependent_transform, another_less_dependent_transform]), Set.new([most_dependent_transform])])
+        end
+      end
+
+
+    end
+
   end
 end
