@@ -71,4 +71,33 @@ class Workflow < ApplicationRecord
 
   accepts_nested_attributes_for :notified_users
 
+  def emails_to_notify
+    @emails_to_notify ||= notified_users.pluck(:email)
+  end
+
+  def ordered_transform_groups
+    # FIXME - VALIDATE GRAPH IS ACYCLICAL HERE.  (IT CAN ONLY BECOME SO IN VIRTUE OF A RACE CONDITION VIA THE UI, WHICH IS QUITE UNLIKELY GIVEN THE SMALL USER BASE.)
+
+    unused_transform_ids = transforms.map(&:id)
+    groups_arr = []
+
+    independent_transforms = transforms.where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id = transforms.id) AND NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)")
+    groups_arr << independent_transforms
+    unused_transform_ids -= independent_transforms.map(&:id)
+
+    while !unused_transform_ids.empty?
+      next_group = next_transform_group(used_transform_ids: groups_arr.flat_map(&:id), unused_transform_ids:  unused_transform_ids)
+      groups_arr << next_group
+      unused_transform_ids -= next_group.map(&:id)
+    end
+
+    groups_arr
+  end
+
+  private
+
+  def next_transform_group(used_transform_ids:, unused_transform_ids:)
+    
+  end
+
 end

@@ -5,11 +5,9 @@ module RunExecutionPlanner
   extend self
 
   def create_run!(workflow:, creator:)
-    # Serialize entire workflow -> execution_plan
-    plan
+    base_plan = ActiveModelSerializers::SerializableResource.new(Workflow.first).as_json
     run = workflow.runs.build(creator: creator, execution_plan: plan)
 
   end
-
 
 end
