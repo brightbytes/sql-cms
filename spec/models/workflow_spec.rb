@@ -82,6 +82,20 @@ describe Workflow do
 
     context "#ordered_transform_groups" do
 
+      context "with a linear graph" do
+        let!(:workflow) { create(:workflow) }
+
+        let!(:gramps_transform) { create(:transform, workflow: workflow) }
+        let!(:daddy_transform) { create(:transform, workflow: workflow) }
+        let!(:dependency_1) { create(:transform_dependency, prerequisite_transform: daddy_transform, postrequisite_transform: gramps_transform) }
+        let!(:son_transform) { create(:transform, workflow: workflow) }
+        let!(:dependency_2) { create(:transform_dependency, prerequisite_transform: son_transform, postrequisite_transform: daddy_transform) }
+
+        it "should define the correct grouping, without maxing-out iterations" do
+          expect(workflow.ordered_transform_groups).to eq([Set.new([son_transform]), Set.new([daddy_transform]), Set.new([gramps_transform])])
+        end
+      end
+
       context "with the cheesey dependency graph" do
         include_examples 'cheesey dependency graph'
 

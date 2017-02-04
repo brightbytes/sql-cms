@@ -90,9 +90,9 @@ class Workflow < ApplicationRecord
 
     max_remaining_iterations = unused_transform_ids.size
     # Ah, my old nemesis, the while loop, ever insidiously scheming to iterate indefinitely.  Must check for graph cycles, rather than the lame counter ^^.
-    while unused_transform_ids.present? && max_remaining_iterations >= 0
+    while unused_transform_ids.present? && max_remaining_iterations > 0
       next_group = next_transform_group(used_transform_ids: groups_arr.flatten.map(&:id), unused_transform_ids: unused_transform_ids)
-dpp      groups_arr << next_group
+      groups_arr << next_group
       unused_transform_ids -= next_group.map(&:id)
       max_remaining_iterations -= 1
     end
