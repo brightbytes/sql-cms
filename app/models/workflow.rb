@@ -75,6 +75,12 @@ class Workflow < ApplicationRecord
     @emails_to_notify ||= notified_users.pluck(:email)
   end
 
+  def run(creator)
+    plan = ActiveModelSerializers::SerializableResource.new(self).as_json
+    run = workflow.runs.create!(creator: creator, execution_plan: plan)
+    RunManagerJob.perform_later(run)
+  end
+
   def ordered_transform_groups
     # FIXME - VALIDATE GRAPH IS ACYCLICAL HERE.  (IT CAN ONLY BECOME SO IN VIRTUE OF A RACE CONDITION VIA THE UI, WHICH IS QUITE UNLIKELY GIVEN THE SMALL USER BASE.)
 
