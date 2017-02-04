@@ -38,7 +38,7 @@ class TransformValidation < ApplicationRecord
 
   # Instance Methods
 
-  delegate :sql, to: :validation
+  delegate :name, :sql, to: :validation
 
   def name
     "Validation '#{validation.name}' for Transform '#{transform.name}'"
