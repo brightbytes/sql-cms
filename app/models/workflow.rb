@@ -85,6 +85,7 @@ class Workflow < ApplicationRecord
     groups_arr << independent_transforms
     unused_transform_ids -= independent_transforms.map(&:id)
 
+    # Ah, my old nemesis, the while loop, ever insidiously scheming to iterate indefinitely.  Must check for graph cycles.
     while !unused_transform_ids.empty?
       next_group = next_transform_group(used_transform_ids: groups_arr.flat_map(&:id), unused_transform_ids:  unused_transform_ids)
       groups_arr << next_group
@@ -97,7 +98,9 @@ class Workflow < ApplicationRecord
   private
 
   def next_transform_group(used_transform_ids:, unused_transform_ids:)
-    
+    joined_used_transform_ids = used_transform_ids.join(',')
+    joined_unused_transform_ids = unused_transform_ids.join(',')
+    transforms.where("id IN (#{joined_unused_transform_ids})").where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id NOT IN (#{joined_used_transform_ids}))").to_a
   end
 
 end

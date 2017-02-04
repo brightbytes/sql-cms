@@ -69,5 +69,16 @@ describe Workflow do
       end
     end
 
+    context "#emails_to_notify" do
+      it "should simply return a list of notified_user emails" do
+        notification_1 = create(:notification)
+        workflow = notification_1.workflow
+        notification_2 = create(:notification, workflow: workflow)
+        notification_3 = create(:notification, workflow: workflow)
+        ignored_notification = create(:notification)
+        expect(Set.new(workflow.emails_to_notify)).to eq(Set.new([notification_1, notification_2, notification_3].map(&:user).map(&:email)))
+      end
+    end
+
   end
 end
