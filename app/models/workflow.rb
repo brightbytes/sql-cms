@@ -77,8 +77,9 @@ class Workflow < ApplicationRecord
 
   def run(creator)
     plan = ActiveModelSerializers::SerializableResource.new(self).as_json
-    run = workflow.runs.create!(creator: creator, execution_plan: plan)
-    RunManagerJob.perform_later(run)
+    workflow.runs.create!(creator: creator, execution_plan: plan).tap do |run|
+      RunManagerJob.perform_later(run)
+    end
   end
 
   def ordered_transform_groups

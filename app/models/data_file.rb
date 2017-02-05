@@ -95,6 +95,7 @@ class DataFile < ApplicationRecord
   attr_accessor :supplied_s3_url
 
   def s3_presigned_url
+    return false unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
     @s3_presigned_url ||
       begin
         s3_bucket = s3.bucket(s3_bucket_name)
@@ -103,7 +104,12 @@ class DataFile < ApplicationRecord
       end
   end
 
+  def s3_file_exists?
+    !!s3_presigned_url
+  end
+  
   def s3_public_url
+    return false unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
     @s3_public_url ||
       begin
         s3_bucket = s3.bucket(s3_bucket_name)
@@ -112,7 +118,7 @@ class DataFile < ApplicationRecord
       end
   end
 
-  # FIXME - ADD METHOD FOR PROVIDING AN UPLOAD STREAM SYNC TO BE LOADED BY THE CLIENT FROM THE DB, TO CREATE AN S3 FILE THAT DOESN'T ALREADY EXIST
+  # FIXME - ADD METHOD FOR PROVIDING AN UPLOAD STREAM SINK TO BE LOADED BY THE CLIENT FROM THE DB, TO CREATE AN S3 FILE THAT DOESN'T ALREADY EXIST
   #         THIS WILL REQUIRE ADDING AN EXTRA `"run_#{run.id}"` PARENT DIRECTORY TO THE SUPPLIED FILE NAME.  MEH.
 
   private

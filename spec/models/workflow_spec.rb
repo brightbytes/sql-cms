@@ -104,6 +104,17 @@ describe Workflow do
         end
       end
 
+      context "with the cheesey dependency graph and extra, redundant dependencies that shouldn't change the result" do
+        include_examples 'cheesey dependency graph'
+
+        let!(:dependency_6) { create(:transform_dependency, prerequisite_transform: least_dependent_transform, postrequisite_transform: most_dependent_transform) }
+        let!(:dependency_7) { create(:transform_dependency, prerequisite_transform: independent_transform, postrequisite_transform: most_dependent_transform) }
+
+        it "should group transforms accordingly" do
+          expect(workflow.ordered_transform_groups).to eq([Set.new([independent_transform, least_dependent_transform, first_child_transform]), Set.new([less_dependent_transform, another_less_dependent_transform]), Set.new([most_dependent_transform])])
+        end
+      end
+
       context "with a cyclical graph" do
         let!(:workflow) { create(:workflow) }
 
