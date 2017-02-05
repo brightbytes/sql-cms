@@ -223,10 +223,10 @@ CREATE TABLE run_step_logs (
     step_id integer NOT NULL,
     step_type character varying NOT NULL,
     step_name character varying NOT NULL,
-    completed_successfully boolean DEFAULT false NOT NULL,
-    step_errors jsonb DEFAULT '{}'::jsonb NOT NULL,
+    completed boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    step_errors jsonb
 );
 
 

@@ -69,168 +69,65 @@ class Run < ApplicationRecord
     schema_name
   end
 
-  # private def start_phase_if_startable!(start_phase)
-  #   puke_if_unsaved
+  def ordered_step_logs
+    run_step_logs(true).ordered_by_id.to_a # Always reload
+  end
 
-  #   return nil unless can_start?(start_phase)
+  def failed?
+    ordered_step_logs.where("step_errors IS NOT NULL").count > 0
+  end
 
-  #   Rails.logger.info("Commencing phase #{start_phase} in schema #{schema_name} for Run with ID #{id} for Pipeline #{pipeline.name}")
-  #   update_attribute(:current_phase, start_phase)
-  # end
+  def transform_group_transform_ids(group_index)
+    # return nil if there is no next group
+  end
 
-  # def run_all_in_phase!(run_serially:, phase_arel:, start_phase:, end_phase:)
-  #   return nil unless start_phase_if_startable!(start_phase)
+  def transform_group_completed?(group_index)
 
-  #   if run_serially
-  #     Run.all_succeeded?(phase_arel.map { |o| o.run(self) }).tap do |success|
-  #       if success
-  #         update_attribute(:current_phase, end_phase)
-  #         Rails.logger.info("Completed phase #{start_phase}; now in phase #{end_phase} in schema #{schema_name} for Run with ID #{id} for Pipeline #{pipeline.name}")
-  #       end
-  #     end
+  end
 
-  #     # else Fire off all these to run in parallel
-  #   end
-  # end
+  def data_quality_reports_completed?
 
-  # def ordered_statuses
-  #   # Always reload, since this will be called after its Run object has been hanging around for a bit
-  #   run_statuses(true).ordered_by_id.to_a
-  # end
+  end
 
-  # def succeeded?
-  #   completed? && !failed?
-  # end
+  # This method is critically important, since it wraps the execution of every single step in the workflow
+  def with_run_status_tracking(step)
+    raise "No block provided; really?!?" unless block_given?
 
-  # def failed?
-  #   !ordered_statuses.all?(&:step_successful?)
-  # end
+    return nil unless step
+    if run_step_log = RunStepLog.find_by(run: self, step: step)
+      return run_step_log.successful?
+    end
 
-  # # This method is critically important, since it wraps the execution of every single step in the pipeline
-  # def with_run_status_tracking(step)
-  #   puke_if_unsaved
-  #   raise "No block provided; really?!?" unless block_given?
+    run_step_log = RunStepLog.create!(run: self, step: step) # step_successful? defaults to false, of course
 
-  #   return nil unless step
-  #   if run_status = RunStatus.find_by(run: self, step: step)
-  #     return run_status.step_successful?
-  #   end
+    begin
+      if validation_failures_h = yield # A hash will only be returned for Validations that fail
+        run_step_log.update_attribute(:step_errors, validation_failures_h)
+        false # the return value, signifying failure
+      else
+        run_step_log.update_attribute(:completed, true) # the return value, signifying success
+      end
 
-  #   run_status = RunStatus.create!(run: self, step: step) # step_successful? defaults to false, of course
+    rescue StandardError => exception
+      run_step_log.update_attribute(
+        :step_errors,
+        class_and_message: exception.inspect,
+        backtrace: exception.backtrace.join("\n")
+      )
+      false # the return value, signifying failure
+    end
+  end
 
-  #   begin
-  #     if validation_failures_h = yield # A hash will only be returned for Validations that fail
-  #       run_status.update_attribute(:step_errors, validation_failures_h)
-  #       false # the return value, signifying failure
-  #     else
-  #       run_status.update_attribute(:step_successful, true) # the return value, signifying success
-  #     end
-  #   rescue StandardError => exception
-  #     run_status.update_attribute(
-  #       :step_errors,
-  #       class_and_message: exception.inspect,
-  #       backtrace: exception.backtrace.join("\n")
-  #     )
-  #     false # the return value, signifying failure
-  #   end
-  # end
-
-  # # @return [Array<RunStatus>]
-  # def run(run_serially = true)
-  #   Rails.logger.info("Starting Run with ID #{id} for Pipeline #{pipeline.name}")
-
-  #   if create_schema_and_tables!
-  #     if run_serially
-  #       upload_data_files! && add_indices! && validate_upload_phase! && # load
-  #         initial_dimension_map! && dimension_map! && initial_fact_map! && fact_map! && validate_map_phase! && # map
-  #         initial_reduce! && reducing! && validate_reduce_phase! && # reduce
-  #         export_tables! # export
-  #       # else
-  #       # Fire off MasterJob, which initially fires off all CopyFrom transforms and then polls for each minor-phase's completion in turn; when a each minor-phase
-  #       #  has ended, it initiates the next minor phase if there were no RunStatus failures.
-  #     end
-  #   end
-
-  #   ordered_statuses
-  # end
-
-  # def create_schema_and_tables!
-  #   return nil unless start_phase_if_startable!(CREATE_SCHEMA_PHASE)
-
-  #   with_run_status_tracking(pipeline) { execute_ddl_in_schema(pipeline.ddl) }.tap do
-  #     update_attribute(:current_phase, CREATED_SCHEMA_PHASE)
-  #   end
-  # end
-
-  # def upload_data_files!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_transforms.copy_from, start_phase: LOAD_PHASE, end_phase: LOADED_PHASE)
-  # end
-
-  # def add_indices!
-  #   return nil unless start_phase_if_startable!(ADD_INDICES_PHASE)
-
-  #   execute_ddl_in_schema(pipeline.indices_ddl) if pipeline.indices_ddl.present?
-  #   update_attribute(:current_phase, ADDED_INDICES_PHASE)
-  # end
-
-  # def validate_upload_phase!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_validations.load_phase, start_phase: LOAD_VALIDATION_PHASE, end_phase: LOAD_VALIDATED_PHASE)
-  # end
-
-  # def initial_dimension_map!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_transforms.initial_dimension_map, start_phase: INITIAL_DIMENSION_MAP_PHASE, end_phase: INITIALLY_DIMENSION_MAPPED_PHASE)
-  # end
-
-  # def dimension_map!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_transforms.dimension_map, start_phase: DIMENSION_MAP_PHASE, end_phase: DIMENSION_MAPPED_PHASE)
-  # end
-
-  # def initial_fact_map!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_transforms.initial_fact_map, start_phase: INITIAL_FACT_MAP_PHASE, end_phase: INITIALLY_FACT_MAPPED_PHASE)
-  # end
-
-  # def fact_map!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_transforms.fact_map, start_phase: FACT_MAP_PHASE, end_phase: FACT_MAPPED_PHASE)
-  # end
-
-  # def validate_map_phase!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_validations.map_phase, start_phase: MAP_VALIDATION_PHASE, end_phase: MAP_VALIDATED_PHASE)
-  # end
-
-  # def initial_reduce!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_transforms.initial_reduce, start_phase: INITIAL_REDUCE_PHASE, end_phase: INITIALLY_REDUCED_PHASE)
-  # end
-
-  # # To avoid confusion with Enum#map
-  # def reducing!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_transforms.reducing, start_phase: REDUCE_PHASE, end_phase: REDUCED_PHASE)
-  # end
-
-  # def validate_reduce_phase!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_validations.reduce_phase, start_phase: REDUCE_VALIDATION_PHASE, end_phase: REDUCE_VALIDATED_PHASE)
-  # end
-
-  # # FIXME - CURRENTLY, THIS IS NOT IMPLEMENTED B/C WE MAY NOT WANT TO GO BACK OUT TO FILE: SEE COMMENT IN Run::PostgresSchema#copy_to_in_schema
-  # def export_tables!(run_serially = true)
-  #   run_all_in_phase!(run_serially: run_serially, phase_arel: pipeline_transforms.copy_to, start_phase: EXPORT_PHASE, end_phase: COMPLETED_PHASE)
-  # end
-
-  # def pp_ordered_statuses
-  #   ordered_statuses.map do |run_status|
-  #     if run_status.step_successful?
-  #       "✓ #{run_status.step_type} - #{run_status.step_name}".colorize(:green)
-  #     else
-  #       [
-  #         "✗ #{run_status.step_type} - #{run_status.step_name}".colorize(:red),
-  #         run_status.step_errors.map { |key, value| [key, value, ""] }
-  #       ]
-  #     end
-  #   end.flatten.join("\n")
-  # end
-
-  # class << self
-  #   def all_succeeded?(arr)
-  #     arr.all? { |result| result }
-  #   end
-  # end
+  def pp_ordered_statuses
+    ordered_step_logs.map do |step_log|
+      if run_step_log.step_successful?
+        "✓ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:green)
+      else
+        [
+          "✗ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:red),
+          run_step_log.step_errors.map { |key, value| [key, value, ""] }
+        ]
+      end
+    end.flatten.join("\n")
+  end
 end

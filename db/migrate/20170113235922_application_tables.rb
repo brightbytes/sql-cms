@@ -174,10 +174,10 @@ class ApplicationTables < ActiveRecord::Migration
         tt.integer :step_id
         tt.string :step_type
         tt.string :step_name # Denormalization to ease debugging
-        tt.boolean :completed_successfully, default: false
-        tt.jsonb :step_errors, default: {}
+        tt.boolean :completed, default: false
         tt.timestamps
       end
+      t.jsonb :step_errors
     end
 
     add_index :run_step_logs, [:run_id, :step_id, :step_type], unique: true

@@ -2,15 +2,15 @@
 #
 # Table name: public.run_step_logs
 #
-#  id                     :integer          not null, primary key
-#  run_id                 :integer          not null
-#  step_id                :integer          not null
-#  step_type              :string           not null
-#  step_name              :string           not null
-#  completed_successfully :boolean          default(FALSE), not null
-#  step_errors            :jsonb            not null
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
+#  id          :integer          not null, primary key
+#  run_id      :integer          not null
+#  step_id     :integer          not null
+#  step_type   :string           not null
+#  step_name   :string           not null
+#  completed   :boolean          default(FALSE), not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  step_errors :jsonb
 #
 # Indexes
 #
@@ -30,12 +30,6 @@ class RunStepLog < ApplicationRecord
 
   validates :run, presence: true, uniqueness: { scope: [:step_id, :step_type] }
 
-  validate :step_errors_not_null
-
-  def step_errors_not_null
-    errors.add(:step_errors, 'may not be null') unless step_errors # {} is #blank?, hence this hair
-  end
-
   # Callbacks
 
   before_validation :maybe_set_step_name
@@ -53,4 +47,11 @@ class RunStepLog < ApplicationRecord
   # Scopes
 
   scope :ordered_by_id, -> { order(:id) }
+
+  # Instance Methods
+
+  def successful?
+    completed? && !step_errors
+  end
+
 end

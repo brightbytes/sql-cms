@@ -1,8 +1,6 @@
 class WorkflowTransformJob < ApplicationJob
 
-  queue_as :high
-
-  def perform(*args)
+  def perform(transform_id: transform_id)
     # Do something later
   end
 end
