@@ -71,20 +71,18 @@ class Workflow < ApplicationRecord
 
   accepts_nested_attributes_for :notified_users
 
-  def emails_to_notify
-    @emails_to_notify ||= notified_users.pluck(:email)
-  end
-
-  def run(creator)
+  def run!(creator)
     plan = ActiveModelSerializers::SerializableResource.new(self).as_json
     workflow.runs.create!(creator: creator, execution_plan: plan).tap do |run|
       RunManagerJob.perform_later(run.id)
     end
   end
 
-  def ordered_transform_groups
-    # FIXME - VALIDATE GRAPH IS ACYCLICAL HERE.  (IT CAN ONLY BECOME SO IN VIRTUE OF A RACE CONDITION VIA THE UI, WHICH IS QUITE UNLIKELY GIVEN THE SMALL USER BASE.)
+  def emails_to_notify
+    notified_users.pluck(:email)
+  end
 
+  def ordered_transform_groups
     unused_transform_ids = transforms.map(&:id)
     return [] if unused_transform_ids.empty?
 
@@ -100,23 +98,21 @@ class Workflow < ApplicationRecord
     groups_arr << independent_transforms
     unused_transform_ids -= independent_transforms.map(&:id)
 
-    max_remaining_iterations = unused_transform_ids.size
-    # Ah, my old nemesis, the while loop, ever insidiously scheming to iterate indefinitely.  Must check for graph cycles, rather than the lame counter ^^.
-    while unused_transform_ids.present? && max_remaining_iterations > 0
-      next_group = next_transform_group(used_transform_ids: groups_arr.flatten.map(&:id), unused_transform_ids: unused_transform_ids)
+    # Ah, my old nemesis, the while loop, ever insidiously scheming to iterate indefinitely.
+    while unused_transform_ids.present?
+      next_group = next_transform_group(transform_groups_thus_far: groups_arr, unused_transform_ids: unused_transform_ids)
+      raise "Your alleged DAG is a cyclical graph because no transform group may be formed from the remaining transforms." if next_group.empty?
       groups_arr << next_group
       unused_transform_ids -= next_group.map(&:id)
-      max_remaining_iterations -= 1
     end
-
-    raise "Your alleged DAG is a cyclical graph." if unused_transform_ids.present?
 
     groups_arr.map { |arr| Set.new(arr) }
   end
 
   private
 
-  def next_transform_group(used_transform_ids:, unused_transform_ids:)
+  def next_transform_group(transform_groups_thus_far:, unused_transform_ids:)
+    used_transform_ids = transform_groups_thus_far.flatten.map(&:id)
     joined_used_transform_ids = used_transform_ids.join(',')
     joined_unused_transform_ids = unused_transform_ids.join(',')
     transforms.
