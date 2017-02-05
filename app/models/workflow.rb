@@ -71,12 +71,16 @@ class Workflow < ApplicationRecord
 
   accepts_nested_attributes_for :notified_users
 
+  # The rest of this file is eligible for extraction to a service.
+
   def run!(creator)
     plan = ActiveModelSerializers::SerializableResource.new(self).as_json
     workflow.runs.create!(creator: creator, execution_plan: plan).tap do |run|
       RunManagerJob.perform_later(run.id)
     end
   end
+
+  # The following methods are used by the serializer
 
   def emails_to_notify
     notified_users.pluck(:email)

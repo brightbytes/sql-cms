@@ -78,19 +78,28 @@ class Run < ApplicationRecord
   end
 
   def transform_group_transform_ids(group_index)
-    # return nil if there is no next group
+    execution_plan[:ordered_transform_groups][group_index]&.map(&:id) if execution_plan.present?
   end
 
   def transform_group_completed?(group_index)
+    return nil if execution_plan.blank?
+    ids = transform_group_transform_ids(group_index)
+    run_step_logs.where(step_id: ids, step_type: Transform, step_errors: nil).count == ids.size
+  end
 
+  def data_quality_report_ids
+    execution_plan[:data_quality_reports]&.map(&:id) if execution_plan.present?
   end
 
   def data_quality_reports_completed?
-
+    return nil if execution_plan.blank?
+    ids = data_quality_report_ids
+    run_step_logs.where(step_id: ids, step_type: DataQualityReport, step_errors: nil).count == ids.size
   end
 
   # This method is critically important, since it wraps the execution of every single step in the workflow
-  def with_run_status_tracking(step)
+  # Arguably, it should be extracted from this file.  Refactor some sunny day.
+  def with_run_step_log_tracking(step)
     raise "No block provided; really?!?" unless block_given?
 
     return nil unless step
@@ -118,7 +127,8 @@ class Run < ApplicationRecord
     end
   end
 
-  def pp_ordered_statuses
+  # This should be in a view file.
+  def pp_ordered_step_logs
     ordered_step_logs.map do |step_log|
       if run_step_log.step_successful?
         "✓ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:green)
