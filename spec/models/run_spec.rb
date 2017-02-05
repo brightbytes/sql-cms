@@ -10,6 +10,7 @@
 #  status         :string           default("unstarted"), not null
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
+#  schema_name    :string
 #
 # Indexes
 #

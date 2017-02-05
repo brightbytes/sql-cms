@@ -78,7 +78,7 @@ class Workflow < ApplicationRecord
   def run(creator)
     plan = ActiveModelSerializers::SerializableResource.new(self).as_json
     workflow.runs.create!(creator: creator, execution_plan: plan).tap do |run|
-      RunManagerJob.perform_later(run)
+      RunManagerJob.perform_later(run.id)
     end
   end
 

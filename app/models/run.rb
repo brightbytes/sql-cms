@@ -65,19 +65,9 @@ class Run < ApplicationRecord
 
   # Instance Methods
 
-
-  # MINOR_PHASES.each do |phase|
-  #   class_eval %{
-  #     def #{phase}?
-  #       current_phase == '#{phase}'
-  #     end
-  #   }
-  # end
-
-  # def can_start?(phase)
-  #   raise "Invalid phase: #{phase}" unless i = MINOR_PHASES.index(phase)
-  #   i == 0 || current_phase == phase || current_phase == MINOR_PHASES[i - 1]
-  # end
+  def to_s
+    schema_name
+  end
 
   # private def start_phase_if_startable!(start_phase)
   #   puke_if_unsaved

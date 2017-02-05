@@ -4,7 +4,7 @@ class WorkflowSerializer < ActiveModel::Serializer
 
   attribute :ordered_transform_groups do
     # Totally ghetto: this should be automatic.  Bah.
-    object.ordered_transform_groups.map { |arr| arr.map { |transform| ActiveModelSerializers::SerializableResource.new(transform).as_json }  }
+    object.ordered_transform_groups.map { |set| set.map { |transform| ActiveModelSerializers::SerializableResource.new(transform).as_json }  }
   end
 
   has_many :data_quality_reports

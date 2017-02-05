@@ -3,6 +3,11 @@ Rails.application.routes.draw do
 
   ActiveAdmin.routes(self)
 
+  require 'sidekiq/web'
+  authenticate :user do
+    mount Sidekiq::Web => '/sidekiq'
+  end
+
   root 'admin/dashboard#index'
 end
 
@@ -29,7 +34,6 @@ end
 #                                     PUT        /customers/:id(.:format)                       customers#update
 #                                     DELETE     /customers/:id(.:format)                       customers#destroy
 #                           dashboard GET        /dashboard(.:format)                           dashboard#index
-#                  undelete_data_file PUT        /data_files/:id/undelete(.:format)             data_files#undelete
 #             batch_action_data_files POST       /data_files/batch_action(.:format)             data_files#batch_action
 #                          data_files GET        /data_files(.:format)                          data_files#index
 #                                     POST       /data_files(.:format)                          data_files#create
@@ -39,8 +43,24 @@ end
 #                                     PATCH      /data_files/:id(.:format)                      data_files#update
 #                                     PUT        /data_files/:id(.:format)                      data_files#update
 #                                     DELETE     /data_files/:id(.:format)                      data_files#destroy
+#   batch_action_data_quality_reports POST       /data_quality_reports/batch_action(.:format)   data_quality_reports#batch_action
+#                data_quality_reports GET        /data_quality_reports(.:format)                data_quality_reports#index
+#                                     POST       /data_quality_reports(.:format)                data_quality_reports#create
+#             new_data_quality_report GET        /data_quality_reports/new(.:format)            data_quality_reports#new
+#            edit_data_quality_report GET        /data_quality_reports/:id/edit(.:format)       data_quality_reports#edit
+#                 data_quality_report GET        /data_quality_reports/:id(.:format)            data_quality_reports#show
+#                                     PATCH      /data_quality_reports/:id(.:format)            data_quality_reports#update
+#                                     PUT        /data_quality_reports/:id(.:format)            data_quality_reports#update
+#                                     DELETE     /data_quality_reports/:id(.:format)            data_quality_reports#destroy
 #          batch_action_notifications POST       /notifications/batch_action(.:format)          notifications#batch_action
 #                        notification DELETE     /notifications/:id(.:format)                   notifications#destroy
+#                   batch_action_runs POST       /runs/batch_action(.:format)                   runs#batch_action
+#                                runs GET        /runs(.:format)                                runs#index
+#                                 run GET        /runs/:id(.:format)                            runs#show
+#                                     DELETE     /runs/:id(.:format)                            runs#destroy
+#          batch_action_run_step_logs POST       /run_step_logs/batch_action(.:format)          run_step_logs#batch_action
+#                        run_step_log GET        /run_step_logs/:id(.:format)                   run_step_logs#show
+#                                     DELETE     /run_step_logs/:id(.:format)                   run_step_logs#destroy
 #             batch_action_transforms POST       /transforms/batch_action(.:format)             transforms#batch_action
 #                          transforms GET        /transforms(.:format)                          transforms#index
 #                                     POST       /transforms(.:format)                          transforms#create
@@ -55,7 +75,11 @@ end
 #  batch_action_transform_validations POST       /transform_validations/batch_action(.:format)  transform_validations#batch_action
 #               transform_validations POST       /transform_validations(.:format)               transform_validations#create
 #            new_transform_validation GET        /transform_validations/new(.:format)           transform_validations#new
-#                transform_validation DELETE     /transform_validations/:id(.:format)           transform_validations#destroy
+#           edit_transform_validation GET        /transform_validations/:id/edit(.:format)      transform_validations#edit
+#                transform_validation GET        /transform_validations/:id(.:format)           transform_validations#show
+#                                     PATCH      /transform_validations/:id(.:format)           transform_validations#update
+#                                     PUT        /transform_validations/:id(.:format)           transform_validations#update
+#                                     DELETE     /transform_validations/:id(.:format)           transform_validations#destroy
 #                       undelete_user PUT        /users/:id/undelete(.:format)                  users#undelete
 #                  batch_action_users POST       /users/batch_action(.:format)                  users#batch_action
 #                               users GET        /users(.:format)                               users#index
@@ -88,5 +112,6 @@ end
 #                                     POST       /comments(.:format)                            comments#create
 #                             comment GET        /comments/:id(.:format)                        comments#show
 #                                     DELETE     /comments/:id(.:format)                        comments#destroy
+#                         sidekiq_web            /sidekiq                                       Sidekiq::Web
 #                                     GET        /                                              admin/dashboard#index
 #
