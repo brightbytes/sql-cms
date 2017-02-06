@@ -112,7 +112,25 @@ describe Run do
       end
     end
 
+    context 'with a run having a cheesey serialized workflow' do
+      include_examples 'a workflow serialized into a run'
 
+      describe "#transform_group_transform_ids" do
+        it "should return the expected transform ids" do
+          expect(Set.new(run.transform_group_transform_ids(0))).to eq(Set.new([independent_transform, least_dependent_transform, first_child_transform].map(&:id)))
+          expect(Set.new(run.transform_group_transform_ids(1))).to eq(Set.new([less_dependent_transform, another_less_dependent_transform].map(&:id)))
+          expect(Set.new(run.transform_group_transform_ids(2))).to eq(Set.new([most_dependent_transform].map(&:id)))
+          expect(run.transform_group_transform_ids(3)).to eq(nil)
+        end
+      end
+
+      describe "#data_quality_reports_ids" do
+        it "should return the expected data_quality_report ids" do
+          expect(Set.new(run.data_quality_reports_ids)).to eq(Set.new([data_quality_report_1, data_quality_report_2, data_quality_report_3].map(&:id)))
+        end
+      end
+
+    end
 
     # describe "#with_run_step_log_tracking and #ordered_step_logs" do
     #   it "should create a new RunStatus for the Run and flag it as successful when no exception is raised" do

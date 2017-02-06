@@ -23,9 +23,18 @@ shared_examples 'cheesey dependency graph' do
 
 end
 
-shared_examples 'serialized workflow' do
+shared_examples 'a workflow serialized into a run' do
 
   include_examples 'cheesey dependency graph'
 
+  let!(:data_quality_report_1) { create(:data_quality_report, workflow: workflow) }
+  let!(:data_quality_report_2) { create(:data_quality_report, workflow: workflow) }
+  let!(:data_quality_report_3) { create(:data_quality_report, workflow: workflow) }
 
+  let!(:creator) { create(:user) }
+
+  let!(:run) do
+    plan = ActiveModelSerializers::SerializableResource.new(workflow).as_json
+    workflow.runs.create!(creator: creator, execution_plan: plan)
+  end
 end

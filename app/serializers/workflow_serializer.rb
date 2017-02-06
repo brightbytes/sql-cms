@@ -11,7 +11,7 @@ class WorkflowSerializer < ActiveModel::Serializer
 
   class DataQualityReportSerializer < ActiveModel::Serializer
 
-    attributes :name, :params, :sql
+    attributes :id, :name, :params, :sql
 
   end
 
@@ -31,7 +31,7 @@ class TransformSerializer < ActiveModel::Serializer
 
   class DataFileSerializer < ActiveModel::Serializer
 
-    attributes :name, :metadata, :file_type, :s3_region_name, :s3_bucket_name, :s3_file_name
+    attributes :id, :name, :metadata, :file_type, :s3_region_name, :s3_bucket_name, :s3_file_name
 
   end
 end

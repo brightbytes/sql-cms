@@ -69,11 +69,15 @@ class Run < ApplicationRecord
     schema_name
   end
 
+  def execution_plan
+    read_attribute(:execution_plan)&.with_indifferent_access # This should be automatic.  Grrr.
+  end
+
   def ordered_step_logs
     run_step_logs(true).ordered_by_id.to_a # Always reload
   end
 
-  # FIXME: This should be in a view file.
+  # FIXME: This should be in a view-related file.  Not bothering to test it until I've decided where it lands.
   def pp_ordered_step_logs
     ordered_step_logs.map do |step_log|
       if run_step_log.step_successful?
@@ -92,7 +96,7 @@ class Run < ApplicationRecord
   end
 
   def transform_group_transform_ids(group_index)
-    execution_plan[:ordered_transform_groups][group_index]&.map(&:id) if execution_plan.present?
+    execution_plan[:ordered_transform_groups][group_index]&.map { |h| h.fetch(:id, nil) } if execution_plan.present?
   end
 
   def transform_group_completed?(group_index)
@@ -101,13 +105,14 @@ class Run < ApplicationRecord
     run_step_logs.where(step_id: ids, step_type: Transform, step_errors: nil).count == ids.size
   end
 
-  def data_quality_report_ids
-    execution_plan[:data_quality_reports]&.map(&:id) if execution_plan.present?
+  # Deliberately pluralized to avoid collision with AR #data_quality_report_ids
+  def data_quality_reports_ids
+    execution_plan[:data_quality_reports]&.map { |h| h.fetch(:id, nil) } if execution_plan.present?
   end
 
   def data_quality_reports_completed?
     return nil if execution_plan.blank?
-    ids = data_quality_report_ids
+    ids = data_quality_reports_ids
     run_step_logs.where(step_id: ids, step_type: DataQualityReport, step_errors: nil).count == ids.size
   end
 
