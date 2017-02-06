@@ -105,14 +105,13 @@ class Run < ApplicationRecord
     run_step_logs.where(step_id: ids, step_type: Transform, step_errors: nil).count == ids.size
   end
 
-  # Deliberately pluralized to avoid collision with AR #data_quality_report_ids
-  def data_quality_reports_ids
+  def data_quality_report_ids
     execution_plan[:data_quality_reports]&.map { |h| h.fetch(:id, nil) } if execution_plan.present?
   end
 
   def data_quality_reports_completed?
     return nil if execution_plan.blank?
-    ids = data_quality_reports_ids
+    ids = data_quality_report_ids
     run_step_logs.where(step_id: ids, step_type: DataQualityReport, step_errors: nil).count == ids.size
   end
 

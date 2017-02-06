@@ -42,7 +42,7 @@ class RunManagerJob < ApplicationJob
       end
 
     when 'unstarted_data_quality_reports'
-      run.data_quality_reports_ids.each do |data_quality_report_id|
+      run.data_quality_report_ids.each do |data_quality_report_id|
         DataQualityReportJob.perform_later(data_quality_report_id)
       end
       run.update_attribute(:status, "started_data_quality_reports")

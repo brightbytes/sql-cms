@@ -124,9 +124,9 @@ describe Run do
         end
       end
 
-      describe "#data_quality_reports_ids" do
+      describe "#data_quality_report_ids" do
         it "should return the expected data_quality_report ids" do
-          expect(Set.new(run.data_quality_reports_ids)).to eq(Set.new([data_quality_report_1, data_quality_report_2, data_quality_report_3].map(&:id)))
+          expect(Set.new(run.data_quality_report_ids)).to eq(Set.new([data_quality_report_1, data_quality_report_2, data_quality_report_3].map(&:id)))
         end
       end
 
