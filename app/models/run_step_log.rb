@@ -32,7 +32,7 @@ class RunStepLog < ApplicationRecord
 
   # Callbacks
 
-  before_validation :maybe_set_step_name
+  before_validation :maybe_set_step_name, on: :create
 
   def maybe_set_step_name
     self.step_name = step.try(:name)

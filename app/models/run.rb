@@ -69,6 +69,10 @@ class Run < ApplicationRecord
     schema_name
   end
 
+  def name
+    to_s
+  end
+
   def execution_plan
     read_attribute(:execution_plan)&.with_indifferent_access # This should be automatic.  Grrr.
   end

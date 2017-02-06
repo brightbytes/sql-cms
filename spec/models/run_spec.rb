@@ -165,84 +165,71 @@ describe Run do
 
     end
 
-    # describe "#with_run_step_log_tracking and #ordered_step_logs" do
-    #   it "should create a new RunStatus for the Run and flag it as successful when no exception is raised" do
-    #     run = create(:run)
+    describe "#with_run_step_log_tracking and #ordered_step_logs" do
+      it "should create a new RunStepLog for the Run and flag it as successful when no exception is raised" do
+        run = create(:run)
 
-    #     expect(run.with_run_step_log_tracking(run.pipeline) { nil }).to eq(true)
+        expect(run.with_run_step_log_tracking(run) { nil }).to eq(true)
 
-    #     statuses = run.ordered_step_logs
-    #     expect(statuses.size).to eq(1)
-    #     status = statuses.first
-    #     expect(status.run).to eq(run) # duh
-    #     expect(status.step).to eq(run.pipeline)
-    #     expect(status.step_successful).to be true
-    #     expect(status.step_errors).to be_empty
-    #   end
+        statuses = run.ordered_step_logs
+        expect(statuses.size).to eq(1)
+        status = statuses.first
+        expect(status.run).to eq(run) # duh
+        expect(status.step).to eq(run)
+        expect(status.successful?).to eq(true)
+        expect(status.completed?).to eq(true)
+        expect(status.running?).to eq(false)
+        expect(status.step_errors).to eq(nil)
+      end
 
-    #   it "should create a new RunStatus for the Run and flag it as unsuccessful and preserve the erring IDs in the error" do
-    #     run = create(:run)
-    #     error_h = { 'ids_failing_validation' => %w(1 5 111) }
+      it "should create a new RunStepLog for the Run and flag it as unsuccessful and preserve the erring IDs in the error" do
+        run = create(:run)
+        error_h = { 'ids_failing_validation' => %w(1 5 111) }
 
-    #     expect(run.with_run_step_log_tracking(run.pipeline) { error_h }).to eq(false)
+        expect(run.with_run_step_log_tracking(run) { error_h }).to eq(false)
 
-    #     statuses = run.ordered_step_logs
-    #     expect(statuses.size).to eq(1)
-    #     status = statuses.first
-    #     expect(status.run).to eq(run) # duh
-    #     expect(status.step).to eq(run.pipeline)
-    #     expect(status.step_successful).to be false
-    #     expect(status.step_errors).to eq(error_h)
-    #   end
+        statuses = run.ordered_step_logs
+        expect(statuses.size).to eq(1)
+        status = statuses.first
+        expect(status.run).to eq(run) # duh
+        expect(status.step).to eq(run)
+        expect(status.successful?).to eq(false)
+        expect(status.completed?).to eq(false)
+        expect(status.running?).to eq(false)
+        expect(status.step_errors).to eq(error_h)
+      end
 
-    #   it "should create a new RunStatus for the Run and add exception details when an exception is raised" do
-    #     run = create(:run)
+      it "should create a new RunStepLog for the Run and add exception details when an exception is raised" do
+        run = create(:run)
 
-    #     error_text = "Boom!"
+        error_text = "Boom!"
 
-    #     expect(run.with_run_step_log_tracking(run.pipeline) { raise error_text }).to eq(false)
+        expect(run.with_run_step_log_tracking(run) { raise error_text }).to eq(false)
 
-    #     statuses = run.ordered_step_logs
-    #     expect(statuses.size).to eq(1)
-    #     status = statuses.first
-    #     expect(status.run).to eq(run) # duh
-    #     expect(status.step).to eq(run.pipeline)
-    #     expect(status.step_successful).to be false
-    #     errors = status.step_errors
-    #     expect(errors).to_not be_empty
-    #     expect(errors['class_and_message']).to eq("#<RuntimeError: Boom!>")
-    #     expect(errors['backtrace']).to_not be_empty
-    #   end
-    # end
+        statuses = run.ordered_step_logs
+        expect(statuses.size).to eq(1)
+        status = statuses.first
+        expect(status.run).to eq(run) # duh
+        expect(status.step).to eq(run)
+        expect(status.successful?).to eq(false)
+        expect(status.completed?).to eq(false)
+        expect(status.running?).to eq(false)
+        errors = status.step_errors
+        expect(errors).to_not be_empty
+        expect(errors['class_and_message']).to eq("#<RuntimeError: Boom!>")
+        expect(errors['backtrace']).to_not be_empty
+      end
+    end
 
-    # describe "#create_schema_and_tables!" do
-    #   context "for a Pipeline with multiple DDL expressions" do
-    #     let!(:pipeline) do
-    #       create(
-    #         :pipeline,
-    #         ddl: %q{
-    #           /* This is a test comment, and is currently the only comment syntax allowed: the -- syntax doesn't work */
+    describe "#create_schema" do
 
-    #           CREATE TABLE staging_boces_mappings (id serial primary key, clarity_org_id integer, co_org_id integer);
-    #           CREATE TABLE silly (id serial primary key, stringy character varying NOT NULL);
-    #         }
-    #       )
-    #     end
+      let!(:run) { create(:run) }
 
-    #     let!(:run) { create(:run, pipeline: pipeline) }
-
-    #     it "should create all the specified tables" do
-    #       run.create_schema_and_tables!
-    #       expect(run.schema_exists?).to be true
-
-    #       ar_result = run.select_all_in_schema("SELECT count(1) FROM staging_boces_mappings")
-    #       expect(ar_result.rows.first.first.to_i).to eq(0)
-
-    #       ar_result = run.select_all_in_schema("SELECT count(1) FROM silly")
-    #       expect(ar_result.rows.first.first.to_i).to eq(0)
-    #     end
-    #   end
-    # end
+      it "should create all the specified tables" do
+        run.create_schema
+        expect(run.schema_exists?).to eq(true)
+      end
+    end
 
   end
 end
