@@ -48,6 +48,12 @@ class RunStepLog < ApplicationRecord
 
   scope :ordered_by_id, -> { order(:id) }
 
+  scope :completed, -> { where(completed: true) }
+
+  scope :non_erring, -> { where(step_errors: nil) }
+
+  scope :successful, -> { completed.non_erring }
+
   # Instance Methods
 
   def successful?

@@ -74,7 +74,7 @@ class Run < ApplicationRecord
   end
 
   def ordered_step_logs
-    run_step_logs(true).ordered_by_id.to_a # Always reload
+    run_step_logs.reload.ordered_by_id.to_a # Always reload
   end
 
   # FIXME: This should be in a view-related file.  Not bothering to test it until I've decided where it lands.
@@ -92,27 +92,28 @@ class Run < ApplicationRecord
   end
 
   def failed?
-    run_step_logs(true).where("step_errors IS NOT NULL").count > 0 # Always reload
+    run_step_logs.reload.where("step_errors IS NOT NULL").count > 0 # Always reload
   end
 
   def transform_group_transform_ids(group_index)
     execution_plan[:ordered_transform_groups][group_index]&.map { |h| h.fetch(:id, nil) } if execution_plan.present?
   end
 
-  def transform_group_completed?(group_index)
+  def transform_group_successfully_completed?(group_index)
     return nil if execution_plan.blank?
     ids = transform_group_transform_ids(group_index)
-    run_step_logs.where(step_id: ids, step_type: Transform, step_errors: nil).count == ids.size
+    run_step_logs.successful.where(step_id: ids, step_type: 'Transform').count == ids.size
   end
 
   def data_quality_report_ids
     execution_plan[:data_quality_reports]&.map { |h| h.fetch(:id, nil) } if execution_plan.present?
   end
 
-  def data_quality_reports_completed?
+  # Yeah, o'er-long method name.
+  def data_quality_reports_successfully_completed?
     return nil if execution_plan.blank?
     ids = data_quality_report_ids
-    run_step_logs.where(step_id: ids, step_type: DataQualityReport, step_errors: nil).count == ids.size
+    run_step_logs.successful.where(step_id: ids, step_type: 'DataQualityReport').count == ids.size
   end
 
   # This method is critically important, since it wraps the execution of every single step in the workflow

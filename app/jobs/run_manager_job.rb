@@ -32,7 +32,7 @@ class RunManagerJob < ApplicationJob
 
     when /started_ordered_transform_groups\[(\d+)\]/
       group_index = $1.to_i
-      if run.transform_group_completed?(group_index)
+      if run.transform_group_successfully_completed?(group_index)
         next_group_index = group_index + 1
         if transform_group_transform_ids(next_group_index)
           run.update_attribute(:status, "ordered_transform_groups[#{next_group_index}]")
@@ -48,7 +48,7 @@ class RunManagerJob < ApplicationJob
       run.update_attribute(:status, "started_data_quality_reports")
 
     when 'started_data_quality_reports'
-      if run.data_quality_reports_completed?
+      if run.data_quality_reports_successfully_completed?
         run.update_attribute(:status, "finished")
         return false
       end

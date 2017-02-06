@@ -124,9 +124,36 @@ describe Run do
         end
       end
 
+      describe "transform_group_successfully_completed?" do
+
+        it "should return true when all transform group steps are successfully_completed" do
+          create(:run_step_log, run: run, completed: true, step: independent_transform)
+          create(:run_step_log, run: run, completed: true, step: least_dependent_transform)
+          create(:run_step_log, run: run, completed: true, step: first_child_transform)
+          expect(run.transform_group_successfully_completed?(0)).to eq(true)
+        end
+
+        it "should return false in scenarios where not all transform group steps are successfully_completed" do
+          create(:run_step_log, run: run, completed: true, step: independent_transform)
+          create(:run_step_log, run: run, step_errors: { too_bad: :dude }, step: least_dependent_transform)
+          create(:run_step_log, run: run, completed: true, step: first_child_transform)
+          expect(run.transform_group_successfully_completed?(0)).to eq(false)
+        end
+      end
+
       describe "#data_quality_report_ids" do
         it "should return the expected data_quality_report ids" do
           expect(Set.new(run.data_quality_report_ids)).to eq(Set.new([data_quality_report_1, data_quality_report_2, data_quality_report_3].map(&:id)))
+        end
+      end
+
+      describe "data_quality_reports_successfully_completed?" do
+        it "should return true when all data quality report steps are successfully_completed" do
+
+        end
+
+        it "should return false in scenarios where not all data quality report steps are successfully_completed" do
+
         end
       end
 
