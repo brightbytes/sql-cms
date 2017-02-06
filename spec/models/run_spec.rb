@@ -149,11 +149,17 @@ describe Run do
 
       describe "data_quality_reports_successfully_completed?" do
         it "should return true when all data quality report steps are successfully_completed" do
-
+          create(:run_step_log, run: run, completed: true, step: data_quality_report_1)
+          create(:run_step_log, run: run, completed: true, step: data_quality_report_2)
+          create(:run_step_log, run: run, completed: true, step: data_quality_report_3)
+          expect(run.data_quality_reports_successfully_completed?).to eq(true)
         end
 
         it "should return false in scenarios where not all data quality report steps are successfully_completed" do
-
+          create(:run_step_log, run: run, completed: true, step: data_quality_report_1)
+          create(:run_step_log, run: run, step_errors: { too_bad: :dude }, step: data_quality_report_2)
+          create(:run_step_log, run: run, completed: true, step: data_quality_report_3)
+          expect(run.data_quality_reports_successfully_completed?).to eq(false)
         end
       end
 
