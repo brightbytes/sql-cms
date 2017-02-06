@@ -88,6 +88,13 @@ describe Run do
       end
     end
 
+    describe "#name" do
+      it "should return the schema_name" do
+        run = create(:run)
+        expect(run.name).to eq(run.schema_name)
+      end
+    end
+
     describe "#ordered_step_logs" do
       let!(:log_1) { create(:run_step_log) }
       let!(:run) { log_1.run }

@@ -101,8 +101,12 @@ class Run < ApplicationRecord
     run_step_logs.reload.where("step_errors IS NOT NULL").count > 0 # Always reload
   end
 
+  def transform_group(group_index)
+    execution_plan[:ordered_transform_groups][group_index] if execution_plan.present?
+  end
+
   def transform_group_transform_ids(group_index)
-    execution_plan[:ordered_transform_groups][group_index]&.map { |h| h.fetch(:id, nil) } if execution_plan.present?
+    transform_group(group_index)&.map { |h| h.fetch(:id, nil) }
   end
 
   def transform_group_successfully_completed?(group_index)
@@ -111,8 +115,12 @@ class Run < ApplicationRecord
     run_step_logs.successful.where(step_id: ids, step_type: 'Transform').count == ids.size
   end
 
+  def data_quality_reports
+    execution_plan[:data_quality_reports] if execution_plan.present?
+  end
+
   def data_quality_report_ids
-    execution_plan[:data_quality_reports]&.map { |h| h.fetch(:id, nil) } if execution_plan.present?
+    data_quality_reports&.map { |h| h.fetch(:id, nil) }
   end
 
   # Yeah, o'er-long method name. Whoops.
