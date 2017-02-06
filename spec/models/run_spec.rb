@@ -81,13 +81,46 @@ describe Run do
       end
     end
 
-    # describe "#with_run_status_tracking and #ordered_statuses" do
+    describe "#to_s" do
+      it "should return the schema_name" do
+        run = create(:run)
+        expect(run.to_s).to eq(run.schema_name)
+      end
+    end
+
+    describe "#ordered_step_logs" do
+      let!(:log_1) { create(:run_step_log) }
+      let!(:run) { log_1.run }
+      let!(:log_2) { create(:run_step_log, run: run) }
+      let!(:log_3) { create(:run_step_log, run: run) }
+      let!(:log_4) { create(:run_step_log, run: run) }
+
+      it "should order the logs by ID, which is effectively execution order" do
+        expect(run.ordered_step_logs).to eq([log_1, log_2, log_3, log_4])
+      end
+    end
+
+    describe "#failed?" do
+      let!(:run) { create(:run) }
+
+      it "should return true when any step log has errors" do
+        2.times { create(:run_step_log, run: run) }
+        create(:run_step_log, run: run, completed: true)
+        expect(run.failed?).to eq(false)
+        create(:run_step_log, run: run, step_errors: { whatever: :dude })
+        expect(run.failed?).to eq(true)
+      end
+    end
+
+
+
+    # describe "#with_run_step_log_tracking and #ordered_step_logs" do
     #   it "should create a new RunStatus for the Run and flag it as successful when no exception is raised" do
     #     run = create(:run)
 
-    #     expect(run.with_run_status_tracking(run.pipeline) { nil }).to eq(true)
+    #     expect(run.with_run_step_log_tracking(run.pipeline) { nil }).to eq(true)
 
-    #     statuses = run.ordered_statuses
+    #     statuses = run.ordered_step_logs
     #     expect(statuses.size).to eq(1)
     #     status = statuses.first
     #     expect(status.run).to eq(run) # duh
@@ -100,9 +133,9 @@ describe Run do
     #     run = create(:run)
     #     error_h = { 'ids_failing_validation' => %w(1 5 111) }
 
-    #     expect(run.with_run_status_tracking(run.pipeline) { error_h }).to eq(false)
+    #     expect(run.with_run_step_log_tracking(run.pipeline) { error_h }).to eq(false)
 
-    #     statuses = run.ordered_statuses
+    #     statuses = run.ordered_step_logs
     #     expect(statuses.size).to eq(1)
     #     status = statuses.first
     #     expect(status.run).to eq(run) # duh
@@ -116,9 +149,9 @@ describe Run do
 
     #     error_text = "Boom!"
 
-    #     expect(run.with_run_status_tracking(run.pipeline) { raise error_text }).to eq(false)
+    #     expect(run.with_run_step_log_tracking(run.pipeline) { raise error_text }).to eq(false)
 
-    #     statuses = run.ordered_statuses
+    #     statuses = run.ordered_step_logs
     #     expect(statuses.size).to eq(1)
     #     status = statuses.first
     #     expect(status.run).to eq(run) # duh

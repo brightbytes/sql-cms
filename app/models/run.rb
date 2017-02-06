@@ -73,8 +73,22 @@ class Run < ApplicationRecord
     run_step_logs(true).ordered_by_id.to_a # Always reload
   end
 
+  # FIXME: This should be in a view file.
+  def pp_ordered_step_logs
+    ordered_step_logs.map do |step_log|
+      if run_step_log.step_successful?
+        "✓ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:green)
+      else
+        [
+          "✗ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:red),
+          run_step_log.step_errors.map { |key, value| [key, value, ""] }
+        ]
+      end
+    end.flatten.join("\n")
+  end
+
   def failed?
-    ordered_step_logs.where("step_errors IS NOT NULL").count > 0
+    run_step_logs(true).where("step_errors IS NOT NULL").count > 0 # Always reload
   end
 
   def transform_group_transform_ids(group_index)
@@ -125,19 +139,5 @@ class Run < ApplicationRecord
       )
       false # the return value, signifying failure
     end
-  end
-
-  # This should be in a view file.
-  def pp_ordered_step_logs
-    ordered_step_logs.map do |step_log|
-      if run_step_log.step_successful?
-        "✓ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:green)
-      else
-        [
-          "✗ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:red),
-          run_step_log.step_errors.map { |key, value| [key, value, ""] }
-        ]
-      end
-    end.flatten.join("\n")
   end
 end

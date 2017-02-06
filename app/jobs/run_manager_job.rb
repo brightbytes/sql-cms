@@ -1,4 +1,5 @@
-# This is a
+# This is a combination of a self-relogging (i.e. polling) job and a state machine for managing the execution of a Run.
+# As such, I suppose it complects separate concerns.  Oh well.
 class RunManagerJob < ApplicationJob
 
   POLLING_FREQUENCY = 10.seconds
@@ -8,6 +9,12 @@ class RunManagerJob < ApplicationJob
 
     return false if run.failed?
 
+    if manage_state_machine(run)
+      RunManagerJob.set(wait: POLLING_FREQUENCY).perform_later(run_id)
+    end
+  end
+
+  private def manage_state_machine(run)
     case run.status
 
     when 'unstarted'
@@ -43,11 +50,12 @@ class RunManagerJob < ApplicationJob
     when 'started_data_quality_reports'
       if run.data_quality_reports_completed?
         run.update_attribute(:status, "finished")
-        return
+        return false
       end
 
     end
 
-    RunManagerJob.set(wait: POLLING_FREQUENCY).perform_later(run_id)
+    true
   end
+
 end

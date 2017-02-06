@@ -22,3 +22,10 @@ shared_examples 'cheesey dependency graph' do
   let!(:another_workflow_transform) { create(:transform) }
 
 end
+
+shared_examples 'serialized workflow' do
+
+  include_examples 'cheesey dependency graph'
+
+
+end
