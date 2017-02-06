@@ -39,7 +39,7 @@ class Transform < ApplicationRecord
 
   validates :sql, :workflow, presence: true
 
-  RUNNERS = %w(CopyFrom Sql CopyTo)
+  RUNNERS = %w(AutoLoad CopyFrom Sql CopyTo)
 
   validates :runner, presence: true, inclusion: { in: RUNNERS }
 

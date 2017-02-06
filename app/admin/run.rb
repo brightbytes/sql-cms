@@ -37,7 +37,7 @@ ActiveAdmin.register Run do
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.run_step_logs.order('id'), sortable: true) do
         column(:step_name, sortable: :step_name) { |log| auto_link(log) }
-        boolean_column(:completed_successfully)
+        boolean_column(:completed)
         column(:action) { |log| link_to("Delete", run_step_log_path(log), method: :delete, data: { confirm: 'Are you sure you want to nuke this Run Step Log?' }) }
       end
     end

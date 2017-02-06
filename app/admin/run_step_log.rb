@@ -9,7 +9,9 @@ ActiveAdmin.register RunStepLog do
       row :id
       row :run
       row :step # includes :step_name
-      boolean_row :completed_successfully
+      boolean_row :completed
+      boolean_row :running
+      boolean_row :successful
       row(:step_errors) { code(resource.step_errors) }
       row :created_at
       row :updated_at

@@ -80,8 +80,10 @@ class Run < ApplicationRecord
   # FIXME: This should be in a view-related file.  Not bothering to test it until I've decided where it lands.
   def pp_ordered_step_logs
     ordered_step_logs.map do |step_log|
-      if run_step_log.step_successful?
+      if run_step_log.successful?
         "✓ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:green)
+      elsif run_step_log.running?
+        ". #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:yellow)
       else
         [
           "✗ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:red),
@@ -122,13 +124,16 @@ class Run < ApplicationRecord
     raise "No block provided; really?!?" unless block_given?
 
     return nil unless step
+
+    # FIXME - MAY WANT A TRANSACTION FROM HERE ON DOWN, TO PREVENT THE RACE CONDITION
     if run_step_log = RunStepLog.find_by(run: self, step: step)
       return run_step_log.successful?
     end
 
-    run_step_log = RunStepLog.create!(run: self, step: step) # step_successful? defaults to false, of course
+    run_step_log = RunStepLog.create!(run: self, step: step)
 
     begin
+
       if validation_failures_h = yield # A hash will only be returned for Validations that fail
         run_step_log.update_attribute(:step_errors, validation_failures_h)
         false # the return value, signifying failure
@@ -137,12 +142,14 @@ class Run < ApplicationRecord
       end
 
     rescue StandardError => exception
+
       run_step_log.update_attribute(
         :step_errors,
         class_and_message: exception.inspect,
         backtrace: exception.backtrace.join("\n")
       )
       false # the return value, signifying failure
+
     end
   end
 end

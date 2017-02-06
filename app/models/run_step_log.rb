@@ -52,12 +52,18 @@ class RunStepLog < ApplicationRecord
 
   scope :non_erring, -> { where(step_errors: nil) }
 
+  scope :erring, -> { where("step_errors IS NOT NULL") }
+
   scope :successful, -> { completed.non_erring }
 
   # Instance Methods
 
   def successful?
     completed? && !step_errors
+  end
+
+  def running? # or, hung/terminated-abnormally, I suppose
+    !completed? && !step_errors
   end
 
 end
