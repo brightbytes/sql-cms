@@ -122,12 +122,34 @@ describe Run do
     context 'with a run having a cheesey serialized workflow' do
       include_examples 'a workflow serialized into a run'
 
+      describe "#transform_group" do
+        it "should return the expected transform hashes" do
+          expect(run.transform_group(0)).to eq(run.execution_plan[:ordered_transform_groups][0])
+          expect(run.transform_group(1)).to eq(run.execution_plan[:ordered_transform_groups][1])
+          expect(run.transform_group(2)).to eq(run.execution_plan[:ordered_transform_groups][2])
+          expect(run.transform_group(3)).to eq(nil)
+        end
+      end
+
       describe "#transform_group_transform_ids" do
         it "should return the expected transform ids" do
           expect(Set.new(run.transform_group_transform_ids(0))).to eq(Set.new([independent_transform, least_dependent_transform, first_child_transform].map(&:id)))
           expect(Set.new(run.transform_group_transform_ids(1))).to eq(Set.new([less_dependent_transform, another_less_dependent_transform].map(&:id)))
           expect(Set.new(run.transform_group_transform_ids(2))).to eq(Set.new([most_dependent_transform].map(&:id)))
           expect(run.transform_group_transform_ids(3)).to eq(nil)
+        end
+      end
+
+      describe "#transform_plan" do
+        it "should return the expected transform hashes" do
+          expect(run.transform_plan(step_index: 0, transform_id: independent_transform.id)).to eq(ActiveModelSerializers::SerializableResource.new(independent_transform).as_json)
+          expect(run.transform_plan(step_index: 0, transform_id: least_dependent_transform.id)).to eq(ActiveModelSerializers::SerializableResource.new(least_dependent_transform).as_json)
+          expect(run.transform_plan(step_index: 0, transform_id: first_child_transform.id)).to eq(ActiveModelSerializers::SerializableResource.new(first_child_transform).as_json)
+          expect(run.transform_plan(step_index: 1, transform_id: less_dependent_transform.id)).to eq(ActiveModelSerializers::SerializableResource.new(less_dependent_transform).as_json)
+          expect(run.transform_plan(step_index: 1, transform_id: another_less_dependent_transform.id)).to eq(ActiveModelSerializers::SerializableResource.new(another_less_dependent_transform).as_json)
+          expect(run.transform_plan(step_index: 2, transform_id: most_dependent_transform.id)).to eq(ActiveModelSerializers::SerializableResource.new(most_dependent_transform).as_json)
+          expect(run.transform_plan(step_index: 2, transform_id: 123421234324)).to eq(nil)
+          expect(run.transform_plan(step_index: 3, transform_id: independent_transform.id)).to eq(nil)
         end
       end
 
@@ -154,6 +176,12 @@ describe Run do
           expect(run.transform_group_successfully_completed?(0)).to eq(false)
         end
 
+      end
+
+      describe "#data_quality_reports" do
+        it "should return the expected data_quality_reports hash" do
+          expect(run.data_quality_reports).to eq(run.execution_plan[:data_quality_reports])
+        end
       end
 
       describe "#data_quality_report_ids" do

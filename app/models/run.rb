@@ -112,7 +112,17 @@ class Run < ApplicationRecord
   end
 
   def transform_plan(step_index:, transform_id:)
-    transform_group(step_index)&.detect { |h| h[:id] == transform_id }
+    if plan = transform_group(step_index)&.detect { |h| h[:id] == transform_id }&.symbolize_keys
+      plan[:data_quality_reports]&.symbolize_keys!
+      plan[:ordered_transform_groups]&.each do |arr|
+        arr.each do |h|
+          h&.symbolize_keys!
+          h[:data_file]&.symbolize_keys!
+          h[:transform_validations]&.symbolize_keys!
+        end
+      end
+      plan
+    end
   end
 
   def transform_group_successfully_completed?(step_index)

@@ -1,3 +1,4 @@
+# Produces runner modules that execute the supplied plan hash.
 module RunnerFactory
 
   extend self
@@ -7,12 +8,14 @@ module RunnerFactory
     "#{runner}Runner".classify rescue nil
   end
 
+  # Introspect on the headers of the data file specified by the plan, create the table using the sql-identifier version of each header, and load the table.
   module AutoLoadRunner
     def run(run:, plan_h:)
-
+      raise "Not yet implemented"
     end
   end
 
+  # Loads a table from a data file
   module CopyFromRunner
     def run(run:, plan_h:)
 
@@ -26,9 +29,17 @@ module RunnerFactory
     end
   end
 
+  # Unloads a table to a data file
   module CopyToRunner
     def run(run:, plan_h:)
 
+    end
+  end
+
+  # Redshift-specific version of CopyToRunner
+  module UnloadRunner
+    def run(run:, plan_h:)
+      raise "Not yet implemented"
     end
   end
 
