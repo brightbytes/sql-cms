@@ -2,7 +2,7 @@
 # As such, I suppose it complects separate concerns.  Oh well.
 class RunManagerJob < ApplicationJob
 
-  POLLING_FREQUENCY = 10.seconds
+  POLLING_FREQUENCY = 5.seconds
 
   def perform(run_id)
     run = Run.find(run_id)
@@ -10,6 +10,7 @@ class RunManagerJob < ApplicationJob
     return false if run.failed?
 
     if manage_state_machine(run)
+      # Self-relog unless the state machine has finished.
       RunManagerJob.set(wait: POLLING_FREQUENCY).perform_later(run_id)
     end
   end

@@ -73,10 +73,6 @@ class Run < ApplicationRecord
     to_s
   end
 
-  def execution_plan
-    read_attribute(:execution_plan)&.with_indifferent_access # This should be automatic.  Grrr.
-  end
-
   def ordered_step_logs
     run_step_logs.reload.ordered_by_id.to_a # Always reload
   end
@@ -99,6 +95,12 @@ class Run < ApplicationRecord
 
   def failed?
     run_step_logs.reload.erring.count > 0 # Always reload
+  end
+
+  # execution_plan helpers
+
+  def execution_plan
+    read_attribute(:execution_plan)&.with_indifferent_access # This should be automatic.  Grrr.
   end
 
   def transform_group(step_index)
@@ -139,7 +141,6 @@ class Run < ApplicationRecord
   end
 
   # This method is critically important, since it wraps the execution of every single step in the workflow
-  # Arguably, it should be extracted from this file.  Refactor some sunny day.
   def with_run_step_log_tracking(step_name:, step_index: 0, step_id: 0)
     raise "No block provided; really?!?" unless block_given?
 
