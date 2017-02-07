@@ -26,8 +26,8 @@ class RunManagerJob < ApplicationJob
 
     when /unstarted_ordered_transform_groups\[(\d+)\]/
       group_index = $1.to_i
-      run.transform_group(group_index).each do |transform_h|
-        TransformJob.perform_later(run_id: run.id, transform_h: transform_h)
+      run.transform_group_transform_ids(group_index).each do |transform_id|
+        TransformJob.perform_later(run_id: run.id, step_index: group_index, step_id: transform_id)
       end
       run.update_attribute(:status, "started_ordered_transform_groups[#{group_index}]")
 
@@ -44,7 +44,7 @@ class RunManagerJob < ApplicationJob
 
     when 'unstarted_data_quality_reports'
       run.data_quality_report_ids.each do |data_quality_report_id|
-        DataQualityReportJob.perform_later(data_quality_report_id)
+        DataQualityReportJob.perform_later(run_id: run.id, step_id: data_quality_report_id)
       end
       run.update_attribute(:status, "started_data_quality_reports")
 

@@ -8,11 +8,11 @@ ActiveAdmin.register RunStepLog do
     attributes_table do
       row :id
       row :run
-      row :step # includes :step_name
+      row :step
       boolean_row :completed
       boolean_row :running
       boolean_row :successful
-      row(:step_errors) { code(resource.step_errors) }
+      row(:step_errors) { code(pretty_print_as_json(resource.step_errors)) }
       row :created_at
       row :updated_at
     end

@@ -220,9 +220,9 @@ ALTER SEQUENCE notifications_id_seq OWNED BY notifications.id;
 CREATE TABLE run_step_logs (
     id integer NOT NULL,
     run_id integer NOT NULL,
-    step_id integer NOT NULL,
-    step_type character varying NOT NULL,
     step_name character varying NOT NULL,
+    step_index integer DEFAULT 0 NOT NULL,
+    step_id integer DEFAULT 0 NOT NULL,
     completed boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -846,17 +846,10 @@ CREATE UNIQUE INDEX index_notifications_on_workflow_id_and_user_id ON notificati
 
 
 --
--- Name: index_run_step_logs_on_run_id_and_step_id_and_step_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_run_step_logs_on_run_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_run_step_logs_on_run_id_and_step_id_and_step_type ON run_step_logs USING btree (run_id, step_id, step_type);
-
-
---
--- Name: index_run_step_logs_on_step_id_and_step_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_run_step_logs_on_step_id_and_step_type ON run_step_logs USING btree (step_id, step_type);
+CREATE INDEX index_run_step_logs_on_run_id ON run_step_logs USING btree (run_id);
 
 
 --

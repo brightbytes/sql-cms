@@ -1,7 +1,11 @@
 class TransformJob < ApplicationJob
 
-  def perform(run_id:, transform_h:)
+  def perform(run_id:, group_index:, step_id:)
+
     run = Run.find(run_id)
+
+    # step_name: "ordered_transform_groups",
+
 
     # run.with_run_status_tracking(self) { transform.send(:run, run: run, pipeline_transform: self) } &&
     #   Run.all_succeeded?(transform_validations.map { |transform_validation| transform_validation.run(run) })

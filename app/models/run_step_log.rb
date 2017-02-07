@@ -4,9 +4,9 @@
 #
 #  id          :integer          not null, primary key
 #  run_id      :integer          not null
-#  step_id     :integer          not null
-#  step_type   :string           not null
 #  step_name   :string           not null
+#  step_index  :integer          default(0), not null
+#  step_id     :integer          default(0), not null
 #  completed   :boolean          default(FALSE), not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
@@ -14,8 +14,7 @@
 #
 # Indexes
 #
-#  index_run_step_logs_on_run_id_and_step_id_and_step_type  (run_id,step_id,step_type) UNIQUE
-#  index_run_step_logs_on_step_id_and_step_type             (step_id,step_type)
+#  index_run_step_logs_on_run_id  (run_id)
 #
 # Foreign Keys
 #
@@ -26,23 +25,15 @@ class RunStepLog < ApplicationRecord
 
   # Validations
 
-  validates :step, :step_name, presence: true
-
-  validates :run, presence: true, uniqueness: { scope: [:step_id, :step_type] }
+  validates :run, :step_name, :step_index, :step_id, presence: true
 
   # Callbacks
 
-  before_validation :maybe_set_step_name, on: :create
 
-  def maybe_set_step_name
-    self.step_name = step.try(:name)
-  end
 
   # Associations
 
   belongs_to :run, inverse_of: :run_step_logs
-
-  belongs_to :step, polymorphic: true
 
   # Scopes
 
@@ -66,4 +57,17 @@ class RunStepLog < ApplicationRecord
     !completed? && !step_errors
   end
 
+  def step
+    return nil unless [step_name, step_index, step_id].all?(&:present)
+    case step_name
+    when 'create_schema'
+      step_name
+    when 'ordered_transform_groups'
+      "#{step_name}[#{step_index}][#{step_id}]"
+    when 'data_quality_reports'
+      "#{step_name}[#{step_id}]"
+    else
+      raise "Unknown step_name: #{step_name}"
+    end
+  end
 end

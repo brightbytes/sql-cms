@@ -112,7 +112,7 @@ class Run < ApplicationRecord
   def transform_group_successfully_completed?(group_index)
     return nil if execution_plan.blank?
     ids = transform_group_transform_ids(group_index)
-    run_step_logs.successful.where(step_id: ids, step_type: 'Transform').count == ids.size
+    run_step_logs.successful.where(step_name: 'ordered_transform_groups', step_index: group_index, step_id: ids).count == ids.size
   end
 
   def data_quality_reports
@@ -127,22 +127,24 @@ class Run < ApplicationRecord
   def data_quality_reports_successfully_completed?
     return nil if execution_plan.blank?
     ids = data_quality_report_ids
-    run_step_logs.successful.where(step_id: ids, step_type: 'DataQualityReport').count == ids.size
+    run_step_logs.successful.where(step_name: 'data_quality_reports', step_id: ids).count == ids.size
   end
 
   # This method is critically important, since it wraps the execution of every single step in the workflow
   # Arguably, it should be extracted from this file.  Refactor some sunny day.
-  def with_run_step_log_tracking(step)
+  def with_run_step_log_tracking(step_name:, step_index: 0, step_id: 0)
     raise "No block provided; really?!?" unless block_given?
 
-    return nil unless step
+    return nil unless [step_name, step_index, step_id].all?(&:present?)
+
+    run_step_log_args = { run: self, step_name: step_name, step_index: step_index, step_id: step_id }
 
     # FIXME - MAY WANT A TRANSACTION FROM HERE ON DOWN, TO PREVENT THE RACE CONDITION
-    if run_step_log = RunStepLog.find_by(run: self, step: step)
+    if run_step_log = RunStepLog.find_by(run_step_log_args)
       return run_step_log.successful?
     end
 
-    run_step_log = RunStepLog.create!(run: self, step: step)
+    run_step_log = RunStepLog.create!(run_step_log_args)
 
     begin
 

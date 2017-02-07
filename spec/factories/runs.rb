@@ -8,8 +8,7 @@ FactoryGirl.define do
 
   factory :run_step_log do
     association :run
-    step { create(:transform, workflow: run.workflow) }
+    step_name "create_schema"
   end
-
 
 end

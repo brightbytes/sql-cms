@@ -134,18 +134,26 @@ describe Run do
       describe "transform_group_successfully_completed?" do
 
         it "should return true when all transform group steps are successfully_completed" do
-          create(:run_step_log, run: run, completed: true, step: independent_transform)
-          create(:run_step_log, run: run, completed: true, step: least_dependent_transform)
-          create(:run_step_log, run: run, completed: true, step: first_child_transform)
+          create(:run_step_log, run: run, completed: true, step_name: 'ordered_transform_groups', step_index: 0, step_id: independent_transform.id)
+          create(:run_step_log, run: run, completed: true, step_name: 'ordered_transform_groups', step_index: 0, step_id: least_dependent_transform.id)
+          create(:run_step_log, run: run, completed: true, step_name: 'ordered_transform_groups', step_index: 0, step_id: first_child_transform.id)
           expect(run.transform_group_successfully_completed?(0)).to eq(true)
         end
 
-        it "should return false in scenarios where not all transform group steps are successfully_completed" do
-          create(:run_step_log, run: run, completed: true, step: independent_transform)
-          create(:run_step_log, run: run, step_errors: { too_bad: :dude }, step: least_dependent_transform)
-          create(:run_step_log, run: run, completed: true, step: first_child_transform)
+        it "should return false when one of the transforms has an error" do
+          create(:run_step_log, run: run, completed: true, step_name: 'ordered_transform_groups', step_index: 0, step_id: independent_transform.id)
+          create(:run_step_log, run: run, step_errors: { too_bad: :dude }, step_name: 'ordered_transform_groups', step_index: 0, step_id: least_dependent_transform.id)
+          create(:run_step_log, run: run, completed: true, step_name: 'ordered_transform_groups', step_index: 0, step_id: first_child_transform.id)
           expect(run.transform_group_successfully_completed?(0)).to eq(false)
         end
+
+        it "should return false when one of the transforms hasn't been completed" do
+          create(:run_step_log, run: run, completed: true, step_name: 'ordered_transform_groups', step_index: 0, step_id: independent_transform.id)
+          create(:run_step_log, run: run, completed: false, step_name: 'ordered_transform_groups', step_index: 0, step_id: least_dependent_transform.id)
+          create(:run_step_log, run: run, completed: true, step_name: 'ordered_transform_groups', step_index: 0, step_id: first_child_transform.id)
+          expect(run.transform_group_successfully_completed?(0)).to eq(false)
+        end
+
       end
 
       describe "#data_quality_report_ids" do
@@ -156,16 +164,23 @@ describe Run do
 
       describe "data_quality_reports_successfully_completed?" do
         it "should return true when all data quality report steps are successfully_completed" do
-          create(:run_step_log, run: run, completed: true, step: data_quality_report_1)
-          create(:run_step_log, run: run, completed: true, step: data_quality_report_2)
-          create(:run_step_log, run: run, completed: true, step: data_quality_report_3)
+          create(:run_step_log, run: run, completed: true, step_name: 'data_quality_reports', step_id: data_quality_report_1.id)
+          create(:run_step_log, run: run, completed: true, step_name: 'data_quality_reports', step_id: data_quality_report_2.id)
+          create(:run_step_log, run: run, completed: true, step_name: 'data_quality_reports', step_id: data_quality_report_3.id)
           expect(run.data_quality_reports_successfully_completed?).to eq(true)
         end
 
-        it "should return false in scenarios where not all data quality report steps are successfully_completed" do
-          create(:run_step_log, run: run, completed: true, step: data_quality_report_1)
-          create(:run_step_log, run: run, step_errors: { too_bad: :dude }, step: data_quality_report_2)
-          create(:run_step_log, run: run, completed: true, step: data_quality_report_3)
+        it "should return false when one of the data quality reports has an error" do
+          create(:run_step_log, run: run, completed: true, step_name: 'data_quality_reports', step_id: data_quality_report_1.id)
+          create(:run_step_log, run: run, step_errors: { too_bad: :dude }, step_name: 'data_quality_reports', step_id: data_quality_report_2.id)
+          create(:run_step_log, run: run, completed: true, step_name: 'data_quality_reports', step_id: data_quality_report_3.id)
+          expect(run.data_quality_reports_successfully_completed?).to eq(false)
+        end
+
+        it "should return false when one of the data quality reports has not yet completed" do
+          create(:run_step_log, run: run, completed: true, step_name: 'data_quality_reports', step_id: data_quality_report_1.id)
+          create(:run_step_log, run: run, completed: false, step_name: 'data_quality_reports', step_id: data_quality_report_2.id)
+          create(:run_step_log, run: run, completed: true, step_name: 'data_quality_reports', step_id: data_quality_report_3.id)
           expect(run.data_quality_reports_successfully_completed?).to eq(false)
         end
       end
@@ -176,13 +191,13 @@ describe Run do
       it "should create a new RunStepLog for the Run and flag it as successful when no exception is raised" do
         run = create(:run)
 
-        expect(run.with_run_step_log_tracking(run) { nil }).to eq(true)
+        expect(run.with_run_step_log_tracking(step_name: 'create_schema') { nil }).to eq(true)
 
         statuses = run.ordered_step_logs
         expect(statuses.size).to eq(1)
         status = statuses.first
         expect(status.run).to eq(run) # duh
-        expect(status.step).to eq(run)
+        expect(status.step_name).to eq('create_schema')
         expect(status.successful?).to eq(true)
         expect(status.completed?).to eq(true)
         expect(status.running?).to eq(false)
@@ -193,13 +208,13 @@ describe Run do
         run = create(:run)
         error_h = { 'ids_failing_validation' => %w(1 5 111) }
 
-        expect(run.with_run_step_log_tracking(run) { error_h }).to eq(false)
+        expect(run.with_run_step_log_tracking(step_name: 'create_schema') { error_h }).to eq(false)
 
         statuses = run.ordered_step_logs
         expect(statuses.size).to eq(1)
         status = statuses.first
         expect(status.run).to eq(run) # duh
-        expect(status.step).to eq(run)
+        expect(status.step_name).to eq('create_schema')
         expect(status.successful?).to eq(false)
         expect(status.completed?).to eq(false)
         expect(status.running?).to eq(false)
@@ -211,13 +226,13 @@ describe Run do
 
         error_text = "Boom!"
 
-        expect(run.with_run_step_log_tracking(run) { raise error_text }).to eq(false)
+        expect(run.with_run_step_log_tracking(step_name: 'create_schema') { raise error_text }).to eq(false)
 
         statuses = run.ordered_step_logs
         expect(statuses.size).to eq(1)
         status = statuses.first
         expect(status.run).to eq(run) # duh
-        expect(status.step).to eq(run)
+        expect(status.step_name).to eq('create_schema')
         expect(status.successful?).to eq(false)
         expect(status.completed?).to eq(false)
         expect(status.running?).to eq(false)
