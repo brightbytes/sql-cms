@@ -44,16 +44,4 @@ class TransformValidation < ApplicationRecord
     "Validation '#{validation.name}' for Transform '#{transform.name}'"
   end
 
-  # FIXME - MOVE TO SERVICE LAYER
-  # IMPORTANT: This will be how all Validations (that aren't PipelineValidations) are actually invoked: the delegated-to #run method shouldn't be called directly,
-  #             which is why it is private
-  # def run(run)
-  #   run.with_run_status_tracking(self) do
-  #     # All TransformValidations should return the IDs of the rows that fail validation
-  #     if ids = validation.send(:run, run: run, validation_association: self).presence
-  #       { ids_failing_validation: ids }
-  #     end
-  #   end
-  # end
-
 end

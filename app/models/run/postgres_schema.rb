@@ -17,7 +17,6 @@ module Run::PostgresSchema
         transaction { Apartment::Tenant.create(schema_name) }
       end
     end
-    nil # for Run#with_run_step_log_tracking
   end
 
   def drop_schema
@@ -27,7 +26,6 @@ module Run::PostgresSchema
         transaction { Apartment::Tenant.drop(schema_name) }
       end
     end
-    nil # for Run#with_run_step_log_tracking
   end
 
   def execute_ddl_in_schema(ddl)
@@ -44,8 +42,6 @@ module Run::PostgresSchema
     with_connection_reset_on_error do
       in_schema_context { Apartment.connection.execute(sql) }
     end
-
-    nil # for Run#with_run_step_log_tracking
   end
 
   # The guts of the following 2 methods were cribbed from https://github.com/diogob/postgres-copy/blob/master/lib/postgres-copy/acts_as_copy_target.rb
@@ -62,8 +58,6 @@ module Run::PostgresSchema
         end
       end
     end
-
-    nil # for Run#with_run_step_log_tracking
   end
 
   # I haven't bothered testing this, since a streaming COPY per-table would be the best way to get data out, by which I mean something like this from the CL:
@@ -79,8 +73,6 @@ module Run::PostgresSchema
         end
       end
     end
-
-    nil # for Run#with_run_step_log_tracking
   end
 
   # These next 5 are useful in tests and for debugging failed Runs (in addition to some of them being used by the system)

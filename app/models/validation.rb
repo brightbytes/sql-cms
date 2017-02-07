@@ -39,11 +39,4 @@ class Validation < ApplicationRecord
 
   # Instance Methods
 
-  # FIXME - MOVE TO SERVICE LAYER
-  # This is private because Validations should always be invoked through TransformValidation#run or PipelineValidation#run (both of which delegate to this)
-  #  since those methods add run status tracking
-  # private def run(run:, validation_association:, query_method: :select_values_in_schema)
-  #   run.send(query_method, validation_association.interpolated_sql)
-  # end
-
 end
