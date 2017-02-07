@@ -190,6 +190,15 @@ describe Run do
         end
       end
 
+      describe "#data_quality_report_plan" do
+        it "should return the expected data_quality_report hashes" do
+          expect(run.data_quality_report_plan(data_quality_report_1.id)).to eq(ActiveModelSerializers::SerializableResource.new(data_quality_report_1).as_json)
+          expect(run.data_quality_report_plan(data_quality_report_2.id)).to eq(ActiveModelSerializers::SerializableResource.new(data_quality_report_2).as_json)
+          expect(run.data_quality_report_plan(data_quality_report_3.id)).to eq(ActiveModelSerializers::SerializableResource.new(data_quality_report_3).as_json)
+          expect(run.data_quality_report_plan(123421234324)).to eq(nil)
+        end
+      end
+
       describe "data_quality_reports_successfully_completed?" do
         it "should return true when all data quality report steps are successfully_completed" do
           create(:run_step_log, run: run, completed: true, step_name: 'data_quality_reports', step_id: data_quality_report_1.id)

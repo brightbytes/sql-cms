@@ -1,5 +1,6 @@
-# Serializer for the Run#execution_plan-relevant attributes of a Workflow
-# Tested only indirectly at this time ... which is OK for now given that this is central to the system
+# Serializer for the Run#execution_plan-relevant attributes of a Workflow, and all subsidiary objects.
+# Tested somewhat indirectly via the Run spec ... which is good enough, IMO
+
 class WorkflowSerializer < ActiveModel::Serializer
 
   attributes :id, :name, :slug, :emails_to_notify
@@ -10,34 +11,33 @@ class WorkflowSerializer < ActiveModel::Serializer
   end
 
   has_many :data_quality_reports
+end
 
-  class DataQualityReportSerializer < ActiveModel::Serializer
 
-    attributes :id, :name, :params, :sql
+class DataQualityReportSerializer < ActiveModel::Serializer
 
-  end
+  attributes :id, :name, :params, :sql
 
 end
 
-# Serializer for the Run#execution_plan-relevant attributes of a Transform.
-# Tested only indirectly at this time ... which is OK for now given that this is central to the system
 class TransformSerializer < ActiveModel::Serializer
 
   attributes :id, :name, :runner, :params, :sql
 
   belongs_to :data_file
 
-  class DataFileSerializer < ActiveModel::Serializer
-
-    attributes :id, :name, :metadata, :file_type, :s3_region_name, :s3_bucket_name, :s3_file_name
-
-  end
-
   has_many :transform_validations
 
-  class TransformValidationSerializer < ActiveModel::Serializer
+end
 
-    attributes :name, :params, :sql
+class DataFileSerializer < ActiveModel::Serializer
 
-  end
+  attributes :id, :name, :metadata, :file_type, :s3_region_name, :s3_bucket_name, :s3_file_name
+
+end
+
+class TransformValidationSerializer < ActiveModel::Serializer
+
+  attributes :name, :params, :sql
+
 end

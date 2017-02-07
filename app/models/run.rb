@@ -111,6 +111,7 @@ class Run < ApplicationRecord
     transform_group(step_index)&.map { |h| h.fetch(:id, nil) }
   end
 
+  # All the symbolize_keys crap is utterly ludicrous.  Thanks, Rails.
   def transform_plan(step_index:, transform_id:)
     if plan = transform_group(step_index)&.detect { |h| h[:id] == transform_id }&.symbolize_keys
       plan[:data_quality_reports]&.symbolize_keys!
@@ -136,7 +137,7 @@ class Run < ApplicationRecord
   end
 
   def data_quality_report_plan(data_quality_report_id)
-    data_quality_reports&.detect { |h| h[:id] == data_quality_report_id }
+    data_quality_reports&.detect { |h| h[:id] == data_quality_report_id }&.symbolize_keys
   end
 
   def data_quality_report_ids
