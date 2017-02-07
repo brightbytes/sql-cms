@@ -25,18 +25,18 @@ class RunManagerJob < ApplicationJob
       manage_state_machine(run) # ah, the glory of a brief affair with a recursive call
 
     when /unstarted_ordered_transform_groups\[(\d+)\]/
-      group_index = $1.to_i
-      run.transform_group_transform_ids(group_index).each do |transform_id|
-        TransformJob.perform_later(run_id: run.id, step_index: group_index, step_id: transform_id)
+      step_index = $1.to_i
+      run.transform_group_transform_ids(step_index).each do |transform_id|
+        TransformJob.perform_later(run_id: run.id, step_index: step_index, step_id: transform_id)
       end
-      run.update_attribute(:status, "started_ordered_transform_groups[#{group_index}]")
+      run.update_attribute(:status, "started_ordered_transform_groups[#{step_index}]")
 
     when /started_ordered_transform_groups\[(\d+)\]/
-      group_index = $1.to_i
-      if run.transform_group_successfully_completed?(group_index)
-        next_group_index = group_index + 1
-        if transform_group_transform_ids(next_group_index)
-          run.update_attribute(:status, "ordered_transform_groups[#{next_group_index}]")
+      step_index = $1.to_i
+      if run.transform_group_successfully_completed?(step_index)
+        next_step_index = step_index + 1
+        if transform_group_transform_ids(next_step_index)
+          run.update_attribute(:status, "ordered_transform_groups[#{next_step_index}]")
         else
           run.update_attribute(:status, "unstarted_data_quality_reports")
         end

@@ -12,6 +12,7 @@ ActiveAdmin.register TransformValidation do
       row :transform
       row :validation
       row(:validation_sql) { resource.validation.sql }
+      row(:interpolated_sql) { code(resource.interpolated_sql) }
       row(:validation_immutable) { yes_no(resource.validation.immutable) }
       row(:params) { code(pretty_print_as_json(resource.params)) }
       row :created_at

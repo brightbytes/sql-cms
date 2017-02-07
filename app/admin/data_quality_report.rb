@@ -27,6 +27,7 @@ ActiveAdmin.register DataQualityReport do
 
       row(:params) { code(pretty_print_as_json(resource.params)) }
       row(:sql) { code(resource.sql) }
+      row(:interpolated_sql) { code(resource.interpolated_sql) }
 
       row :copied_from_data_quality_report
 

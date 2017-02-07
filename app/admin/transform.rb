@@ -33,6 +33,7 @@ ActiveAdmin.register Transform do
       row :runner
       row(:params) { code(pretty_print_as_json(resource.params)) }
       row(:sql) { code(resource.sql) }
+      row(:interpolated_sql) { code(resource.interpolated_sql) }
       row :transcompiled_source_language
       row(:transcompiled_source) { code(resource.transcompiled_source) }
       row :data_file

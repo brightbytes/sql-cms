@@ -12,14 +12,20 @@ module Concerns::ParamsHelpers
   end
 
   def interpolated_sql
-    if params.present?
-      sql.dup.tap do |sql|
-        params.each_pair do |k, v|
-          sql.gsub!(":#{k}", v)
+    self.class.interpolated(sql: sql, params: params)
+  end
+
+  module ClassMethods
+    def interpolate(sql:, params: nil)
+      if params.present?
+        sql.dup.tap do |sql|
+          params.each_pair do |k, v|
+            sql.gsub!(":#{k}", v)
+          end
         end
+      else
+        sql
       end
-    else
-      sql
     end
   end
 

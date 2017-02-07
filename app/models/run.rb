@@ -82,41 +82,49 @@ class Run < ApplicationRecord
   end
 
   # FIXME: This should be in a view-related file.  Not bothering to test it until I've decided where it lands.
-  def pp_ordered_step_logs
-    ordered_step_logs.map do |step_log|
-      if run_step_log.successful?
-        "✓ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:green)
-      elsif run_step_log.running?
-        ". #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:yellow)
-      else
-        [
-          "✗ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:red),
-          run_step_log.step_errors.map { |key, value| [key, value, ""] }
-        ]
-      end
-    end.flatten.join("\n")
-  end
+  # def pp_ordered_step_logs
+  #   ordered_step_logs.map do |step_log|
+  #     if run_step_log.successful?
+  #       "✓ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:green)
+  #     elsif run_step_log.running?
+  #       ". #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:yellow)
+  #     else
+  #       [
+  #         "✗ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:red),
+  #         run_step_log.step_errors.map { |key, value| [key, value, ""] }
+  #       ]
+  #     end
+  #   end.flatten.join("\n")
+  # end
 
   def failed?
-    run_step_logs.reload.where("step_errors IS NOT NULL").count > 0 # Always reload
+    run_step_logs.reload.erring.count > 0 # Always reload
   end
 
-  def transform_group(group_index)
-    execution_plan[:ordered_transform_groups][group_index] if execution_plan.present?
+  def transform_group(step_index)
+    execution_plan[:ordered_transform_groups][step_index] if execution_plan.present?
   end
 
-  def transform_group_transform_ids(group_index)
-    transform_group(group_index)&.map { |h| h.fetch(:id, nil) }
+  def transform_group_transform_ids(step_index)
+    transform_group(step_index)&.map { |h| h.fetch(:id, nil) }
   end
 
-  def transform_group_successfully_completed?(group_index)
+  def transform_plan(step_index:, transform_id:)
+    transform_group(step_index)&.detect { |h| h[:id] == transform_id }
+  end
+
+  def transform_group_successfully_completed?(step_index)
     return nil if execution_plan.blank?
-    ids = transform_group_transform_ids(group_index)
-    run_step_logs.successful.where(step_name: 'ordered_transform_groups', step_index: group_index, step_id: ids).count == ids.size
+    ids = transform_group_transform_ids(step_index)
+    run_step_logs.successful.where(step_name: 'ordered_transform_groups', step_index: step_index, step_id: ids).count == ids.size
   end
 
   def data_quality_reports
     execution_plan[:data_quality_reports] if execution_plan.present?
+  end
+
+  def data_quality_report_plan(data_quality_report_id)
+    data_quality_reports&.detect { |h| h[:id] == data_quality_report_id }
   end
 
   def data_quality_report_ids
@@ -147,8 +155,8 @@ class Run < ApplicationRecord
 
     begin
 
-      if validation_failures_h = yield # A hash will only be returned for Validations that fail
-        run_step_log.update_attribute(:step_errors, validation_failures_h)
+      if validation_failures_a = yield # A hash will only be returned for Validations that fail
+        run_step_log.update_attribute(:step_errors, validation_failures_a)
         false # the return value, signifying failure
       else
         run_step_log.update_attribute(:completed, true) # the return value, signifying success
