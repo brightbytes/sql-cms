@@ -8,7 +8,8 @@ FactoryGirl.define do
 
   factory :run_step_log do
     association :run
-    step_name "create_schema"
+    step_name "data_quality_reports"
+    sequence(:step_id)
   end
 
 end

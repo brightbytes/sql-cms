@@ -30,11 +30,6 @@ describe TransformValidation do
     [:transform, :params, :validation].each do |att|
       it { should validate_presence_of(att) }
     end
-
-    context "with a transform_validation already extant, and having a data_file" do
-      let!(:subject) { create(:transform_validation) }
-    end
-
   end
 
   describe "associations" do

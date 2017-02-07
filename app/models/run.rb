@@ -139,7 +139,6 @@ class Run < ApplicationRecord
 
     run_step_log_args = { run: self, step_name: step_name, step_index: step_index, step_id: step_id }
 
-    # FIXME - MAY WANT A TRANSACTION FROM HERE ON DOWN, TO PREVENT THE RACE CONDITION
     if run_step_log = RunStepLog.find_by(run_step_log_args)
       return run_step_log.successful?
     end

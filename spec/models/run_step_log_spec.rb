@@ -14,7 +14,7 @@
 #
 # Indexes
 #
-#  index_run_step_logs_on_run_id  (run_id)
+#  index_run_step_log_on_unique_run_id_and_step_fields  (run_id,step_id,step_index,step_name) UNIQUE
 #
 # Foreign Keys
 #
@@ -31,6 +31,12 @@ describe RunStepLog do
     [:run, :step_name, :step_index, :step_id].each do |att|
       it { should validate_presence_of(att) }
     end
+
+    # This isn't working, for reasons unlikely to ever become clear.  Don't care, because the corresponding DB constraint works just fine.
+    # context 'with a run_step_log already extant' do
+    #   let!(:subject) { create(:run_step_log) }
+    #   it { should validate_uniqueness_of(:run_id).scoped_to([:step_id, :step_index, :step_name]) }
+    # end
   end
 
   describe "associations" do

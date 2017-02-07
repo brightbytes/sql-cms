@@ -14,7 +14,7 @@
 #
 # Indexes
 #
-#  index_run_step_logs_on_run_id  (run_id)
+#  index_run_step_log_on_unique_run_id_and_step_fields  (run_id,step_id,step_index,step_name) UNIQUE
 #
 # Foreign Keys
 #
@@ -25,7 +25,9 @@ class RunStepLog < ApplicationRecord
 
   # Validations
 
-  validates :run, :step_name, :step_index, :step_id, presence: true
+  validates :step_name, :step_index, :step_id, presence: true
+
+  validates :run, presence: true, uniqueness: { scope: [:step_id, :step_index, :step_name] }
 
   # Callbacks
 

@@ -180,7 +180,7 @@ class ApplicationTables < ActiveRecord::Migration
       t.jsonb :step_errors
     end
 
-    add_index :run_step_logs, :run_id
+    add_index :run_step_logs, [:run_id, :step_id, :step_index, :step_name], unique: true, name: :index_run_step_log_on_unique_run_id_and_step_fields
 
     add_foreign_key :run_step_logs, :runs
 

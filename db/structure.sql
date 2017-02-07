@@ -846,10 +846,10 @@ CREATE UNIQUE INDEX index_notifications_on_workflow_id_and_user_id ON notificati
 
 
 --
--- Name: index_run_step_logs_on_run_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_run_step_log_on_unique_run_id_and_step_fields; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_run_step_logs_on_run_id ON run_step_logs USING btree (run_id);
+CREATE UNIQUE INDEX index_run_step_log_on_unique_run_id_and_step_fields ON run_step_logs USING btree (run_id, step_id, step_index, step_name);
 
 
 --
