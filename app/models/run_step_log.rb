@@ -73,7 +73,11 @@ class RunStepLog < ApplicationRecord
 
   def step_plan
     return nil unless run
-
+    if step_type == 'transform'
+      run.transform_plan(step_index: step_index, transform_id: step_id)
+    elsif step_type == 'data_quality_report'
+      run.data_quality_report_plan(step_id)
+    end
   end
 
 end
