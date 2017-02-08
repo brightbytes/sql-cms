@@ -78,12 +78,12 @@ class Run < ApplicationRecord
   end
 
   def failed?
-    run_step_logs.reload.erring.count > 0 # Always reload
+    run_step_logs.reload.failed.count > 0 # Always reload
   end
 
   # This doesn't work ... and it just kills me!!!!!!
-  # def step_errors
-  #   read_attribute(:step_errors)&.map(&:with_indifferent_access) # This should be automatic.  Grrr.
+  # def step_exceptions
+  #   read_attribute(:step_exceptions)&.map(&:with_indifferent_access) # This should be automatic.  Grrr.
   # end
 
   # def step_result
@@ -111,7 +111,7 @@ class Run < ApplicationRecord
   def transform_group_successfully_completed?(step_index)
     return nil if execution_plan.blank?
     ids = transform_group_transform_ids(step_index)
-    run_step_logs.successful.where(step_name: 'ordered_transform_groups', step_index: step_index, step_id: ids).count == ids.size
+    run_step_logs.successful.where(step_type: 'transform', step_index: step_index, step_id: ids).count == ids.size
   end
 
   def data_quality_reports
@@ -130,16 +130,15 @@ class Run < ApplicationRecord
   def data_quality_reports_successfully_completed?
     return nil if execution_plan.blank?
     ids = data_quality_report_ids
-    run_step_logs.successful.where(step_name: 'data_quality_reports', step_id: ids).count == ids.size
+    run_step_logs.successful.where(step_type: 'data_quality_report', step_id: ids).count == ids.size
   end
 
   # This method is critically important, since it wraps the execution of every single step in the workflow
-  def with_run_step_log_tracking(step_name:, step_index: 0, step_id: 0)
+  def with_run_step_log_tracking(step_type:, step_index: 0, step_id: 0 )
     raise "No block provided; really?!?" unless block_given?
+    return nil unless [step_type, step_index, step_id].all?(&:present?)
 
-    return nil unless [step_name, step_index, step_id].all?(&:present?)
-
-    run_step_log_args = { run: self, step_name: step_name, step_index: step_index, step_id: step_id }
+    run_step_log_args = { run: self, step_type: step_type, step_index: step_index, step_id: step_id }
 
     if run_step_log = RunStepLog.find_by(run_step_log_args)
       return run_step_log.successful?
@@ -152,10 +151,10 @@ class Run < ApplicationRecord
       result = yield
 
       if result.present?
-        if step_name == 'ordered_transform_groups' # A hash will be returned for this step_name only when one or more Validations failed
-          run_step_log.update_attribute(:step_errors, result)
+        if step_type == 'transform' # A hash will be returned for this step_type only when one or more Validations failed
+          run_step_log.update_attribute(:step_validation_failures, result)
           return false # signifying failure
-        elsif step_name == 'data_quality_reports'
+        elsif step_type == 'data_quality_report'
           run_step_log.update_attribute(:step_result, result)
         end
       end
@@ -165,7 +164,7 @@ class Run < ApplicationRecord
     rescue StandardError => exception
 
       run_step_log.update_attribute(
-        :step_errors,
+        :step_exceptions,
         class_and_message: exception.inspect,
         backtrace: exception.backtrace.join("\n")
       )

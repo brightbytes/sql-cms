@@ -171,17 +171,18 @@ class ApplicationTables < ActiveRecord::Migration
     create_table :run_step_logs do |t|
       t.with_options(null: false) do |tt|
         tt.integer :run_id
-        tt.string :step_name
+        tt.string :step_type
         tt.integer :step_index, default: 0
         tt.integer :step_id, default: 0
         tt.boolean :completed, default: false
         tt.timestamps
       end
-      t.jsonb :step_errors
+      t.jsonb :step_validation_failures
+      t.jsonb :step_exceptions
       t.jsonb :step_result
     end
 
-    add_index :run_step_logs, [:run_id, :step_id, :step_index, :step_name], unique: true, name: :index_run_step_log_on_unique_run_id_and_step_fields
+    add_index :run_step_logs, [:run_id, :created_at]
 
     add_foreign_key :run_step_logs, :runs
 

@@ -32,6 +32,7 @@ module RunnerFactory
     end
   end
 
+  # Runs any DDL or DML SQL
   module SqlRunner
 
     extend self
@@ -74,6 +75,7 @@ module RunnerFactory
     end
   end
 
+  # Runs TransformValidations
   module ValidationRunner
 
     extend self
@@ -90,6 +92,7 @@ module RunnerFactory
     end
   end
 
+  # Runs DataQualityReports
   module DataQualityReportRunner
 
     extend self

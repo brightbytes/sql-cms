@@ -31,9 +31,10 @@ describe TransformJob do
           Sidekiq::Testing.inline! do
             TransformJob.perform_later(run_id: run.id, step_index: 0, step_id: transform.id)
             run.reload
-            logs = run.run_step_logs.where(step_name: 'ordered_transform_groups').to_a
+            logs = run.run_step_logs.where(step_type: 'transform').to_a
             log = logs.first
-            expect(log.step_errors).to eq(nil)
+            expect(log.step_exceptions).to eq(nil)
+            expect(log.step_validation_failures).to eq(nil)
             expect(log.completed?).to eq(true)
             expect(run.select_value_in_schema("SELECT COUNT(1) FROM target_table").to_i).to eq(3)
           end
@@ -62,9 +63,9 @@ describe TransformJob do
           Sidekiq::Testing.inline! do
             TransformJob.perform_later(run_id: run.id, step_index: 0, step_id: transform.id)
             run.reload
-            logs = run.run_step_logs.where(step_name: 'ordered_transform_groups').to_a
+            logs = run.run_step_logs.where(step_type: 'transform').to_a
             log = logs.first
-            expect(log.step_errors&.first&.fetch('ids_failing_validation', nil)).to eq([2, 3])
+            expect(log.step_validation_failures&.first&.fetch('ids_failing_validation', nil)).to eq([2, 3])
             expect(log.completed?).to eq(false)
             expect(run.select_value_in_schema("SELECT COUNT(1) FROM target_table").to_i).to eq(3)
           end

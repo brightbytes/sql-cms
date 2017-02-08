@@ -20,10 +20,11 @@ describe DataQualityReportJob do
       Sidekiq::Testing.inline! do
         DataQualityReportJob.perform_later(run_id: run.id, step_id: data_quality_report.id)
         run.reload
-        logs = run.run_step_logs.where(step_name: 'data_quality_reports').to_a
+        logs = run.run_step_logs.where(step_type: 'data_quality_report').to_a
         expect(logs.size).to eq(1)
         log = logs.first
-        expect(log.step_errors).to eq(nil)
+        expect(log.step_exceptions).to eq(nil)
+        expect(log.step_validation_failures).to eq(nil)
         expect(log.completed?).to eq(true)
         expect(log.step_result).to eq([{ 'count' => 5 }])
       end
