@@ -94,28 +94,27 @@ class DataFile < ApplicationRecord
 
   attr_accessor :supplied_s3_url
 
-  def s3_presigned_url
+  def s3_object
     return false unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
-    @s3_presigned_url ||
+    @s3_object ||
       begin
         s3_bucket = s3.bucket(s3_bucket_name)
-        s3_object = s3_bucket.object(s3_file_name)
-        @s3_presigned_url = s3_object.presigned_url(:get) if s3_object.exists?
+        @s3_object = s3_bucket.object(s3_file_name)
       end
+  end
+
+  def s3_presigned_url
+    return false unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
+    @s3_presigned_url ||= s3_object.presigned_url(:get) if s3_object.exists?
   end
 
   def s3_file_exists?
     !!s3_presigned_url
   end
-  
+
   def s3_public_url
     return false unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
-    @s3_public_url ||
-      begin
-        s3_bucket = s3.bucket(s3_bucket_name)
-        s3_object = s3_bucket.object(s3_file_name)
-        @s3_public_url = s3_object.public_url if s3_object.exists?
-      end
+    @s3_public_url ||= s3_object.public_url if s3_object.exists?
   end
 
   # FIXME - ADD METHOD FOR PROVIDING AN UPLOAD STREAM SINK TO BE LOADED BY THE CLIENT FROM THE DB, TO CREATE AN S3 FILE THAT DOESN'T ALREADY EXIST

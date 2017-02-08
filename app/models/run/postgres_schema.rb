@@ -54,9 +54,9 @@ module Run::PostgresSchema
     end
   end
 
-  # I haven't bothered testing this, since a streaming COPY per-table would be the best way to get data out, by which I mean something like this from the CL:
+  # A streaming COPY per-table would be the best way to get data out, by which I mean something like this from the CL:
   #   psql <fin_pipeline_connection> -c "\COPY source_pipeline_table TO STDOUT ..." | psql <fin_app_db_connection> -c "\COPY target_fin_app_table FROM STDIN ..."
-  # FIXME - IF WE EVER DECIDE TO USE THIS, WRITE A TEST FOR IT
+  # Short of that, this will have to do.
   def copy_to_in_schema(sql:, writeable_io:)
     with_connection_reset_on_error do
       in_schema_context do

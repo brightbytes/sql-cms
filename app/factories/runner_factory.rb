@@ -50,11 +50,17 @@ module RunnerFactory
     def run(run:, plan_h:)
       sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
       virtual_data_file = Datafile.new(plan_h[:data_file])
-
-      # Use S3 .put API
-      # run.copy_to_in_schema(sql: sql, writeable_io: stream)
-
-
+      rd, wr = IO.pipe # I'm in love with IO.pipe!!!!!
+      if fork
+        wr.close
+        virtual_data_file.s3_object.put(body: rd)
+        rd.close
+        Process.wait
+      else
+        rd.close
+        run.copy_to_in_schema(sql: sql, writeable_io: wr)
+        wr.close
+      end
     end
   end
 

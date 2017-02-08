@@ -77,27 +77,11 @@ class Run < ApplicationRecord
     run_step_logs.reload.ordered_by_id.to_a # Always reload
   end
 
-  # FIXME: This should be in a view-related file.  Not bothering to test it until I've decided where it lands.
-  # def pp_ordered_step_logs
-  #   ordered_step_logs.map do |step_log|
-  #     if run_step_log.successful?
-  #       "✓ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:green)
-  #     elsif run_step_log.running?
-  #       ". #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:yellow)
-  #     else
-  #       [
-  #         "✗ #{run_step_log.step_type} - #{run_step_log.step_name}".colorize(:red),
-  #         run_step_log.step_errors.map { |key, value| [key, value, ""] }
-  #       ]
-  #     end
-  #   end.flatten.join("\n")
-  # end
-
   def failed?
     run_step_logs.reload.erring.count > 0 # Always reload
   end
 
-  # This doesn't work ... and it fucking kills me!!!!!!
+  # This doesn't work ... and it just kills me!!!!!!
   # def step_errors
   #   read_attribute(:step_errors)&.map(&:with_indifferent_access) # This should be automatic.  Grrr.
   # end
