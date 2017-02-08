@@ -24,7 +24,11 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-
+      sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
+      virtual_data_file = Datafile.new(plan_h[:data_file])
+      open(virtual_data_file.s3_presigned_url) do |file|
+        run.copy_from_in_schema(sql: sql, enumerable: file)
+      end
     end
   end
 
@@ -44,6 +48,12 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
+      sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
+      virtual_data_file = Datafile.new(plan_h[:data_file])
+
+      # Use S3 .put API
+      # run.copy_to_in_schema(sql: sql, writeable_io: stream)
+
 
     end
   end
