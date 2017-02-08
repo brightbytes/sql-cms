@@ -17,6 +17,7 @@ module Run::PostgresSchema
         transaction { Apartment::Tenant.create(schema_name) }
       end
     end
+    nil
   end
 
   def drop_schema
@@ -26,18 +27,11 @@ module Run::PostgresSchema
         transaction { Apartment::Tenant.drop(schema_name) }
       end
     end
-  end
-
-  def execute_ddl_in_schema(ddl)
-    create_schema # no-op if it already exists
-
-    # FIXME - MAYBE PREPEND NON-SEARCH-PATH-RELATED CRAP FROM structure.sql TO THE DDL ... OR NOT, IF WE DON'T EXPERIENCE WEIRDNESS.
-    execute_in_schema(ddl)
+    nil
   end
 
   def execute_in_schema(sql)
-    # No point in creating it on-the-fly since dml requires tables
-    raise "Schema #{schema_name} doesn't exist; if you're trying to execute DDL, use #execute_ddl_in_schema instead." unless schema_exists?
+    create_schema # no-op if it already exists
 
     with_connection_reset_on_error do
       in_schema_context { Apartment.connection.execute(sql) }

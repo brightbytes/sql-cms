@@ -228,13 +228,13 @@ describe Run do
       it "should create a new RunStepLog for the Run and flag it as successful when no exception is raised" do
         run = create(:run)
 
-        expect(run.with_run_step_log_tracking(step_name: 'create_schema') { nil }).to eq(true)
+        expect(run.with_run_step_log_tracking(step_name: 'ordered_transform_groups') { nil }).to eq(true)
 
         statuses = run.ordered_step_logs
         expect(statuses.size).to eq(1)
         status = statuses.first
         expect(status.run).to eq(run) # duh
-        expect(status.step_name).to eq('create_schema')
+        expect(status.step_name).to eq('ordered_transform_groups')
         expect(status.successful?).to eq(true)
         expect(status.completed?).to eq(true)
         expect(status.running?).to eq(false)
@@ -245,13 +245,13 @@ describe Run do
         run = create(:run)
         error_h = { 'ids_failing_validation' => %w(1 5 111) }
 
-        expect(run.with_run_step_log_tracking(step_name: 'create_schema') { error_h }).to eq(false)
+        expect(run.with_run_step_log_tracking(step_name: 'ordered_transform_groups') { error_h }).to eq(false)
 
         statuses = run.ordered_step_logs
         expect(statuses.size).to eq(1)
         status = statuses.first
         expect(status.run).to eq(run) # duh
-        expect(status.step_name).to eq('create_schema')
+        expect(status.step_name).to eq('ordered_transform_groups')
         expect(status.successful?).to eq(false)
         expect(status.completed?).to eq(false)
         expect(status.running?).to eq(false)
@@ -263,13 +263,13 @@ describe Run do
 
         error_text = "Boom!"
 
-        expect(run.with_run_step_log_tracking(step_name: 'create_schema') { raise error_text }).to eq(false)
+        expect(run.with_run_step_log_tracking(step_name: 'ordered_transform_groups') { raise error_text }).to eq(false)
 
         statuses = run.ordered_step_logs
         expect(statuses.size).to eq(1)
         status = statuses.first
         expect(status.run).to eq(run) # duh
-        expect(status.step_name).to eq('create_schema')
+        expect(status.step_name).to eq('ordered_transform_groups')
         expect(status.successful?).to eq(false)
         expect(status.completed?).to eq(false)
         expect(status.running?).to eq(false)

@@ -8,6 +8,8 @@ require 'rspec/rails'
 require 'simplecov'
 SimpleCov.start
 
+require 'sidekiq/testing'
+
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -38,14 +40,15 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 RSpec.configure do |config|
 
   config.before(:each) do
+    Sidekiq::Worker.clear_all
     User.flush_cache
   end
 
-  config.include FactoryGirl::Syntax::Methods
-
-  config.before :each, versioning: true do
+  config.before(:each, versioning: true) do
     PaperTrail.enabled = true
   end
+
+  config.include FactoryGirl::Syntax::Methods
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false

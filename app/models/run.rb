@@ -167,12 +167,18 @@ class Run < ApplicationRecord
 
     begin
 
-      if validation_failures_a = yield # A hash will only be returned for Validations that fail
-        run_step_log.update_attribute(:step_errors, validation_failures_a)
-        false # the return value, signifying failure
-      else
-        run_step_log.update_attribute(:completed, true) # the return value, signifying success
+      result = yield
+
+      if result.present?
+        if step_name == 'ordered_transform_groups' # A hash will be returned for this step_name only when one or more Validations failed
+          run_step_log.update_attribute(:step_errors, result)
+          return false # signifying failure
+        elsif step_name == 'data_quality_reports'
+          run_step_log.update_attribute(:step_result, result)
+        end
       end
+
+      run_step_log.update_attribute(:completed, true) # the return value, signifying success
 
     rescue StandardError => exception
 

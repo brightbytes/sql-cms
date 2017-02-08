@@ -178,6 +178,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.timestamps
       end
       t.jsonb :step_errors
+      t.jsonb :step_result
     end
 
     add_index :run_step_logs, [:run_id, :step_id, :step_index, :step_name], unique: true, name: :index_run_step_log_on_unique_run_id_and_step_fields

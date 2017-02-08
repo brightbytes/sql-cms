@@ -226,7 +226,8 @@ CREATE TABLE run_step_logs (
     completed boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    step_errors jsonb
+    step_errors jsonb,
+    step_result jsonb
 );
 
 

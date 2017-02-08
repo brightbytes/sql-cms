@@ -11,6 +11,7 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  step_errors :jsonb
+#  step_result :jsonb
 #
 # Indexes
 #
