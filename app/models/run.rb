@@ -97,6 +97,15 @@ class Run < ApplicationRecord
     run_step_logs.reload.erring.count > 0 # Always reload
   end
 
+  # This doesn't work ... and it fucking kills me!!!!!!
+  # def step_errors
+  #   read_attribute(:step_errors)&.map(&:with_indifferent_access) # This should be automatic.  Grrr.
+  # end
+
+  # def step_result
+  #   read_attribute(:step_result)&.map(&:with_indifferent_access) # This should be automatic.  Grrr.
+  # end
+
   # execution_plan helpers
 
   def execution_plan
@@ -111,19 +120,8 @@ class Run < ApplicationRecord
     transform_group(step_index)&.map { |h| h.fetch(:id, nil) }
   end
 
-  # All the symbolize_keys crap is utterly ludicrous.  Thanks, Rails.
   def transform_plan(step_index:, transform_id:)
-    if plan = transform_group(step_index)&.detect { |h| h[:id] == transform_id }&.symbolize_keys
-      plan[:data_quality_reports]&.symbolize_keys!
-      plan[:ordered_transform_groups]&.each do |arr|
-        arr.each do |h|
-          h&.symbolize_keys!
-          h[:data_file]&.symbolize_keys!
-          h[:transform_validations]&.symbolize_keys!
-        end
-      end
-      plan
-    end
+    transform_group(step_index)&.detect { |h| h[:id] == transform_id }&.deep_symbolize_keys
   end
 
   def transform_group_successfully_completed?(step_index)

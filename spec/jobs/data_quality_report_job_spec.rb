@@ -22,7 +22,10 @@ describe DataQualityReportJob do
         run.reload
         logs = run.run_step_logs.where(step_name: 'data_quality_reports').to_a
         expect(logs.size).to eq(1)
-        expect(logs.first.step_result).to eq([{ 'count' => 5 }])
+        log = logs.first
+        expect(log.step_errors).to eq(nil)
+        expect(log.completed?).to eq(true)
+        expect(log.step_result).to eq([{ 'count' => 5 }])
       end
     end
   end

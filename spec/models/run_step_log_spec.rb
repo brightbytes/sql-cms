@@ -32,6 +32,8 @@ describe RunStepLog do
       it { should validate_presence_of(att) }
     end
 
+    it { should validate_inclusion_of(:step_name).in_array(described_class::STEP_NAMES) }
+
     # This isn't working, for reasons unlikely to ever become clear.  Don't care, because the corresponding DB constraint works just fine.
     # context 'with a run_step_log already extant' do
     #   let!(:subject) { create(:run_step_log) }

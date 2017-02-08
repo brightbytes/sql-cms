@@ -20,7 +20,7 @@ module Concerns::ParamsHelpers
       if params.present?
         sql.dup.tap do |sql|
           params.each_pair do |k, v|
-            sql.gsub!(":#{k}", v)
+            sql.gsub!(":#{k}", v.to_s)
           end
         end
       else

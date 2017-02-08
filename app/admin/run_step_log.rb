@@ -13,6 +13,7 @@ ActiveAdmin.register RunStepLog do
       boolean_row :running
       boolean_row :successful
       row(:step_errors) { code(pretty_print_as_json(resource.step_errors)) }
+      row(:step_result) { code(pretty_print_as_json(resource.step_result)) }
       row :created_at
       row :updated_at
     end

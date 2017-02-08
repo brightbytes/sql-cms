@@ -26,7 +26,11 @@ class RunStepLog < ApplicationRecord
 
   # Validations
 
-  validates :step_name, :step_index, :step_id, presence: true
+  validates :step_index, :step_id, presence: true
+
+  STEP_NAMES = %w(create_schema ordered_transform_groups data_quality_reports)
+
+  validates :step_name, presence: true, inclusion: { in: STEP_NAMES }
 
   validates :run, presence: true, uniqueness: { scope: [:step_id, :step_index, :step_name] }
 

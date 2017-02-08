@@ -5,7 +5,7 @@ class TransformJob < ApplicationJob
     run = Run.find(run_id)
 
     run.with_run_step_log_tracking(step_name: "ordered_transform_groups", step_index: step_index, step_id: step_id) do
-      transform_h = run.transform_plan(step_index:, transform_id:)
+      transform_h = run.transform_plan(step_index: step_index, transform_id: step_id)
       transform_runner = RunnerFactory.runner_for(transform_h[:runner])
       transform_runner.run(run: run, plan_h: transform_h)
 

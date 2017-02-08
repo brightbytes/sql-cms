@@ -11,9 +11,9 @@ module ValidationSeeder
       sql: 'SELECT id FROM :table_name WHERE :column_name IS NULL'
     )
 
-    Validation.where(name: 'Field Value is Present').first_or_create!(
+    Validation.where(name: 'String Field Value is Present').first_or_create!(
       immutable: true,
-      sql: "SELECT id FROM :table_name WHERE (:column_name IS NULL OR trim(:column_name) = '')" # There's probably a better idiom for this than the OR
+      sql: "SELECT id FROM :table_name WHERE (:column_name <> '') IS NOT TRUE"
     )
 
     Validation.where(name: 'Field Value is Unique').first_or_create!(
