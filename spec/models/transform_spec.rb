@@ -10,8 +10,6 @@
 #  sql                           :text             not null
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
-#  transcompiled_source          :text
-#  transcompiler :string
 #  data_file_id                  :integer
 #  copied_from_transform_id      :integer
 #
@@ -57,7 +55,6 @@ describe Transform do
     end
 
     it { should validate_inclusion_of(:runner).in_array(described_class::RUNNERS) }
-    it { should validate_inclusion_of(:transcompiler).in_array(described_class::TRANSCOMPILED_LANGUAGES).allow_nil }
   end
 
   describe "callbacks" do

@@ -366,13 +366,12 @@ ALTER SEQUENCE transform_validations_id_seq OWNED BY transform_validations.id;
 CREATE TABLE transforms (
     id integer NOT NULL,
     name character varying NOT NULL,
-    runner character varying NOT NULL,
+    runner character varying DEFAULT 'Sql'::character varying NOT NULL,
     workflow_id integer NOT NULL,
     params jsonb DEFAULT '{}'::jsonb NOT NULL,
     sql text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    transcompiler character varying,
     data_file_id integer,
     copied_from_transform_id integer
 );

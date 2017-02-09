@@ -18,6 +18,17 @@ module RunnerFactory
     end
   end
 
+  # Runs a Rails Migration
+  module RailsMigrationRunner
+
+    extend self
+
+    def run(run:, plan_h:)
+      # NOTE: params are discarded due to the heavy use of symbols in Rails Migrations
+      run.eval_in_schema(plan_h[:sql])
+    end
+  end
+
   # Loads a table from a data file
   module CopyFromRunner
 
@@ -38,12 +49,8 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      if plan_h[:transcompiler] == 'RailsMigration'
-        run.eval_in_schema(plan_h[:sql])
-      else
-        sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
-        run.execute_in_schema(sql)
-      end
+      sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
+      run.execute_in_schema(sql)
     end
   end
 
@@ -79,7 +86,7 @@ module RunnerFactory
     end
   end
 
-  # Runs TransformValidations
+  # Runs TransformValidations; internal-only Runner
   module ValidationRunner
 
     extend self
@@ -96,7 +103,7 @@ module RunnerFactory
     end
   end
 
-  # Runs DataQualityReports
+  # Runs DataQualityReports; internal-only Runner
   module DataQualityReportRunner
 
     extend self

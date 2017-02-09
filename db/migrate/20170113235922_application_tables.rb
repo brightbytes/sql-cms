@@ -70,13 +70,12 @@ class ApplicationTables < ActiveRecord::Migration
     create_table :transforms do |t|
       t.with_options(null: false) do |tt|
         tt.string :name
-        tt.string :runner
+        tt.string :runner, default: 'Sql'
         tt.integer :workflow_id
         tt.jsonb :params, default: {}
         tt.text :sql
         tt.timestamps
       end
-      t.string :transcompiler
       t.integer :data_file_id
       t.integer :copied_from_transform_id
     end
