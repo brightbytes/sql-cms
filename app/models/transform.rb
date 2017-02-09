@@ -2,17 +2,17 @@
 #
 # Table name: public.transforms
 #
-#  id                            :integer          not null, primary key
-#  name                          :string           not null
-#  runner                        :string           not null
-#  workflow_id                   :integer          not null
-#  params                        :jsonb            not null
-#  sql                           :text             not null
-#  created_at                    :datetime         not null
-#  updated_at                    :datetime         not null
-#  transcompiled_source_language :string
-#  data_file_id                  :integer
-#  copied_from_transform_id      :integer
+#  id                       :integer          not null, primary key
+#  name                     :string           not null
+#  runner                   :string           not null
+#  workflow_id              :integer          not null
+#  params                   :jsonb            not null
+#  sql                      :text             not null
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  transcompiler            :string
+#  data_file_id             :integer
+#  copied_from_transform_id :integer
 #
 # Indexes
 #
@@ -44,7 +44,7 @@ class Transform < ApplicationRecord
 
   TRANSCOMPILED_LANGUAGES = %w(RailsMigration)
 
-  validates :transcompiled_source_language, allow_nil: true, inclusion: { in: TRANSCOMPILED_LANGUAGES }
+  validates :transcompiler, allow_nil: true, inclusion: { in: TRANSCOMPILED_LANGUAGES }
 
   validates :data_file, uniqueness: { scope: :workflow_id }, allow_nil: true
 

@@ -76,7 +76,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.text :sql
         tt.timestamps
       end
-      t.string :transcompiled_source_language
+      t.string :transcompiler
       t.integer :data_file_id
       t.integer :copied_from_transform_id
     end

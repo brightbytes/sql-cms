@@ -4,13 +4,13 @@ ActiveAdmin.register Transform do
 
   actions :all
 
-  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :transcompiled_source_language, :data_file_id, prerequisite_transform_ids: []
+  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :transcompiler, :data_file_id, prerequisite_transform_ids: []
 
   filter :name, as: :string
   filter :runner, as: :select, collection: Transform::RUNNERS
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :sql, as: :string
-  filter :transcompiled_source_language, as: :select, collection: Transform::TRANSCOMPILED_LANGUAGES
+  filter :transcompiler, as: :select, collection: Transform::TRANSCOMPILED_LANGUAGES
   filter :data_file, as: :select, collection: proc { DataFile.order(:name).all }
 
   config.sort_order = 'workflows.slug_asc,name_asc'
@@ -33,7 +33,7 @@ ActiveAdmin.register Transform do
       row(:params) { code(pretty_print_as_json(resource.params)) }
       row(:sql) { code(resource.sql) }
       row(:interpolated_sql) { code(resource.interpolated_sql) }
-      row :transcompiled_source_language
+      row :transcompiler
       row :data_file
 
       row :copied_from_transform
@@ -99,7 +99,7 @@ ActiveAdmin.register Transform do
       #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
       input :params_yaml, as: :text
 
-      input :transcompiled_source_language, required: false, as: :select, collection: Transform::TRANSCOMPILED_LANGUAGES
+      input :transcompiler, required: false, as: :select, collection: Transform::TRANSCOMPILED_LANGUAGES
       input :sql, as: :text
 
       input :data_file, as: :select, collection: data_files_for_workflow
