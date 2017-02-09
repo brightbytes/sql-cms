@@ -15,7 +15,9 @@ ActiveAdmin.register Run do
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
     column(:creator, sortable: 'users.first_name,users.last_name')
-    column(:succeeded?) { |run| yes_no(run.succeeded?, yes_color: :green, no_color: :red) }
+    column(:succeeded_so_far?) { |run| yes_no(run.succeeded_so_far?, yes_color: :green, no_color: :red) }
+    column(:failed?) { |run| yes_no(run.failed?, yes_color: :red, no_color: :green) }
+    column(:running_or_crashed?) { |run| yes_no(run.running_or_crashed?) }
   end
 
   show do
@@ -24,7 +26,9 @@ ActiveAdmin.register Run do
       row :schema_name
       row :workflow
       row :customer
-      row(:succeeded?) { |run| yes_no(run.succeeded?, yes_color: :green, no_color: :red) }
+      row(:succeeded_so_far?) { |run| yes_no(run.succeeded_so_far?, yes_color: :green, no_color: :red) }
+      row(:failed?) { |run| yes_no(run.failed?, yes_color: :red, no_color: :green) }
+      row(:running_or_crashed?) { |run| yes_no(run.running_or_crashed?) }
       row :status
       row :creator
       row :created_at

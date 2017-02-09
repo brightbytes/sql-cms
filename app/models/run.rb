@@ -83,8 +83,13 @@ class Run < ApplicationRecord
     run_step_logs.reload.failed.count > 0 # Always reload
   end
 
-  def succeeded?
-    !failed?
+  def succeeded_so_far?
+    completions = run_step_logs.pluck(:completed)
+    completions.size > 0 && completions.uniq == [true]
+  end
+
+  def running_or_crashed?
+    !failed? && !succeeded_so_far?
   end
 
   # This doesn't work ... and it just kills me!!!!!!
@@ -167,7 +172,7 @@ class Run < ApplicationRecord
 
       run_step_log.update_attribute(:completed, true) # the return value, signifying success
 
-    rescue StandardError => exception
+    rescue Exception => exception
 
       run_step_log.update_attribute(
         :step_exceptions,
@@ -176,7 +181,7 @@ class Run < ApplicationRecord
         class_and_message: exception.inspect,
         # ... hence this redundant bit
         message: exception.message,
-        backtrace: exception.backtrace
+        backtrace: Rails.backtrace_cleaner.clean(exception.backtrace)
       )
       false # the return value, signifying failure
 
