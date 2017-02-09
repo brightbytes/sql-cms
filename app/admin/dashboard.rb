@@ -18,7 +18,7 @@ ActiveAdmin.register_page "Dashboard" do
         panel "Recent Runs" do
           ul do
             Run.order(id: :desc).limit(10).map do |run|
-              li link_to(run, run_path(path))
+              li link_to(run, run_path(run))
             end
           end
         end
