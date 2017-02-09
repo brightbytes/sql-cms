@@ -3,12 +3,26 @@ module Concerns::ParamsHelpers
 
   extend ActiveSupport::Concern
 
+  include Concerns::ValidateYaml
+
   def params_yaml
     params.to_yaml if params.present?
+  rescue
+    @params_yaml_invalid = true
   end
 
   def params_yaml=(val)
     self.params = (val.blank? ? {} : YAML.load(val))
+  rescue
+    @params_yaml_invalid = true
+  end
+
+  included do
+    validate :validate_yaml_for_params
+  end
+
+  def validate_yaml_for_params
+    validate_yaml(:params, @params_yaml_invalid)
   end
 
   def interpolated_sql

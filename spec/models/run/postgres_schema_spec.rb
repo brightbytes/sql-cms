@@ -21,7 +21,7 @@ describe Run::PostgresSchema do
   end
 
   describe "execution methods" do
-    it "should have different methods for executing DDL & DML SQL in an extant schema" do
+    it "should have several methods for executing DDL & DML SQL in an extant schema" do
       run = create(:run)
       run.create_schema
 
@@ -32,6 +32,15 @@ describe Run::PostgresSchema do
       dml = "INSERT INTO silly (id, stringy) VALUES (DEFAULT, 'FOOBAR!'), (DEFAULT, 'BARFOO!')"
       expect { run.execute_in_schema(dml) }.to_not raise_error
 
+      ar_result = run.select_all_in_schema("SELECT * FROM silly ORDER BY id")
+      expect(ar_result.columns).to eq(%w(id stringy))
+      expect(ar_result.rows).to eq([[1, 'FOOBAR!'], [2, 'BARFOO!']])
+    end
+
+    it "should allow Rails Migrations to be run in the schema" do
+      run = create(:run)
+      run.eval_in_schema("create_table(:silly) { |t| t.string :stringy }")
+      run.execute_in_schema("INSERT INTO silly (id, stringy) VALUES (DEFAULT, 'FOOBAR!'), (DEFAULT, 'BARFOO!')")
       ar_result = run.select_all_in_schema("SELECT * FROM silly ORDER BY id")
       expect(ar_result.columns).to eq(%w(id stringy))
       expect(ar_result.rows).to eq([[1, 'FOOBAR!'], [2, 'BARFOO!']])

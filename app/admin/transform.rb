@@ -4,14 +4,13 @@ ActiveAdmin.register Transform do
 
   actions :all
 
-  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :transcompiled_source, :transcompiled_source_language, :data_file_id, prerequisite_transform_ids: []
+  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :transcompiled_source_language, :data_file_id, prerequisite_transform_ids: []
 
   filter :name, as: :string
   filter :runner, as: :select, collection: Transform::RUNNERS
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :sql, as: :string
   filter :transcompiled_source_language, as: :select, collection: Transform::TRANSCOMPILED_LANGUAGES
-  filter :transcompiled_source, as: :string
   filter :data_file, as: :select, collection: proc { DataFile.order(:name).all }
 
   config.sort_order = 'workflows.slug_asc,name_asc'
@@ -35,7 +34,6 @@ ActiveAdmin.register Transform do
       row(:sql) { code(resource.sql) }
       row(:interpolated_sql) { code(resource.interpolated_sql) }
       row :transcompiled_source_language
-      row(:transcompiled_source) { code(resource.transcompiled_source) }
       row :data_file
 
       row :copied_from_transform
@@ -101,11 +99,8 @@ ActiveAdmin.register Transform do
       #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
       input :params_yaml, as: :text
 
-      input :sql, as: :text
-
-      # If this is set, hide the :sql field and show the transcompiled_source, if it's unset, hide the transcompiled_source field and show the :sql field
       input :transcompiled_source_language, required: false, as: :select, collection: Transform::TRANSCOMPILED_LANGUAGES
-      input :transcompiled_source, as: :text
+      input :sql, as: :text
 
       input :data_file, as: :select, collection: data_files_for_workflow
     end

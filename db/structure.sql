@@ -372,7 +372,6 @@ CREATE TABLE transforms (
     sql text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    transcompiled_source text,
     transcompiled_source_language character varying,
     data_file_id integer,
     copied_from_transform_id integer

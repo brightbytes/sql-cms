@@ -10,7 +10,6 @@
 #  sql                           :text             not null
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
-#  transcompiled_source          :text
 #  transcompiled_source_language :string
 #  data_file_id                  :integer
 #  copied_from_transform_id      :integer
