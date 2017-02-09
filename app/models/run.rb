@@ -83,13 +83,12 @@ class Run < ApplicationRecord
     run_step_logs.reload.failed.count > 0 # Always reload
   end
 
-  def succeeded_so_far?
-    completions = run_step_logs.pluck(:completed)
-    completions.size > 0 && completions.uniq == [true]
+  def succeeded?
+    status == 'finished'
   end
 
   def running_or_crashed?
-    !failed? && !succeeded_so_far?
+    !failed? && !succeeded?
   end
 
   # This doesn't work ... and it just kills me!!!!!!

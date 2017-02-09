@@ -35,8 +35,8 @@ class RunManagerJob < ApplicationJob
       step_index = $1.to_i
       if run.transform_group_successfully_completed?(step_index)
         next_step_index = step_index + 1
-        if transform_group_transform_ids(next_step_index)
-          run.update_attribute(:status, "ordered_transform_groups[#{next_step_index}]")
+        if run.transform_group_transform_ids(next_step_index)
+          run.update_attribute(:status, "unstarted_ordered_transform_groups[#{next_step_index}]")
         else
           run.update_attribute(:status, "unstarted_data_quality_reports")
         end
