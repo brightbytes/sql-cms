@@ -38,8 +38,12 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
-      run.execute_in_schema(sql)
+      if plan_h[:transcompiler] == 'RailsMigration'
+        run.eval_in_schema(plan_h[:sql])
+      else
+        sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
+        run.execute_in_schema(sql)
+      end
     end
   end
 

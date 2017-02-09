@@ -22,7 +22,7 @@ end
 
 class TransformSerializer < ActiveModel::Serializer
 
-  attributes :id, :name, :runner, :params, :sql
+  attributes :id, :name, :runner, :params, :sql, :transcompiler
 
   belongs_to :data_file
 
