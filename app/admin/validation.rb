@@ -23,7 +23,7 @@ ActiveAdmin.register Validation do
       row :id
       row :name
       row :immutable
-      row(:sql) { code(resource.sql) }
+      simple_format_row(:sql)
       row :created_at
       row :updated_at
     end

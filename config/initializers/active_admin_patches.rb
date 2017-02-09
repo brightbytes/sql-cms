@@ -44,7 +44,7 @@ module ActiveAdmin::Views
     def simple_format_row(attribute)
       row(attribute) do |model|
         if val = model.send(attribute)
-          simple_format(val)
+          code(simple_format(val.gsub(/ /, '&nbsp;')))
         end
       end
     end

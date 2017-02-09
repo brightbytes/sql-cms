@@ -31,7 +31,7 @@ class Transform < ApplicationRecord
 
   include Concerns::ParamsHelpers
 
-  auto_normalize
+  auto_normalize except: :sql
 
   # Validations
 

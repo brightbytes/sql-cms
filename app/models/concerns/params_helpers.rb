@@ -26,7 +26,7 @@ module Concerns::ParamsHelpers
   end
 
   def interpolated_sql
-    self.class.interpolated(sql: sql, params: params)
+    self.class.interpolate(sql: sql, params: params)
   end
 
   module ClassMethods

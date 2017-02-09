@@ -37,7 +37,7 @@ ActiveAdmin.register Run do
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.run_step_logs.order('id'), sortable: true) do
         column(:step_type, sortable: :step_type) { |log| auto_link(log) }
-        column(:step_plan) { |plan| code(plan) }
+        column(:step_plan) { |plan| code(pretty_print_as_json(plan)) }
         boolean_column(:running)
         boolean_column(:successful)
       end

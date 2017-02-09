@@ -30,8 +30,8 @@ ActiveAdmin.register Transform do
 
       row :runner
       row(:params) { code(pretty_print_as_json(resource.params)) }
-      row(:sql) { code(resource.sql) }
-      row(:interpolated_sql) { code(resource.interpolated_sql) }
+      simple_format_row(:sql)
+      simple_format_row(:interpolated_sql) if resource.params.present?
       row :data_file
 
       row :copied_from_transform
