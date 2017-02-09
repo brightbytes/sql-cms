@@ -63,10 +63,18 @@ ActiveAdmin.register Workflow do
 
   sidebar("Actions", only: :show) do
     ul do
-      li link_to("Run Workflow!")
+      li link_to("Run Workflow!", run_workflow_path(workflow))
       li link_to("Clone Workflow")
     end
   end
+
+  member_action :run do
+    run = resource.run!(current_user)
+    flash[:notice] = "Run generated."
+    redirect_to run_path(run)
+  end
+
+  # run!(creator)
 
   form do |f|
     # For debugging:

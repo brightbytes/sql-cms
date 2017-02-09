@@ -11,10 +11,10 @@ ActiveAdmin.register Run do
   config.sort_order = 'workflows.slug_asc,id_asc'
 
   index(download_links: false) do
+    column(:schema_name, sortable: 'schema_name') { |run| auto_link(run) }
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
     column(:creator, sortable: 'users.first_name,users.last_name')
-    column(:schema_name, sortable: 'schema_prefix,id')
     column(:status)
   end
 
@@ -23,10 +23,7 @@ ActiveAdmin.register Run do
       row :id
       row :workflow
       row :creator
-
-      row(:execution_plan) { code(pretty_print_as_json(resource.execution_plan)) }
-      row(:status)
-
+      row :status
       row :created_at
       row :updated_at
     end
@@ -41,6 +38,10 @@ ActiveAdmin.register Run do
         boolean_column(:running)
         boolean_column(:successful)
       end
+    end
+
+    attributes_table do
+      row(:execution_plan) { code(pretty_print_as_json(resource.execution_plan)) }
     end
 
     render partial: 'admin/shared/history'
