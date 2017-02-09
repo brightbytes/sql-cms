@@ -120,7 +120,7 @@ module WorkflowSeeder
           t.integer :clarity_org_id, index: true
           t.integer :co_org_id, index: true
         end
-        add_index :school_parent_mappings, [:staging_school_parent_mapping_id, :staging_school_parent_mapping_type], unique: true, name: :index_school_parent_mappings_on_staging_school_parent_mapping_id_type
+        add_index :school_parent_mappings, [:staging_school_parent_mapping_id, :staging_school_parent_mapping_type], unique: true, name: :index_school_parent_mappings_on_unique_parent_mapping_id_type
       SQL
     )
 
