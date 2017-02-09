@@ -59,6 +59,8 @@ class Run < ApplicationRecord
 
   belongs_to :workflow, inverse_of: :runs
 
+  has_one :customer, through: :workflow
+
   has_many :transforms, through: :workflow
 
   has_many :data_quality_reports, through: :workflow
@@ -79,6 +81,10 @@ class Run < ApplicationRecord
 
   def failed?
     run_step_logs.reload.failed.count > 0 # Always reload
+  end
+
+  def succeeded?
+    !failed?
   end
 
   # This doesn't work ... and it just kills me!!!!!!
@@ -165,8 +171,12 @@ class Run < ApplicationRecord
 
       run_step_log.update_attribute(
         :step_exceptions,
+        cause: exception.cause,
+        # This doesn't always work ...
         class_and_message: exception.inspect,
-        backtrace: exception.backtrace.join("\n")
+        # ... hence this redundant bit
+        message: exception.message,
+        backtrace: exception.backtrace
       )
       false # the return value, signifying failure
 

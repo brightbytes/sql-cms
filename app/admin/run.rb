@@ -15,15 +15,18 @@ ActiveAdmin.register Run do
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
     column(:creator, sortable: 'users.first_name,users.last_name')
-    column(:status)
+    column(:succeeded?) { |run| yes_no(run.succeeded?, yes_color: :green, no_color: :red) }
   end
 
   show do
     attributes_table do
       row :id
+      row :schema_name
       row :workflow
-      row :creator
+      row :customer
+      row(:succeeded?) { |run| yes_no(run.succeeded?, yes_color: :green, no_color: :red) }
       row :status
+      row :creator
       row :created_at
       row :updated_at
     end

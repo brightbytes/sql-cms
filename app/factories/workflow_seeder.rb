@@ -107,6 +107,8 @@ module WorkflowSeeder
       SQL
     )
 
+    create_demo_dependency!(prerequisite_transform: staging_school_mappings_table_transform, postrequisite_transform: school_mappings_table_transform)
+
     school_parent_mappings_table_transform = create_demo_transform!(
       name: "CREATE TABLE school_parent_mappings",
       runner: 'RailsMigration',
@@ -118,7 +120,7 @@ module WorkflowSeeder
           t.integer :clarity_org_id, index: true
           t.integer :co_org_id, index: true
         end
-        add_index :school_mappings, [:staging_school_parent_mapping_id, :staging_school_parent_mapping_type], unique: true, name: :index_school_parent_mappings_on_staging_school_parent_mapping_id_type
+        add_index :school_parent_mappings, [:staging_school_parent_mapping_id, :staging_school_parent_mapping_type], unique: true, name: :index_school_parent_mappings_on_staging_school_parent_mapping_id_type
       SQL
     )
 
@@ -137,6 +139,8 @@ module WorkflowSeeder
         add_foreign_key :mapped_facts, :staging_facts
       SQL
     )
+
+    create_demo_dependency!(prerequisite_transform: staging_facts_table_transform, postrequisite_transform: mapped_facts_table_transform)
 
     reduced_facts_table_transform = create_demo_transform!(
       name: "CREATE TABLE reduced_facts",
@@ -161,6 +165,9 @@ module WorkflowSeeder
     Transform.where(name: options.delete(:name)).first_or_create!(options)
   end
 
+  def create_demo_dependency!(**options)
+    TransformDependency.where(options).first_or_create!
+  end
 
 
 end

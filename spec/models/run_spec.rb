@@ -299,6 +299,7 @@ describe Run do
         errors = status.step_exceptions
         expect(errors).to_not be_empty
         expect(errors['class_and_message']).to eq("#<RuntimeError: Boom!>")
+        expect(errors['message']).to eq("Boom!")
         expect(errors['backtrace']).to_not be_empty
         expect(status.step_validation_failures).to eq(nil)
       end

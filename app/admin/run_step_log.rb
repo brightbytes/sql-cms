@@ -8,7 +8,9 @@ ActiveAdmin.register RunStepLog do
     attributes_table do
       row :id
       row :run
+      row :workflow
       row :step_type
+      row :likely_step
       row(:step_plan) { code(pretty_print_as_json(resource.step_plan)) }
       boolean_row :completed
       boolean_row :running
