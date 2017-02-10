@@ -162,37 +162,145 @@ module WorkflowSeeder
 
     staging_boces_mappings_loader_transform = create_demo_transform!(
       name: "BOCES staging dimension table loader",
+      runner: "CopyFrom",
       sql: "COPY staging_boces_mappings (clarity_org_id, co_org_id) FROM STDIN WITH CSV HEADER",
       data_file: staging_boces_mappings_data_file
     )
 
-    # create_demo_transform_validation!
+    create_demo_transform_validation!(
+      transform: staging_boces_mappings_loader_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_boces_mappings, column_name: :clarity_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_boces_mappings_loader_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_boces_mappings, column_name: :co_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_boces_mappings_loader_transform,
+      validation: Validation.uniqueness,
+      params: { table_name: :staging_boces_mappings, column_name: :co_org_id }
+    )
 
     staging_district_mappings_data_file = create_demo_data_file!(
       name: "District mappings",
       s3_file_name: 'district_mappings.csv'
     )
 
+    staging_district_mappings_loader_transform = create_demo_transform!(
+      name: "District staging dimension table loader",
+      runner: "CopyFrom",
+      sql: "COPY staging_district_mappings (clarity_org_id, co_org_id) FROM STDIN WITH CSV HEADER",
+      data_file: staging_district_mappings_data_file
+    )
 
+    create_demo_transform_validation!(
+      transform: staging_district_mappings_loader_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_district_mappings, column_name: :clarity_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_district_mappings_loader_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_district_mappings, column_name: :co_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_district_mappings_loader_transform,
+      validation: Validation.uniqueness,
+      params: { table_name: :staging_district_mappings, column_name: :co_org_id }
+    )
 
     staging_school_mappings_data_file = create_demo_data_file!(
       name: "School mappings",
       s3_file_name: 'school_mappings.csv'
     )
 
+    staging_school_mappings_loader_transform = create_demo_transform!(
+      name: "School staging dimension table loader",
+      runner: "CopyFrom",
+      sql: "COPY staging_school_mappings (clarity_org_id, co_org_id, added_on_date_s) FROM STDIN WITH CSV HEADER",
+      data_file: staging_school_mappings_data_file
+    )
 
+    create_demo_transform_validation!(
+      transform: staging_school_mappings_loader_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_school_mappings, column_name: :clarity_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_school_mappings_loader_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_school_mappings, column_name: :co_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_school_mappings_loader_transform,
+      validation: Validation.uniqueness,
+      params: { table_name: :staging_school_mappings, column_name: :co_org_id }
+    )
 
     staging_fund_mappings_data_file = create_demo_data_file!(
       name: "Fund mappings",
       s3_file_name: 'fund_mappings.csv'
     )
 
+    staging_fund_mappings_loader_transform = create_demo_transform!(
+      name: "Fund staging dimension table loader",
+      runner: "CopyFrom",
+      sql: "COPY staging_fund_mappings (fund_name, fund_low_val, fund_high_val) FROM STDIN WITH CSV HEADER",
+      data_file: staging_fund_mappings_data_file
+    )
 
+    create_demo_transform_validation!(
+      transform: staging_fund_mappings_loader_transform,
+      validation: Validation.presence,
+      params: { table_name: :staging_fund_mappings, column_name: :fund_name },
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_fund_mappings_loader_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_fund_mappings, column_name: :fund_low_val }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_fund_mappings_loader_transform,
+      validation: Validation.uniqueness,
+      params: { table_name: :staging_fund_mappings, column_name: :fund_high_val }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_fund_mappings_loader_transform,
+      validation: Validation.non_overlapping,
+      params: { table_name: :staging_fund_mappings, low_column_name: :fund_low_val, high_column_name: :fund_high_val }
+    )
 
     boces_9035_data_file = create_demo_data_file!(
       name: "BOCES 9035 data",
       s3_file_name: 'boces_9035_sample.csv'
     )
+
+    staging_fact_loader_transform = create_demo_transform!(
+      name: "BOCES 9035 fact table loader",
+      runner: "CopyFrom",
+      sql: "COPY staging_facts (boces_id, admin_unit, school_code, fund_code, location_code, sre_code, program_code, object_source_code, job_class_code, grant_code, amount_cents) FROM STDIN WITH CSV HEADER",
+      data_file: boces_9035_data_file
+    )
+
+    [
+      { params: { table_name: :staging_facts, column_name: :boces_id } },
+      { params: { table_name: :staging_facts, column_name: :school_code } },
+      { params: { table_name: :staging_facts, column_name: :fund_code } },
+      { params: { table_name: :staging_facts, column_name: :program_code } },
+      { params: { table_name: :staging_facts, column_name: :object_source_code } },
+      { params: { table_name: :staging_facts, column_name: :amount_cents } }
+    ].each { |h| create_demo_transform_validation!(h.merge(transform: staging_fact_loader_transform, validation: Validation.non_null)) }
 
 
     demo_workflow.reload

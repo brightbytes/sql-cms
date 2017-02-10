@@ -48,7 +48,7 @@ class Validation < ApplicationRecord
     DIGIT_REGEXP = '^-?[[:digit:]]+$'
 
     def non_null
-      @not_null ||= Validation.where(name: 'Field Value IS NOT NULL').first_or_create!(
+      @non_null ||= Validation.where(name: 'Field Value IS NOT NULL').first_or_create!(
         immutable: true,
         sql: 'SELECT id FROM :table_name WHERE :column_name IS NULL'
       )
