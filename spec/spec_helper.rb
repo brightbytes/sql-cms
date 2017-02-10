@@ -42,6 +42,7 @@ RSpec.configure do |config|
   config.before(:each) do
     Sidekiq::Worker.clear_all
     User.flush_cache
+    Validation.flush_cache
   end
 
   config.before(:each, versioning: true) do

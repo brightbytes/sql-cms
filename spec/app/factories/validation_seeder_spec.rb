@@ -3,7 +3,7 @@ describe ValidationSeeder do
 
   describe "#seed" do
 
-    it "should idempotently create some users" do
+    it "should idempotently create some validations" do
       expect(Validation.count).to eq(0)
       expect { ValidationSeeder.seed }.to_not raise_error
       count = Validation.count

@@ -11,8 +11,7 @@ describe TransformJob do
 
       context "with a validation that passes" do
         let!(:transform_validation) do
-          ValidationSeeder.seed
-          create(:transform_validation, transform: transform, validation: Validation.find_by(name: 'Field Value IS NOT NULL'), params: { table_name: :target_table, column_name: :col_target })
+          create(:transform_validation, transform: transform, validation: Validation.non_null, params: { table_name: :target_table, column_name: :col_target })
         end
 
         let!(:run) do
