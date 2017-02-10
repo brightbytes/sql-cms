@@ -4,7 +4,7 @@ ActiveAdmin.register DataFile do
 
   actions :all
 
-  permit_params :name, :metadata_yaml, :customer_id, :file_type, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_name
+  permit_params :name, :customer_id, :file_type, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_name
 
   filter :name, as: :string
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
@@ -31,7 +31,6 @@ ActiveAdmin.register DataFile do
       row :customer
 
       row :file_type
-      row(:metadata) { code(pretty_print_as_json(resource.metadata)) }
 
       row :s3_region_name
       row :s3_bucket_name
@@ -69,12 +68,8 @@ ActiveAdmin.register DataFile do
         input :s3_bucket_name, as: :string
         input :s3_file_name, as: :string
       end
-
-
-      # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
-      #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
-      input :metadata_yaml, as: :text
     end
+
     actions do
       action(:submit)
       path = (params[:source] == 'customer' ? customer_path(params[:customer_id]) : f.object.new_record? ? data_files_path : data_file_path(f.object))

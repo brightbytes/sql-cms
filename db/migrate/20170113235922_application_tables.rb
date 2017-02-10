@@ -18,7 +18,6 @@ class ApplicationTables < ActiveRecord::Migration
     create_table :data_files do |t|
       t.with_options(null: false) do |tt|
         tt.string :name
-        tt.jsonb :metadata, default: {}
         tt.integer :customer_id
         tt.string :file_type, default: :import
         tt.string :s3_region_name, default: 'us-west-2'
@@ -28,7 +27,7 @@ class ApplicationTables < ActiveRecord::Migration
       end
     end
 
-    execute "CREATE UNIQUE INDEX index_data_files_on_lowercase_name ON data_files USING btree (lower(name))"
+    execute "CREATE UNIQUE INDEX index_data_files_on_lowercase_name_and_customer_id ON data_files USING btree (lower(name), customer_id)"
     add_index :data_files, :customer_id
 
     add_foreign_key :data_files, :customers

@@ -4,7 +4,6 @@
 #
 #  id             :integer          not null, primary key
 #  name           :string           not null
-#  metadata       :jsonb            not null
 #  customer_id    :integer          not null
 #  file_type      :string           default("import"), not null
 #  s3_region_name :string           default("us-west-2"), not null
@@ -15,8 +14,8 @@
 #
 # Indexes
 #
-#  index_data_files_on_customer_id     (customer_id)
-#  index_data_files_on_lowercase_name  (lower((name)::text)) UNIQUE
+#  index_data_files_on_customer_id                     (customer_id)
+#  index_data_files_on_lowercase_name_and_customer_id  (lower((name)::text), customer_id) UNIQUE
 #
 # Foreign Keys
 #
@@ -35,12 +34,6 @@ class DataFile < ApplicationRecord
   FILE_TYPES = %w(import export).freeze
 
   validates :file_type, presence: true, inclusion: { in: FILE_TYPES }
-
-  validate :metadata_not_null
-
-  def metadata_not_null
-    errors.add(:metadata, 'may not be null') unless metadata # {} is #blank?, hence this hair
-  end
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
@@ -83,14 +76,6 @@ class DataFile < ApplicationRecord
   # Instance Methods
 
   alias_attribute :to_s, :name
-
-  def metadata_yaml
-    metadata.to_yaml if metadata.present?
-  end
-
-  def metadata_yaml=(val)
-    self.metadata = (val.blank? ? {} : YAML.load(val))
-  end
 
   attr_accessor :supplied_s3_url
 

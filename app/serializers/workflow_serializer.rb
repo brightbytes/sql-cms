@@ -32,7 +32,7 @@ end
 
 class DataFileSerializer < ActiveModel::Serializer
 
-  attributes :id, :name, :metadata, :file_type, :s3_region_name, :s3_bucket_name, :s3_file_name
+  attributes :id, :name, :file_type, :s3_region_name, :s3_bucket_name, :s3_file_name
 
 end
 

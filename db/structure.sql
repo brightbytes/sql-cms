@@ -117,7 +117,6 @@ ALTER SEQUENCE customers_id_seq OWNED BY customers.id;
 CREATE TABLE data_files (
     id integer NOT NULL,
     name character varying NOT NULL,
-    metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
     customer_id integer NOT NULL,
     file_type character varying DEFAULT 'import'::character varying NOT NULL,
     s3_region_name character varying DEFAULT 'us-west-2'::character varying NOT NULL,
@@ -811,10 +810,10 @@ CREATE INDEX index_data_files_on_customer_id ON data_files USING btree (customer
 
 
 --
--- Name: index_data_files_on_lowercase_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_data_files_on_lowercase_name_and_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_data_files_on_lowercase_name ON data_files USING btree (lower((name)::text));
+CREATE UNIQUE INDEX index_data_files_on_lowercase_name_and_customer_id ON data_files USING btree (lower((name)::text), customer_id);
 
 
 --

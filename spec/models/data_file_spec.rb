@@ -4,7 +4,6 @@
 #
 #  id             :integer          not null, primary key
 #  name           :string           not null
-#  metadata       :jsonb            not null
 #  customer_id    :integer          not null
 #  file_type      :string           default("import"), not null
 #  s3_region_name :string           default("us-west-2"), not null
@@ -38,15 +37,6 @@ describe DataFile do
     end
 
     it { should validate_inclusion_of(:file_type).in_array(described_class::FILE_TYPES) }
-
-    it "should validate that metadata is not null, but allow blank" do
-      pt = create(:data_file)
-      pt.metadata = nil
-      expect(pt.valid?).to be false
-
-      pt.metadata = {}
-      expect(pt.valid?).to be true
-    end
 
     context "with a data_file already extant" do
       let!(:subject) { create(:data_file) }
