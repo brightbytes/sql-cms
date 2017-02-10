@@ -7,7 +7,7 @@
 #  step_name   :string           not null
 #  step_index  :integer          default(0), not null
 #  step_id     :integer          default(0), not null
-#  completed   :boolean          default(FALSE), not null
+#  successful   :boolean          default(FALSE), not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  step_errors :jsonb

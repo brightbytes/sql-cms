@@ -36,7 +36,7 @@ module RunnerFactory
 
     def run(run:, plan_h:)
       sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
-      virtual_data_file = Datafile.new(plan_h[:data_file])
+      virtual_data_file = DataFile.new(plan_h[:data_file])
       open(virtual_data_file.s3_presigned_url) do |file|
         run.copy_from_in_schema(sql: sql, enumerable: file)
       end
@@ -61,7 +61,7 @@ module RunnerFactory
 
     def run(run:, plan_h:)
       sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
-      virtual_data_file = Datafile.new(plan_h[:data_file])
+      virtual_data_file = DataFile.new(plan_h[:data_file])
       rd, wr = IO.pipe # I'm in love with IO.pipe!!!!!
       if fork
         wr.close

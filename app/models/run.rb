@@ -83,12 +83,12 @@ class Run < ApplicationRecord
     run_step_logs.reload.failed.count > 0 # Always reload
   end
 
-  def succeeded?
+  def successful?
     status == 'finished'
   end
 
   def running_or_crashed?
-    !failed? && !succeeded?
+    !failed? && !successful?
   end
 
   # This doesn't work ... and it just kills me!!!!!!
@@ -118,7 +118,7 @@ class Run < ApplicationRecord
     transform_group(step_index)&.detect { |h| h[:id] == transform_id }&.deep_symbolize_keys
   end
 
-  def transform_group_successfully_completed?(step_index)
+  def transform_group_successful?(step_index)
     return nil if execution_plan.blank?
     ids = transform_group_transform_ids(step_index)
     run_step_logs.successful.where(step_type: 'transform', step_index: step_index, step_id: ids).count == ids.size
@@ -137,7 +137,7 @@ class Run < ApplicationRecord
   end
 
   # Yeah, o'er-long method name. Whoops.
-  def data_quality_reports_successfully_completed?
+  def data_quality_reports_successful?
     return nil if execution_plan.blank?
     ids = data_quality_report_ids
     run_step_logs.successful.where(step_type: 'data_quality_report', step_id: ids).count == ids.size
@@ -169,7 +169,7 @@ class Run < ApplicationRecord
         end
       end
 
-      run_step_log.update_attribute(:completed, true) # the return value, signifying success
+      run_step_log.update_attribute(:successful, true) # the return value, signifying success
 
     rescue Exception => exception
 

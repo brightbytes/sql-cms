@@ -167,6 +167,8 @@ module WorkflowSeeder
       data_file: staging_boces_mappings_data_file
     )
 
+    create_demo_dependency!(prerequisite_transform: staging_boces_mappings_table_transform, postrequisite_transform: staging_boces_mappings_loader_transform)
+
     create_demo_transform_validation!(
       transform: staging_boces_mappings_loader_transform,
       validation: Validation.non_null,
@@ -196,6 +198,8 @@ module WorkflowSeeder
       sql: "COPY staging_district_mappings (clarity_org_id, co_org_id) FROM STDIN WITH CSV HEADER",
       data_file: staging_district_mappings_data_file
     )
+
+    create_demo_dependency!(prerequisite_transform: staging_district_mappings_table_transform, postrequisite_transform: staging_district_mappings_loader_transform)
 
     create_demo_transform_validation!(
       transform: staging_district_mappings_loader_transform,
@@ -227,6 +231,8 @@ module WorkflowSeeder
       data_file: staging_school_mappings_data_file
     )
 
+    create_demo_dependency!(prerequisite_transform: staging_school_mappings_table_transform, postrequisite_transform: staging_school_mappings_loader_transform)
+
     create_demo_transform_validation!(
       transform: staging_school_mappings_loader_transform,
       validation: Validation.non_null,
@@ -257,6 +263,8 @@ module WorkflowSeeder
       data_file: staging_fund_mappings_data_file
     )
 
+    create_demo_dependency!(prerequisite_transform: staging_fund_mappings_table_transform, postrequisite_transform: staging_fund_mappings_loader_transform)
+
     create_demo_transform_validation!(
       transform: staging_fund_mappings_loader_transform,
       validation: Validation.presence,
@@ -286,12 +294,14 @@ module WorkflowSeeder
       s3_file_name: 'boces_9035_sample.csv'
     )
 
-    staging_fact_loader_transform = create_demo_transform!(
+    staging_facts_loader_transform = create_demo_transform!(
       name: "BOCES 9035 fact table loader",
       runner: "CopyFrom",
       sql: "COPY staging_facts (boces_id, admin_unit, school_code, fund_code, location_code, sre_code, program_code, object_source_code, job_class_code, grant_code, amount_cents) FROM STDIN WITH CSV HEADER",
       data_file: boces_9035_data_file
     )
+
+    create_demo_dependency!(prerequisite_transform: staging_facts_table_transform, postrequisite_transform: staging_facts_loader_transform)
 
     [
       { params: { table_name: :staging_facts, column_name: :boces_id } },
@@ -300,8 +310,10 @@ module WorkflowSeeder
       { params: { table_name: :staging_facts, column_name: :program_code } },
       { params: { table_name: :staging_facts, column_name: :object_source_code } },
       { params: { table_name: :staging_facts, column_name: :amount_cents } }
-    ].each { |h| create_demo_transform_validation!(h.merge(transform: staging_fact_loader_transform, validation: Validation.non_null)) }
+    ].each { |h| create_demo_transform_validation!(h.merge(transform: staging_facts_loader_transform, validation: Validation.non_null)) }
 
+
+    
 
     demo_workflow.reload
   end

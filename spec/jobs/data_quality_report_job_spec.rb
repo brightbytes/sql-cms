@@ -25,7 +25,7 @@ describe DataQualityReportJob do
         log = logs.first
         expect(log.step_exceptions).to eq(nil)
         expect(log.step_validation_failures).to eq(nil)
-        expect(log.completed?).to eq(true)
+        expect(log.successful?).to eq(true)
         expect(log.step_result).to eq([{ 'count' => 5 }])
       end
     end

@@ -74,8 +74,6 @@ ActiveAdmin.register Workflow do
     redirect_to run_path(run)
   end
 
-  # run!(creator)
-
   form do |f|
     # For debugging:
     # semantic_errors *f.object.errors.keys

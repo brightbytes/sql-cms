@@ -7,7 +7,7 @@
 #  step_type                :string           not null
 #  step_index               :integer          default(0), not null
 #  step_id                  :integer          default(0), not null
-#  completed                :boolean          default(FALSE), not null
+#  successful               :boolean          default(FALSE), not null
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  step_validation_failures :jsonb
@@ -49,7 +49,9 @@ class RunStepLog < ApplicationRecord
 
   scope :ordered_by_id, -> { order(:id) }
 
-  scope :completed, -> { where(completed: true) }
+  scope :successful, -> { where(successful: true) }
+
+  scope :failed, -> { where("step_exceptions IS NOT NULL OR step_validation_failures IS NOT NULL") }
 
   scope :non_erring, -> { where(step_exceptions: nil) }
 
@@ -59,18 +61,14 @@ class RunStepLog < ApplicationRecord
 
   scope :invalid, -> { where("step_validation_failures IS NOT NULL") }
 
-  scope :successful, -> { completed.non_erring.valid }
-
-  scope :failed, -> { where("step_exceptions IS NOT NULL OR step_validation_failures IS NOT NULL") }
-
   # Instance Methods
 
-  def successful?
-    completed? && !step_exceptions && !step_validation_failures
+  def failed?
+    step_validation_failures.present? || step_exceptions.present?
   end
 
-  def running? # or, hung/terminated-abnormally, I suppose
-    !completed? && !step_exceptions && !step_validation_failures
+  def running_or_crashed?
+    !successful? && !step_exceptions && !step_validation_failures
   end
 
   def step_plan
@@ -87,6 +85,11 @@ class RunStepLog < ApplicationRecord
     return nil unless step_plan
     klass = (step_type == 'transform' ? Transform : DataQualityReport)
     klass.find_by(id: step_plan[:id])
+  end
+
+  def self.nuke_and_rerun!(run_step_log)
+    run_step_log.delete
+    TransformJob.perform_later(run_id: run_step_log.run_id, step_index: run_step_log.step_index, step_id: run_step_log.step_id)
   end
 
 end

@@ -171,7 +171,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.string :step_type
         tt.integer :step_index, default: 0
         tt.integer :step_id, default: 0
-        tt.boolean :completed, default: false
+        tt.boolean :successful, default: false
         tt.timestamps
       end
       t.jsonb :step_validation_failures

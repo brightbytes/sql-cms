@@ -222,7 +222,7 @@ CREATE TABLE run_step_logs (
     step_type character varying NOT NULL,
     step_index integer DEFAULT 0 NOT NULL,
     step_id integer DEFAULT 0 NOT NULL,
-    completed boolean DEFAULT false NOT NULL,
+    successful boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     step_validation_failures jsonb,
