@@ -15,9 +15,7 @@ ActiveAdmin.register Run do
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
     column(:creator, sortable: 'users.first_name,users.last_name')
-    column(:successful?) { |run| yes_no(run.successful?, yes_color: :green, no_color: :red) }
-    column(:failed?) { |run| yes_no(run.failed?, yes_color: :red, no_color: :green) }
-    column(:running_or_crashed?) { |run| yes_no(run.running_or_crashed?) }
+    column(:human_status) { |run| human_status(run) }
   end
 
   show do
@@ -26,9 +24,7 @@ ActiveAdmin.register Run do
       row :schema_name
       row :workflow
       row :customer
-      row(:successful?) { |run| yes_no(run.successful?, yes_color: :green, no_color: :red) }
-      row(:failed?) { |run| yes_no(run.failed?, yes_color: :red, no_color: :green) }
-      row(:running_or_crashed?) { |run| yes_no(run.running_or_crashed?) }
+      row(:human_status) { human_status(resource) }
       row :status
       row :creator
       row :created_at
@@ -41,9 +37,15 @@ ActiveAdmin.register Run do
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.run_step_logs.order('id'), sortable: true) do
         column(:step_type, sortable: :step_type) { |log| auto_link(log) }
-        column(:step_plan) { |plan| code(pretty_print_as_json(plan)) }
-        boolean_column(:running)
-        boolean_column(:successful)
+        column(:human_status) { |log| human_status(log) }
+        column(:json_output) do |log|
+          code(pretty_print_as_json(log.step_validation_failures.presence || log.step_exceptions.presence || log.step_result.presence))
+        end
+        column(:action) do |log|
+          if log.step_validation_failures.present? || log.step_exceptions.present?
+            link_to("Nuke and Rerun (with same Plan!)", nuke_and_rerun_run_step_log_path(log))
+          end
+        end
       end
     end
 

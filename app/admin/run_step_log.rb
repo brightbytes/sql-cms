@@ -10,22 +10,22 @@ ActiveAdmin.register RunStepLog do
       row :run
       row :workflow
       row :step_type
+      row :step_index
+      row :step_id
       row :likely_step
+      row(:human_status) { human_status(resource) }
       row(:step_plan) { code(pretty_print_as_json(resource.step_plan)) }
-      boolean_row :successful
-      boolean_row :failed
-      boolean_row :running_or_crashed
-      row(:step_result) { code(pretty_print_as_json(resource.step_result)) }
+      row(:step_result) { code(pretty_print_as_json(resource.step_result)) } if resource.step_result.present?
       if resource.step_validation_failures.present?
         row(:step_validation_failures) do
           code(pretty_print_as_json(resource.step_validation_failures))
-          para(link_to("Nuke and Rerun", nuke_and_rerun_run_step_log_path(resource)))
+          para(link_to("Nuke and Rerun (with same Plan!)", nuke_and_rerun_run_step_log_path(resource)))
         end
       end
       if resource.step_exceptions.present?
         row(:step_exceptions) do
           code(pretty_print_as_json(resource.step_exceptions))
-          para(link_to("Nuke and Rerun", nuke_and_rerun_run_step_log_path(resource)))
+          para(link_to("Nuke and Rerun (with same Plan!)", nuke_and_rerun_run_step_log_path(resource)))
         end
       end
       row :created_at

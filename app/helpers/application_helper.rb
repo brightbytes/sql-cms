@@ -17,6 +17,17 @@ module ApplicationHelper
     end
   end
 
+  def human_status(obj)
+    case
+    when obj.running_or_crashed?
+      "<span style='color: yellow'>Running (or Crashed)</span>".html_safe
+    when obj.successful?
+      "<span style='color: green'>Successful</span>".html_safe
+    when obj.failed?
+      "<span style='color: red'>Failed :-(</span>".html_safe
+    end
+  end
+
   # JSON stuff
 
   def pretty_print_as_json(json)

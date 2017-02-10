@@ -49,6 +49,14 @@ ActiveAdmin.register Workflow do
       end
     end
 
+    panel 'Runs' do
+      table_for(resource.runs.includes(:creator).order(id: :desc)) do
+        column(:schema_name) { |run| auto_link(run) }
+        column(:creator)
+        column(:human_status) { |run| human_status(run) }
+      end
+    end
+
     panel 'Run Notifications' do
       table_for(resource.notifications.joins(:user).order('users.first_name, users.last_name')) do
         column(:user) { |notification| auto_link(notification.user) }

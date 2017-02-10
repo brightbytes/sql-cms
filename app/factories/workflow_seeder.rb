@@ -157,7 +157,7 @@ module WorkflowSeeder
 
     staging_boces_mappings_data_file = create_demo_data_file!(
       name: "BOCES mappings",
-      s3_file_name: 'boces_mappings.csv'
+      s3_file_name: 'fake_customer/demo_workflow_version_1/source_data_files/boces_mappings.csv'
     )
 
     staging_boces_mappings_loader_transform = create_demo_transform!(
@@ -189,7 +189,7 @@ module WorkflowSeeder
 
     staging_district_mappings_data_file = create_demo_data_file!(
       name: "District mappings",
-      s3_file_name: 'district_mappings.csv'
+      s3_file_name: 'fake_customer/demo_workflow_version_1/source_data_files/district_mappings.csv'
     )
 
     staging_district_mappings_loader_transform = create_demo_transform!(
@@ -221,7 +221,7 @@ module WorkflowSeeder
 
     staging_school_mappings_data_file = create_demo_data_file!(
       name: "School mappings",
-      s3_file_name: 'school_mappings.csv'
+      s3_file_name: 'fake_customer/demo_workflow_version_1/source_data_files/school_mappings.csv'
     )
 
     staging_school_mappings_loader_transform = create_demo_transform!(
@@ -253,7 +253,7 @@ module WorkflowSeeder
 
     staging_fund_mappings_data_file = create_demo_data_file!(
       name: "Fund mappings",
-      s3_file_name: 'fund_mappings.csv'
+      s3_file_name: 'fake_customer/demo_workflow_version_1/source_data_files/fund_mappings.csv'
     )
 
     staging_fund_mappings_loader_transform = create_demo_transform!(
@@ -291,7 +291,7 @@ module WorkflowSeeder
 
     boces_9035_data_file = create_demo_data_file!(
       name: "BOCES 9035 data",
-      s3_file_name: 'boces_9035_sample.csv'
+      s3_file_name: 'fake_customer/demo_workflow_version_1/source_data_files/boces_9035_sample.csv'
     )
 
     staging_facts_loader_transform = create_demo_transform!(
@@ -313,7 +313,7 @@ module WorkflowSeeder
     ].each { |h| create_demo_transform_validation!(h.merge(transform: staging_facts_loader_transform, validation: Validation.non_null)) }
 
 
-    
+
 
     demo_workflow.reload
   end
@@ -327,7 +327,7 @@ module WorkflowSeeder
   end
 
   def create_demo_data_file!(**options)
-    DataFile.where(name: options.delete(:name)).first_or_create!(options.merge(s3_bucket_name: :bb_dpl_cms, customer: demo_customer))
+    DataFile.where(name: options.delete(:name)).first_or_create!(options.merge(s3_bucket_name: 'bb-dpl-cms', customer: demo_customer))
   end
 
   def create_demo_transform_validation!(**options)
