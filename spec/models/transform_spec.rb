@@ -45,15 +45,6 @@ describe Transform do
       # it { should validate_uniqueness_of(:data_file).scoped_to(:workflow_id).allow_nil }
     end
 
-    it "should validate that params is not null, but allow blank" do
-      transform = create(:transform)
-      transform.params = nil
-      expect(transform.valid?).to be false
-
-      transform.params = {}
-      expect(transform.valid?).to be true
-    end
-
     it { should validate_inclusion_of(:runner).in_array(described_class::RUNNERS) }
   end
 

@@ -6,10 +6,10 @@
 #  id                                 :integer          not null, primary key
 #  workflow_id                        :integer          not null
 #  name                               :string           not null
-#  params                             :jsonb            not null
 #  sql                                :text             not null
 #  created_at                         :datetime         not null
 #  updated_at                         :datetime         not null
+#  params                             :jsonb
 #  copied_from_data_quality_report_id :integer
 #
 # Indexes
@@ -35,12 +35,6 @@ class DataQualityReport < ApplicationRecord
   validates :sql, :workflow, presence: true
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
-
-  validate :params_not_null
-
-  def params_not_null
-    errors.add(:params, 'may not be null') unless params # {} is #blank?, hence this hair
-  end
 
   # Associations
 

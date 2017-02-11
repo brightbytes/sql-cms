@@ -11,6 +11,10 @@ module WorkflowSeeder
     ].each { |workflow| notify_me!(workflow) }
   end
 
+  def demo_workflow
+    @demo_workflow ||= Workflow.where(name: 'Demo Workflow, version 1').first_or_create!(customer: demo_customer)
+  end
+
   private
 
   def notify_me!(workflow)
@@ -19,10 +23,6 @@ module WorkflowSeeder
 
   def demo_customer
     @demo_customer ||= Customer.where(name: CustomerSeeder::CUSTOMERS[2]).first
-  end
-
-  def demo_workflow
-    @demo_workflow ||= Workflow.where(name: 'Demo Workflow, version 1').first_or_create!(customer: demo_customer)
   end
 
   def create_demo_workflow!

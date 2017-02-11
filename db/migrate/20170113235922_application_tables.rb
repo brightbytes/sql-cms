@@ -71,10 +71,10 @@ class ApplicationTables < ActiveRecord::Migration
         tt.string :name
         tt.string :runner, default: 'Sql'
         tt.integer :workflow_id
-        tt.jsonb :params, default: {}
         tt.text :sql
         tt.timestamps
       end
+      t.jsonb :params
       t.integer :data_file_id
       t.integer :copied_from_transform_id
     end
@@ -117,7 +117,7 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.integer :transform_id
         tt.integer :validation_id
-        tt.jsonb :params, default: {}
+        tt.jsonb :params
         tt.timestamps
       end
     end
@@ -133,10 +133,10 @@ class ApplicationTables < ActiveRecord::Migration
       t.with_options(null: false) do |tt|
         tt.integer :workflow_id
         tt.string :name
-        tt.jsonb :params, default: {}
         tt.text :sql
         tt.timestamps
       end
+      t.jsonb :params
       t.integer :copied_from_data_quality_report_id
     end
 

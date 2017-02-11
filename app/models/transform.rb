@@ -6,10 +6,10 @@
 #  name                     :string           not null
 #  runner                   :string           default("Sql"), not null
 #  workflow_id              :integer          not null
-#  params                   :jsonb            not null
 #  sql                      :text             not null
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  params                   :jsonb
 #  data_file_id             :integer
 #  copied_from_transform_id :integer
 #
@@ -44,12 +44,6 @@ class Transform < ApplicationRecord
   validates :data_file, uniqueness: { scope: :workflow_id }, allow_nil: true
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
-
-  validate :params_not_null
-
-  def params_not_null
-    errors.add(:params, 'may not be null') unless params # {} is #blank?, hence this hair
-  end
 
   # Callbacks
 

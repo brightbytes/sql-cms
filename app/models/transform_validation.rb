@@ -26,7 +26,7 @@ class TransformValidation < ApplicationRecord
 
   # Validations
 
-  # Note that here, params can never be {}, unlike other JSONB columns.
+  # Note that here, params can never be NULL/empty, unlike other JSONB columns.
   validates :validation, :transform, :params, presence: true
 
   # Associations
