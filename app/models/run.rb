@@ -143,6 +143,8 @@ class Run < ApplicationRecord
     run_step_logs.successful.where(step_type: 'data_quality_report', step_id: ids).count == ids.size
   end
 
+  DEADLOCK_WAIT = 1.second
+
   # This method is critically important, since it wraps the execution of every single step in the workflow
   def with_run_step_log_tracking(step_type:, step_index: 0, step_id: 0 )
     raise "No block provided; really?!?" unless block_given?
@@ -150,9 +152,7 @@ class Run < ApplicationRecord
 
     run_step_log_args = { run: self, step_type: step_type, step_index: step_index, step_id: step_id }
 
-    if run_step_log = RunStepLog.find_by(run_step_log_args)
-      return run_step_log.successful?
-    end
+    return nil if RunStepLog.find_by(run_step_log_args)
 
     run_step_log = RunStepLog.create!(run_step_log_args)
 
@@ -173,15 +173,27 @@ class Run < ApplicationRecord
 
     rescue Exception => exception
 
-      run_step_log.update_attribute(
-        :step_exceptions,
-        cause: exception.cause,
-        # This doesn't always work ...
-        class_and_message: exception.inspect,
-        # ... hence this redundant bit
-        message: exception.message,
-        backtrace: Rails.backtrace_cleaner.clean(exception.backtrace)
-      )
+      # This hack is, quite frankly, utterly humiliating, since it undermines part of my (apparently bogus) theory about how to maintainably write Transforms.
+      # Specifically, I *assumed* that modern DBs would provide an option to implement field-lock or at least column-lock semantics, since Oracle did a couple decades ago.
+      # However, Postgres certainly doesn't, and Redshift doesn't appear to.
+      # So, while I can still argue that writing Transforms on a column-by-column basis makes them easier to maintain because each Transform only concerns a single
+      #  aspect of the data, I can no longer argue that any performance gains adhere.
+      # Plus, I might not even have a leg to stand on as regards maintainability, since in some cases complex joins would need to be copy/pasted between Transforms
+      #  that pertain to the same target table. FML ** 1,000,000,000
+      if exception.message =~ /^PG::TRDeadlockDetected/
+        run_step_log.destroy
+        TransformJob.set(wait: DEADLOCK_WAIT).perform_later(run_id: id, step_index: step_index, step_id: step_id)
+      else
+        run_step_log.update_attribute(
+          :step_exceptions,
+          cause: exception.cause,
+          # This doesn't always work ...
+          class_and_message: exception.inspect,
+          # ... hence this redundant bit
+          message: exception.message,
+          backtrace: Rails.backtrace_cleaner.clean(exception.backtrace)
+        )
+      end
       false # the return value, signifying failure
 
     end

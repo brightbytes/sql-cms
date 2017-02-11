@@ -2,7 +2,7 @@
 # As such, I suppose it complects separate concerns.  Oh well.
 class RunManagerJob < ApplicationJob
 
-  POLLING_FREQUENCY = 5.seconds
+  POLLING_FREQUENCY = (Rails.env.dev? ? 2.seconds : 5.seconds)
 
   def perform(run_id)
     run = Run.find(run_id)

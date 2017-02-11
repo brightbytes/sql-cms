@@ -22,6 +22,7 @@ ActiveAdmin.register DataFile do
     column(:s3_region_name)
     column(:s3_bucket_name)
     column(:s3_file_name)
+    column(:s3_file_exists?) { |data_file| yes_no(data_file.s3_file_exists?, yes_color: :green, no_color: :red) }
   end
 
   show do
@@ -35,6 +36,7 @@ ActiveAdmin.register DataFile do
       row :s3_region_name
       row :s3_bucket_name
       row :s3_file_name
+      row(:s3_file_exists?) { yes_no(resource.s3_file_exists?, yes_color: :green, no_color: :red) }
 
       row :created_at
       row :updated_at

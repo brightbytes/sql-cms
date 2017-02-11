@@ -14,7 +14,6 @@ class TransformJob < ApplicationJob
         validation_runner.run(run: run, transform_validation_h: transform_validation_h)
       end.compact.presence
     end
-
   end
 
 end

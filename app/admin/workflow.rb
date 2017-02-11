@@ -42,9 +42,8 @@ ActiveAdmin.register Workflow do
     panel 'Data Quality Reports' do
       text_node link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
 
-      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
-      table_for(resource.data_quality_reports.order(sort), sortable: true) do
-        column(:name, sortable: :name) { |dqr| auto_link(dqr) }
+      table_for(resource.data_quality_reports.order(:name)) do
+        column(:name) { |dqr| auto_link(dqr) }
         column(:action) { |dqr| link_to("Delete", data_quality_report_path(dqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data Quality Report?' }) }
       end
     end

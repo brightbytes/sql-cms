@@ -132,7 +132,7 @@ module WorkflowSeeder
       sql: <<-SQL.strip_heredoc
         create_table :mapped_facts do |t|
           t.integer :staging_fact_id, null: false
-          t.integer :clarity_school_parent_id, index: true
+          t.integer :clarity_school_parent_org_id, index: true
           t.integer :clarity_school_org_id, index: true
           t.string :fund_type, index: true
         end
