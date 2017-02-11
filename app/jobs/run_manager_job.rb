@@ -2,7 +2,7 @@
 # As such, I suppose it complects separate concerns.  Oh well.
 class RunManagerJob < ApplicationJob
 
-  POLLING_FREQUENCY = (Rails.env.dev? ? 2.seconds : 5.seconds)
+  POLLING_FREQUENCY = 3.seconds
 
   def perform(run_id)
     run = Run.find(run_id)
@@ -16,6 +16,7 @@ class RunManagerJob < ApplicationJob
   end
 
   private def manage_state_machine(run)
+
     case run.status
 
     when 'unstarted'
@@ -51,7 +52,7 @@ class RunManagerJob < ApplicationJob
     when 'started_data_quality_reports'
       if run.data_quality_reports_successful?
         run.update_attribute(:status, "finished")
-        return false
+        return false # don't self-relog
       end
 
     end

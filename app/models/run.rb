@@ -143,8 +143,6 @@ class Run < ApplicationRecord
     run_step_logs.successful.where(step_type: 'data_quality_report', step_id: ids).count == ids.size
   end
 
-  DEADLOCK_WAIT = 1.second
-
   # This method is critically important, since it wraps the execution of every single step in the workflow
   def with_run_step_log_tracking(step_type:, step_index: 0, step_id: 0 )
     raise "No block provided; really?!?" unless block_given?
@@ -182,7 +180,7 @@ class Run < ApplicationRecord
       #  that pertain to the same target table. FML ** 1,000,000,000
       if exception.message =~ /^PG::TRDeadlockDetected/
         run_step_log.destroy
-        TransformJob.set(wait: DEADLOCK_WAIT).perform_later(run_id: id, step_index: step_index, step_id: step_id)
+        TransformJob.perform_later(run_id: id, step_index: step_index, step_id: step_id)
       else
         run_step_log.update_attribute(
           :step_exceptions,
