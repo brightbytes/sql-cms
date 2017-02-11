@@ -308,6 +308,8 @@ module WorkflowSeeder
 
     create_demo_dependency!(prerequisite_transform: staging_facts_table_transform, postrequisite_transform: staging_facts_loader_transform)
 
+    # Note that we only perform validation of columns we'll need further along in the flow.
+
     [
       { params: { table_name: :staging_facts, column_name: :boces_id } },
       { params: { table_name: :staging_facts, column_name: :school_code } },
@@ -348,11 +350,16 @@ module WorkflowSeeder
 
     school_mappings_initial_map_transform = create_demo_transform!(
       name: "School org mapped dimension table initial-loader",
-      sql: "INSERT INTO school_mappings (staging_school_mapping_id, clarity_org_id, co_school_id) SELECT id, clarity_org_id, co_org_id FROM staging_school_mappings"
+      sql: <<-SQL.strip_heredoc
+        INSERT INTO school_mappings (staging_school_mapping_id, clarity_org_id, co_school_id)
+        SELECT id, clarity_org_id, co_org_id FROM staging_school_mappings
+      SQL
     )
 
     create_demo_dependency!(prerequisite_transform: school_mappings_table_transform, postrequisite_transform: school_mappings_initial_map_transform)
     create_demo_dependency!(prerequisite_transform: staging_school_mappings_loader_transform, postrequisite_transform: school_mappings_initial_map_transform)
+
+    # Note that we don't bother with validations of the staging_school_mapping_id column because its NOT NULL, UNIQUE and FK constraints are all in the DB.
 
     create_demo_transform_validation!(
       transform: school_mappings_initial_map_transform,
@@ -374,12 +381,17 @@ module WorkflowSeeder
 
     school_parent_mappings_initial_map_transform = create_demo_transform!(
       name: "School Parent org mapped dimension table initial-loader",
-      sql: "INSERT INTO school_parent_mappings (staging_school_parent_mapping_id, staging_school_parent_mapping_type, clarity_org_id, co_school_parent_id) SELECT id, 'District', clarity_org_id, co_org_id FROM staging_district_mappings UNION SELECT id, 'BOCES', clarity_org_id, co_org_id FROM staging_boces_mappings"
+      sql: <<-SQL.strip_heredoc
+        INSERT INTO school_parent_mappings (staging_school_parent_mapping_id, staging_school_parent_mapping_type, clarity_org_id, co_school_parent_id)
+        SELECT id, 'District', clarity_org_id, co_org_id FROM staging_district_mappings UNION SELECT id, 'BOCES', clarity_org_id, co_org_id FROM staging_boces_mappings
+      SQL
     )
 
     create_demo_dependency!(prerequisite_transform: school_parent_mappings_table_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
     create_demo_dependency!(prerequisite_transform: staging_district_mappings_loader_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
     create_demo_dependency!(prerequisite_transform: staging_boces_mappings_loader_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
+
+    # Note that we don't bother with validations of the staging_school_parent_mapping_id column because its NOT NULL, UNIQUE and FK constraints are all in the DB.
 
     create_demo_transform_validation!(
       transform: school_parent_mappings_initial_map_transform,
@@ -401,6 +413,8 @@ module WorkflowSeeder
 
     # Fact Initial Mapping Transform
 
+    # Note that for Mapped Fact tables, we don't copy-forward identity-mapped columns, since they will be accessible by FK, and Fact tables can be **HUGE**
+    # (Whereas, by contrast, we **do** copy-forward identity-mapped columns for Dimensions, since Dimension tables are small.)
     fact_initial_map_transform  = create_demo_transform!(
       name: "Mapped fact table initial-loader",
       sql: "INSERT INTO mapped_facts (staging_fact_id) SELECT id FROM staging_facts"
@@ -409,7 +423,21 @@ module WorkflowSeeder
     create_demo_dependency!(prerequisite_transform: mapped_facts_table_transform, postrequisite_transform: fact_initial_map_transform)
     create_demo_dependency!(prerequisite_transform: staging_facts_loader_transform, postrequisite_transform: fact_initial_map_transform)
 
+    # Note that we don't bother with validations of the staging_fact_id column because its NOT NULL, UNIQUE and FK constraints are all in the DB.
+
     # Mapping Transforms
+
+    school_mappings_map_transform = create_demo_transform!(
+      name: "School org mapped dimension table added_on column-loader",
+      sql: "UPDATE school_mappings AS sm SET added_on = TO_DATE(ssm.added_on_date_s, 'YYYY.MM.DD') FROM staging_school_mappings ssm WHERE sm.staging_school_mapping_id = ssm.id"
+    )
+
+    # We have no validation of ^^ because we don't give a shit.  ^^ exists as an example of a "data format-conversion" Map Transform only.
+
+    create_demo_dependency!(prerequisite_transform: school_mappings_initial_map_transform, postrequisite_transform: school_mappings_map_transform)
+
+    # Note that the next 3 Map Transforms are more complex than the previous transform because we're not carrying the fund_code and CO Org IDs forward
+    #  to the mapped fact table
 
 
 

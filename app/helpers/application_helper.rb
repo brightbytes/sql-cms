@@ -39,6 +39,12 @@ module ApplicationHelper
     pretty_print_as_json(JSON.parse(json))
   end
 
+  def sql_newlines_to_array(hash)
+    hash = hash.with_indifferent_access
+    hash[:sql] = hash[:sql].split("\n")
+    hash
+  end
+
   # Customer stuff
 
   def customers_with_preselect

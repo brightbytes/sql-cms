@@ -46,6 +46,7 @@ ActiveAdmin.register Run do
             link_to("Nuke and Rerun (with same Plan!)", nuke_and_rerun_run_step_log_path(log))
           end
         end
+        # column(:step_plan) { |log| code(pretty_print_as_json(sql_newlines_to_array(log.step_plan))) }
       end
     end
 
