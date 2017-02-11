@@ -26,6 +26,9 @@ module WorkflowSeeder
   end
 
   def create_demo_workflow!
+
+    # DDL Transforms
+
     staging_boces_mappings_table_transform = create_demo_transform!(
       name: "CREATE TABLE staging_boces_mappings",
       runner: 'RailsMigration',
@@ -99,7 +102,7 @@ module WorkflowSeeder
         create_table :school_mappings do |t|
           t.integer :staging_school_mapping_id, null: false
           t.integer :clarity_org_id, index: true
-          t.integer :co_org_id, index: true
+          t.integer :co_school_id, index: true
           t.date :added_on
         end
         add_index :school_mappings, :staging_school_mapping_id, unique: true
@@ -117,7 +120,7 @@ module WorkflowSeeder
           t.integer :staging_school_parent_mapping_id, null: false
           t.string :staging_school_parent_mapping_type
           t.integer :clarity_org_id, index: true
-          t.integer :co_org_id, index: true
+          t.integer :co_school_parent_id, index: true
         end
         add_index :school_parent_mappings, [:staging_school_parent_mapping_id, :staging_school_parent_mapping_type], unique: true, name: :index_school_parent_mappings_on_unique_parent_mapping_id_type
       SQL
@@ -154,6 +157,8 @@ module WorkflowSeeder
         end
       SQL
     )
+
+    # CopyFrom Transforms
 
     staging_boces_mappings_data_file = create_demo_data_file!(
       name: "BOCES mappings",
@@ -312,6 +317,101 @@ module WorkflowSeeder
       { params: { table_name: :staging_facts, column_name: :amount_cents } }
     ].each { |h| create_demo_transform_validation!(h.merge(transform: staging_facts_loader_transform, validation: Validation.non_null)) }
 
+    # DataQualityReports for CopyFrom Transforms
+
+    create_data_quality_report!(
+      name: "Staging BOCES Mappings table count",
+      sql: "SELECT count(1) FROM staging_boces_mappings"
+    )
+
+    create_data_quality_report!(
+      name: "Staging District Mappings table count",
+      sql: "SELECT count(1) FROM staging_district_mappings"
+    )
+
+    create_data_quality_report!(
+      name: "Staging School Mappings table count",
+      sql: "SELECT count(1) FROM staging_school_mappings"
+    )
+
+    create_data_quality_report!(
+      name: "Staging Fund Mappings table count",
+      sql: "SELECT count(1) FROM staging_fund_mappings"
+    )
+
+    create_data_quality_report!(
+      name: "Staging Fact Mappings table count",
+      sql: "SELECT count(1) FROM staging_facts"
+    )
+
+    # Dimension Initial Mapping Transforms
+
+    school_mappings_initial_map_transform = create_demo_transform!(
+      name: "School org mapped dimension table initial-loader",
+      sql: "INSERT INTO school_mappings (staging_school_mapping_id, clarity_org_id, co_school_id) SELECT id, clarity_org_id, co_org_id FROM staging_school_mappings"
+    )
+
+    create_demo_dependency!(prerequisite_transform: school_mappings_table_transform, postrequisite_transform: school_mappings_initial_map_transform)
+    create_demo_dependency!(prerequisite_transform: staging_school_mappings_loader_transform, postrequisite_transform: school_mappings_initial_map_transform)
+
+    create_demo_transform_validation!(
+      transform: school_mappings_initial_map_transform,
+      validation: Validation.non_null,
+      params: { table_name: :school_mappings, column_name: :clarity_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: school_mappings_initial_map_transform,
+      validation: Validation.non_null,
+      params: { table_name: :school_mappings, column_name: :co_school_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: school_mappings_initial_map_transform,
+      validation: Validation.uniqueness,
+      params: { table_name: :school_mappings, column_name: :co_school_id }
+    )
+
+    school_parent_mappings_initial_map_transform = create_demo_transform!(
+      name: "School Parent org mapped dimension table initial-loader",
+      sql: "INSERT INTO school_parent_mappings (staging_school_parent_mapping_id, staging_school_parent_mapping_type, clarity_org_id, co_school_parent_id) SELECT id, 'District', clarity_org_id, co_org_id FROM staging_district_mappings UNION SELECT id, 'BOCES', clarity_org_id, co_org_id FROM staging_boces_mappings"
+    )
+
+    create_demo_dependency!(prerequisite_transform: school_parent_mappings_table_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
+    create_demo_dependency!(prerequisite_transform: staging_district_mappings_loader_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
+    create_demo_dependency!(prerequisite_transform: staging_boces_mappings_loader_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
+
+    create_demo_transform_validation!(
+      transform: school_parent_mappings_initial_map_transform,
+      validation: Validation.non_null,
+      params: { table_name: :school_parent_mappings, column_name: :clarity_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: school_parent_mappings_initial_map_transform,
+      validation: Validation.non_null,
+      params: { table_name: :school_parent_mappings, column_name: :co_school_parent_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: school_parent_mappings_initial_map_transform,
+      validation: Validation.uniqueness,
+      params: { table_name: :school_parent_mappings, column_name: :co_school_parent_id }
+    )
+
+    # Fact Initial Mapping Transform
+
+    fact_initial_map_transform  = create_demo_transform!(
+      name: "Mapped fact table initial-loader",
+      sql: "INSERT INTO mapped_facts (staging_fact_id) SELECT id FROM staging_facts"
+    )
+
+    create_demo_dependency!(prerequisite_transform: mapped_facts_table_transform, postrequisite_transform: fact_initial_map_transform)
+    create_demo_dependency!(prerequisite_transform: staging_facts_loader_transform, postrequisite_transform: fact_initial_map_transform)
+
+    # Mapping Transforms
+
+
 
 
 
@@ -332,6 +432,10 @@ module WorkflowSeeder
 
   def create_demo_transform_validation!(**options)
     TransformValidation.where(transform: options.delete(:transform), validation: options.delete(:validation)).first_or_create!(options)
+  end
+
+  def create_data_quality_report!(**options)
+    DataQualityReport.where(name: options.delete(:name)).first_or_create!(options.merge(workflow: demo_workflow))
   end
 
 end
