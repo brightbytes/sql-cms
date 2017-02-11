@@ -429,7 +429,12 @@ module WorkflowSeeder
 
     school_mappings_map_transform = create_demo_transform!(
       name: "School org mapped dimension table added_on column-loader",
-      sql: "UPDATE school_mappings AS sm SET added_on = TO_DATE(ssm.added_on_date_s, 'YYYY.MM.DD') FROM staging_school_mappings ssm WHERE sm.staging_school_mapping_id = ssm.id"
+      sql: <<-SQL.strip_heredoc
+        UPDATE school_mappings AS sm
+           SET added_on = TO_DATE(ssm.added_on_date_s, 'YYYY.MM.DD')
+          FROM staging_school_mappings ssm
+         WHERE sm.staging_school_mapping_id = ssm.id
+      SQL
     )
 
     # We have no validation of ^^ because we don't give a shit.  ^^ exists as an example of a "data format-conversion" Map Transform only.
@@ -439,7 +444,96 @@ module WorkflowSeeder
     # Note that the next 3 Map Transforms are more complex than the previous transform because we're not carrying the fund_code and CO Org IDs forward
     #  to the mapped fact table
 
+    fact_fund_type_map_transform = create_demo_transform!(
+      name: "Mapped fact table fund_type column-loader",
+      sql: <<-SQL.strip_heredoc
+        UPDATE mapped_facts AS mf
+           SET fund_type = sfm.fund_name
+          FROM staging_facts sf, staging_fund_mappings sfm
+         WHERE mf.staging_fact_id = sf.id
+           AND sf.fund_code BETWEEN sfm.fund_low_val AND sfm.fund_high_val
+      SQL
+    )
 
+    create_demo_dependency!(prerequisite_transform: fact_initial_map_transform, postrequisite_transform: fact_fund_type_map_transform)
+
+    create_demo_transform_validation!(
+      transform: fact_fund_type_map_transform,
+      validation: Validation.presence,
+      params: { table_name: :mapped_facts, column_name: :fund_type }
+    )
+
+    # This is borderline-unnecessary, but again is again mainly here as an example of some of the more-obvious validations
+    create_demo_transform_validation!(
+      transform: fact_fund_type_map_transform,
+      validation: Validation.fk,
+      params: { table_name: :mapped_facts, fk_table_name: :mapped_facts, fk_column_name: :fund_type, pk_table_name: :staging_fund_mappings, pk_column_name: :fund_name }
+    )
+
+    fact_parent_org_map_transform = create_demo_transform!(
+      name: "Mapped fact table clarity_school_parent_org_id column-loader",
+      sql: <<-SQL.strip_heredoc
+        UPDATE mapped_facts AS mf
+           SET clarity_school_parent_org_id = spm.clarity_org_id
+          FROM staging_facts sf, school_parent_mappings spm
+         WHERE mf.staging_fact_id = sf.id
+           AND sf.boces_id = spm.co_school_parent_id
+      SQL
+    )
+
+    create_demo_dependency!(prerequisite_transform: fact_initial_map_transform, postrequisite_transform: fact_parent_org_map_transform)
+
+    create_demo_transform_validation!(
+      transform: fact_parent_org_map_transform,
+      validation: Validation.non_null,
+      params: { table_name: :mapped_facts, column_name: :clarity_school_parent_org_id }
+    )
+
+    # This is borderline-unnecessary, but again is again mainly here as an example of some of the more-obvious validations
+    create_demo_transform_validation!(
+      transform: fact_parent_org_map_transform,
+      validation: Validation.fk,
+      params: { table_name: :mapped_facts, fk_table_name: :mapped_facts, fk_column_name: :clarity_school_parent_org_id, pk_table_name: :school_parent_mappings, pk_column_name: :clarity_org_id }
+    )
+
+    fact_school_org_map_transform = create_demo_transform!(
+      name: "Mapped fact table clarity_school_org_id column-loader",
+      sql: <<-SQL.strip_heredoc
+        UPDATE mapped_facts AS mf
+           SET clarity_school_org_id = sm.clarity_org_id
+          FROM staging_facts sf, school_mappings sm
+         WHERE mf.staging_fact_id = sf.id
+           AND sf.school_code = sm.co_school_id
+      SQL
+    )
+
+    create_demo_dependency!(prerequisite_transform: fact_initial_map_transform, postrequisite_transform: fact_school_org_map_transform)
+
+    # This is borderline-unnecessary, but again is again mainly here as an example of some of the more-obvious validations
+    create_demo_transform_validation!(
+      transform: fact_school_org_map_transform,
+      validation: Validation.fk,
+      params: { table_name: :mapped_facts, fk_table_name: :mapped_facts, fk_column_name: :clarity_school_org_id, pk_table_name: :school_mappings, pk_column_name: :clarity_org_id }
+    )
+
+    # DataQualityReports for Mapping Transforms
+
+    create_data_quality_report!(
+      name: "School Mappings table count",
+      sql: "SELECT count(1) FROM school_mappings"
+    )
+
+    create_data_quality_report!(
+      name: "School Parent Mappings table count",
+      sql: "SELECT count(1) FROM school_parent_mappings"
+    )
+
+    create_data_quality_report!(
+      name: "Mapped Facts table count",
+      sql: "SELECT count(1) FROM mapped_facts"
+    )
+
+    # Reduce Transform
 
 
 
