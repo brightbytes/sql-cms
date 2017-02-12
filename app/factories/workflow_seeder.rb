@@ -535,7 +535,18 @@ module WorkflowSeeder
 
     # Reduce Transform
 
+    # fact_reduce_transform = create_demo_transform!(
+    #   name: "Reduced fact table initial-loader",
+    #   sql: <<-SQL.strip_heredoc
+    #     INSERT INTO reduced_facts (clarity_school_parent_org_id, clarity_school_org_id, fund_type, program_code, object_source_code, total_amount_cents)
+    #     SELECT mf.clarity_school_parent_org_id, mf.clarity_school_org_id, mf.fund_type, sf.program_code, sf.object_source_code, sum(sf.amount_cents)
+    #       FROM mapped_facts mf
+    #      INNER JOIN staging_facts sf ON mf.staging_fact_id = sf.id
+    #      GROUP BY mf.clarity_school_parent_org_id, mf.clarity_school_org_id, mf.fund_type, sf.program_code, sf.object_source_code
+    #   SQL
+    # )
 
+    # create_demo_dependency!(prerequisite_transform: , postrequisite_transform: fact_reduce_transform)
 
     demo_workflow.reload
   end

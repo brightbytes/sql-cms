@@ -267,8 +267,9 @@ describe Run do
       it "should create a new RunStepLog for the Run and flag it as unsuccessful and preserve the erring IDs in the error" do
         run = create(:run)
         failures_h = [{ 'ids_failing_validation' => %w(1 5 111) }]
+        result_h = { step_validation_failures: failures_h }
 
-        expect(run.with_run_step_log_tracking(step_type: 'transform') { failures_h }).to eq(false)
+        expect(run.with_run_step_log_tracking(step_type: 'transform') { result_h }).to eq(false)
 
         statuses = run.ordered_step_logs
         expect(statuses.size).to eq(1)

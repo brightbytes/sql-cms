@@ -36,7 +36,7 @@ ActiveAdmin.register Run do
     panel 'Run Step Logs' do
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.run_step_logs.order('id'), sortable: true) do
-        column(:step_type, sortable: :step_type) { |log| auto_link(log) }
+        column(:step_name, sortable: :step_type) { |log| auto_link(log) }
         column(:human_status) { |log| human_status(log) }
         column(:json_output) do |log|
           code(pretty_print_as_json(log.step_validation_failures.presence || log.step_exceptions.presence || log.step_result.presence))

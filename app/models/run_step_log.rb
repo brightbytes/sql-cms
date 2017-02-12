@@ -71,6 +71,15 @@ class RunStepLog < ApplicationRecord
     !successful? && !step_exceptions && !step_validation_failures
   end
 
+  def step_name
+    return nil unless run
+    @step_name ||= step_plan[:name]
+  end
+
+  def to_s
+    step_name
+  end
+
   def step_plan
     return nil unless run
     @step_plan ||=

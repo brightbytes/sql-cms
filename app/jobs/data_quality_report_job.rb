@@ -8,7 +8,7 @@ class DataQualityReportJob < ApplicationJob
     data_quality_report_runner = RunnerFactory.runner_for('DataQualityReport')
 
     run.with_run_step_log_tracking(step_type: "data_quality_report", step_id: step_id) do
-      data_quality_report_runner.run(run: run, plan_h: data_quality_report_h)
+      { step_result: data_quality_report_runner.run(run: run, plan_h: data_quality_report_h) }
     end
 
   end

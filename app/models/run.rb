@@ -159,11 +159,12 @@ class Run < ApplicationRecord
       result = yield
 
       if result.present?
-        if step_type == 'transform' # A hash will be returned for this step_type only when one or more Validations failed
-          run_step_log.update_attribute(:step_validation_failures, result)
+        if step_result = result[:step_result].presence
+          run_step_log.update_attribute(:step_result, step_result)
+        end
+        if step_validation_failures = result[:step_validation_failures].presence
+          run_step_log.update_attribute(:step_validation_failures, step_validation_failures)
           return false # signifying failure
-        elsif step_type == 'data_quality_report'
-          run_step_log.update_attribute(:step_result, result)
         end
       end
 
