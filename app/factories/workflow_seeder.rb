@@ -110,6 +110,7 @@ module WorkflowSeeder
       SQL
     )
 
+    # Because of the foreign key
     create_demo_dependency!(prerequisite_transform: staging_school_mappings_table_transform, postrequisite_transform: school_mappings_table_transform)
 
     school_parent_mappings_table_transform = create_demo_transform!(
@@ -141,6 +142,7 @@ module WorkflowSeeder
       SQL
     )
 
+    # Because of the foreign key
     create_demo_dependency!(prerequisite_transform: staging_facts_table_transform, postrequisite_transform: mapped_facts_table_transform)
 
     reduced_facts_table_transform = create_demo_transform!(
@@ -482,6 +484,8 @@ module WorkflowSeeder
     )
 
     create_demo_dependency!(prerequisite_transform: fact_initial_map_transform, postrequisite_transform: fact_parent_org_map_transform)
+    create_demo_dependency!(prerequisite_transform: school_parent_mappings_initial_map_transform, postrequisite_transform: fact_parent_org_map_transform)
+
 
     create_demo_transform_validation!(
       transform: fact_parent_org_map_transform,
@@ -508,12 +512,20 @@ module WorkflowSeeder
     )
 
     create_demo_dependency!(prerequisite_transform: fact_initial_map_transform, postrequisite_transform: fact_school_org_map_transform)
+    create_demo_dependency!(prerequisite_transform: school_mappings_initial_map_transform, postrequisite_transform: fact_school_org_map_transform)
 
     # This is borderline-unnecessary, but again is again mainly here as an example of some of the more-obvious validations
     create_demo_transform_validation!(
       transform: fact_school_org_map_transform,
       validation: Validation.fk,
       params: { table_name: :mapped_facts, fk_table_name: :mapped_facts, fk_column_name: :clarity_school_org_id, pk_table_name: :school_mappings, pk_column_name: :clarity_org_id }
+    )
+
+    # This is intended to fail, for now ...
+    create_demo_transform_validation!(
+      transform: fact_school_org_map_transform,
+      validation: Validation.non_null,
+      params: { table_name: :mapped_facts, column_name: :clarity_school_org_id }
     )
 
     # DataQualityReports for Mapping Transforms

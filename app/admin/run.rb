@@ -41,11 +41,6 @@ ActiveAdmin.register Run do
         column(:json_output) do |log|
           code(pretty_print_as_json(log.step_validation_failures.presence || log.step_exceptions.presence || log.step_result.presence))
         end
-        column(:action) do |log|
-          if log.step_validation_failures.present? || log.step_exceptions.present?
-            link_to("Nuke and Rerun (with same Plan!)", nuke_and_rerun_run_step_log_path(log))
-          end
-        end
         # column(:step_plan) { |log| code(pretty_print_as_json(sql_newlines_to_array(log.step_plan))) }
       end
     end

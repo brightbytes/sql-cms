@@ -9,6 +9,7 @@ module RunnerFactory
   end
 
   # Introspect on the headers of the data file specified by the plan, create the table using the sql-identifier version of each header, and load the table.
+  # Obviously, requires that the source file have a header row.
   module AutoLoadRunner
 
     extend self
@@ -65,13 +66,19 @@ module RunnerFactory
       rd, wr = IO.pipe # I'm in love with IO.pipe!!!!!
       if fork
         wr.close
-        virtual_data_file.s3_object.put(body: rd)
-        rd.close
+        begin
+          virtual_data_file.s3_object.put(body: rd)
+        ensure
+          rd.close
+        end
         Process.wait
       else
         rd.close
-        run.copy_to_in_schema(sql: sql, writeable_io: wr)
-        wr.close
+        begin
+          run.copy_to_in_schema(sql: sql, writeable_io: wr) # this ends up being the return value ;-)
+        ensure
+          wr.close
+        end
       end
     end
   end
