@@ -72,10 +72,10 @@ ActiveAdmin.register DataFile do
         input :supplied_s3_url, label: "S3 File URL", required: true , hint: "You may use either https:// format or s3:// format for this URL"
 
         # FIXME ... and show this when :file_type is :export
-        input :s3_region_name, as: :string, input_html: { style: 'display:none' } # should be a drop-down
-        input :s3_bucket_name, as: :string, input_html: { style: 'display:none' }
-        input :s3_file_path, as: :string, input_html: { style: 'display:none' }
-        input :s3_file_name, as: :string, input_html: { style: 'display:none' }
+        input :s3_region_name, as: :string, wrapper_html: { style: 'display:none' } # should be a drop-down
+        input :s3_bucket_name, as: :string, wrapper_html: { style: 'display:none' }
+        input :s3_file_path, as: :string, wrapper_html: { style: 'display:none' }
+        input :s3_file_name, as: :string, wrapper_html: { style: 'display:none' }
 
       else
         input :s3_region_name, as: :string # This should be a drop-down
