@@ -27,7 +27,7 @@ FactoryGirl.define do
   factory :data_file do
     sequence(:name) { |n| "Data File #{n}" }
     s3_bucket_name "bb-pipeline-sandbox-rawdata"
-    s3_file_path "ca_pleasant_valley_sis/v_2_201610041757_full/calendars_2015.tsv"
+    s3_file_path "ca_some_sis/v_2_201610041757_full/calendars_2015.tsv"
     s3_file_name "part_0000.tsv"
     association :customer
   end
