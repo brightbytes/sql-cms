@@ -164,7 +164,8 @@ module WorkflowSeeder
 
     staging_boces_mappings_data_file = create_demo_data_file!(
       name: "BOCES mappings",
-      s3_file_name: 'fake_customer/demo_workflow_version_1/source_data_files/boces_mappings.csv'
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'boces_mappings.csv'
     )
 
     staging_boces_mappings_loader_transform = create_demo_transform!(
@@ -196,7 +197,8 @@ module WorkflowSeeder
 
     staging_district_mappings_data_file = create_demo_data_file!(
       name: "District mappings",
-      s3_file_name: 'fake_customer/demo_workflow_version_1/source_data_files/district_mappings.csv'
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'district_mappings.csv'
     )
 
     staging_district_mappings_loader_transform = create_demo_transform!(
@@ -228,7 +230,8 @@ module WorkflowSeeder
 
     staging_school_mappings_data_file = create_demo_data_file!(
       name: "School mappings",
-      s3_file_name: 'fake_customer/demo_workflow_version_1/source_data_files/school_mappings.csv'
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'school_mappings.csv'
     )
 
     staging_school_mappings_loader_transform = create_demo_transform!(
@@ -260,7 +263,8 @@ module WorkflowSeeder
 
     staging_fund_mappings_data_file = create_demo_data_file!(
       name: "Fund mappings",
-      s3_file_name: 'fake_customer/demo_workflow_version_1/source_data_files/fund_mappings.csv'
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'fund_mappings.csv'
     )
 
     staging_fund_mappings_loader_transform = create_demo_transform!(
@@ -298,7 +302,8 @@ module WorkflowSeeder
 
     boces_9035_data_file = create_demo_data_file!(
       name: "BOCES 9035 data",
-      s3_file_name: 'fake_customer/demo_workflow_version_1/source_data_files/boces_9035_sample.csv'
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'boces_9035_sample.csv'
     )
 
     staging_facts_loader_transform = create_demo_transform!(
@@ -521,12 +526,12 @@ module WorkflowSeeder
       params: { table_name: :mapped_facts, fk_table_name: :mapped_facts, fk_column_name: :clarity_school_org_id, pk_table_name: :school_mappings, pk_column_name: :clarity_org_id }
     )
 
-    # This is intended to fail, for now ...
-    create_demo_transform_validation!(
-      transform: fact_school_org_map_transform,
-      validation: Validation.non_null,
-      params: { table_name: :mapped_facts, column_name: :clarity_school_org_id }
-    )
+    # This fails b/c the source file doesn't have any valid school IDs ... but, it's still useful for seeing what validation errors look like.
+    # create_demo_transform_validation!(
+    #   transform: fact_school_org_map_transform,
+    #   validation: Validation.non_null,
+    #   params: { table_name: :mapped_facts, column_name: :clarity_school_org_id }
+    # )
 
     # DataQualityReports for Mapping Transforms
 
@@ -545,20 +550,7 @@ module WorkflowSeeder
       sql: "SELECT count(1) FROM mapped_facts"
     )
 
-    # Reduce Transform
-
-    # fact_reduce_transform = create_demo_transform!(
-    #   name: "Reduced fact table initial-loader",
-    #   sql: <<-SQL.strip_heredoc
-    #     INSERT INTO reduced_facts (clarity_school_parent_org_id, clarity_school_org_id, fund_type, program_code, object_source_code, total_amount_cents)
-    #     SELECT mf.clarity_school_parent_org_id, mf.clarity_school_org_id, mf.fund_type, sf.program_code, sf.object_source_code, sum(sf.amount_cents)
-    #       FROM mapped_facts mf
-    #      INNER JOIN staging_facts sf ON mf.staging_fact_id = sf.id
-    #      GROUP BY mf.clarity_school_parent_org_id, mf.clarity_school_org_id, mf.fund_type, sf.program_code, sf.object_source_code
-    #   SQL
-    # )
-
-    # create_demo_dependency!(prerequisite_transform: , postrequisite_transform: fact_reduce_transform)
+    # Export Transform
 
     demo_workflow.reload
   end

@@ -15,13 +15,13 @@ ActiveAdmin.register DataFile do
   config.sort_order = 'customers.name_asc'
 
   index download_links: false do
-    # id_column
     column(:name) { |data_file| auto_link(data_file) }
     column(:customer)
     column(:file_type)
     column(:s3_region_name)
     column(:s3_bucket_name)
     column(:s3_file_name)
+    column(:s3_file_path)
     column(:s3_file_exists?) { |data_file| yes_no(data_file.s3_file_exists?, yes_color: :green, no_color: :red) }
   end
 
@@ -35,6 +35,7 @@ ActiveAdmin.register DataFile do
 
       row :s3_region_name
       row :s3_bucket_name
+      row :s3_file_path
       row :s3_file_name
       row(:s3_file_exists?) { yes_no(resource.s3_file_exists?, yes_color: :green, no_color: :red) }
 
@@ -47,27 +48,31 @@ ActiveAdmin.register DataFile do
     render partial: 'admin/shared/history'
   end
 
-  # FIXME - Build a browser for files already on S3, from which to select, perhaps using this example: https://www.topdan.com/ruby-on-rails/aws-s3-browser.html
-
   form do |f|
     inputs 'Details' do
       input :customer, as: :select, collection: customers_with_preselect
       input :name, as: :string
 
-      input :file_type, as: :select, collection: DataFile::FILE_TYPES
+      creating = action_name.in?(['create', 'new'])
 
-      if action_name.in?(['create', 'new'])
-        # FIXME: Only show this when :file_type is :import ...
+      input :file_type, as: :select, collection: DataFile::FILE_TYPES, input_html: { disabled: !creating }
+
+      # FIXME - Build a browser for files already on S3, from which to select, perhaps using this example: https://www.topdan.com/ruby-on-rails/aws-s3-browser.html
+
+      if creating
+        # FIXME: Add JS to only show this when :file_type is :import ...
         input :supplied_s3_url, label: "S3 File URL", required: true , hint: "You may use either https:// format or s3:// format for this URL"
 
-        # FIXME: When :file_type is :export, show these instead:
-        # input :s3_region_name, as: :string
-        # input :s3_bucket_name, as: :string
-        # input :s3_file_name, as: :string
+        # FIXME ... and show this when :file_type is :export
+        input :s3_region_name, as: :string, input_html: { style: 'display:none' } # should be a drop-down
+        input :s3_bucket_name, as: :string, input_html: { style: 'display:none' }
+        input :s3_file_path, as: :string, input_html: { style: 'display:none' }
+        input :s3_file_name, as: :string, input_html: { style: 'display:none' }
 
       else
         input :s3_region_name, as: :string # This should be a drop-down
         input :s3_bucket_name, as: :string
+        input :s3_file_path, as: :string
         input :s3_file_name, as: :string
       end
     end

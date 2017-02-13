@@ -11,12 +11,12 @@
 #  s3_file_name   :string           not null
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
-#  deleted_at     :datetime
+#  s3_file_path   :string
 #
 # Indexes
 #
-#  index_data_files_on_customer_id     (customer_id)
-#  index_data_files_on_lowercase_name  (lower((name)::text)) UNIQUE
+#  index_data_files_on_customer_id                     (customer_id)
+#  index_data_files_on_lowercase_name_and_customer_id  (lower((name)::text), customer_id) UNIQUE
 #
 # Foreign Keys
 #
@@ -48,24 +48,27 @@ describe DataFile do
   describe "callbacks" do
     context "before_validation" do
       it "should parse a supplied s3-resource URL regardless of format" do
-        df = build(:data_file, s3_bucket_name: nil, s3_file_name: nil)
-        df.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-pipeline-production-rawdata/ca_pleasant_valley_sis/v_2_201610212151_custom/calendars_2017.tsv/part_0000.tsv"
+        df = build(:data_file, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil)
+        df.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-rawdata/ca_some_sis/v_2_201610212151_custom/calendars_2017.tsv"
         expect(df.valid?).to eq(true)
         expect(df.s3_region_name).to eq('us-west-2')
-        expect(df.s3_bucket_name).to eq('bb-pipeline-production-rawdata')
-        expect(df.s3_file_name).to eq('ca_pleasant_valley_sis/v_2_201610212151_custom/calendars_2017.tsv/part_0000.tsv')
+        expect(df.s3_bucket_name).to eq('bb-rawdata')
+        expect(df.s3_file_path).to eq('ca_some_sis/v_2_201610212151_custom')
+        expect(df.s3_file_name).to eq('calendars_2017.tsv')
 
-        df = build(:data_file, s3_bucket_name: nil, s3_file_name: nil)
-        df.supplied_s3_url = "s3://bb-pipeline-production-rawdata/ca_pleasant_valley_sis/v_2_201610212151_custom/calendars_2017.tsv/part_0000.tsv"
+        df = build(:data_file, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil)
+        df.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-rawdata/calendars_2017.tsv"
         expect(df.valid?).to eq(true)
-        expect(df.s3_bucket_name).to eq('bb-pipeline-production-rawdata')
-        expect(df.s3_file_name).to eq('ca_pleasant_valley_sis/v_2_201610212151_custom/calendars_2017.tsv/part_0000.tsv')
+        expect(df.s3_region_name).to eq('us-west-2')
+        expect(df.s3_bucket_name).to eq('bb-rawdata')
+        expect(df.s3_file_path).to eq(nil)
+        expect(df.s3_file_name).to eq('calendars_2017.tsv')
 
-        df = build(:data_file, s3_bucket_name: nil, s3_file_name: nil)
+        df = build(:data_file, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil)
         df.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-pipeline-production-rawdata"
         expect(df.valid?).to eq(false)
 
-        df = build(:data_file, s3_bucket_name: nil, s3_file_name: nil)
+        df = build(:data_file, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil)
         df.supplied_s3_url = "s3://bb-pipeline-production-rawdata"
         expect(df.valid?).to eq(false)
       end

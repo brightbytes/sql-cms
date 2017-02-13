@@ -57,6 +57,7 @@ ActiveAdmin.register Customer do
         column(:file_type, sortable: :file_type)
         column(:s3_region_name, sortable: :s3_region_name)
         column(:s3_bucket_name, sortable: :s3_bucket_name)
+        column(:s3_file_path, sortable: :s3_file_path)
         column(:s3_file_name, sortable: :s3_file_name)
         column(:action) { |data_file| link_to("Delete", data_file_path(data_file, source: :customer), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data File?' }) }
       end

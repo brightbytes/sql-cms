@@ -11,6 +11,7 @@
 #  s3_file_name   :string           not null
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
+#  s3_file_path   :string
 #
 # Indexes
 #
@@ -50,14 +51,13 @@ class DataFile < ApplicationRecord
 
   def parse_supplied_s3_url
     if supplied_s3_url.present?
-      if (http_match = %r{\Ahttp(?:s)?://s3-([-\w]+).amazonaws.com/([-\w]+)/(.{10,})\Z}.match(supplied_s3_url))
+      http_match = %r{\Ahttp(?:s)?://s3-([-\w]+).amazonaws.com/([-\w]+)/(.{10,})\Z}.match(supplied_s3_url)
+      if http_match
         self.s3_region_name = http_match[1]
         self.s3_bucket_name = http_match[2]
-        self.s3_file_name = http_match[3]
-      end
-      if (s3_match = %r{\As3://([-\w]+)/(.{10,})\Z}.match(supplied_s3_url))
-        self.s3_bucket_name = s3_match[1]
-        self.s3_file_name = s3_match[2]
+        file_path_and_name = http_match[3].split('/').reject(&:blank?)
+        self.s3_file_path = file_path_and_name[0..-2].join('/') unless file_path_and_name.size == 1
+        self.s3_file_name = file_path_and_name.last
       end
     end
   end
@@ -80,16 +80,16 @@ class DataFile < ApplicationRecord
   attr_accessor :supplied_s3_url
 
   def s3_object
-    return false unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
+    return false unless required_s3_fields_present?
     @s3_object ||
       begin
         s3_bucket = s3.bucket(s3_bucket_name)
-        @s3_object = s3_bucket.object(s3_file_name)
+        @s3_object = s3_bucket.object("#{s3_file_path}/#{s3_file_name}")
       end
   end
 
   def s3_presigned_url
-    return false unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
+    return false unless required_s3_fields_present?
     @s3_presigned_url ||= s3_object.presigned_url(:get) if s3_object.exists?
   end
 
@@ -98,8 +98,12 @@ class DataFile < ApplicationRecord
   end
 
   def s3_public_url
-    return false unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
+    return false unless required_s3_fields_present?
     @s3_public_url ||= s3_object.public_url if s3_object.exists?
+  end
+
+  private def required_s3_fields_present?
+    [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
   end
 
   # FIXME - ADD METHOD FOR PROVIDING AN UPLOAD STREAM SINK TO BE LOADED BY THE CLIENT FROM THE DB, TO CREATE AN S3 FILE THAT DOESN'T ALREADY EXIST

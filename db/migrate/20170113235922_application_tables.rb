@@ -25,6 +25,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.string :s3_file_name
         tt.timestamps
       end
+      t.string :s3_file_path
     end
 
     execute "CREATE UNIQUE INDEX index_data_files_on_lowercase_name_and_customer_id ON data_files USING btree (lower(name), customer_id)"
