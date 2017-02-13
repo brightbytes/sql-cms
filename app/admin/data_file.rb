@@ -68,10 +68,11 @@ ActiveAdmin.register DataFile do
       # FIXME - Build a browser for files already on S3, from which to select, perhaps using this example: https://www.topdan.com/ruby-on-rails/aws-s3-browser.html
 
       if creating
-        # FIXME: Add JS to only show this when :file_type is :import ...
+
+        # For import files ...
         input :supplied_s3_url, label: "S3 File URL", required: true , hint: "You may use either https:// format or s3:// format for this URL"
 
-        # FIXME ... and show this when :file_type is :export
+        # For export files ...
         input :s3_region_name, as: :string, wrapper_html: { style: 'display:none' } # should be a drop-down
         input :s3_bucket_name, as: :string, wrapper_html: { style: 'display:none' }
         input :s3_file_path, as: :string, wrapper_html: { style: 'display:none' }
