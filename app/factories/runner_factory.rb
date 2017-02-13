@@ -63,21 +63,12 @@ module RunnerFactory
     def run(run:, plan_h:)
       sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
       virtual_data_file = DataFile.new(plan_h[:data_file])
-      rd, wr = IO.pipe # I'm in love with IO.pipe!!!!!
-      if fork
-        wr.close
-        begin
-          virtual_data_file.s3_object.put(body: rd)
-        ensure
-          rd.close
-        end
-        Process.wait
-      else
-        rd.close
-        begin
-          run.copy_to_in_schema(sql: sql, writeable_io: wr) # this ends up being the return value ;-)
-        ensure
-          wr.close
+
+      # Tragically, we can't use IO.pipe b/c AWS needs to know the file size in advance so as to chunk the data when appropriate
+      Tempfile.open(virtual_data_file.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
+        run.copy_to_in_schema(sql: sql, writeable_io: stream).tap do
+          stream.rewind
+          virtual_data_file.s3_object(run).put(body: stream)
         end
       end
     end

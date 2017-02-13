@@ -4,7 +4,7 @@ ActiveAdmin.register DataFile do
 
   actions :all
 
-  permit_params :name, :customer_id, :file_type, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_name
+  permit_params :name, :customer_id, :file_type, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
 
   filter :name, as: :string
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
@@ -20,9 +20,9 @@ ActiveAdmin.register DataFile do
     column(:file_type)
     column(:s3_region_name)
     column(:s3_bucket_name)
-    column(:s3_file_name)
     column(:s3_file_path)
-    column(:s3_file_exists?) { |data_file| yes_no(data_file.s3_file_exists?, yes_color: :green, no_color: :red) }
+    column(:s3_file_name)
+    column(:s3_file_exists?) { |data_file| data_file.export? ? 'n/a' : yes_no(data_file.s3_file_exists?, yes_color: :green, no_color: :red) }
   end
 
   show do
@@ -37,10 +37,18 @@ ActiveAdmin.register DataFile do
       row :s3_bucket_name
       row :s3_file_path
       row :s3_file_name
-      row(:s3_file_exists?) { yes_no(resource.s3_file_exists?, yes_color: :green, no_color: :red) }
+      row(:s3_file_exists?) { yes_no(resource.s3_file_exists?, yes_color: :green, no_color: :red) } if data_file.import?
 
       row :created_at
       row :updated_at
+    end
+
+    panel 'Transforms Using this DataFile' do
+      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
+      table_for(resource.transforms.order(sort), sortable: true) do
+        column(:name, sortable: :name) { |transform| auto_link(transform) }
+        column(:runner, sortable: :runner) { |transform| transform.runner }
+      end
     end
 
     active_admin_comments

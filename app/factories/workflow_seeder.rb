@@ -552,6 +552,24 @@ module WorkflowSeeder
 
     # Export Transform
 
+    export_data_file = create_demo_data_file!(
+      name: "Mapped Fact Export File",
+      file_type: :export,
+      s3_file_path: 'fake_customer/demo_workflow_version_1/exported_data_files',
+      s3_file_name: 'mapped_facts.csv'
+    )
+
+    export_transform = create_demo_transform!(
+      name: "Mapped Fact Exporter",
+      runner: "CopyTo",
+      sql: "COPY (SELECT * FROM mapped_facts) TO STDOUT WITH CSV HEADER",
+      data_file: export_data_file
+    )
+
+    create_demo_dependency!(prerequisite_transform: fact_school_org_map_transform, postrequisite_transform: export_transform)
+    create_demo_dependency!(prerequisite_transform: fact_parent_org_map_transform, postrequisite_transform: export_transform)
+    create_demo_dependency!(prerequisite_transform: fact_fund_type_map_transform, postrequisite_transform: export_transform)
+
     demo_workflow.reload
   end
 

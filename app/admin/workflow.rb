@@ -32,9 +32,10 @@ ActiveAdmin.register Workflow do
       text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
 
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
-      table_for(resource.transforms.order(sort), sortable: true) do
+      table_for(resource.transforms.includes(:data_file).order(sort), sortable: true) do
         column(:name, sortable: :name) { |transform| auto_link(transform) }
         column(:runner, sortable: :runner) { |transform| transform.runner }
+        column(:data_file, sortable: 'data_files.name')
         column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
       end
     end

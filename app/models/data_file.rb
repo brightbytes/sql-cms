@@ -77,14 +77,26 @@ class DataFile < ApplicationRecord
 
   alias_attribute :to_s, :name
 
+  def import?
+    file_type == 'import'
+  end
+
+  def export?
+    file_type == 'export'
+  end
+
   attr_accessor :supplied_s3_url
 
-  def s3_object
-    return false unless required_s3_fields_present?
+  def s3_object(for_run = nil)
+    return nil unless required_s3_fields_present?
+    # FIXME - I'm not happy about how I did this method overloading.
+    raise "You must supply a Run object for export files!" if export? && !for_run
+
     @s3_object ||
       begin
         s3_bucket = s3.bucket(s3_bucket_name)
-        @s3_object = s3_bucket.object("#{s3_file_path}/#{s3_file_name}")
+        path = (export? ? "#{s3_file_path}/run_#{for_run.id}" : s3_file_path)
+        @s3_object = s3_bucket.object("#{path}/#{s3_file_name}")
       end
   end
 
@@ -94,7 +106,7 @@ class DataFile < ApplicationRecord
   end
 
   def s3_file_exists?
-    !!s3_presigned_url
+    import? && !!s3_presigned_url
   end
 
   def s3_public_url

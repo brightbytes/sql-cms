@@ -96,10 +96,10 @@ class RunStepLog < ApplicationRecord
     klass.find_by(id: step_plan[:id])
   end
 
-  # Entirely useless.
-  # def self.nuke_and_rerun!(run_step_log)
-  #   run_step_log.delete
-  #   TransformJob.perform_later(run_id: run_step_log.run_id, step_index: run_step_log.step_index, step_id: run_step_log.step_id)
-  # end
+  # This is only useful for dev debugging
+  def self.nuke_and_rerun!(run_step_log)
+    run_step_log.delete
+    TransformJob.perform_later(run_id: run_step_log.run_id, step_index: run_step_log.step_index, step_id: run_step_log.step_id)
+  end
 
 end

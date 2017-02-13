@@ -59,6 +59,7 @@ ActiveAdmin.register Customer do
         column(:s3_bucket_name, sortable: :s3_bucket_name)
         column(:s3_file_path, sortable: :s3_file_path)
         column(:s3_file_name, sortable: :s3_file_name)
+        column(:s3_file_exists?) { |data_file| data_file.export? ? 'n/a' : yes_no(data_file.s3_file_exists?, yes_color: :green, no_color: :red) }
         column(:action) { |data_file| link_to("Delete", data_file_path(data_file, source: :customer), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data File?' }) }
       end
     end
