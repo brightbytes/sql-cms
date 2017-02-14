@@ -32,9 +32,12 @@ module Concerns::NormalizationMethods
     rescue ActiveRecord::StatementInvalid => e
       # This is for rake one_ring, which pukes if att methods are defined when the DB doesn't exist yet
       raise unless e.message =~ /PG::UndefinedTable/
+
+    # This proved unnecessary after the initial deployment.  Keeping here as a note.
     # rescue PG::ConnectionBad => e
     #   # This is for Heroku, which is gagging on a fresh deploy
     #   raise unless e.message =~ /password authentication failed/
+
     end
 
     def normalize_attr(*attrs)
