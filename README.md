@@ -2,9 +2,9 @@
 
 This is a general-purpose application for creating per-Customer Workflows of interdependent SQL Transforms that convert a set of Import DataFiles on S3 to a set of Export DataFiles on S3.
 
-A Workflow may be Run multiple times, and each time the system will deposit its Export DataFiles in a namespaced S3 "directory". Every Run occurs within a newly-created Postgres (or Redshift) schema.
+A Workflow may be Run multiple times, and each time the system will deposit its Export DataFiles in a namespaced S3 "directory". Every Run occurs within a newly-created Postgres (or, soon, Redshift) schema.
 
-The following entities exist in the public Postgres (or Redshift) schema:
+The following entities exist in the **public** Postgres (or, soon, Redshift) schema:
 
 - **User**: You, the SQL Analyst
 
