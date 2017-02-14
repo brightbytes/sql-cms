@@ -132,12 +132,15 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
 
   ```
   git clone https://github.com/brightbytes/dpl-cms.git
+  # Clone this only if you want slightly-faster `one_ring` time
+  git clone https://github.com/brightbytes/bb_data.git
   ```
 
   Or use ssh if you prefer (You will need to generate an ssh key first. Instructions can be found here: https://help.github.com/articles/generating-an-ssh-key/)
 
   ```
   git clone git@github.com:brightbytes/dpl-cms.git
+  git clone git@github.com:brightbytes/bb_data.git
   ```
 
  Configure git:
@@ -193,7 +196,7 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
     [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm" # Automatically prompt to install Ruby if it's not installed yet upon cd into a Ruby repo dir
     ```
 
-    * CD into each repo you pulled down (except bb_data) and copy/paste the `rvm use` command to the terminal prompt.  If you're on on Mavericks and it fails, just run the command again, and it should succeed.
+    * CD into the dpl-cms directory and copy/paste the `rvm use` command to the terminal prompt.  If you're on on Mavericks and it fails, just run the command again, and it should succeed.
 
   * Or install rbenv
 
@@ -249,7 +252,7 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
   foreman start
   ```
 
-  * To run them separately - which I prefer because `thin` provides more-useful logging than `unicorn` does, and I've also had `foreman` wedge my machine to the point that it could only be fixed by a rebo
+  * To run them separately - which I prefer because `thin` provides more-useful logging than `unicorn` does, and I've also had `foreman` wedge my machine to the point that it could only be fixed by a reboot:
 
   ```
   # Start thin in one terminal tab:
