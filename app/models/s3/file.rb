@@ -2,7 +2,7 @@ class S3::File
 
   attr_reader :path
 
-  def initialize(bucket, path)
+  def initialize(bucket:, path:)
     @bucket = bucket
     @path = path
   end
