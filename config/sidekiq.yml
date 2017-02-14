@@ -2,7 +2,9 @@
 :concurrency: 25
 :logfile: ./log/sidekiq.log
 :queues:
+  - high
   - default
+  - low
   - mailers
 production:
   pool: 25

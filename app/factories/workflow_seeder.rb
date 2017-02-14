@@ -4,11 +4,7 @@ module WorkflowSeeder
 
   def seed
     CustomerSeeder.seed
-    [
-      Workflow.where(name: 'Public Data Workflow, version 1').first_or_create!(customer: Customer.where(name: CustomerSeeder::CUSTOMERS[1]).first),
-      Workflow.where(name: 'SIS Data Workflow, version 1').first_or_create!(customer: Customer.where(name: CustomerSeeder::CUSTOMERS[0]).first),
-      create_demo_workflow!
-    ].each { |workflow| notify_me!(workflow) }
+    notify_me!(create_demo_workflow!)
   end
 
   def demo_workflow
@@ -22,7 +18,7 @@ module WorkflowSeeder
   end
 
   def demo_customer
-    @demo_customer ||= Customer.where(name: CustomerSeeder::CUSTOMERS[2]).first
+    @demo_customer ||= Customer.where(name: CustomerSeeder::CUSTOMERS[0]).first
   end
 
   def create_demo_workflow!

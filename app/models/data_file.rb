@@ -89,7 +89,7 @@ class DataFile < ApplicationRecord
 
   def s3_object(for_run = nil)
     return nil unless required_s3_fields_present?
-    # FIXME - I'm not happy about how I did this method overloading.
+    # FIXME - I'm not happy about how I did this method overloading for import and export file_types
     raise "You must supply a Run object for export files!" if export? && !for_run
 
     @s3_object ||
@@ -114,17 +114,14 @@ class DataFile < ApplicationRecord
     @s3_public_url ||= s3_object.public_url if s3_object.exists?
   end
 
-  private def required_s3_fields_present?
-    [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
-  end
-
-  # FIXME - ADD METHOD FOR PROVIDING AN UPLOAD STREAM SINK TO BE LOADED BY THE CLIENT FROM THE DB, TO CREATE AN S3 FILE THAT DOESN'T ALREADY EXIST
-  #         THIS WILL REQUIRE ADDING AN EXTRA `"run_#{run.id}"` PARENT DIRECTORY TO THE SUPPLIED FILE NAME.  MEH.
-
   private
 
   def s3
     @s3 ||= Aws::S3::Resource.new(region: s3_region_name)
+  end
+
+  def required_s3_fields_present?
+    [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
   end
 
   # Class Methods

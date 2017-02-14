@@ -28,6 +28,12 @@ module ApplicationHelper
     end
   end
 
+  def human_notification_status(run)
+    status = run.notification_status.titleize
+    color = (status == 'Sent' ? :green : :blue)
+    "<span style='color: #{color}'>#{status}</span>".html_safe
+  end
+
   # JSON stuff
 
   def pretty_print_as_json(json)

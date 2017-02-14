@@ -16,6 +16,7 @@ ActiveAdmin.register Run do
     column(:customer, sortable: 'customers.slug')
     column(:creator, sortable: 'users.first_name,users.last_name')
     column(:human_status) { |run| human_status(run) }
+    column(:human_notification_status) { |run| human_notification_status(run) }
   end
 
   show do
@@ -27,6 +28,7 @@ ActiveAdmin.register Run do
       row :workflow
       row :customer
       row(:human_status) { human_status(resource) }
+      row(:human_notification_status) { human_notification_status(resource) }
       row :status
       row :creator
       row :created_at
