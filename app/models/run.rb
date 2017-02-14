@@ -2,14 +2,15 @@
 #
 # Table name: public.runs
 #
-#  id             :integer          not null, primary key
-#  workflow_id    :integer          not null
-#  creator_id     :integer          not null
-#  execution_plan :jsonb            not null
-#  status         :string           default("unstarted"), not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  schema_name    :string
+#  id                  :integer          not null, primary key
+#  workflow_id         :integer          not null
+#  creator_id          :integer          not null
+#  execution_plan      :jsonb            not null
+#  status              :string           default("unstarted"), not null
+#  notification_status :string           default("unsent"), not null
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  schema_name         :string
 #
 # Indexes
 #
@@ -39,6 +40,10 @@ class Run < ApplicationRecord
   # Validations
 
   validates :workflow, :creator, :execution_plan, :status, presence: true
+
+  NOTIFICATION_STATUSES = %w(unsent sending sent)
+
+  validates :notification_status, presence: true, inclusion: { in: NOTIFICATION_STATUSES }
 
   # Callbacks
 
@@ -194,6 +199,21 @@ class Run < ApplicationRecord
       end
       false # the return value, signifying failure
 
+    end
+  end
+
+  def notify_completed!
+    return nil unless persisted?
+    # Atomically lock, to avoid dup notifications upon multiple failures
+    update_count = Run.where(id: id, notification_status: 'unsent').update_all(notification_status: 'sending')
+    if update_count == 1
+      reload # to get new notification_status
+      begin
+        UserMailer.run_completed(self).deliver_later
+      rescue
+        update_attribute(:notification_status, 'unsent')
+      end
+      update_attribute(:notification_status, 'sent')
     end
   end
 end

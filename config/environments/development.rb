@@ -53,8 +53,6 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   BB_HOST = ENV['BRIGHTBYTES_HOST'] || 'localhost:3000'
-
-  # Devise-recommended
   config.action_mailer.default_url_options = { host: BB_HOST }
   Rails.application.routes.default_url_options[:host] = BB_HOST
 

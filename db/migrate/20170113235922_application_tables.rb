@@ -155,6 +155,7 @@ class ApplicationTables < ActiveRecord::Migration
         tt.integer :creator_id
         tt.jsonb :execution_plan
         tt.string :status, default: :unstarted
+        tt.string :notification_status, default: 'unsent'
         tt.timestamps
       end
       t.string :schema_name # Hate for this to not be required, but it requires the Run#id.  Bah.

@@ -52,6 +52,7 @@ class RunManagerJob < ApplicationJob
     when 'started_data_quality_reports'
       if run.data_quality_reports_successful?
         run.update_attribute(:status, "finished")
+        run.notify_completed!
         return false # don't self-relog
       end
 

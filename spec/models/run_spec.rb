@@ -1,16 +1,16 @@
-# frozen_string_literal: true
 # == Schema Information
 #
 # Table name: public.runs
 #
-#  id             :integer          not null, primary key
-#  workflow_id    :integer          not null
-#  creator_id     :integer          not null
-#  execution_plan :jsonb            not null
-#  status         :string           default("unstarted"), not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  schema_name    :string
+#  id                  :integer          not null, primary key
+#  workflow_id         :integer          not null
+#  creator_id          :integer          not null
+#  execution_plan      :jsonb            not null
+#  status              :string           default("unstarted"), not null
+#  notification_status :string           default("unsent"), not null
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  schema_name         :string
 #
 # Indexes
 #
@@ -30,9 +30,11 @@ describe Run do
   end
 
   describe "validations" do
-    [:workflow, :creator, :execution_plan, :status].each do |att|
+    [:workflow, :creator, :execution_plan, :status, :notification_status].each do |att|
       it { should validate_presence_of(att) }
     end
+
+    it { should validate_inclusion_of(:notification_status).in_array(described_class::NOTIFICATION_STATUSES) }
   end
 
   describe "associations" do

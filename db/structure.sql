@@ -261,6 +261,7 @@ CREATE TABLE runs (
     creator_id integer NOT NULL,
     execution_plan jsonb NOT NULL,
     status character varying DEFAULT 'unstarted'::character varying NOT NULL,
+    notification_status character varying DEFAULT 'unsent'::character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     schema_name character varying
