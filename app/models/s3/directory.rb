@@ -49,10 +49,15 @@ class S3::Directory
 
   class << self
 
-    def root_directory()
-      new(bucket: s3_bucket_name)
+    def root_directory(s3_region_name: 'us-west-2', s3_bucket_name:)
+      s3_bucket = s3.bucket(s3_bucket_name)
+      new(bucket: s3_bucket)
+    end
+
+    private def s3(s3_region_name = 'us-west-2')
+      Aws::S3::Resource.new(region: s3_region_name)
     end
 
   end
-  
+
 end
