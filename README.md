@@ -12,35 +12,35 @@ The following entities exist in the public Postgres (or Redshift) schema:
 
 - DataFile: Comes in 2 varieties:
 
---- Import DataFile: A specification of the location of a tabular flat-file that already exists on S3 (e.g. a CSV file)
+  - Import DataFile: A specification of the location of a tabular flat-file that already exists on S3 (e.g. a CSV file)
 
---- Export DataFile: A specification of the desired location to which the system will write a tabular flat-file on S3 (e.g. a CSV file)
+  - Export DataFile: A specification of the desired location to which the system will write a tabular flat-file on S3 (e.g. a CSV file)
 
 - Workflow: A named, per-Customer collection of the following, each described in detail below:
 
---- Various types of SQL Transform and their TransformDependencies, TransformValidations, and (for some types of Transform) DataFiles
+  - Various types of SQL Transform and their TransformDependencies, TransformValidations, and (for some types of Transform) DataFiles
 
---- DataQualityReports
+  - DataQualityReports
 
---- Notifications
+  - Notifications
 
---- Runs and their RunStepLogs
+  - Runs and their RunStepLogs
 
 - Notification: An association of a Workflow with a User for the purpose of notifying the User whenenever a Run of that Workflow successfully or unsuccessfully completes.
 
 - Transform: A named, optionally-parametrized SQL query that may be optionally associated with an Import or Export DataFile and that specifies one of the following Runners for the SQL:
 
---- RailsMigrationRunner: Evals the contents of the sql field as a Ruby Migration (because hand-writing boilerplate DDL sucks); supports every feature that Rails Migrations support
+  - RailsMigrationRunner: Evals the contents of the sql field as a Ruby Migration (because hand-writing boilerplate DDL sucks); supports every feature that Rails Migrations support
 
---- CopyFromRunner: Requires association with an Import DataFile, and requires that its sql field be a `COPY ... FROM ...` type of SQL statement
+  - CopyFromRunner: Requires association with an Import DataFile, and requires that its sql field be a `COPY ... FROM ...` type of SQL statement
 
---- SqlRunner: Allows its sql field to be any type of DDL statement (CREATE) or DML statement (INSERT, UPDATE, DELETE, but not SELECT, since that would be pointless) other than those that read from or write to files.
+  - SqlRunner: Allows its sql field to be any type of DDL statement (CREATE) or DML statement (INSERT, UPDATE, DELETE, but not SELECT, since that would be pointless) other than those that read from or write to files.
 
---- CopyToRunner: Requires association with an Export DataFile, and requires that its sql field be a `COPY ... TO ...` type of SQL statement
+  - CopyToRunner: Requires association with an Export DataFile, and requires that its sql field be a `COPY ... TO ...` type of SQL statement
 
---- AutoLoadRunner: **Not yet implemented** - Will require only an association to an Import DataFile, and will introspect on the DataFile's header, create a table with string columns based upon the sql-identifier-coerced version of the headers, and load the table from the file.
+  - AutoLoadRunner: **Not yet implemented** - Will require only an association to an Import DataFile, and will introspect on the DataFile's header, create a table with string columns based upon the sql-identifier-coerced version of the headers, and load the table from the file.
 
---- UnloadRunner: **Not yet implemented** -  Will be a Redshift-specific version of CopyToRunner
+  - UnloadRunner: **Not yet implemented** -  Will be a Redshift-specific version of CopyToRunner
 
 - TransformDependency: An association of one Transform with another where the Prerequisite Transform must be run before the Postrequisite Transform.  Every Workflow has a TransformDependency-based DAG that is resolved at runtime into a list of groups of Transforms, where each Transform in a group may be run in parallel
 
