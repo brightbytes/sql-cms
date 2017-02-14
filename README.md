@@ -163,11 +163,9 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
   Add the remotes to your .git/config:
 
   ```
-  [remote "production"]
-    url = git@heroku.com:dpl-cms.git
-    fetch = +refs/heads/*:refs/remotes/production/*
-  [heroku]
-    remote = production
+  [remote "heroku"]
+	  url = https://git.heroku.com/dpl-cms.git
+	  fetch = +refs/heads/*:refs/remotes/heroku/*
   ```
   Additional optional settings may be configured by running the following from the dpl-cms repo directory; feel free to review before executing:
 
