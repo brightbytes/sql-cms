@@ -33,8 +33,8 @@ FactoryGirl.define do
 
   factory :transform do
     sequence(:name) { |n| "Transform #{n}" }
-    runner 'CopyFrom'
-    sequence(:sql)  { |n| "COPY tmp_#{n} (id, stringy) FROM STDIN WITH CSV HEADER" }
+    runner 'Sql'
+    sequence(:sql)  { |n| "SELECT 1" }
     association :workflow
   end
 
