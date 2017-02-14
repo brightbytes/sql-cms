@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1><%= @h1_text %></h1>
+    <p>
+      View <%= link_to("the run log", run_url(@run)) %> for full details.
+    </p>
+    <% if @run.successful? %>
+      <h2>Data Quality Reports for the Run</h2>
+      <table>
+        <tr>
+          <th>Name</th>
+          <th>SQL</th>
+          <th>Result</th>
+        </tr>
+        <% @run.run_step_logs.data_quality_reports.each do |log| %>
+          <tr>
+            <td><%= log.step_name %></td>
+            <td><%= log.step_sql %></td>
+            <td><%= log.step_result %></td>
+          </tr>
+        <% end %>
+      </table>
+    <% end %>
+  </body>
+</html>

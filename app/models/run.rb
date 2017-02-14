@@ -136,7 +136,6 @@ class Run < ApplicationRecord
     data_quality_reports&.map { |h| h.fetch(:id, nil) }
   end
 
-  # Yeah, o'er-long method name. Whoops.
   def data_quality_reports_successful?
     return nil if execution_plan.blank?
     ids = data_quality_report_ids

@@ -59,11 +59,11 @@ class User < ApplicationRecord
     "#{first_name} #{last_name}".squish
   end
 
-  def full_name_and_email
+  def rfc_email_address
     "#{full_name} <#{email}>".squish
   end
 
-  alias_method :to_s, :full_name_and_email
+  alias_method :to_s, :rfc_email_address
 
   # Class Methods
 

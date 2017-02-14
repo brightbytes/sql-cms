@@ -61,6 +61,10 @@ class RunStepLog < ApplicationRecord
 
   scope :invalid, -> { where("step_validation_failures IS NOT NULL") }
 
+  scope :data_quality_reports, -> { where(step_type: 'data_quality_report') }
+
+  scope :transforms, -> { where(step_type: 'transform') }
+
   # Instance Methods
 
   def failed?
@@ -74,6 +78,11 @@ class RunStepLog < ApplicationRecord
   def step_name
     return nil unless run
     @step_name ||= step_plan[:name]
+  end
+
+  def step_sql
+    return nil unless run
+    @step_sql ||= step_plan[:sql]
   end
 
   def to_s

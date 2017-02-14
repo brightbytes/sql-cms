@@ -86,6 +86,10 @@ class Workflow < ApplicationRecord
     notified_users.pluck(:email)
   end
 
+  def rfc_email_addresses_to_notify
+    notified_users.map(&:rfc_email_address)
+  end
+
   def ordered_transform_groups
     unused_transform_ids = transforms.map(&:id)
     return [] if unused_transform_ids.empty?
