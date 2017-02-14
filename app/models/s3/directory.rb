@@ -56,6 +56,7 @@ class S3::Directory
 
     # This doesn't belong here.  So sue me.
     def s3_regions
+      # For some weird reason, #describe_regions doesn't work on s3.client ... WTF?!?!
       @s3_regions ||= Aws::EC2::Client.new(region: 'us-west-2').describe_regions
     end
 
