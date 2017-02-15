@@ -154,7 +154,9 @@ class Run < ApplicationRecord
 
     run_step_log_args = { run: self, step_type: step_type, step_index: step_index, step_id: step_id }
 
-    return nil if RunStepLog.find_by(run_step_log_args)
+    if run_step_log = RunStepLog.find_by(run_step_log_args)
+      return run_step_log.successful?
+    end
 
     run_step_log = RunStepLog.create!(run_step_log_args)
 
