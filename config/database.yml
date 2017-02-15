@@ -3,7 +3,8 @@ default: &default
   encoding: unicode
   # For details on connection pooling, see rails configuration guide
   # http://guides.rubyonrails.org/configuring.html#database-pooling
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  # NOTE - THIS IS SET HIGHER THAN THE USUAL RAILS DEFAULT SOLELY FOR SIDEKIQ
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 25 } %>
   timeout: 5000
   host: <%= ENV['DB_HOST'] || 'localhost' %>
   username: <%= ENV['DB_USERNAME'] || 'postgres' %>

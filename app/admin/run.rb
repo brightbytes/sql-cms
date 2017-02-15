@@ -22,15 +22,21 @@ ActiveAdmin.register Run do
   show do
     attributes_table do
       row :id
+
       row(:schema_name) do
         text_node("<span style='color: blue'>SET search_path TO</span> <span style='color: red'>#{resource.schema_name}</span><span style='color: blue'>,public</span>".html_safe)
       end
+
       row :workflow
       row :customer
+
       row(:human_status) { human_status(resource) }
       row(:human_notification_status) { human_notification_status(resource) }
+
       row :status
+
       row :creator
+
       row :created_at
       row :updated_at
     end
@@ -45,7 +51,6 @@ ActiveAdmin.register Run do
         column(:json_output) do |log|
           code(pretty_print_as_json(log.step_validation_failures.presence || log.step_exceptions.presence || log.step_result.presence))
         end
-        # column(:step_plan) { |log| code(pretty_print_as_json(sql_newlines_to_array(log.step_plan))) }
       end
     end
 
@@ -56,6 +61,21 @@ ActiveAdmin.register Run do
     render partial: 'admin/shared/history'
   end
 
+  config.add_action_item :nuke_failed_steps_and_rerun, only: :show, if: proc { resource.failed? } do
+    link_to(
+      "Nuke Failed Steps and Rerun",
+      nuke_failed_steps_and_rerun_run_path(resource),
+      method: :put,
+      data: { confirm: 'This will rerun with the same execution_plan, and thus is only useful for system-wide exceptions or validation failures you fixed directly in the DB.  Proceed?' }
+    )
+  end
+
+  # This is only useful for dev debugging
+  member_action :nuke_failed_steps_and_rerun, method: :put do
+    resource.nuke_failed_steps_and_rerun!
+    flash[:notice] = "Failured steps nuked; rerunning from that point onward ..."
+    redirect_to run_path(resource)
+  end
 
   controller do
 

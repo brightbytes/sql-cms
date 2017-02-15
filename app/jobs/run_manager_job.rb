@@ -11,6 +11,8 @@ class RunManagerJob < ApplicationJob
 
     if manage_state_machine(run)
       # Self-relog unless the state machine has finished.
+      # FIXME - THERE'S THE POSSIBILITY THAT THIS COULD ENDLESSLY RECREATE THIS JOB FOR A GIVEN RUN IF THERE'S A BUG WITH THE RunStepLog MECHANISM;
+      #         SO, THERE WILL NEED TO BE A NUMBER-OF-ITERATIONS TTL ON THIS RELOG FUNCTIONALITY, WHICH WILL REQUIRE A NEW Run FIELD
       RunManagerJob.set(wait: POLLING_FREQUENCY).perform_later(run_id)
     end
   end

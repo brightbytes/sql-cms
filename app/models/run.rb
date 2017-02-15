@@ -218,4 +218,12 @@ class Run < ApplicationRecord
       update_attribute(:notification_status, 'sent')
     end
   end
+
+  def nuke_failed_steps_and_rerun!
+    if failed?
+      run_step_logs.failed.delete_all
+      update_attributes(notification_status: 'unsent', status: status.sub(/^started/, 'unstarted'))
+      RunManagerJob.perform_later(id)
+    end
+  end
 end
