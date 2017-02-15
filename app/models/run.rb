@@ -116,7 +116,7 @@ class Run < ApplicationRecord
   end
 
   def transform_group_transform_ids(step_index)
-    transform_group(step_index)&.map { |h| h.fetch(:id, nil) }
+    transform_group(step_index)&.map { |h| h.fetch(:id, nil) }&.uniq
   end
 
   def transform_plan(step_index:, transform_id:)
@@ -138,7 +138,7 @@ class Run < ApplicationRecord
   end
 
   def data_quality_report_ids
-    data_quality_reports&.map { |h| h.fetch(:id, nil) }
+    data_quality_reports&.map { |h| h.fetch(:id, nil) }&.uniq
   end
 
   def data_quality_reports_successful?
@@ -155,7 +155,8 @@ class Run < ApplicationRecord
     run_step_log_args = { run: self, step_type: step_type, step_index: step_index, step_id: step_id }
 
     if run_step_log = RunStepLog.find_by(run_step_log_args)
-      return run_step_log.successful?
+      # We want this to return `true` even if the RunStepLog is still running so that we don't prematurely notify of failure
+      return !run_step_log.failed?
     end
 
     run_step_log = RunStepLog.create!(run_step_log_args)
