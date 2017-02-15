@@ -71,6 +71,7 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 - Add support for files coming from or going to the local filesystem, rather than S3.  (I started this project using PaperClip, but dropped it when it became too inflexible for my needs.  Maybe re-introduce?)
 - Add Redshift support, both for production and local development.
 - Maybe port to Convox, especially if it would facilitate Redshift support.
+- Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
 - Add an API and/or SQS integration for remote-triggering of Workflow Runs
 - Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
 - Perhaps generalize the notion of a Transform beyond pure SQL to encompass external services.
