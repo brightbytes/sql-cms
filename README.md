@@ -8,7 +8,7 @@ A Workflow may be Run multiple times, and each time the system will deposit its 
 
 The following entities exist in the **public** Postgres schema:
 
-- **User**: You, the SQL Analyst.
+- **User**: An Analyst possessing basic knowledge of SQL
 
 - **Customer**: The Customer with which every Workflow and DataFile must be associated
 
@@ -264,6 +264,6 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
   ```
 
   ```
-  # Start sidekiq in another terminal tab:
+  # Start sidekiq in another terminal tab; if you want to be sneaky, tack on an `&` at the end of the following:
   bundle exec sidekiq
   ```
