@@ -66,15 +66,15 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 
 ## Future plans
 
-- Implement an S3 browser for the Import DataFile Create and Edit pages, so S3 URLs needn't be copy/pasted in.
-- Implement the 2 remaining Transform runners
-- Add support for files coming from or going to the local filesystem, rather than S3
+- Implement an S3 browser for the Import DataFile Create and Edit pages, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3`.)
+- Implement the 2 remaining Transform runners.  (The BE work has commenced in `app/factories/runner_factory.rb`.)
+- Add support for files coming from or going to the local filesystem, rather than S3.  (I started this project using PaperClip, but dropped it when it became too inflexible for my needs.  Maybe re-introduce?)
 - Add Redshift support, both for production and local development.
 - Maybe port to Convox, especially if it would facilitate Redshift support.
 - Add an API and/or SQS integration for remote-triggering of Workflow Runs
 - Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
 - Perhaps generalize the notion of a Transform beyond pure SQL to encompass external services.
-- Open source this at some point
+- Open source this once it's deemed sufficiently robust.
 
 ## Environment Setup for local development
 
