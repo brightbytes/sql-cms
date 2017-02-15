@@ -68,6 +68,7 @@ This application comes with a Demo Workflow that was ported from an ancestor of 
 
 - Implement an S3 browser for the Create and Edit Import DataFile pages, so S3 URLs needn't be copy/pasted in.
 - Implement the 2 remaining Transform runners
+- Add support for files coming from or going to the local filesystem, rather than S3
 - Add Redshift support, both for production and local development.
 - Maybe port to Convox, especially if it would facilitate Redshift support.
 - Add an API and/or SQS integration for remote-triggering of Workflow Runs
@@ -236,12 +237,9 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
     export PORT=3000
     export RACK_ENV=development
 
-    # For files stored in Amazon S3
-    #export S3_ACCESS_ID=
-    #export S3_SECRET_ACCESS_KEY=
-
-    # For connecting to staging Redis from your local machine
-    #export OPENREDIS_URL=
+    # You must supply these to connect to S3
+    export S3_ACCESS_ID=<your access ID here>
+    export S3_SECRET_ACCESS_KEY=<your secret access key here>
     ```
 
   * Use [dotenv](https://github.com/bkeepers/dotenv) to import this file automatically when you enter the `dpl-cms` directory.
@@ -260,9 +258,9 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
 
   Run the above script every time you want to re-initialize your dev environment to baseline.
 
-3) Start web-servers:
+3) Start your web server and worker:
 
-  * In order to run the application in development environment you need both a web server and a sidekiq queue worker.
+  * In order to run the application in development environment you need both a web server and a sidekiq worker.
 
   * To start both unicorn and sidekiq in the same process, run:
 
@@ -270,7 +268,7 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
   foreman start
   ```
 
-  * To run them separately - which I prefer because `thin` provides more-useful logging than `unicorn` does, and I've also had `foreman` wedge my machine to the point that it could only be fixed by a reboot:
+  * To run them separately - which I prefer because `thin` provides more-useful logging than `unicorn`, and I've also had `foreman` wedge my machine to the point that it could only be fixed by a reboot:
 
   ```
   # Start thin in one terminal tab:
