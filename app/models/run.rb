@@ -116,7 +116,7 @@ class Run < ApplicationRecord
   end
 
   def transform_group_transform_ids(step_index)
-    transform_group(step_index)&.map { |h| h.fetch(:id, nil) }&.uniq
+    transform_group(step_index)&.map { |h| h.fetch(:id, nil) }
   end
 
   def transform_plan(step_index:, transform_id:)
@@ -138,7 +138,7 @@ class Run < ApplicationRecord
   end
 
   def data_quality_report_ids
-    data_quality_reports&.map { |h| h.fetch(:id, nil) }&.uniq
+    data_quality_reports&.map { |h| h.fetch(:id, nil) }
   end
 
   def data_quality_reports_successful?
@@ -189,6 +189,7 @@ class Run < ApplicationRecord
       if exception.message =~ /^PG::TRDeadlockDetected/
         run_step_log.destroy
         TransformJob.perform_later(run_id: id, step_index: step_index, step_id: step_id)
+        true # the return value, signifying mu (non-failure, non-success, non-running_or_crashed - just don't send notifications)
       else
         run_step_log.update_attribute(
           :step_exceptions,
@@ -199,8 +200,8 @@ class Run < ApplicationRecord
           message: exception.message,
           backtrace: Rails.backtrace_cleaner.clean(exception.backtrace)
         )
+        false # the return value, signifying failure
       end
-      false # the return value, signifying failure
 
     end
   end
