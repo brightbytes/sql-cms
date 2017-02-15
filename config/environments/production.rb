@@ -87,4 +87,14 @@ Rails.application.configure do
   BB_HOST = 'dpl-cms.herokuapp.com'
   config.action_mailer.default_url_options = { :host => BB_HOST }
   Rails.application.routes.default_url_options[:host] = BB_HOST
+  ActionMailer::Base.delivery_method = :smtp
+  ActionMailer::Base.smtp_settings = {
+    address: 'smtp.sendgrid.net',
+    port: '587',
+    authentication: :plain,
+    user_name: ENV['SENDGRID_USERNAME'],
+    password: ENV['SENDGRID_PASSWORD'],
+    domain: ENV['SENDGRID_DOMAIN'] || 'brightbytes.net'
+  }
+
 end

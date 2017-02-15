@@ -15,7 +15,7 @@ ActiveAdmin.register User, sort_order: "id_asc" do
 
   index(download_links: false) do
     # selectable_column
-    id_column
+    # id_column
     column(:full_name, sortable: :first_name) { |user| auto_link(user) }
     column(:email, sortable: :email) { |user| mail_to user.email }
     column :current_sign_in_at
