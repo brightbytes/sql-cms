@@ -1,12 +1,14 @@
 # dpl-cms
 
-This is a general-purpose application for creating per-Customer Workflows of interdependent SQL Transforms that convert a set of Import DataFiles on S3 to a set of Export DataFiles on S3.
+This application is intended to be used by SQL Analysts with no knowledge of programming; only knowledge of SQL and the entity types presented below are required.
 
-A Workflow may be Run multiple times, and each time the system will deposit its Export DataFiles in a namespaced S3 "directory". Every Run occurs within a newly-created Postgres (or, soon, Redshift) schema.
+With it, one may create per-Customer Workflows of interdependent SQL Transforms that convert a set of pre-existing Import DataFiles on S3 to a set of newly-generated Export DataFiles on S3.
 
-The following entities exist in the **public** Postgres (or, soon, Redshift) schema:
+A Workflow may be Run multiple times, and each time the system will deposit its Export DataFiles in a namespaced S3 "directory". Every Run occurs within a newly-created Postgres schema.
 
-- **User**: You, the SQL Analyst
+The following entities exist in the **public** Postgres schema:
+
+- **User**: You, the SQL Analyst.
 
 - **Customer**: The Customer with which every Workflow and DataFile must be associated
 
@@ -28,13 +30,13 @@ The following entities exist in the **public** Postgres (or, soon, Redshift) sch
 
 - **Notification**: An association of a Workflow with a User for the purpose of notifying the User whenenever a Run of that Workflow successfully or unsuccessfully completes.
 
-- **Transform**: A named, optionally-parametrized SQL query that may be optionally associated with an Import or Export DataFile and that specifies one of the following Runners for the SQL:
+- **Transform**: A named, optionally-parametrized SQL query that may be optionally associated with an Import or Export DataFile, and that specifies one of the following Runners for the SQL:
 
-  - **RailsMigrationRunner**: Evals the contents of the sql field as a Ruby Migration (because hand-writing boilerplate DDL sucks); supports every feature that Rails Migrations support
+  - **RailsMigrationRunner**: Evals the contents of the sql field as a Ruby Migration (because hand-writing boilerplate DDL sucks); supports every feature that Rails Migrations support.  If preferred, SQL Analysts uncomfortable with Ruby code may use the generic **SqlRunner** described below to author DDL ... though I'd recommend learning Rails Migration syntax, because it's much more convenient.
 
   - **CopyFromRunner**: Requires association with an Import DataFile, and requires that its sql field be a `COPY ... FROM STDIN ...` type of SQL statement
 
-  - **SqlRunner**: Allows its sql field to be any type of DDL statement (CREATE) or DML statement (INSERT, UPDATE, DELETE, but not SELECT, since that would be pointless) other than those that read from or write to files.
+  - **SqlRunner**: Allows its sql field to be any type of DDL statement (CREATE) or DML statement (INSERT, UPDATE, DELETE, but not SELECT, since that would be pointless) other than those that read from or write to files (COPY, UNLOAD, LOAD).
 
   - **CopyToRunner**: Requires association with an Export DataFile, and requires that its sql field be a `COPY ... TO STDOUT ...` type of SQL statement
 
@@ -42,17 +44,21 @@ The following entities exist in the **public** Postgres (or, soon, Redshift) sch
 
   - **UnloadRunner**: **Not yet implemented** -  Will be a Redshift-specific version of CopyToRunner
 
-- **TransformDependency**: An association of one Transform with another where the Prerequisite Transform must be run before the Postrequisite Transform.  Every Workflow has a TransformDependency-based DAG that is resolved at runtime into a list of groups of Transforms, where each Transform in a group may be run in parallel
+- **TransformDependency**: An association of one Transform with another where the Prerequisite Transform must be run before the Postrequisite Transform.  Every Workflow has a TransformDependency-based DAG that is resolved at Run-time into a list of groups of Transforms, where each Transform in a given group may be run in parallel with all other Transforms in that group.
 
-- **TransformValidation**: An association of a Transform to a parameterized Validation that specifies the parameters required for the Validation.  When a TransformValidation fails, that Transform is considered to have failed, and execution halts in failure after that Transform's group completes.
+- **TransformValidation**: An association of a Transform to a parameterized Validation that specifies the parameters required for the Validation.  When a TransformValidation fails, the system fails its associated Transform, and execution halts in failure after that Transform's group completes execution.
 
-- **Validation**: A named, reusable, manditorily-parametrized SQL query that validates the result of a Transform, e.g. to verify that all rows in a table have a value for a given column, are unique, reference values in another table, etc.  Similar in intent to Rails Validations.  Upon failure, returns the IDs of all invlalid rows.
+- **Validation**: A named, reusable, manditorily-parametrized SQL query that validates the result of a Transform via an intermediating TransformValidation's params, e.g. to verify that all rows in a table have a value for a given column, are unique, reference values in another table, etc.  Similar in intent to Rails Validations.  Upon failure, returns the IDs of all invalid rows.
 
-- **DataQualityReport**: A named, optionally-parametrized SELECT SQL statement that is run after all Transforms have completed.  The system will store the tabular data returned by the SQL as well as include that data in the Notification email that is sent after a successful Run.
+- **DataQualityReport**: A named, optionally-parametrized SELECT SQL statement that is run after all Transforms have completed.  The system will store the tabular data returned by the SQL and also include that data in the Notification email that is sent after a successful Run.
 
-- **Run**: A record of the postgres-schema_name, current status, and execution_plan of a given Run of a Workflow.  When a User creates a Run for a Workflow, the system serializes the Workflow and *all* its dependent objects into the execution_plan field, and execution of the Run proceeds against that field.  This allows a Workflow to be changed at any time without affecting any current Runs.
+- **Run**: A record of the postgres-schema_name (useful for debugging/examining data), current status, and execution_plan of a given Run of a Workflow.  When a User creates a Run for a Workflow, the system serializes the Workflow and **all** its dependent objects into the Run#execution_plan field, and execution of the Run proceeds against that field.  This allows a Workflow to be changed at any time without affecting any current Runs.
 
-- **RunStepLog**: A per-Run record of the execution of a single Transform or DataQualityReport that in success cases stores the result of running the SQL and in failure cases either stores TransformValidation failures or - in the case of an Exception being raised - the error message
+- **RunStepLog**: A per-Run record of the execution of a single Transform or DataQualityReport that in success cases stores the result of running the SQL, in failure cases stores TransformValidation failures, or - when the Step raises an Exception - the error details.
+
+## Run Management
+
+This application uses Sidekiq via Active::Job for parallelization of Runs, Transform groups, and DataQualityReports.  Details may be found in `app/jobs/`.
 
 ## Environment Setup for local development
 
