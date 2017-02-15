@@ -62,11 +62,11 @@ This application uses Sidekiq via Active::Job for parallelization of Runs, Trans
 
 ## Demo Workflow
 
-This application comes with a Demo Workflow that was ported from an ancestor of this application.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide some examples of how to use this system.
+This application comes with a Demo Workflow that was ported from an ancestral app.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide some examples of how to use this system.
 
 ## Future plans
 
-- Implement an S3 browser for the Create and Edit Import DataFile pages, so S3 URLs needn't be copy/pasted in.
+- Implement an S3 browser for the Import DataFile Create and Edit pages, so S3 URLs needn't be copy/pasted in.
 - Implement the 2 remaining Transform runners
 - Add support for files coming from or going to the local filesystem, rather than S3
 - Add Redshift support, both for production and local development.
@@ -74,6 +74,7 @@ This application comes with a Demo Workflow that was ported from an ancestor of 
 - Add an API and/or SQS integration for remote-triggering of Workflow Runs
 - Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
 - Perhaps generalize the notion of a Transform beyond pure SQL to encompass external services.
+- Open source this at some point
 
 ## Environment Setup for local development
 
