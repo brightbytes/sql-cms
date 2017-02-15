@@ -73,11 +73,44 @@ describe DataFile do
         expect(df.valid?).to eq(false)
       end
     end
+
+    context "before_destoy" do
+      it "should prevent destroy if one or more transforms are using the DataFile" do
+        df = create(:data_file)
+        expect { df.destroy }.to_not raise_error
+
+        df = create(:data_file)
+        t = create(:transform, runner: "CopyFrom", data_file: df)
+        df.reload
+        expect { df.destroy }.to raise_error(RuntimeError)
+      end
+    end
   end
 
   describe "associations" do
     it { should belong_to(:customer) }
     it { should have_many(:transforms) }
     it { should have_many(:workflows) }
+  end
+
+  describe "instance methods" do
+    it "should have a #used? method that returns true only when there are one or more Transforms associated with the DataFile" do
+      df = create(:data_file)
+      expect(df.used?).to eq(false)
+
+      t = create(:transform, runner: "CopyFrom", data_file: df)
+      df.reload
+      expect(df.used?).to eq(true)
+    end
+
+    it "should have #import? and #export? convenience methods wrapping the file_type attribute" do
+      df = create(:data_file, file_type: :import)
+      expect(df.import?).to eq(true)
+      expect(df.export?).to eq(false)
+
+      df = create(:data_file, file_type: :export)
+      expect(df.import?).to eq(false)
+      expect(df.export?).to eq(true)
+    end
   end
 end

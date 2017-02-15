@@ -62,6 +62,13 @@ class DataFile < ApplicationRecord
     end
   end
 
+  before_destroy :raise_if_still_used
+
+  def raise_if_still_used
+    count = transforms.count
+    raise "This DataFile is still used by #{count} Transforms; please sever those associations before nuking this DataFile."if count > 0
+  end
+
   # Associations
 
   belongs_to :customer, inverse_of: :data_files
@@ -71,19 +78,27 @@ class DataFile < ApplicationRecord
 
   # Scopes
 
+  scope :import, -> { where(file_type: :import) }
 
+  scope :export, -> { where(file_type: :export) }
 
   # Instance Methods
 
   alias_attribute :to_s, :name
 
   def import?
-    file_type == 'import'
+    file_type&.to_sym == :import
   end
 
   def export?
-    file_type == 'export'
+    file_type&.to_sym == :export
   end
+
+  def used?
+    transforms.count > 0
+  end
+
+  # FIXME: Consider moving all the s3_* functionality down under app/models/s3/
 
   attr_accessor :supplied_s3_url
 

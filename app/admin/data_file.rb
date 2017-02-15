@@ -95,6 +95,13 @@ ActiveAdmin.register DataFile do
 
   controller do
 
+    def action_methods
+      result = super
+      # Don't show the destroy button if the DataFile is used by a transform
+      result -= ['destroy'] if resource.used?
+      result
+    end
+
     def scoped_collection
       super.joins(:customer)
     end
