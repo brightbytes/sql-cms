@@ -12,11 +12,11 @@ The following entities exist in the **public** Postgres schema:
 
 - **Customer**: The Customer with which every Workflow and DataFile must be associated
 
-- **DataFile**: Comes in 2 varieties:
+- **DataFile**: Associated with a Customer, and thus usable in multiple Workflows.  Comes in 2 varieties:
 
   - **Import DataFile**: A specification of the location of a tabular flat-file that already exists on S3 (e.g. a CSV file)
 
-  - **Export DataFile**: A specification of the desired location to which the system will write a tabular flat-file on S3 (e.g. a CSV file)
+  - **Export DataFile**: A specification of the desired location to which the system will write a per-Run tabular flat-file on S3 (e.g. a CSV file)
 
 - **Workflow**: A named, per-Customer collection of the following, each described in detail below:
 
@@ -42,7 +42,7 @@ The following entities exist in the **public** Postgres schema:
 
   - **AutoLoadRunner**: **Not yet implemented** - Will require only an association to an Import DataFile, and will introspect on the DataFile's header, create a table with string columns based upon the sql-identifier-coerced version of the headers, and load the table from the file.
 
-  - **UnloadRunner**: **Not yet implemented** -  Will be a Redshift-specific version of CopyToRunner
+  - **UnloadRunner**: **Not yet implemented** -  Will be a Redshift-specific version of CopyToRunner, to be added when Redshift support is added.
 
 - **TransformDependency**: An association of one Transform with another where the Prerequisite Transform must be run before the Postrequisite Transform.  Every Workflow has a TransformDependency-based DAG that is resolved at Run-time into a list of groups of Transforms, where each Transform in a given group may be run in parallel with all other Transforms in that group.
 
@@ -59,6 +59,20 @@ The following entities exist in the **public** Postgres schema:
 ## Run Management
 
 This application uses Sidekiq via Active::Job for parallelization of Runs, Transform groups, and DataQualityReports.  Details may be found in `app/jobs/`.
+
+## Demo Workflow
+
+This application comes with a Demo Workflow that was ported from an ancestor of this application.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide some examples of how to use this system.
+
+## Future plans
+
+- Implement an S3 browser for the Create and Edit Import DataFile pages, so S3 URLs needn't be copy/pasted in.
+- Implement the 2 remaining Transform runners
+- Add Redshift support, both for production and local development.
+- Maybe port to Convox, especially if it would facilitate Redshift support.
+- Add an API and/or SQS integration for remote-triggering of Workflow Runs
+- Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
+- Perhaps generalize the notion of a Transform beyond pure SQL to encompass external services.
 
 ## Environment Setup for local development
 
