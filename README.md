@@ -18,7 +18,7 @@ The following entities exist in the **public** Postgres schema:
 
   - **Export DataFile**: A specification of the desired location to which the system will write a per-Run tabular flat-file on S3 (e.g. a CSV file)
 
-- **Workflow**: A named, per-Customer collection of the following, each described in detail below:
+- **Workflow**: A named, per-Customer collection of the following, each via a `has_many` relationship, and each described in detail below:
 
   - Various types of SQL Transform and their TransformDependencies, TransformValidations, and (for some types of Transform) DataFiles
 
