@@ -238,9 +238,14 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
     export PORT=3000
     export RACK_ENV=development
 
-    # You must supply these to connect to S3
-    export S3_ACCESS_ID=<your access ID here>
-    export S3_SECRET_ACCESS_KEY=<your secret access key here>
+    # You must supply these to connect to S3:
+    #  (If you are a SIS DPL dude, you already have these set up in your ~/.bb_ops/aws_user.env file, so move along: nothing to see here.)
+    export AWS_ACCESS_KEY_ID=<your access ID here>
+    export AWS_SECRET_ACCESS_KEY=<your secret access key here>
+
+    # These aren't required, but I have them locally, and they may be necessary for something I haven't run into yet:
+    export AWS_ACCOUNT_ID=<your account ID here>
+    export AWS_REGION="us-west-2"
     ```
 
   * Use [dotenv](https://github.com/bkeepers/dotenv) to import this file automatically when you enter the `dpl-cms` directory.
