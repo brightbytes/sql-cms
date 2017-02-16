@@ -68,7 +68,8 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 
 - DIFFICULT: Implement an S3 browser for the Import DataFile Create and Edit pages, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3`.)
 - EASY: Implement the 2 remaining Transform runners.  (The BE work has commenced in `app/factories/runner_factory.rb`.)
-- EASY: Add support for uploading local files to an Import DataFile location.
+- EASY: Add support for uploading local files to an Import DataFile S3 location.
+- MIDDLING: Add support transferring files from an SFTP server to an Import DataFile S3 location
 - MIDDLING: Add Redshift support, both for production and local development.
 - MIDDLING: Maybe port to Convox, especially if it would facilitate Redshift support.
 - DIFFICULT: Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
