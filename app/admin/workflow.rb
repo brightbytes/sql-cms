@@ -28,27 +28,6 @@ ActiveAdmin.register Workflow do
       row :updated_at
     end
 
-    panel 'Data Files' do
-      text_node link_to("Create New Data File", new_data_file_path(workflow_id: workflow.id, source: :workflow))
-
-      table_for(resource.data_files.order("file_type DESC, name")) do
-        column(:name) { |data_file| auto_link(data_file) }
-        column(:file_type)
-        column(:s3_region_name)
-        column(:s3_bucket_name)
-        column(:s3_file_path)
-        column(:s3_file_name)
-        column(:s3_file_exists?) { |data_file| data_file.export? ? 'n/a' : yes_no(data_file.s3_file_exists?, yes_color: :green, no_color: :red) }
-        column(:action) do |data_file|
-          if data_file.used?
-            text_node("Used by Transform(s)")
-          else
-            link_to("Delete", data_file_path(data_file, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data File?' })
-          end
-        end
-      end
-    end
-
     panel 'Transforms' do
       text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
 
