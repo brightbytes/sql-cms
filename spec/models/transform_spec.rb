@@ -105,6 +105,11 @@ describe Transform do
 
   describe "instance methods" do
 
+    context "#params" do
+      let!(:subject) { build(:transform) }
+      include_examples 'yaml helper methods'
+    end
+
     context "#available_prerequisite_transforms && #available_unused_prerequisite_transforms" do
 
       include_examples 'cheesey dependency graph'

@@ -38,6 +38,13 @@ describe TransformValidation do
   end
 
   describe "instance methods" do
+
+    context "#params" do
+      let!(:subject) { build(:transform) }
+      include_examples 'yaml helper methods'
+    end
+
+    # FIXME - PORT THIS OVER FROM pipeline REPO
     # describe "#run" do
     #   before { User.seed }
 

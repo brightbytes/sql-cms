@@ -24,6 +24,13 @@ describe DataQualityReport do
     it { should have_many(:copied_to_data_quality_reports) }
   end
 
+  describe "instance methods" do
+    context "#params" do
+      let!(:subject) { build(:data_quality_report) }
+      include_examples 'yaml helper methods'
+    end
+  end
+
 end
 
 # == Schema Information
