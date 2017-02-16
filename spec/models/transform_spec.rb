@@ -51,31 +51,31 @@ describe Transform do
 
       it "should require the presence of a data_file for the DATA_FILE_RUNNERS" do
         Transform::DATA_FILE_RUNNERS.each do |runner|
-          t = build(:transform, runner: runner, data_file: nil).should_not be_valid
+          expect(build(:transform, runner: runner, data_file: nil)).to_not be_valid
         end
       end
 
       it "should require the absence of a data_file for the NON_DATA_FILE_RUNNERS" do
         Transform::NON_DATA_FILE_RUNNERS.each do |runner|
-          build(:transform, runner: runner, data_file: create(:data_file)).should_not be_valid
+          expect(build(:transform, runner: runner, data_file: create(:data_file))).to_not be_valid
         end
       end
 
       it "should require an import data_file for the IMPORT_DATA_FILE_RUNNERS" do
         Transform::IMPORT_DATA_FILE_RUNNERS.each do |runner|
           t = build(:transform, runner: runner, data_file: create(:data_file, file_type: :export))
-          t.should_not be_valid
+          expect(t).to_not be_valid
           t.data_file = create(:data_file, file_type: :import)
-          t.should be_valid
+          expect(t).to be_valid
         end
       end
 
       it "should require an export data_file for the EXPORT_DATA_FILE_RUNNERS" do
         Transform::EXPORT_DATA_FILE_RUNNERS.each do |runner|
           t = build(:transform, runner: runner, data_file: create(:data_file, file_type: :import))
-          t.should_not be_valid
+          expect(t).to_not be_valid
           t.data_file = create(:data_file, file_type: :export)
-          t.should be_valid
+          expect(t).to be_valid
         end
       end
 
