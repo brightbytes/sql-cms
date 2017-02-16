@@ -88,7 +88,7 @@ ActiveAdmin.register DataFile do
 
     actions do
       action(:submit)
-      path = (params[:source] == 'workflow' ? customer_path(params[:workflow_id]) : f.object.new_record? ? data_files_path : data_file_path(f.object))
+      path = (params[:source] == 'workflow' ? workflow_path(params[:workflow_id]) : f.object.new_record? ? data_files_path : data_file_path(f.object))
       cancel_link(path)
     end
   end
@@ -108,7 +108,7 @@ ActiveAdmin.register DataFile do
 
     def destroy
       super do |success, failure|
-        success.html { redirect_to(params[:source] == 'workflow' ? customer_path(resource.workflow) : data_files_path) }
+        success.html { redirect_to(params[:source] == 'workflow' ? workflow_path(resource.workflow) : data_files_path) }
       end
     end
 
