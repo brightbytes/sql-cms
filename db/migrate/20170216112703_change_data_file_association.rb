@@ -15,6 +15,7 @@ class ChangeDataFileAssociation < ActiveRecord::Migration[5.0]
 
   def down
     Workflow.all.to_a.each(&:destroy)
+    DataFile.all.to_a.each(&:destroy)
     remove_column :data_files, :workflow_id
 
     add_column :data_files, :customer_id, :integer, null: false
