@@ -2,16 +2,16 @@
 #
 # Table name: public.transforms
 #
-#  id                            :integer          not null, primary key
-#  name                          :string           not null
-#  runner                        :string           not null
-#  workflow_id                   :integer          not null
-#  params                        :jsonb            not null
-#  sql                           :text             not null
-#  created_at                    :datetime         not null
-#  updated_at                    :datetime         not null
-#  data_file_id                  :integer
-#  copied_from_transform_id      :integer
+#  id                       :integer          not null, primary key
+#  name                     :string           not null
+#  runner                   :string           default("Sql"), not null
+#  workflow_id              :integer          not null
+#  sql                      :text             not null
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  params                   :jsonb
+#  data_file_id             :integer
+#  copied_from_transform_id :integer
 #
 # Indexes
 #

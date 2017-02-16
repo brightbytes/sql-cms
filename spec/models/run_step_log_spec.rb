@@ -2,19 +2,21 @@
 #
 # Table name: public.run_step_logs
 #
-#  id          :integer          not null, primary key
-#  run_id      :integer          not null
-#  step_name   :string           not null
-#  step_index  :integer          default(0), not null
-#  step_id     :integer          default(0), not null
-#  successful   :boolean          default(FALSE), not null
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  step_errors :jsonb
+#  id                       :integer          not null, primary key
+#  run_id                   :integer          not null
+#  step_type                :string           not null
+#  step_index               :integer          default(0), not null
+#  step_id                  :integer          default(0), not null
+#  successful               :boolean          default(FALSE), not null
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  step_validation_failures :jsonb
+#  step_exceptions          :jsonb
+#  step_result              :jsonb
 #
 # Indexes
 #
-#  index_run_step_log_on_unique_run_id_and_step_fields  (run_id,step_id,step_index,step_name) UNIQUE
+#  index_run_step_logs_on_run_id_and_created_at  (run_id,created_at)
 #
 # Foreign Keys
 #
