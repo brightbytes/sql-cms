@@ -98,7 +98,7 @@ ActiveAdmin.register DataFile do
     def action_methods
       result = super
       # Don't show the destroy button if the DataFile is used by a transform
-      result -= ['destroy'] if resource.used?
+      result -= ['destroy'] if action_name == 'show' && resource.used?
       result
     end
 
