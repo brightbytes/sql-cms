@@ -44,6 +44,7 @@ describe Workflow do
   describe 'associations' do
     it { should belong_to(:customer) }
     it { should belong_to(:copied_from_workflow) }
+    it { should have_many(:data_files) }
     it { should have_many(:copied_to_workflows) }
     it { should have_many(:notifications) }
     it { should have_many(:notified_users).through(:notifications).source(:user) }

@@ -29,6 +29,6 @@ FactoryGirl.define do
     s3_bucket_name "bb-pipeline-sandbox-rawdata"
     s3_file_path "ca_some_sis/v_2_201610041757_full/calendars_2015.tsv"
     s3_file_name "part_0000.tsv"
-    association :customer
+    association :workflow
   end
 end

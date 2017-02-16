@@ -1,22 +1,22 @@
 ActiveAdmin.register DataFile do
 
-  menu priority: 15
+  menu priority: 25
 
   actions :all
 
-  permit_params :name, :customer_id, :file_type, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
+  permit_params :name, :workflow_id, :file_type, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
 
   filter :name, as: :string
-  filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
+  filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :file_type, as: :select, collection: DataFile::FILE_TYPES
   filter :s3_region_name, as: :select
   filter :s3_bucket_name, as: :select
 
-  config.sort_order = 'customers.name_asc'
+  config.sort_order = 'workflows.slug_asc,name_asc'
 
   index download_links: false do
     column(:name) { |data_file| auto_link(data_file) }
-    column(:customer)
+    column(:workflow)
     column(:file_type)
     column(:s3_region_name)
     column(:s3_bucket_name)
@@ -29,7 +29,7 @@ ActiveAdmin.register DataFile do
     attributes_table do
       row :id
       row :name
-      row :customer
+      row :workflow
 
       row :file_type
 
@@ -58,7 +58,7 @@ ActiveAdmin.register DataFile do
 
   form do |f|
     inputs 'Details' do
-      input :customer, as: :select, collection: customers_with_preselect
+      input :workflow, as: :select, collection: workflows_with_preselect
       input :name, as: :string
 
       creating = action_name.in?(['create', 'new'])
@@ -88,7 +88,7 @@ ActiveAdmin.register DataFile do
 
     actions do
       action(:submit)
-      path = (params[:source] == 'customer' ? customer_path(params[:customer_id]) : f.object.new_record? ? data_files_path : data_file_path(f.object))
+      path = (params[:source] == 'workflow' ? customer_path(params[:workflow_id]) : f.object.new_record? ? data_files_path : data_file_path(f.object))
       cancel_link(path)
     end
   end
@@ -103,12 +103,12 @@ ActiveAdmin.register DataFile do
     end
 
     def scoped_collection
-      super.joins(:customer)
+      super.joins(:workflow)
     end
 
     def destroy
       super do |success, failure|
-        success.html { redirect_to(params[:source] == 'customer' ? customer_path(resource.customer) : data_files_path) }
+        success.html { redirect_to(params[:source] == 'workflow' ? customer_path(resource.workflow) : data_files_path) }
       end
     end
 
