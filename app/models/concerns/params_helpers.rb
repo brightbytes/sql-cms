@@ -7,9 +7,6 @@ module Concerns::ParamsHelpers
 
   def params_yaml
     params.to_yaml if params.present?
-  rescue
-    # This line is probably unreachable
-    @params_yaml_invalid = true
   end
 
   def params_yaml=(val)
