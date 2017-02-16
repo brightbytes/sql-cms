@@ -64,18 +64,17 @@ This application uses Sidekiq via Active::Job for parallelization of Runs, Trans
 
 This application comes with a Demo Workflow that was ported from an ancestral app.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide some examples of how to use this system.
 
-## Future plans
+## Future plans, with difficulty levels
 
-- Implement an S3 browser for the Import DataFile Create and Edit pages, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3`.)
-- Implement the 2 remaining Transform runners.  (The BE work has commenced in `app/factories/runner_factory.rb`.)
-- Add support for files coming from or going to the local filesystem, rather than S3.  (I started this project using PaperClip, but dropped it when it became too inflexible for my needs.  Maybe re-introduce?)
-- Add Redshift support, both for production and local development.
-- Maybe port to Convox, especially if it would facilitate Redshift support.
-- Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
-- Add an API and/or SQS integration for remote-triggering of Workflow Runs
-- Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
-- Perhaps generalize the notion of a Transform beyond pure SQL to encompass external services.
-- Open source this once it's deemed sufficiently robust.
+- DIFFICULT: Implement an S3 browser for the Import DataFile Create and Edit pages, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3`.)
+- EASY: Implement the 2 remaining Transform runners.  (The BE work has commenced in `app/factories/runner_factory.rb`.)
+- EASY: Add support for uploading local files to an Import DataFile location.
+- MIDDLING: Add Redshift support, both for production and local development.
+- MIDDLING: Maybe port to Convox, especially if it would facilitate Redshift support.
+- DIFFICULT: Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
+- MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs
+- EASY: Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
+- EASY: Open source this application after extracting everything BB-specific to dotenv ENV vars
 
 ## Environment Setup for local development
 

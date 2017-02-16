@@ -1,0 +1,143 @@
+#!/usr/bin/env ruby
+
+# Change this script to run both local (-l) and non-local deletes at the same time
+
+require 'rubygems'
+require 'optparse'
+require 'pp'
+
+class GitCleaner
+  class << self
+
+    ALL_PHASES = %w(heroku).freeze
+
+    ALL_NON_PHASED_MASTERS = ["master", "release", "release_sandbox"].freeze
+
+    ACTUAL_MASTER_BRANCHES = (ALL_NON_PHASED_MASTERS + ALL_NON_PHASED_MASTERS.map { |s| "origin/#{s}" } + ALL_PHASES.map { |s| "#{s}/master" }).freeze
+
+    def mastered_branches(local: nil)
+      if local
+        branch_type_txt = "local"
+      else
+        remote_flag = '-r'
+        branch_type_txt = "remote"
+      end
+
+      mastered_branches = cleanup_branch_names(`git br #{remote_flag} --merged origin/master`)
+      all_branches = cleanup_branch_names(`git br #{remote_flag}`)
+
+      release_branches = all_branches.select { |branch| branch =~ /release_/ } || []
+      all_branches.reject! { |branch| ACTUAL_MASTER_BRANCHES.include?(branch) || branch =~ /release_/ }
+      add_back_num = release_branches.size - 3
+      all_branches += release_branches.first(add_back_num) if add_back_num > 0
+
+      unmastered = (all_branches - mastered_branches)
+      if unmastered.empty?
+        puts "All #{branch_type_txt} branches are mastered!"
+      else
+        puts "The following #{branch_type_txt} branches are *NOT* mastered ..."
+        puts
+        unmastered.each { |branch| puts branch }
+      end
+      puts
+
+      mastered_and_nukable = (all_branches & mastered_branches)
+      if mastered_and_nukable.empty?
+        puts "No #{branch_type_txt} branches are nukable."
+      else
+        puts "The following #{branch_type_txt} branches are nukable ..."
+        puts
+        mastered_and_nukable.each { |branch| puts branch }
+      end
+      puts
+
+      mastered_and_nukable
+    end
+
+    def delete_mastered_branches(opts = {})
+      regenerate_remote_cache
+
+      mastered_branches(local: opts[:local]).each do |branch|
+        if opts[:local]
+          run "git br -D #{branch}", opts
+        else
+          b = branch.sub('origin/', '')
+          run "git push origin :#{b}", opts
+        end
+        puts
+      end
+
+      regenerate_remote_cache if opts[:local]
+    end
+
+    def regenerate_remote_cache
+      puts "Regenerating the cache of remote references ..."
+      puts
+      suppress_output do
+        fetch
+        run("git br -r | grep -v 'master' | xargs git br -Dr")
+        fetch
+      end
+    end
+
+    private
+
+    def cleanup_branch_names(branches)
+      branches.split("\n").map! { |s| s.strip.split.last }.map { |branch| branch.strip.sub("* ", "") } if branches
+    end
+
+    def fetch
+      run("git fetch -p")
+    end
+
+    def run(cmd, opts = {})
+      print "[Dry] " if opts[:dry_run]
+      puts "Running: #{cmd}"
+      system cmd unless opts[:dry_run]
+    end
+
+    def suppress_output
+      begin
+        original_stderr = $stderr.clone
+        original_stdout = $stdout.clone
+        $stderr.reopen(File.new('/dev/null', 'w'))
+        $stdout.reopen(File.new('/dev/null', 'w'))
+        result = yield
+      rescue Exception => e
+        $stdout.reopen(original_stdout)
+        $stderr.reopen(original_stderr)
+        raise e
+      ensure
+        $stdout.reopen(original_stdout)
+        $stderr.reopen(original_stderr)
+      end
+      result
+    end
+  end
+end
+
+options = {}
+optparse =
+  OptionParser.new do |opts|
+    opts.banner = 'Usage: git-cleaner list|delete|regen [options]'
+
+    opts.on '-s', '--dry', "Dry run" do
+      options[:dry_run] = true
+    end
+
+    opts.on '-l', '--local', 'Run command for local branches, if possible' do
+      options[:local] = true
+    end
+  end
+optparse.parse!
+
+case ARGV.first
+when 'delete', 'd'
+  GitCleaner.delete_mastered_branches(options)
+when 'list', 'l'
+  puts GitCleaner.mastered_branches(local: options[:local])
+when 'regen', 'r'
+  GitCleaner.regenerate_remote_cache
+else
+  puts optparse.help
+end
