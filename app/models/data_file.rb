@@ -4,7 +4,6 @@
 #
 #  id             :integer          not null, primary key
 #  name           :string           not null
-#  customer_id    :integer          not null
 #  file_type      :string           default("import"), not null
 #  s3_region_name :string           default("us-west-2"), not null
 #  s3_bucket_name :string           not null
@@ -12,15 +11,12 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  s3_file_path   :string
+#  workflow_id    :integer          not null
 #
 # Indexes
 #
-#  index_data_files_on_customer_id                     (customer_id)
-#  index_data_files_on_lowercase_name_and_customer_id  (lower((name)::text), customer_id) UNIQUE
-#
-# Foreign Keys
-#
-#  fk_rails_...  (customer_id => customers.id)
+#  index_data_files_on_lowercase_name_and_workflow_id  (lower((name)::text), workflow_id) UNIQUE
+#  index_data_files_on_workflow_id                     (workflow_id)
 #
 
 # For storing a reference to a CSV/TSV/any-tabularly-formatted-file on S3, for the purpose of loading/unloading data to/from the DB
@@ -30,7 +26,7 @@ class DataFile < ApplicationRecord
 
   # Validations
 
-  validates :customer, :s3_region_name, :s3_bucket_name, :s3_file_name, presence: true
+  validates :workflow, :s3_region_name, :s3_bucket_name, :s3_file_name, presence: true
 
   FILE_TYPES = %w(import export).freeze
 
@@ -71,10 +67,9 @@ class DataFile < ApplicationRecord
 
   # Associations
 
-  belongs_to :customer, inverse_of: :data_files
+  belongs_to :workflow, inverse_of: :data_files
 
   has_many :transforms, inverse_of: :data_file
-  has_many :workflows, through: :transforms
 
   # Scopes
 

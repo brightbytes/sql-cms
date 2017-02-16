@@ -578,7 +578,7 @@ module WorkflowSeeder
   end
 
   def create_demo_data_file!(**options)
-    DataFile.where(name: options.delete(:name)).first_or_create!(options.merge(s3_bucket_name: 'bb-dpl-cms', customer: demo_customer))
+    DataFile.where(name: options.delete(:name)).first_or_create!(options.merge(s3_bucket_name: 'bb-dpl-cms', workflow: demo_workflow))
   end
 
   def create_demo_transform_validation!(**options)

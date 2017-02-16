@@ -1,4 +1,4 @@
-# == Schema Information
+ # == Schema Information
 #
 # Table name: public.data_files
 #
@@ -32,7 +32,7 @@ describe DataFile do
   end
 
   describe "validations" do
-    [:name, :customer, :file_type, :s3_region_name, :s3_bucket_name, :s3_file_name].each do |att|
+    [:name, :workflow, :file_type, :s3_region_name, :s3_bucket_name, :s3_file_name].each do |att|
       it { should validate_presence_of(att) }
     end
 
@@ -88,9 +88,8 @@ describe DataFile do
   end
 
   describe "associations" do
-    it { should belong_to(:customer) }
+    it { should belong_to(:workflow) }
     it { should have_many(:transforms) }
-    it { should have_many(:workflows) }
   end
 
   describe "instance methods" do
@@ -114,3 +113,24 @@ describe DataFile do
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: public.data_files
+#
+#  id             :integer          not null, primary key
+#  name           :string           not null
+#  file_type      :string           default("import"), not null
+#  s3_region_name :string           default("us-west-2"), not null
+#  s3_bucket_name :string           not null
+#  s3_file_name   :string           not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  s3_file_path   :string
+#  workflow_id    :integer          not null
+#
+# Indexes
+#
+#  index_data_files_on_lowercase_name_and_workflow_id  (lower((name)::text), workflow_id) UNIQUE
+#  index_data_files_on_workflow_id                     (workflow_id)
+#

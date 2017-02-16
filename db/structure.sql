@@ -10,10 +10,10 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 
 --
--- Name: fake_customer_demo_workflow_version_1_run_1; Type: SCHEMA; Schema: -; Owner: -
+-- Name: fake_customer_demo_workflow_version_1_run_2; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA fake_customer_demo_workflow_version_1_run_1;
+CREATE SCHEMA fake_customer_demo_workflow_version_1_run_2;
 
 
 --
@@ -30,14 +30,14 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
-SET search_path = fake_customer_demo_workflow_version_1_run_1, pg_catalog;
+SET search_path = fake_customer_demo_workflow_version_1_run_2, pg_catalog;
 
 SET default_tablespace = '';
 
 SET default_with_oids = false;
 
 --
--- Name: mapped_facts; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: mapped_facts; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE TABLE mapped_facts (
@@ -50,7 +50,7 @@ CREATE TABLE mapped_facts (
 
 
 --
--- Name: mapped_facts_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: mapped_facts_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 CREATE SEQUENCE mapped_facts_id_seq
@@ -62,14 +62,14 @@ CREATE SEQUENCE mapped_facts_id_seq
 
 
 --
--- Name: mapped_facts_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: mapped_facts_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER SEQUENCE mapped_facts_id_seq OWNED BY mapped_facts.id;
 
 
 --
--- Name: reduced_facts; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: reduced_facts; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE TABLE reduced_facts (
@@ -84,7 +84,7 @@ CREATE TABLE reduced_facts (
 
 
 --
--- Name: reduced_facts_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: reduced_facts_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 CREATE SEQUENCE reduced_facts_id_seq
@@ -96,14 +96,14 @@ CREATE SEQUENCE reduced_facts_id_seq
 
 
 --
--- Name: reduced_facts_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: reduced_facts_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER SEQUENCE reduced_facts_id_seq OWNED BY reduced_facts.id;
 
 
 --
--- Name: school_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: school_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE TABLE school_mappings (
@@ -116,7 +116,7 @@ CREATE TABLE school_mappings (
 
 
 --
--- Name: school_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: school_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 CREATE SEQUENCE school_mappings_id_seq
@@ -128,14 +128,14 @@ CREATE SEQUENCE school_mappings_id_seq
 
 
 --
--- Name: school_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: school_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER SEQUENCE school_mappings_id_seq OWNED BY school_mappings.id;
 
 
 --
--- Name: school_parent_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: school_parent_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE TABLE school_parent_mappings (
@@ -148,7 +148,7 @@ CREATE TABLE school_parent_mappings (
 
 
 --
--- Name: school_parent_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: school_parent_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 CREATE SEQUENCE school_parent_mappings_id_seq
@@ -160,14 +160,14 @@ CREATE SEQUENCE school_parent_mappings_id_seq
 
 
 --
--- Name: school_parent_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: school_parent_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER SEQUENCE school_parent_mappings_id_seq OWNED BY school_parent_mappings.id;
 
 
 --
--- Name: staging_boces_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: staging_boces_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE TABLE staging_boces_mappings (
@@ -178,7 +178,7 @@ CREATE TABLE staging_boces_mappings (
 
 
 --
--- Name: staging_boces_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: staging_boces_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 CREATE SEQUENCE staging_boces_mappings_id_seq
@@ -190,14 +190,14 @@ CREATE SEQUENCE staging_boces_mappings_id_seq
 
 
 --
--- Name: staging_boces_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: staging_boces_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER SEQUENCE staging_boces_mappings_id_seq OWNED BY staging_boces_mappings.id;
 
 
 --
--- Name: staging_district_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: staging_district_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE TABLE staging_district_mappings (
@@ -208,7 +208,7 @@ CREATE TABLE staging_district_mappings (
 
 
 --
--- Name: staging_district_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: staging_district_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 CREATE SEQUENCE staging_district_mappings_id_seq
@@ -220,14 +220,14 @@ CREATE SEQUENCE staging_district_mappings_id_seq
 
 
 --
--- Name: staging_district_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: staging_district_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER SEQUENCE staging_district_mappings_id_seq OWNED BY staging_district_mappings.id;
 
 
 --
--- Name: staging_facts; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: staging_facts; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE TABLE staging_facts (
@@ -247,7 +247,7 @@ CREATE TABLE staging_facts (
 
 
 --
--- Name: staging_facts_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: staging_facts_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 CREATE SEQUENCE staging_facts_id_seq
@@ -259,14 +259,14 @@ CREATE SEQUENCE staging_facts_id_seq
 
 
 --
--- Name: staging_facts_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: staging_facts_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER SEQUENCE staging_facts_id_seq OWNED BY staging_facts.id;
 
 
 --
--- Name: staging_fund_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: staging_fund_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE TABLE staging_fund_mappings (
@@ -278,7 +278,7 @@ CREATE TABLE staging_fund_mappings (
 
 
 --
--- Name: staging_fund_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: staging_fund_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 CREATE SEQUENCE staging_fund_mappings_id_seq
@@ -290,14 +290,14 @@ CREATE SEQUENCE staging_fund_mappings_id_seq
 
 
 --
--- Name: staging_fund_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: staging_fund_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER SEQUENCE staging_fund_mappings_id_seq OWNED BY staging_fund_mappings.id;
 
 
 --
--- Name: staging_school_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: staging_school_mappings; Type: TABLE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE TABLE staging_school_mappings (
@@ -309,7 +309,7 @@ CREATE TABLE staging_school_mappings (
 
 
 --
--- Name: staging_school_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: staging_school_mappings_id_seq; Type: SEQUENCE; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 CREATE SEQUENCE staging_school_mappings_id_seq
@@ -321,7 +321,7 @@ CREATE SEQUENCE staging_school_mappings_id_seq
 
 
 --
--- Name: staging_school_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: staging_school_mappings_id_seq; Type: SEQUENCE OWNED BY; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER SEQUENCE staging_school_mappings_id_seq OWNED BY staging_school_mappings.id;
@@ -417,14 +417,14 @@ ALTER SEQUENCE customers_id_seq OWNED BY customers.id;
 CREATE TABLE data_files (
     id integer NOT NULL,
     name character varying NOT NULL,
-    customer_id integer NOT NULL,
     file_type character varying DEFAULT 'import'::character varying NOT NULL,
     s3_region_name character varying DEFAULT 'us-west-2'::character varying NOT NULL,
     s3_bucket_name character varying NOT NULL,
     s3_file_name character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    s3_file_path character varying
+    s3_file_path character varying,
+    workflow_id integer NOT NULL
 );
 
 
@@ -843,66 +843,66 @@ CREATE SEQUENCE workflows_id_seq
 ALTER SEQUENCE workflows_id_seq OWNED BY workflows.id;
 
 
-SET search_path = fake_customer_demo_workflow_version_1_run_1, pg_catalog;
+SET search_path = fake_customer_demo_workflow_version_1_run_2, pg_catalog;
 
 --
--- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY mapped_facts ALTER COLUMN id SET DEFAULT nextval('mapped_facts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY reduced_facts ALTER COLUMN id SET DEFAULT nextval('reduced_facts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY school_mappings ALTER COLUMN id SET DEFAULT nextval('school_mappings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY school_parent_mappings ALTER COLUMN id SET DEFAULT nextval('school_parent_mappings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY staging_boces_mappings ALTER COLUMN id SET DEFAULT nextval('staging_boces_mappings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY staging_district_mappings ALTER COLUMN id SET DEFAULT nextval('staging_district_mappings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY staging_facts ALTER COLUMN id SET DEFAULT nextval('staging_facts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY staging_fund_mappings ALTER COLUMN id SET DEFAULT nextval('staging_fund_mappings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: id; Type: DEFAULT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY staging_school_mappings ALTER COLUMN id SET DEFAULT nextval('staging_school_mappings_id_seq'::regclass);
@@ -1008,10 +1008,10 @@ ALTER TABLE ONLY versions ALTER COLUMN id SET DEFAULT nextval('versions_id_seq':
 ALTER TABLE ONLY workflows ALTER COLUMN id SET DEFAULT nextval('workflows_id_seq'::regclass);
 
 
-SET search_path = fake_customer_demo_workflow_version_1_run_1, pg_catalog;
+SET search_path = fake_customer_demo_workflow_version_1_run_2, pg_catalog;
 
 --
--- Name: mapped_facts_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: mapped_facts_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY mapped_facts
@@ -1019,7 +1019,7 @@ ALTER TABLE ONLY mapped_facts
 
 
 --
--- Name: reduced_facts_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: reduced_facts_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY reduced_facts
@@ -1027,7 +1027,7 @@ ALTER TABLE ONLY reduced_facts
 
 
 --
--- Name: school_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: school_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY school_mappings
@@ -1035,7 +1035,7 @@ ALTER TABLE ONLY school_mappings
 
 
 --
--- Name: school_parent_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: school_parent_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY school_parent_mappings
@@ -1043,7 +1043,7 @@ ALTER TABLE ONLY school_parent_mappings
 
 
 --
--- Name: staging_boces_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: staging_boces_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY staging_boces_mappings
@@ -1051,7 +1051,7 @@ ALTER TABLE ONLY staging_boces_mappings
 
 
 --
--- Name: staging_district_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: staging_district_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY staging_district_mappings
@@ -1059,7 +1059,7 @@ ALTER TABLE ONLY staging_district_mappings
 
 
 --
--- Name: staging_facts_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: staging_facts_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY staging_facts
@@ -1067,7 +1067,7 @@ ALTER TABLE ONLY staging_facts
 
 
 --
--- Name: staging_fund_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: staging_fund_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY staging_fund_mappings
@@ -1075,7 +1075,7 @@ ALTER TABLE ONLY staging_fund_mappings
 
 
 --
--- Name: staging_school_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: staging_school_mappings_pkey; Type: CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY staging_school_mappings
@@ -1212,185 +1212,185 @@ ALTER TABLE ONLY workflows
     ADD CONSTRAINT workflows_pkey PRIMARY KEY (id);
 
 
-SET search_path = fake_customer_demo_workflow_version_1_run_1, pg_catalog;
+SET search_path = fake_customer_demo_workflow_version_1_run_2, pg_catalog;
 
 --
--- Name: index_mapped_facts_on_clarity_school_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_mapped_facts_on_clarity_school_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_mapped_facts_on_clarity_school_org_id ON mapped_facts USING btree (clarity_school_org_id);
 
 
 --
--- Name: index_mapped_facts_on_clarity_school_parent_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_mapped_facts_on_clarity_school_parent_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_mapped_facts_on_clarity_school_parent_org_id ON mapped_facts USING btree (clarity_school_parent_org_id);
 
 
 --
--- Name: index_mapped_facts_on_fund_type; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_mapped_facts_on_fund_type; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_mapped_facts_on_fund_type ON mapped_facts USING btree (fund_type);
 
 
 --
--- Name: index_mapped_facts_on_staging_fact_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_mapped_facts_on_staging_fact_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX index_mapped_facts_on_staging_fact_id ON mapped_facts USING btree (staging_fact_id);
 
 
 --
--- Name: index_reduced_facts_on_clarity_school_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_reduced_facts_on_clarity_school_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_reduced_facts_on_clarity_school_org_id ON reduced_facts USING btree (clarity_school_org_id);
 
 
 --
--- Name: index_reduced_facts_on_clarity_school_parent_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_reduced_facts_on_clarity_school_parent_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_reduced_facts_on_clarity_school_parent_id ON reduced_facts USING btree (clarity_school_parent_id);
 
 
 --
--- Name: index_reduced_facts_on_fund_type; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_reduced_facts_on_fund_type; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_reduced_facts_on_fund_type ON reduced_facts USING btree (fund_type);
 
 
 --
--- Name: index_reduced_facts_on_object_source_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_reduced_facts_on_object_source_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_reduced_facts_on_object_source_code ON reduced_facts USING btree (object_source_code);
 
 
 --
--- Name: index_reduced_facts_on_program_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_reduced_facts_on_program_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_reduced_facts_on_program_code ON reduced_facts USING btree (program_code);
 
 
 --
--- Name: index_school_mappings_on_clarity_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_school_mappings_on_clarity_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_school_mappings_on_clarity_org_id ON school_mappings USING btree (clarity_org_id);
 
 
 --
--- Name: index_school_mappings_on_co_school_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_school_mappings_on_co_school_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_school_mappings_on_co_school_id ON school_mappings USING btree (co_school_id);
 
 
 --
--- Name: index_school_mappings_on_staging_school_mapping_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_school_mappings_on_staging_school_mapping_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX index_school_mappings_on_staging_school_mapping_id ON school_mappings USING btree (staging_school_mapping_id);
 
 
 --
--- Name: index_school_parent_mappings_on_clarity_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_school_parent_mappings_on_clarity_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_school_parent_mappings_on_clarity_org_id ON school_parent_mappings USING btree (clarity_org_id);
 
 
 --
--- Name: index_school_parent_mappings_on_co_school_parent_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_school_parent_mappings_on_co_school_parent_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_school_parent_mappings_on_co_school_parent_id ON school_parent_mappings USING btree (co_school_parent_id);
 
 
 --
--- Name: index_school_parent_mappings_on_unique_parent_mapping_id_type; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_school_parent_mappings_on_unique_parent_mapping_id_type; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX index_school_parent_mappings_on_unique_parent_mapping_id_type ON school_parent_mappings USING btree (staging_school_parent_mapping_id, staging_school_parent_mapping_type);
 
 
 --
--- Name: index_staging_boces_mappings_on_clarity_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_boces_mappings_on_clarity_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_boces_mappings_on_clarity_org_id ON staging_boces_mappings USING btree (clarity_org_id);
 
 
 --
--- Name: index_staging_boces_mappings_on_co_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_boces_mappings_on_co_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_boces_mappings_on_co_org_id ON staging_boces_mappings USING btree (co_org_id);
 
 
 --
--- Name: index_staging_district_mappings_on_clarity_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_district_mappings_on_clarity_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_district_mappings_on_clarity_org_id ON staging_district_mappings USING btree (clarity_org_id);
 
 
 --
--- Name: index_staging_district_mappings_on_co_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_district_mappings_on_co_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_district_mappings_on_co_org_id ON staging_district_mappings USING btree (co_org_id);
 
 
 --
--- Name: index_staging_facts_on_boces_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_facts_on_boces_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_facts_on_boces_id ON staging_facts USING btree (boces_id);
 
 
 --
--- Name: index_staging_facts_on_fund_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_facts_on_fund_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_facts_on_fund_code ON staging_facts USING btree (fund_code);
 
 
 --
--- Name: index_staging_facts_on_object_source_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_facts_on_object_source_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_facts_on_object_source_code ON staging_facts USING btree (object_source_code);
 
 
 --
--- Name: index_staging_facts_on_program_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_facts_on_program_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_facts_on_program_code ON staging_facts USING btree (program_code);
 
 
 --
--- Name: index_staging_facts_on_school_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_facts_on_school_code; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_facts_on_school_code ON staging_facts USING btree (school_code);
 
 
 --
--- Name: index_staging_school_mappings_on_clarity_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_school_mappings_on_clarity_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_school_mappings_on_clarity_org_id ON staging_school_mappings USING btree (clarity_org_id);
 
 
 --
--- Name: index_staging_school_mappings_on_co_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -; Tablespace: 
+-- Name: index_staging_school_mappings_on_co_org_id; Type: INDEX; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_staging_school_mappings_on_co_org_id ON staging_school_mappings USING btree (co_org_id);
@@ -1434,17 +1434,17 @@ CREATE UNIQUE INDEX index_customers_on_lowercase_slug ON customers USING btree (
 
 
 --
--- Name: index_data_files_on_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_data_files_on_lowercase_name_and_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_data_files_on_customer_id ON data_files USING btree (customer_id);
+CREATE UNIQUE INDEX index_data_files_on_lowercase_name_and_workflow_id ON data_files USING btree (lower((name)::text), workflow_id);
 
 
 --
--- Name: index_data_files_on_lowercase_name_and_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_data_files_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_data_files_on_lowercase_name_and_customer_id ON data_files USING btree (lower((name)::text), customer_id);
+CREATE INDEX index_data_files_on_workflow_id ON data_files USING btree (workflow_id);
 
 
 --
@@ -1622,10 +1622,10 @@ CREATE UNIQUE INDEX index_workflows_on_lowercase_slug ON customers USING btree (
 CREATE INDEX resource_created_at ON active_admin_comments USING btree (resource_id, resource_type, created_at);
 
 
-SET search_path = fake_customer_demo_workflow_version_1_run_1, pg_catalog;
+SET search_path = fake_customer_demo_workflow_version_1_run_2, pg_catalog;
 
 --
--- Name: fk_rails_c3d608314f; Type: FK CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: fk_rails_c3d608314f; Type: FK CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY mapped_facts
@@ -1633,7 +1633,7 @@ ALTER TABLE ONLY mapped_facts
 
 
 --
--- Name: fk_rails_fae278aa36; Type: FK CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_1; Owner: -
+-- Name: fk_rails_fae278aa36; Type: FK CONSTRAINT; Schema: fake_customer_demo_workflow_version_1_run_2; Owner: -
 --
 
 ALTER TABLE ONLY school_mappings
@@ -1731,14 +1731,6 @@ ALTER TABLE ONLY versions
 
 
 --
--- Name: fk_rails_98b72d517e; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY data_files
-    ADD CONSTRAINT fk_rails_98b72d517e FOREIGN KEY (customer_id) REFERENCES customers(id);
-
-
---
 -- Name: fk_rails_a46b8f09db; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1796,6 +1788,7 @@ INSERT INTO schema_migrations (version) VALUES
 ('20170112005400'),
 ('20170112022558'),
 ('20170113013703'),
-('20170113235922');
+('20170113235922'),
+('20170216112703');
 
 

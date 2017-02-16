@@ -31,7 +31,6 @@ describe Customer do
 
   describe "associations" do
     it { should have_many(:workflows) }
-    it { should have_many(:data_files) }
   end
 
   describe "scopes" do
