@@ -1,12 +1,12 @@
+require 'simplecov'
+SimpleCov.start
+
 require 'factory_girl_rails'
 require 'paper_trail/frameworks/rspec'
 
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
-
-require 'simplecov'
-SimpleCov.start
 
 require 'sidekiq/testing'
 

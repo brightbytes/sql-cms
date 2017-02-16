@@ -64,7 +64,7 @@ end
 group :test do
   gem 'acts_as_fu' # active record tests
 
-  gem 'simplecov'
+  gem 'simplecov', require: false
 
   gem 'rspec'
   gem 'rspec-rails'
