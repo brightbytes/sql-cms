@@ -64,9 +64,13 @@ module TaskHelper
     result.last.try(:strip) unless dry_run
   end
 
-  def ask(prompt, show_abort_message = true)
-    msg = (show_abort_message ? " Anything other than a yes will abort." : " You must type yes to do so.")
-    HighLine.new.ask("#{prompt}#{msg}") =~ /\Ayes\Z/i
+  def ask(prompt, show_abort_message: true, required_response: 'yes', important: false)
+    msg = prompt + (show_abort_message ? " Typing anything other than '#{required_response}' will abort." : " You must type #{required_response} to do so.")
+    if important # Color important text RED and highlight the required response
+      msg = "\e[31m#{msg}\e[0m"
+      msg.sub!(/'#{required_response}'/, "\e[47m'#{required_response}'\e[49m")
+    end
+    HighLine.new.ask(msg) =~ /\A#{required_response}\Z/i
   end
 
   def current_branch
