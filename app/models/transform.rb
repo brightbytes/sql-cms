@@ -2,27 +2,24 @@
 #
 # Table name: public.transforms
 #
-#  id                       :integer          not null, primary key
-#  name                     :string           not null
-#  runner                   :string           default("Sql"), not null
-#  workflow_id              :integer          not null
-#  sql                      :text             not null
-#  created_at               :datetime         not null
-#  updated_at               :datetime         not null
-#  params                   :jsonb
-#  data_file_id             :integer
-#  copied_from_transform_id :integer
+#  id           :integer          not null, primary key
+#  name         :string           not null
+#  runner       :string           default("Sql"), not null
+#  workflow_id  :integer          not null
+#  sql          :text             not null
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  params       :jsonb
+#  data_file_id :integer
 #
 # Indexes
 #
-#  index_transforms_on_copied_from_transform_id      (copied_from_transform_id)
 #  index_transforms_on_data_file_id                  (data_file_id)
 #  index_transforms_on_lowercase_name                (lower((name)::text)) UNIQUE
 #  index_transforms_on_workflow_id_and_data_file_id  (workflow_id,data_file_id) UNIQUE
 #
 # Foreign Keys
 #
-#  fk_rails_...  (copied_from_transform_id => transforms.id)
 #  fk_rails_...  (data_file_id => data_files.id)
 #  fk_rails_...  (workflow_id => workflows.id)
 #
@@ -86,9 +83,6 @@ class Transform < ApplicationRecord
   has_one :customer, through: :workflow
 
   belongs_to :data_file, inverse_of: :transforms
-
-  belongs_to :copied_from_transform, class_name: 'Transform', inverse_of: :copied_to_transforms
-  has_many :copied_to_transforms, class_name: 'Transform', foreign_key: :copied_from_transform_id, inverse_of: :copied_from_transform
 
   has_many :prerequisite_dependencies, class_name: 'TransformDependency', foreign_key: :postrequisite_transform_id, dependent: :delete_all
   has_many :prerequisite_transforms, through: :prerequisite_dependencies, source: :prerequisite_transform

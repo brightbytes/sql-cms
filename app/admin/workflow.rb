@@ -23,7 +23,6 @@ ActiveAdmin.register Workflow do
       row :customer
       row :name
       row :slug
-      row :copied_from_workflow
       row :created_at
       row :updated_at
     end
@@ -86,7 +85,6 @@ ActiveAdmin.register Workflow do
   sidebar("Actions", only: :show) do
     ul do
       li link_to("Run Workflow!", run_workflow_path(workflow))
-      li link_to("Clone Workflow")
     end
   end
 

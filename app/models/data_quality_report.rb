@@ -3,24 +3,21 @@
 #
 # Table name: public.data_quality_reports
 #
-#  id                                 :integer          not null, primary key
-#  workflow_id                        :integer          not null
-#  name                               :string           not null
-#  sql                                :text             not null
-#  created_at                         :datetime         not null
-#  updated_at                         :datetime         not null
-#  params                             :jsonb
-#  copied_from_data_quality_report_id :integer
+#  id          :integer          not null, primary key
+#  workflow_id :integer          not null
+#  name        :string           not null
+#  sql         :text             not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  params      :jsonb
 #
 # Indexes
 #
-#  idx_data_quality_reports_on_copied_from_data_quality_report_id  (copied_from_data_quality_report_id)
-#  index_data_quality_reports_on_lowercase_name                    (lower((name)::text)) UNIQUE
-#  index_data_quality_reports_on_workflow_id                       (workflow_id)
+#  index_data_quality_reports_on_lowercase_name  (lower((name)::text)) UNIQUE
+#  index_data_quality_reports_on_workflow_id     (workflow_id)
 #
 # Foreign Keys
 #
-#  fk_rails_...  (copied_from_data_quality_report_id => data_quality_reports.id)
 #  fk_rails_...  (workflow_id => workflows.id)
 #
 
@@ -41,9 +38,6 @@ class DataQualityReport < ApplicationRecord
   belongs_to :workflow, inverse_of: :data_quality_reports
 
   has_one :customer, through: :workflow
-
-  belongs_to :copied_from_data_quality_report, class_name: 'DataQualityReport', inverse_of: :copied_to_data_quality_reports
-  has_many :copied_to_data_quality_reports, class_name: 'DataQualityReport', foreign_key: :copied_from_data_quality_report_id, inverse_of: :copied_from_data_quality_report
 
 
 end

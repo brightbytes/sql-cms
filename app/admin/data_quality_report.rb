@@ -29,8 +29,6 @@ ActiveAdmin.register DataQualityReport do
       simple_format_row(:sql)
       simple_format_row(:interpolated_sql) if resource.params.present?
 
-      row :copied_from_data_quality_report
-
       row :created_at
       row :updated_at
     end

@@ -458,8 +458,7 @@ CREATE TABLE data_quality_reports (
     sql text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    params jsonb,
-    copied_from_data_quality_report_id integer
+    params jsonb
 );
 
 
@@ -673,8 +672,7 @@ CREATE TABLE transforms (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     params jsonb,
-    data_file_id integer,
-    copied_from_transform_id integer
+    data_file_id integer
 );
 
 
@@ -819,8 +817,7 @@ CREATE TABLE workflows (
     slug character varying NOT NULL,
     customer_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    copied_from_workflow_id integer
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -1399,13 +1396,6 @@ CREATE INDEX index_staging_school_mappings_on_co_org_id ON staging_school_mappin
 SET search_path = public, pg_catalog;
 
 --
--- Name: idx_data_quality_reports_on_copied_from_data_quality_report_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_data_quality_reports_on_copied_from_data_quality_report_id ON data_quality_reports USING btree (copied_from_data_quality_report_id);
-
-
---
 -- Name: index_active_admin_comments_on_author_id_and_author_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1518,13 +1508,6 @@ CREATE INDEX index_transform_validations_on_validation_id ON transform_validatio
 
 
 --
--- Name: index_transforms_on_copied_from_transform_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_transforms_on_copied_from_transform_id ON transforms USING btree (copied_from_transform_id);
-
-
---
 -- Name: index_transforms_on_data_file_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1588,13 +1571,6 @@ CREATE INDEX index_versions_on_user_id ON versions USING btree (user_id);
 
 
 --
--- Name: index_workflows_on_copied_from_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_workflows_on_copied_from_workflow_id ON workflows USING btree (copied_from_workflow_id);
-
-
---
 -- Name: index_workflows_on_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1643,22 +1619,6 @@ ALTER TABLE ONLY school_mappings
 SET search_path = public, pg_catalog;
 
 --
--- Name: fk_rails_215d6c0d1f; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY transforms
-    ADD CONSTRAINT fk_rails_215d6c0d1f FOREIGN KEY (copied_from_transform_id) REFERENCES transforms(id);
-
-
---
--- Name: fk_rails_31def9802a; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY workflows
-    ADD CONSTRAINT fk_rails_31def9802a FOREIGN KEY (copied_from_workflow_id) REFERENCES workflows(id);
-
-
---
 -- Name: fk_rails_3f13522448; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1672,14 +1632,6 @@ ALTER TABLE ONLY transforms
 
 ALTER TABLE ONLY runs
     ADD CONSTRAINT fk_rails_404232665a FOREIGN KEY (workflow_id) REFERENCES workflows(id);
-
-
---
--- Name: fk_rails_4ec34a7d94; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY data_quality_reports
-    ADD CONSTRAINT fk_rails_4ec34a7d94 FOREIGN KEY (copied_from_data_quality_report_id) REFERENCES data_quality_reports(id);
 
 
 --
@@ -1796,6 +1748,7 @@ INSERT INTO schema_migrations (version) VALUES
 ('20170112005400'),
 ('20170112022558'),
 ('20170113013703'),
-('20170113235922');
+('20170113235922'),
+('20170217203644');
 
 

@@ -8,19 +8,17 @@
 #  customer_id             :integer          not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
-#  copied_from_workflow_id :integer
 #
 # Indexes
 #
-#  index_workflows_on_copied_from_workflow_id  (copied_from_workflow_id)
 #  index_workflows_on_customer_id              (customer_id)
 #  index_workflows_on_lowercase_name           (lower((name)::text)) UNIQUE
 #
 # Foreign Keys
 #
-#  fk_rails_...  (copied_from_workflow_id => workflows.id)
 #  fk_rails_...  (customer_id => customers.id)
 #
+
 
 describe Workflow do
 
@@ -43,11 +41,10 @@ describe Workflow do
 
   describe 'associations' do
     it { should belong_to(:customer) }
-    it { should belong_to(:copied_from_workflow) }
-    it { should have_many(:copied_to_workflows) }
     it { should have_many(:notifications) }
     it { should have_many(:notified_users).through(:notifications).source(:user) }
     it { should have_many(:transforms) }
+    it { should have_many(:data_files) }
     it { should have_many(:data_quality_reports) }
     it { should have_many(:runs) }
   end

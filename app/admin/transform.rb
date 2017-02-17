@@ -38,7 +38,6 @@ ActiveAdmin.register Transform do
       simple_format_row(:interpolated_sql) if resource.params.present?
       row :data_file
 
-      row :copied_from_transform
       row :created_at
       row :updated_at
     end

@@ -11,18 +11,15 @@
 #  updated_at               :datetime         not null
 #  params                   :jsonb
 #  data_file_id             :integer
-#  copied_from_transform_id :integer
 #
 # Indexes
 #
-#  index_transforms_on_copied_from_transform_id      (copied_from_transform_id)
 #  index_transforms_on_data_file_id                  (data_file_id)
 #  index_transforms_on_lowercase_name                (lower((name)::text)) UNIQUE
 #  index_transforms_on_workflow_id_and_data_file_id  (workflow_id,data_file_id) UNIQUE
 #
 # Foreign Keys
 #
-#  fk_rails_...  (copied_from_transform_id => transforms.id)
 #  fk_rails_...  (data_file_id => data_files.id)
 #  fk_rails_...  (workflow_id => workflows.id)
 #
@@ -90,9 +87,6 @@ describe Transform do
     it { should belong_to(:workflow) }
     it { should have_one(:customer) }
     it { should belong_to(:data_file) }
-
-    it { should belong_to(:copied_from_transform) }
-    it { should have_many(:copied_to_transforms) }
 
     it { should have_many(:prerequisite_dependencies) }
     it { should have_many(:prerequisite_transforms) }
