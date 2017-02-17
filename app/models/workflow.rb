@@ -58,6 +58,7 @@ class Workflow < ApplicationRecord
   has_many :notified_users, through: :notifications, source: :user
 
   has_many :transforms, inverse_of: :workflow, dependent: :destroy
+  has_many :data_files, through: :transforms
 
   has_many :data_quality_reports, inverse_of: :workflow, dependent: :delete_all
 

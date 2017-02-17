@@ -58,7 +58,7 @@ ActiveAdmin.register DataFile do
 
   form do |f|
     inputs 'Details' do
-      input :customer, as: :select, collection: customers_with_preselect
+      input :customer, as: :select, collection: customers_with_preselect, input_html: { disabled: params[:source].present? }
       input :name, as: :string
 
       creating = action_name.in?(['create', 'new'])
@@ -88,7 +88,16 @@ ActiveAdmin.register DataFile do
 
     actions do
       action(:submit)
-      path = (params[:source] == 'customer' ? customer_path(params[:customer_id]) : f.object.new_record? ? data_files_path : data_file_path(f.object))
+      path =
+        if params[:source] == 'customer'
+          customer_path(params[:customer_id])
+        elsif params[:source] == 'workflow'
+          workflow_path(params[:workflow_id])
+        elsif f.object.new_record?
+          data_files_path
+        else
+          data_file_path(f.object)
+        end
       cancel_link(path)
     end
   end
