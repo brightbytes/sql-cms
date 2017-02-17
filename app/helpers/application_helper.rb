@@ -53,18 +53,23 @@ module ApplicationHelper
 
   # Customer stuff
 
-  def customers_with_preselect
-    param_val = params[:customer_id].to_i
-    Customer.order(:slug).map { |c| (c.id == param_val) ? [c.name, c.id, selected: true] : [c.name, c.id] }
+  # FIXME - DO SAME TREATMENT AS resource_workflow HERE; GOTTA RUN NOW
+  def customers_with_single_select
+    if param_val = params[:customer_id].presence&.to_i
+      if customer = Customer.find_by(id: param_val)
+        return [[customer.name, customer.id, selected: true]]
+      end
+    end
+    Customer.order(:slug).map { |c| [c.name, c.id] }
   end
 
   # Workflow stuff
 
-  def workflows_with_preselect(disabled = false)
-    if disabled
+  def workflows_with_single_select
+    if resource_workflow
       [[resource_workflow.name, resource_workflow.id, selected: true]]
     else
-      Workflow.order(:slug).map { |c| (c.id == workflow_id_param_val) ? [c.name, c.id, selected: true] : [c.name, c.id] }
+      Workflow.order(:slug).map { |c| [c.name, c.id] }
     end
   end
 
@@ -88,11 +93,6 @@ module ApplicationHelper
         []
       end
   end
-
-  # The preselect doesn't work, for obvious reasons
-  # def users_with_preselect
-  #   User.order(:first_name, :last_name).map { |c| (c == current_user) ? [c.full_name, c.id, selected: true] : [c.full_name, c.id] }
-  # end
 
   # TranformValidations stuff
 

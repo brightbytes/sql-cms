@@ -58,10 +58,12 @@ ActiveAdmin.register DataFile do
 
   form do |f|
     inputs 'Details' do
-      input :customer, as: :select, collection: customers_with_preselect, input_html: { disabled: params[:source].present? }
-      input :name, as: :string
 
       creating = action_name.in?(['create', 'new'])
+      input :customer, as: :select, collection: customers_with_single_select, include_blank: params[:customer_id].blank?, input_html: { disabled: !creating }
+
+      input :name, as: :string
+
 
       input :file_type, as: :select, collection: DataFile::FILE_TYPES, input_html: { disabled: !creating }
 

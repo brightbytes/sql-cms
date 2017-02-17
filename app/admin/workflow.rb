@@ -100,7 +100,8 @@ ActiveAdmin.register Workflow do
     # For debugging:
     # semantic_errors *f.object.errors.keys
     inputs 'Details' do
-      input :customer, as: :select, collection: customers_with_preselect, input_html: { disabled: params[:source].present? }
+      editing = action_name.in?(%w(edit update))
+      input :customer, as: :select, collection: customers_with_single_select, include_blank: params[:customer_id].blank?, input_html: { disabled: editing }
       input :name, as: :string
       input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated."
     end

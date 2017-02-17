@@ -51,7 +51,7 @@ ActiveAdmin.register DataQualityReport do
       editing = action_name.in?(%w(edit update))
       input :customer_id, as: :hidden, input_html: { value: transform_customer_id_param_val }
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
-      input :workflow, as: :select, collection: workflows_with_preselect(editing), input_html: { disabled: editing || params[:source].present? }
+      input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: editing }
 
       input :name, as: :string
 
