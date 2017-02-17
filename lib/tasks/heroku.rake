@@ -72,6 +72,8 @@ namespace :heroku do
       end
     end
 
+    private
+
     def exit_with_message(msg)
       puts "\n#{msg}\n"
       exit(0)
@@ -130,7 +132,7 @@ namespace :heroku do
     def open_in_browser
       puts "Opening the site for inspection ..."
       sleep 2 # because removing maint mode takes a couple seconds to propagate
-      run("heroku open")
+      heroku_run("heroku open")
     end
 
 
