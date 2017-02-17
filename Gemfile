@@ -2,6 +2,8 @@ source 'https://rubygems.org'
 
 ruby "2.3.3"
 
+gem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'
+
 # Use Puma as the app server
 # gem 'puma', '~> 3.0'
 # Or maybe not, since Rails isn't threadsafe ...
