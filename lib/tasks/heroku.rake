@@ -24,8 +24,7 @@ namespace :heroku do
 
     puts "Downloading latest backup ..."
 
-    public_url = heroku_run("heroku pg:backups public-url --remote #{phase}")
-    run("curl -o #{DOWNLOAD_DUMPFILE} '#{public_url}'")
+    heroku_run("heroku pg:backups:download -o #{DOWNLOAD_DUMPFILE}")
 
   end
 
@@ -33,10 +32,9 @@ namespace :heroku do
 
     task development: :environment do
       if File.exists?(DOWNLOAD_DUMPFILE)
-        run("pg_restore --verbose --clean --no-acl --no-owner -h localhost -U postgres -d clarity_survey_data_development #{DOWNLOAD_DUMPFILE}")
-        Rake::Task['db:blur'].invoke
+        run("pg_restore --clean --no-acl --no-owner -h localhost -U postgres -d dpl_cms_development #{DOWNLOAD_DUMPFILE}")
       else
-        raise "You must first run `rake heroku:download:staging` or `rake heroku:download:production` before you can upload to dev."
+        raise "You must first run `rake heroku` before you can upload to dev."
       end
     end
 
