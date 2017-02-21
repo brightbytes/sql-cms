@@ -42,24 +42,24 @@ describe Transform do
       # it { should validate_uniqueness_of(:data_file).scoped_to(:workflow_id).allow_nil }
     end
 
-    it { should validate_inclusion_of(:runner).in_array(described_class::RUNNERS) }
+    it { should validate_inclusion_of(:runner).in_array(RunnerFactory::RUNNERS) }
 
     context "#data_file_type_vis_a_vis_runner" do
 
       it "should require the presence of a data_file for the DATA_FILE_RUNNERS" do
-        Transform::DATA_FILE_RUNNERS.each do |runner|
+        RunnerFactory::DATA_FILE_RUNNERS.each do |runner|
           expect(build(:transform, runner: runner, data_file: nil)).to_not be_valid
         end
       end
 
       it "should require the absence of a data_file for the NON_DATA_FILE_RUNNERS" do
-        Transform::NON_DATA_FILE_RUNNERS.each do |runner|
+        RunnerFactory::NON_DATA_FILE_RUNNERS.each do |runner|
           expect(build(:transform, runner: runner, data_file: create(:data_file))).to_not be_valid
         end
       end
 
       it "should require an import data_file for the IMPORT_DATA_FILE_RUNNERS" do
-        Transform::IMPORT_DATA_FILE_RUNNERS.each do |runner|
+        RunnerFactory::IMPORT_DATA_FILE_RUNNERS.each do |runner|
           t = build(:transform, runner: runner, data_file: create(:data_file, file_type: :export))
           expect(t).to_not be_valid
           t.data_file = create(:data_file, file_type: :import)
@@ -68,7 +68,7 @@ describe Transform do
       end
 
       it "should require an export data_file for the EXPORT_DATA_FILE_RUNNERS" do
-        Transform::EXPORT_DATA_FILE_RUNNERS.each do |runner|
+        RunnerFactory::EXPORT_DATA_FILE_RUNNERS.each do |runner|
           t = build(:transform, runner: runner, data_file: create(:data_file, file_type: :import))
           expect(t).to_not be_valid
           t.data_file = create(:data_file, file_type: :export)

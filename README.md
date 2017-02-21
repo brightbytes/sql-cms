@@ -66,7 +66,8 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 
 ## Future plans, with difficulty levels
 
-- MIDDLING: Create CustomerWorkflow join-entity and move all parameterization of Transforms (#params & #data_file_id) and DataQualityReports (#params) into CustomerWorkflow#params.  This so that a single Workflow may be used by multiple Customers with different configuration, especially of Transform DataFiles.
+- DIFFICULT: Create CustomerWorkflow join-entity and associated TransformConfig and DataQualityReportConfig entities, moving all parameterization of Transforms (#params & #data_file_id) and DataQualityReports (#params) into the respective Config classes.  Change Runs and Notifications to be associated with CustomerWorkflows This so that a single Workflow may be used by multiple Customers with different configuration, especially of Transform DataFiles.  Since this is a major refactor, I'm hesitant to do it ... but am spiking on it now.
+- EASY: Remove DataFile entity, replacing with Transform (or TransformConfig) attributes/methods.  This because DataFiles are unlikely to be reused by multiple workflows, and it's a low lift to re-specify if ever they need to be.  And, it just makes more sense for them to be part of the Transform, since they are.
 - EASY: Add support for uploading local files to an Import DataFile S3 location.
 - EASY: Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
 - DIFFICULT: Implement an S3 browser for the Import DataFile Create and Edit pages, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3`.)
@@ -270,13 +271,7 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
 
   * In order to run the application in development environment you need both a web server and a sidekiq worker.
 
-  * To start both unicorn and sidekiq in the same process, run:
-
-  ```
-  foreman start
-  ```
-
-  * To run them separately - which I prefer because `thin` provides more-useful logging than `unicorn`, and I've also had `foreman` wedge my machine to the point that it could only be fixed by a reboot:
+  * I recommend using 2 separate processes rather than something like `foreman` because both `thin` and `sidekiq` provide more-useful console logging, and I've also had `foreman start` wedge my machine to the point that it could only be fixed by a reboot:
 
   ```
   # Start thin in one terminal tab:
@@ -284,6 +279,6 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
   ```
 
   ```
-  # Start sidekiq in another terminal tab; if you want to be sneaky, tack on an `&` at the end of the following:
-  bundle exec sidekiq
+  # Start sidekiq in another terminal tab
+  sidekiq
   ```

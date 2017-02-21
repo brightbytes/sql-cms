@@ -38,37 +38,23 @@ class Transform < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
-  RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload)
-
-  validates :runner, presence: true, inclusion: { in: RUNNERS }
-
-  IMPORT_DATA_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
-  JOINED_IMPORT_DATA_FILE_RUNNERS = IMPORT_DATA_FILE_RUNNERS.join(',').freeze
-
-  EXPORT_DATA_FILE_RUNNERS = %w(CopyTo Unload).freeze
-  JOINED_EXPORT_DATA_FILE_RUNNERS = EXPORT_DATA_FILE_RUNNERS.join(',').freeze
-
-  DATA_FILE_RUNNERS = (IMPORT_DATA_FILE_RUNNERS + EXPORT_DATA_FILE_RUNNERS).freeze
-  JOINED_DATA_FILE_RUNNERS = DATA_FILE_RUNNERS.join(',').freeze
-
-  NON_DATA_FILE_RUNNERS = %w(RailsMigration Sql)
-  JOINED_NON_DATA_FILE_RUNNERS = NON_DATA_FILE_RUNNERS.join(',')
+  validates :runner, presence: true, inclusion: { in: RunnerFactory::RUNNERS }
 
   validate :data_file_type_vis_a_vis_runner
 
   def data_file_type_vis_a_vis_runner
-    if runner.in?(DATA_FILE_RUNNERS)
+    if runner.in?(RunnerFactory::DATA_FILE_RUNNERS)
       if data_file
-        if runner.in?(IMPORT_DATA_FILE_RUNNERS)
-          errors.add(:data_file, "must have a file_type of import for runners of type: #{JOINED_IMPORT_DATA_FILE_RUNNERS}") if data_file.export?
-        elsif runner.in?(EXPORT_DATA_FILE_RUNNERS)
-          errors.add(:data_file, "must have a file_type of export for runners of type: #{JOINED_EXPORT_DATA_FILE_RUNNERS}") if data_file.import?
+        if runner.in?(RunnerFactory::IMPORT_DATA_FILE_RUNNERS)
+          errors.add(:data_file, "must have a file_type of import for runners of type: #{RunnerFactory::JOINED_IMPORT_DATA_FILE_RUNNERS}") if data_file.export?
+        elsif runner.in?(RunnerFactory::EXPORT_DATA_FILE_RUNNERS)
+          errors.add(:data_file, "must have a file_type of export for runners of type: #{RunnerFactory::JOINED_EXPORT_DATA_FILE_RUNNERS}") if data_file.import?
         end
       else
-        errors.add(:data_file, "is required for runners of type: #{JOINED_DATA_FILE_RUNNERS}")
+        errors.add(:data_file, "is required for runners of type: #{RunnerFactory::JOINED_DATA_FILE_RUNNERS}")
       end
     else
-      errors.add(:data_file, "should not be specified for runners of type #{JOINED_NON_DATA_FILE_RUNNERS}") if data_file
+      errors.add(:data_file, "should not be specified for runners of type #{RunnerFactory::JOINED_NON_DATA_FILE_RUNNERS}") if data_file
     end
   end
 
