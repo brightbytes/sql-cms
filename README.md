@@ -67,16 +67,17 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 ## Future plans, with difficulty levels
 
 - DIFFICULT: Create CustomerWorkflow join-entity and associated TransformConfig and DataQualityReportConfig entities, moving all parameterization of Transforms (#params & #data_file_id) and DataQualityReports (#params) into the respective Config classes.  Change Runs and Notifications to be associated with CustomerWorkflows This so that a single Workflow may be used by multiple Customers with different configuration, especially of Transform DataFiles.  Since this is a major refactor, I'm hesitant to do it ... but am spiking on it now.
-- EASY: Remove DataFile entity, replacing with Transform (or TransformConfig) attributes/methods.  This because DataFiles are unlikely to be reused by multiple workflows, and it's a low lift to re-specify if ever they need to be.  And, it just makes more sense for them to be part of the Transform, since they are.
-- EASY: Add support for uploading local files to an Import DataFile S3 location.
+- EASY: Remove DataFile entity, replacing with Transform (or TransformConfig, if the preceding item is finished first) attributes/methods.  This because DataFiles are unlikely to be reused by multiple workflows, and it's a low lift to re-specify if ever they need to be.  And, it just makes more sense for them to be part of the Transform, since, well, they conceptually are.
+- EASY: Add support for uploading local files to an Import DataFile S3 location.  Assuming the previous item is finished first, this would occur on Transform#show.
 - EASY: Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
 - DIFFICULT: Implement an S3 browser for the Import DataFile Create and Edit pages, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3`.)
 - EASY: Implement the Autoload Transform runner.
 - DIFFICULT: Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
 - MIDDLING: Add Redshift support, both for production and local development.
 - MIDDLING: Maybe port to Convox, especially if it would facilitate Redshift support.
-- MIDDLING: Add support transferring files from an SFTP server to an Import DataFile S3 location
+- MIDDLING: Add support for transferring files from an SFTP server to an Import DataFile S3 location, so that the system can read the raw files provided by our customers
 - MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs
+- EASY: Add support for scheduling Workflows
 - EASY: Open source this application after extracting everything BB-specific to dotenv ENV vars
 
 ## Environment Setup for local development
