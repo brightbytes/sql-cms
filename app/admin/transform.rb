@@ -118,7 +118,7 @@ ActiveAdmin.register Transform do
       else
 
         # For import files ...
-        input :supplied_s3_url, label: "S3 File URL", required: true , hint: "You may use either https:// format or s3:// format for this URL"
+        input :supplied_s3_url, label: "S3 File URL", required: true, wrapper_html: { style: 'display:none' }, hint: "Copy/paste the https:// URL from S3"
 
         # For export files ...
         input :s3_region_name, as: :string, wrapper_html: { style: 'display:none' } # should be a drop-down
