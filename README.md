@@ -2,25 +2,19 @@
 
 This application is intended to be used by SQL Analysts with no knowledge of programming; only knowledge of SQL and the entity types presented below are required.
 
-With it, one may create per-Customer Workflows of interdependent SQL Transforms that convert a set of pre-existing Import DataFiles on S3 to a set of newly-generated Export DataFiles on S3.
+With it, one may create per-Customer Workflows of interdependent SQL Transforms that convert a set of pre-existing import files on S3 to a set of newly-generated export files on S3.
 
-A Workflow may be Run multiple times, and each time the system will deposit its Export DataFiles in a namespaced S3 "directory". Every Run occurs within a newly-created Postgres schema.
+A Workflow may be Run multiple times, and each time the system will deposit its export files in a namespaced S3 "directory". Every Run occurs within a newly-created Postgres schema.
 
 The following entities exist in the **public** Postgres schema:
 
 - **User**: An Analyst possessing basic knowledge of SQL
 
-- **Customer**: The Customer with which every Workflow and DataFile must be associated
-
-- **DataFile**: Associated with a Customer, and thus usable in multiple Workflows.  Comes in 2 varieties:
-
-  - **Import DataFile**: A specification of the location of a tabular flat-file that already exists on S3 (e.g. a CSV file)
-
-  - **Export DataFile**: A specification of the desired location to which the system will write a per-Run tabular flat-file on S3 (e.g. a CSV file)
+- **Customer**: The Customer with which every Workflow must be associated
 
 - **Workflow**: A named, per-Customer collection of the following, each via a `has_many` relationship, and each described in detail below:
 
-  - Various types of SQL Transform and their TransformDependencies, TransformValidations, and (for some types of Transform) DataFiles
+  - Various types of SQL Transform and their TransformDependencies and TransformValidations
 
   - DataQualityReports
 
@@ -30,17 +24,17 @@ The following entities exist in the **public** Postgres schema:
 
 - **Notification**: An association of a Workflow with a User for the purpose of notifying the User whenenever a Run of that Workflow successfully or unsuccessfully completes.
 
-- **Transform**: A named, optionally-parametrized SQL query that may be optionally associated with an Import or Export DataFile, and that specifies one of the following Runners for the SQL:
+- **Transform**: A named, optionally-parametrized SQL query, some types of which must be associated with an S3 file, and that specifies one of the following Runners for the SQL:
 
   - **RailsMigrationRunner**: Evals the contents of the sql field as a Ruby Migration (because hand-writing boilerplate DDL sucks); supports every feature that Rails Migrations support.  If preferred, SQL Analysts uncomfortable with Ruby code may use the generic **SqlRunner** described below to author DDL ... though I'd recommend learning Rails Migration syntax, because it's much more convenient.
 
-  - **CopyFromRunner**: Requires association with an Import DataFile, and requires that its sql field be a `COPY ... FROM STDIN ...` type of SQL statement
+  - **CopyFromRunner**: Requires specification a file to be imported from S3, and requires that its sql field be a `COPY ... FROM STDIN ...` type of SQL statement
 
-  - **SqlRunner**: Allows its sql field to be any type of DDL statement (CREATE) or DML statement (INSERT, UPDATE, DELETE, but not SELECT, since that would be pointless) other than those that read from or write to files (COPY, UNLOAD, LOAD).
+  - **SqlRunner**: Allows its sql field to be any type of DDL statement (CREATE) or DML statement (INSERT, UPDATE, DELETE, but not SELECT, since that would be pointless) other than those that read from or write to S3 files (COPY, UNLOAD, LOAD).
 
-  - **CopyToRunner**: Requires association with an Export DataFile, and requires that its sql field be a `COPY ... TO STDOUT ...` type of SQL statement
+  - **CopyToRunner**: Requires specification of an s3 file location to which to export data, and requires that its sql field be a `COPY ... TO STDOUT ...` type of SQL statement
 
-  - **AutoLoadRunner**: **Not yet implemented** - Will require only an association to an Import DataFile, and will introspect on the DataFile's header, create a table with string columns based upon the sql-identifier-coerced version of the headers, and load the table from the file.
+  - **AutoLoadRunner**: **Not yet implemented** - Will require only the specification of a file to be imported from S3, and will introspect on the file's header, create a table with string columns based upon the sql-identifier-coerced version of the headers, and load the table from the file.
 
   - **UnloadRunner**: **Not yet implemented** -  Will be a Redshift-specific version of CopyToRunner, to be added when Redshift support is added.
 
@@ -66,16 +60,15 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 
 ## Future plans, with difficulty levels
 
-- DIFFICULT: Create CustomerWorkflow join-entity and associated TransformConfig and DataQualityReportConfig entities, moving all parameterization of Transforms (#params & #data_file_id) and DataQualityReports (#params) into the respective Config classes.  Change Runs and Notifications to be associated with CustomerWorkflows This so that a single Workflow may be used by multiple Customers with different configuration, especially of Transform DataFiles.  Since this is a major refactor, I'm hesitant to do it ... but am spiking on it now.
-- EASY: Remove DataFile entity, replacing with Transform (or TransformConfig, if the preceding item is finished first) attributes/methods.  This because DataFiles are unlikely to be reused by multiple workflows, and it's a low lift to re-specify if ever they need to be.  And, it just makes more sense for them to be part of the Transform, since, well, they conceptually are.
-- EASY: Add support for uploading local files to an Import DataFile S3 location.  Assuming the previous item is finished first, this would occur on Transform#show.
+- DIFFICULT: Create CustomerWorkflow join-entity and associated TransformConfig and DataQualityReportConfig entities, moving all parameterization of Transforms (#params & #s3_*) and DataQualityReports (#params) into the respective Config classes.  Change Runs and Notifications to be associated with CustomerWorkflows This so that a single Workflow may be used by multiple Customers with different configuration.  Since this is a major refactor, I'm hesitant to do it ... but am spiking on it now.
+- EASY: Add support for uploading local files to a Transform-specified location on S3.  This would occur on Transform#show.
 - EASY: Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
-- DIFFICULT: Implement an S3 browser for the Import DataFile Create and Edit pages, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3`.)
+- DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3`.)
 - EASY: Implement the Autoload Transform runner.
 - DIFFICULT: Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
 - MIDDLING: Add Redshift support, both for production and local development.
 - MIDDLING: Maybe port to Convox, especially if it would facilitate Redshift support.
-- MIDDLING: Add support for transferring files from an SFTP server to an Import DataFile S3 location, so that the system can read the raw files provided by our customers
+- MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by our customers
 - MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs
 - EASY: Add support for scheduling Workflows
 - EASY: Open source this application after extracting everything BB-specific to dotenv ENV vars

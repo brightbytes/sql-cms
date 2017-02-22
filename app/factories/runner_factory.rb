@@ -3,19 +3,15 @@ module RunnerFactory
 
   extend self
 
-  RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload)
+  RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
 
-  IMPORT_DATA_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
-  JOINED_IMPORT_DATA_FILE_RUNNERS = IMPORT_DATA_FILE_RUNNERS.join(',').freeze
+  IMPORT_S3_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
 
-  EXPORT_DATA_FILE_RUNNERS = %w(CopyTo Unload).freeze
-  JOINED_EXPORT_DATA_FILE_RUNNERS = EXPORT_DATA_FILE_RUNNERS.join(',').freeze
+  EXPORT_S3_FILE_RUNNERS = %w(CopyTo Unload).freeze
 
-  DATA_FILE_RUNNERS = (IMPORT_DATA_FILE_RUNNERS + EXPORT_DATA_FILE_RUNNERS).freeze
-  JOINED_DATA_FILE_RUNNERS = DATA_FILE_RUNNERS.join(',').freeze
+  S3_FILE_RUNNERS = (IMPORT_S3_FILE_RUNNERS + EXPORT_S3_FILE_RUNNERS).freeze
 
-  NON_DATA_FILE_RUNNERS = %w(RailsMigration Sql)
-  JOINED_NON_DATA_FILE_RUNNERS = NON_DATA_FILE_RUNNERS.join(',')
+  NON_S3_FILE_RUNNERS = %w(RailsMigration Sql).freeze
 
   def runner_for(runner_name)
     return nil if runner_name.blank?
@@ -51,8 +47,14 @@ module RunnerFactory
 
     def run(run:, plan_h:)
       sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
-      virtual_data_file = DataFile.new(plan_h[:data_file])
-      open(virtual_data_file.s3_presigned_url) do |file|
+      # FIXME - THIS IS CHEESEY, AND BEGS FOR AN OBJECT TO WRAP THE S3 ATTS
+      virtual_transform = Transform.new(
+        s3_region_name: plan_h[:s3_region_name],
+        s3_bucket_name: plan_h[:s3_bucket_name],
+        s3_file_path: plan_h[:s3_file_path],
+        s3_file_name: plan_h[:s3_file_name],
+      )
+      open(virtual_transform.s3_presigned_url) do |file|
         run.copy_from_in_schema(sql: sql, enumerable: file)
       end
     end
@@ -76,13 +78,19 @@ module RunnerFactory
 
     def run(run:, plan_h:)
       sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
-      virtual_data_file = DataFile.new(plan_h[:data_file])
+      # FIXME - THIS IS CHEESEY, AND BEGS FOR AN OBJECT TO WRAP THE S3 ATTS
+      virtual_transform = Transform.new(
+        s3_region_name: plan_h[:s3_region_name],
+        s3_bucket_name: plan_h[:s3_bucket_name],
+        s3_file_path: plan_h[:s3_file_path],
+        s3_file_name: plan_h[:s3_file_name],
+      )
 
       # Tragically, we can't use IO.pipe b/c AWS needs to know the file size in advance so as to chunk the data when appropriate
-      Tempfile.open(virtual_data_file.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
+      Tempfile.open(virtual_transform.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
         run.copy_to_in_schema(sql: sql, writeable_io: stream).tap do
           stream.rewind
-          virtual_data_file.s3_object(run).put(body: stream)
+          virtual_transform.s3_object(run).put(body: stream)
         end
       end
     end

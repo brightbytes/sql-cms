@@ -1,19 +1,18 @@
-
 # == Schema Information
 #
 # Table name: public.workflows
 #
-#  id                      :integer          not null, primary key
-#  name                    :string           not null
-#  slug                    :string           not null
-#  customer_id             :integer          not null
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
+#  id          :integer          not null, primary key
+#  name        :string           not null
+#  slug        :string           not null
+#  customer_id :integer          not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
 #
 # Indexes
 #
-#  index_workflows_on_customer_id              (customer_id)
-#  index_workflows_on_lowercase_name           (lower((name)::text)) UNIQUE
+#  index_workflows_on_customer_id     (customer_id)
+#  index_workflows_on_lowercase_name  (lower((name)::text)) UNIQUE
 #
 # Foreign Keys
 #
@@ -43,17 +42,9 @@ end
 
 class TransformSerializer < ActiveModel::Serializer
 
-  attributes :id, :name, :runner, :params, :sql
-
-  belongs_to :data_file
+  attributes :id, :name, :runner, :params, :sql, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
 
   has_many :transform_validations
-
-end
-
-class DataFileSerializer < ActiveModel::Serializer
-
-  attributes :id, :name, :file_type, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
 
 end
 

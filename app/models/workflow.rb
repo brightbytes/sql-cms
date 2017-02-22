@@ -52,7 +52,6 @@ class Workflow < ApplicationRecord
   has_many :notified_users, through: :notifications, source: :user
 
   has_many :transforms, inverse_of: :workflow, dependent: :destroy
-  has_many :data_files, through: :transforms
 
   has_many :data_quality_reports, inverse_of: :workflow, dependent: :delete_all
 
@@ -91,11 +90,7 @@ class Workflow < ApplicationRecord
 
     groups_arr = []
 
-    independent_transforms =
-      transforms.
-      where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)").
-      distinct.
-      to_a
+    independent_transforms = transforms.independent.to_a
 
     raise "Your alleged DAG is a cyclical graph because it has no leaf nodes." if independent_transforms.empty?
 
@@ -122,7 +117,6 @@ class Workflow < ApplicationRecord
     transforms.
       where("id IN (#{joined_unused_transform_ids})").
       where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id NOT IN (#{joined_used_transform_ids}) AND postrequisite_transform_id = transforms.id)").
-      distinct.
       to_a
   end
 

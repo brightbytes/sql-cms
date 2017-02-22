@@ -8,17 +8,13 @@ module WorkflowSeeder
   end
 
   def demo_workflow
-    @demo_workflow ||= Workflow.where(name: 'Demo Workflow, version 1').first_or_create!(customer: demo_customer)
+    Workflow.where(name: 'Demo Workflow, version 1').first_or_create!(customer: CustomerSeeder.demo_customer)
   end
 
   private
 
   def notify_me!(workflow)
     workflow.notifications.first_or_create!(user: User.where(email: 'aaron@brightbytes.net').first)
-  end
-
-  def demo_customer
-    @demo_customer ||= Customer.where(name: CustomerSeeder::CUSTOMERS[0]).first
   end
 
   def create_demo_workflow!
@@ -158,17 +154,12 @@ module WorkflowSeeder
 
     # CopyFrom Transforms
 
-    staging_boces_mappings_data_file = create_demo_data_file!(
-      name: "BOCES mappings",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
-      s3_file_name: 'boces_mappings.csv'
-    )
-
     staging_boces_mappings_loader_transform = create_demo_transform!(
       name: "BOCES staging dimension table loader",
       runner: "CopyFrom",
       sql: "COPY staging_boces_mappings (clarity_org_id, co_org_id) FROM STDIN WITH CSV HEADER",
-      data_file: staging_boces_mappings_data_file
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'boces_mappings.csv'
     )
 
     create_demo_dependency!(prerequisite_transform: staging_boces_mappings_table_transform, postrequisite_transform: staging_boces_mappings_loader_transform)
@@ -191,17 +182,12 @@ module WorkflowSeeder
       params: { table_name: :staging_boces_mappings, column_name: :co_org_id }
     )
 
-    staging_district_mappings_data_file = create_demo_data_file!(
-      name: "District mappings",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
-      s3_file_name: 'district_mappings.csv'
-    )
-
     staging_district_mappings_loader_transform = create_demo_transform!(
       name: "District staging dimension table loader",
       runner: "CopyFrom",
       sql: "COPY staging_district_mappings (clarity_org_id, co_org_id) FROM STDIN WITH CSV HEADER",
-      data_file: staging_district_mappings_data_file
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'district_mappings.csv'
     )
 
     create_demo_dependency!(prerequisite_transform: staging_district_mappings_table_transform, postrequisite_transform: staging_district_mappings_loader_transform)
@@ -224,17 +210,12 @@ module WorkflowSeeder
       params: { table_name: :staging_district_mappings, column_name: :co_org_id }
     )
 
-    staging_school_mappings_data_file = create_demo_data_file!(
-      name: "School mappings",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
-      s3_file_name: 'school_mappings.csv'
-    )
-
     staging_school_mappings_loader_transform = create_demo_transform!(
       name: "School staging dimension table loader",
       runner: "CopyFrom",
       sql: "COPY staging_school_mappings (clarity_org_id, co_org_id, added_on_date_s) FROM STDIN WITH CSV HEADER",
-      data_file: staging_school_mappings_data_file
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'school_mappings.csv'
     )
 
     create_demo_dependency!(prerequisite_transform: staging_school_mappings_table_transform, postrequisite_transform: staging_school_mappings_loader_transform)
@@ -257,17 +238,12 @@ module WorkflowSeeder
       params: { table_name: :staging_school_mappings, column_name: :co_org_id }
     )
 
-    staging_fund_mappings_data_file = create_demo_data_file!(
-      name: "Fund mappings",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
-      s3_file_name: 'fund_mappings.csv'
-    )
-
     staging_fund_mappings_loader_transform = create_demo_transform!(
       name: "Fund staging dimension table loader",
       runner: "CopyFrom",
       sql: "COPY staging_fund_mappings (fund_name, fund_low_val, fund_high_val) FROM STDIN WITH CSV HEADER",
-      data_file: staging_fund_mappings_data_file
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'fund_mappings.csv'
     )
 
     create_demo_dependency!(prerequisite_transform: staging_fund_mappings_table_transform, postrequisite_transform: staging_fund_mappings_loader_transform)
@@ -296,17 +272,12 @@ module WorkflowSeeder
       params: { table_name: :staging_fund_mappings, low_column_name: :fund_low_val, high_column_name: :fund_high_val }
     )
 
-    boces_9035_data_file = create_demo_data_file!(
-      name: "BOCES 9035 data",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
-      s3_file_name: 'boces_9035_sample.csv'
-    )
-
     staging_facts_loader_transform = create_demo_transform!(
       name: "BOCES 9035 fact table loader",
       runner: "CopyFrom",
       sql: "COPY staging_facts (boces_id, admin_unit, school_code, fund_code, location_code, sre_code, program_code, object_source_code, job_class_code, grant_code, amount_cents) FROM STDIN WITH CSV HEADER",
-      data_file: boces_9035_data_file
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'boces_9035_sample.csv'
     )
 
     create_demo_dependency!(prerequisite_transform: staging_facts_table_transform, postrequisite_transform: staging_facts_loader_transform)
@@ -548,18 +519,12 @@ module WorkflowSeeder
 
     # Export Transform
 
-    export_data_file = create_demo_data_file!(
-      name: "Mapped Fact Export File",
-      file_type: :export,
-      s3_file_path: 'fake_customer/demo_workflow_version_1/exported_data_files',
-      s3_file_name: 'mapped_facts.csv'
-    )
-
     export_transform = create_demo_transform!(
       name: "Mapped Fact Exporter",
       runner: "CopyTo",
       sql: "COPY (SELECT * FROM mapped_facts) TO STDOUT WITH CSV HEADER",
-      data_file: export_data_file
+      s3_file_path: 'fake_customer/demo_workflow_version_1/exported_data_files',
+      s3_file_name: 'mapped_facts.csv'
     )
 
     create_demo_dependency!(prerequisite_transform: fact_school_org_map_transform, postrequisite_transform: export_transform)
@@ -570,15 +535,11 @@ module WorkflowSeeder
   end
 
   def create_demo_transform!(**options)
-    Transform.where(name: options.delete(:name)).first_or_create!(options.merge(workflow: demo_workflow))
+    Transform.where(name: options.delete(:name)).first_or_create!(options.merge(workflow: demo_workflow, s3_bucket_name: 'bb-dpl-cms'))
   end
 
   def create_demo_dependency!(**options)
     TransformDependency.where(options).first_or_create!
-  end
-
-  def create_demo_data_file!(**options)
-    DataFile.where(name: options.delete(:name)).first_or_create!(options.merge(s3_bucket_name: 'bb-dpl-cms', customer: demo_customer))
   end
 
   def create_demo_transform_validation!(**options)

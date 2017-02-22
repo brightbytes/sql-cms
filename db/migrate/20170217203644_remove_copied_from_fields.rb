@@ -1,4 +1,4 @@
-class RemoveCopiedFromFields < ActiveRecord::Migration[5.0]
+class RemoveCopiedFromFields < ActiveRecord::Migration
   def up
     remove_column :workflows, :copied_from_workflow_id
     remove_column :transforms, :copied_from_transform_id

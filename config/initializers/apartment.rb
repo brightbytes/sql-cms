@@ -12,6 +12,6 @@ Apartment::Adapters::PostgresqlSchemaFromSqlAdapter.class_eval %q{
 }
 
 Apartment.configure do |config|
-  config.excluded_models = %w(User PaperTrail::Version Customer DataFile Workflow Notification Transform TransformDependency Validation TransformValidation DataQualityReport Run RunStepLog)
+  config.excluded_models = %w(User PaperTrail::Version Customer Workflow Notification Transform TransformDependency Validation TransformValidation DataQualityReport Run RunStepLog)
   config.use_sql = true
 end
