@@ -2,25 +2,25 @@
 #
 # Table name: public.transforms
 #
-#  id           :integer          not null, primary key
-#  name         :string           not null
-#  runner       :string           default("Sql"), not null
-#  workflow_id  :integer          not null
-#  sql          :text             not null
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  params       :jsonb
-#  data_file_id :integer
+#  id             :integer          not null, primary key
+#  name           :string           not null
+#  runner         :string           default("Sql"), not null
+#  workflow_id    :integer          not null
+#  sql            :text             not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  params         :jsonb
+#  s3_region_name :string
+#  s3_bucket_name :string
+#  s3_file_path   :string
+#  s3_file_name   :string
 #
 # Indexes
 #
-#  index_transforms_on_data_file_id                  (data_file_id)
-#  index_transforms_on_lowercase_name                (lower((name)::text)) UNIQUE
-#  index_transforms_on_workflow_id_and_data_file_id  (workflow_id,data_file_id) UNIQUE
+#  index_transforms_on_lowercase_name  (lower((name)::text)) UNIQUE
 #
 # Foreign Keys
 #
-#  fk_rails_...  (data_file_id => data_files.id)
 #  fk_rails_...  (workflow_id => workflows.id)
 #
 
@@ -62,8 +62,8 @@ class Transform < ApplicationRecord
 
   private def set_defaults
     if new_record?
-      self.s3_region_name = ENV.fetch('DEFAULT_S3_REGION', 'us-west-2')
-      self.s3_bucket_name = ENV['DEFAULT_S3_BUCKET']
+      self.s3_region_name ||= ENV.fetch('DEFAULT_S3_REGION', 'us-west-2')
+      self.s3_bucket_name ||= ENV['DEFAULT_S3_BUCKET']
     end
   end
 
@@ -105,11 +105,13 @@ class Transform < ApplicationRecord
 
   # Scopes
 
-  scope :having_s3_import_file, -> { where(runner: RunnerFactory::IMPORT_S3_FILE_RUNNERS) }
+  scope :importing, -> { where(runner: RunnerFactory::IMPORT_S3_FILE_RUNNERS) }
 
-  scope :having_s3_export_file, -> { where(runner: RunnerFactory::EXPORT_S3_FILE_RUNNERS) }
+  scope :exporting, -> { where(runner: RunnerFactory::EXPORT_S3_FILE_RUNNERS) }
 
-  scope :having_no_s3_file, -> { where(runner: RunnerFactory::NON_S3_FILE_RUNNERS) }
+  scope :independent, -> { where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)") }
+
+  scope :dependent_non_file_related, -> { where("EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)").where(runner: RunnerFactory::NON_S3_FILE_RUNNERS) }
 
   # Instance Methods
 
@@ -154,21 +156,31 @@ class Transform < ApplicationRecord
 
   public
 
+  def importing?
+    runner.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
+  end
+
+  def exporting?
+    runner.in?(RunnerFactory::EXPORT_S3_FILE_RUNNERS)
+  end
+
   def s3_file_required?
     runner.in?(RunnerFactory::S3_FILE_RUNNERS)
   end
 
   attr_accessor :supplied_s3_url
 
+  # FIXME - EXTRACT ALL METHODS THAT ACTUALLY DEAL WITH THE REMOTE S3 OBJECT INTO THEIR OWN HELPER-OBJECT, PERHAPS IN THE app/models/s3 directory
+
+  # FIXME - I'm not happy about how I did this method overloading for importing? and exporting?
   def s3_object(for_run = nil)
     return nil unless all_required_s3_fields_present?
-    # FIXME - I'm not happy about how I did this method overloading for import and export file_types
-    raise "You must supply a Run object for export files!" if export? && !for_run
+    raise "You must supply a Run object for export files!" if exporting? && !for_run
 
     @s3_object ||
       begin
         s3_bucket = s3.bucket(s3_bucket_name)
-        path = (export? ? "#{s3_file_path}/run_#{for_run.id}" : s3_file_path)
+        path = (exporting? ? "#{s3_file_path}/run_#{for_run.id}" : s3_file_path)
         @s3_object = s3_bucket.object("#{path}/#{s3_file_name}")
       end
   end
@@ -179,13 +191,13 @@ class Transform < ApplicationRecord
   end
 
   def s3_file_exists?
-    import? && !!s3_presigned_url
+    importing? && !!s3_presigned_url
   end
 
-  def s3_public_url
-    return false unless all_required_s3_fields_present?
-    @s3_public_url ||= s3_object.public_url if s3_object.exists?
-  end
+  # def s3_public_url
+  #   return false unless all_required_s3_fields_present?
+  #   @s3_public_url ||= s3_object.public_url if s3_object.exists?
+  # end
 
   private
 

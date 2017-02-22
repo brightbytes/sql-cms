@@ -4,13 +4,14 @@ ActiveAdmin.register Transform do
 
   actions :all
 
-  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :data_file_id, prerequisite_transform_ids: []
+  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name, prerequisite_transform_ids: []
 
   filter :name, as: :string
   filter :runner, as: :select, collection: RunnerFactory::RUNNERS
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :sql, as: :string
-  filter :data_file, as: :select, collection: proc { DataFile.order(:name).all }
+  filter :s3_region_name, as: :select
+  filter :s3_bucket_name, as: :select
 
   config.sort_order = 'workflows.slug_asc,name_asc'
 
@@ -36,7 +37,14 @@ ActiveAdmin.register Transform do
         simple_format_row(:sql)
       end
       simple_format_row(:interpolated_sql) if resource.params.present?
-      row :data_file
+
+      if transform.importing? || transform.exporting?
+        row :s3_region_name
+        row :s3_bucket_name
+        row :s3_file_path
+        row :s3_file_name
+        row(:s3_file_exists?) { yes_no(resource.s3_file_exists?, yes_color: :green, no_color: :red) } if transform.importing?
+      end
 
       row :created_at
       row :updated_at
@@ -81,17 +89,15 @@ ActiveAdmin.register Transform do
 
   sidebar("Actions", only: :show) do
     ul do
-      li link_to("Copy to Another Workflow")
+      li link_to("Upload File to S3") if resource.importing? && !resource.s3_file_exists?
     end
   end
 
   form do |f|
-    editing = action_name.in?(%w(edit update))
-
     inputs 'Details' do
       input :customer_id, as: :hidden, input_html: { value: transform_customer_id_param_val }
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
-      input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: editing }
+      input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
 
       input :name, as: :string
       input :runner, as: :select, collection: RunnerFactory::RUNNERS
@@ -102,13 +108,32 @@ ActiveAdmin.register Transform do
 
       input :sql, as: :text
 
-      input :data_file, as: :select, collection: data_files_for_workflow
+      if f.object.persisted?
+
+        input :s3_region_name, as: :string # This should be a drop-down
+        input :s3_bucket_name, as: :string
+        input :s3_file_path, as: :string
+        input :s3_file_name, as: :string
+
+      else
+
+        # For import files ...
+        input :supplied_s3_url, label: "S3 File URL", required: true , hint: "You may use either https:// format or s3:// format for this URL"
+
+        # For export files ...
+        input :s3_region_name, as: :string, wrapper_html: { style: 'display:none' } # should be a drop-down
+        input :s3_bucket_name, as: :string, wrapper_html: { style: 'display:none' }
+        input :s3_file_path, as: :string, wrapper_html: { style: 'display:none' }
+        input :s3_file_name, as: :string, wrapper_html: { style: 'display:none' }
+
+      end
+
     end
 
     # We don't know the :workflow if we're creating, so we can't populate these
     # (Yes, we do know params[:workflow_id] if we get here from the Workflow, BUT, the .save goes sideways because Rails tries to save the assn before the main obj,
     #  and it's just not worth my time to debug.)
-    if editing
+    if f.object.persisted?
       inputs 'Dependencies' do
         input :prerequisite_transforms, as: :check_boxes, collection: f.object.available_prerequisite_transforms
       end

@@ -27,28 +27,47 @@ ActiveAdmin.register Workflow do
       row :updated_at
     end
 
-    panel 'Data Files Used by Transforms' do
-      text_node link_to("Create New Data File", new_data_file_path(customer_id: resource.customer.id, workflow_id: resource.id, source: :workflow))
+    para link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
 
-      table_for(resource.data_files.order('data_files.name')) do
-        column(:name) { |data_file| auto_link(data_file) }
-        column(:file_type)
+    # FIXME - GET RID OF COPY/PASTE
+
+    panel 'Independent Transforms' do
+      table_for(resource.transforms.independent.order(:name)) do
+        column(:name, sortable: :name) { |transform| auto_link(transform) }
+        column(:runner, sortable: :runner) { |transform| transform.runner }
+        column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
+      end
+    end
+
+    panel 'Data-Importing Transforms' do
+      table_for(resource.transforms.importing.order(:name)) do
+        column(:name, sortable: :name) { |transform| auto_link(transform) }
+        column(:runner, sortable: :runner) { |transform| transform.runner }
         column(:s3_region_name)
         column(:s3_bucket_name)
         column(:s3_file_path)
         column(:s3_file_name)
-        column(:s3_file_exists?) { |data_file| data_file.export? ? 'n/a' : yes_no(data_file.s3_file_exists?, yes_color: :green, no_color: :red) }
+        column(:s3_file_exists?) { |transform| transform.exporting? ? 'n/a' : yes_no(transform.s3_file_exists?, yes_color: :green, no_color: :red) }
+        column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
       end
     end
 
-    panel 'Transforms' do
-      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
-
-      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
-      table_for(resource.transforms.includes(:data_file).order(sort), sortable: true) do
+    panel 'Dependent, non-Importing/Exporting Transforms' do
+      table_for(resource.transforms.dependent_non_file_related.order(:name)) do
         column(:name, sortable: :name) { |transform| auto_link(transform) }
         column(:runner, sortable: :runner) { |transform| transform.runner }
-        column(:data_file, sortable: 'data_files.name')
+        column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
+      end
+    end
+
+    panel 'Data-Exporting Transforms' do
+      table_for(resource.transforms.exporting.order(:name)) do
+        column(:name, sortable: :name) { |transform| auto_link(transform) }
+        column(:runner, sortable: :runner) { |transform| transform.runner }
+        column(:s3_region_name)
+        column(:s3_bucket_name)
+        column(:s3_file_path)
+        column(:s3_file_name)
         column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
       end
     end

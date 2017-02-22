@@ -2,25 +2,25 @@
 #
 # Table name: public.transforms
 #
-#  id                       :integer          not null, primary key
-#  name                     :string           not null
-#  runner                   :string           default("Sql"), not null
-#  workflow_id              :integer          not null
-#  sql                      :text             not null
-#  created_at               :datetime         not null
-#  updated_at               :datetime         not null
-#  params                   :jsonb
-#  data_file_id             :integer
+#  id             :integer          not null, primary key
+#  name           :string           not null
+#  runner         :string           default("Sql"), not null
+#  workflow_id    :integer          not null
+#  sql            :text             not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  params         :jsonb
+#  s3_region_name :string
+#  s3_bucket_name :string
+#  s3_file_path   :string
+#  s3_file_name   :string
 #
 # Indexes
 #
-#  index_transforms_on_data_file_id                  (data_file_id)
-#  index_transforms_on_lowercase_name                (lower((name)::text)) UNIQUE
-#  index_transforms_on_workflow_id_and_data_file_id  (workflow_id,data_file_id) UNIQUE
+#  index_transforms_on_lowercase_name  (lower((name)::text)) UNIQUE
 #
 # Foreign Keys
 #
-#  fk_rails_...  (data_file_id => data_files.id)
 #  fk_rails_...  (workflow_id => workflows.id)
 #
 

@@ -2,18 +2,22 @@
 #
 # Table name: public.transforms
 #
-#  id                       :integer          not null, primary key
-#  name                     :string           not null
-#  runner                   :string           default("Sql"), not null
-#  workflow_id              :integer          not null
-#  sql                      :text             not null
-#  created_at               :datetime         not null
-#  updated_at               :datetime         not null
-#  params                   :jsonb
+#  id             :integer          not null, primary key
+#  name           :string           not null
+#  runner         :string           default("Sql"), not null
+#  workflow_id    :integer          not null
+#  sql            :text             not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  params         :jsonb
+#  s3_region_name :string
+#  s3_bucket_name :string
+#  s3_file_path   :string
+#  s3_file_name   :string
 #
 # Indexes
 #
-#  index_transforms_on_lowercase_name                (lower((name)::text)) UNIQUE
+#  index_transforms_on_lowercase_name  (lower((name)::text)) UNIQUE
 #
 # Foreign Keys
 #
@@ -45,9 +49,9 @@ describe Transform do
       RunnerFactory::S3_FILE_RUNNERS.each do |runner|
         t = build(:transform, runner: runner)
         expect(t).to_not be_valid
-        expect(errors[:s3_bucket_name]).to_not eq(nil)
-        expect(errors[:s3_file_name]).to_not eq(nil)
-        expect(errors[:supplied_s3_url]).to_not eq(nil)
+        expect(t.errors[:s3_bucket_name]).to_not eq(nil)
+        expect(t.errors[:s3_file_name]).to_not eq(nil)
+        expect(t.errors[:supplied_s3_url]).to_not eq(nil)
         t.s3_bucket_name = 'foobar'
         t.s3_file_name = 'barfoo.csv'
         expect(t).to be_valid

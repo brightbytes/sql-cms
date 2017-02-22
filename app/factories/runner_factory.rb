@@ -47,8 +47,14 @@ module RunnerFactory
 
     def run(run:, plan_h:)
       sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
-      virtual_data_file = DataFile.new(plan_h[:data_file])
-      open(virtual_data_file.s3_presigned_url) do |file|
+      # FIXME - THIS IS CHEESEY, AND BEGS FOR AN OBJECT TO WRAP THE S3 ATTS
+      virtual_transform = Transform.new(
+        s3_region_name: plan_h[:s3_region_name],
+        s3_bucket_name: plan_h[:s3_bucket_name],
+        s3_file_path: plan_h[:s3_file_path],
+        s3_file_name: plan_h[:s3_file_name],
+      )
+      open(virtual_transform.s3_presigned_url) do |file|
         run.copy_from_in_schema(sql: sql, enumerable: file)
       end
     end
@@ -72,13 +78,19 @@ module RunnerFactory
 
     def run(run:, plan_h:)
       sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
-      virtual_data_file = DataFile.new(plan_h[:data_file])
+      # FIXME - THIS IS CHEESEY, AND BEGS FOR AN OBJECT TO WRAP THE S3 ATTS
+      virtual_transform = Transform.new(
+        s3_region_name: plan_h[:s3_region_name],
+        s3_bucket_name: plan_h[:s3_bucket_name],
+        s3_file_path: plan_h[:s3_file_path],
+        s3_file_name: plan_h[:s3_file_name],
+      )
 
       # Tragically, we can't use IO.pipe b/c AWS needs to know the file size in advance so as to chunk the data when appropriate
-      Tempfile.open(virtual_data_file.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
+      Tempfile.open(virtual_transform.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
         run.copy_to_in_schema(sql: sql, writeable_io: stream).tap do
           stream.rewind
-          virtual_data_file.s3_object(run).put(body: stream)
+          virtual_transform.s3_object(run).put(body: stream)
         end
       end
     end

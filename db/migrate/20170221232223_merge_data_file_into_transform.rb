@@ -1,12 +1,14 @@
 class MergeDataFileIntoTransform < ActiveRecord::Migration
   def up
     # Nuke these b/c only the Demo Workflow exists at this time, and it's easier to just re-seed
-    WorkflowSeeder.demo_workflow.destroy
+    WorkflowSeeder.demo_workflow.destroy!
 
     add_column :transforms, :s3_region_name, :string
     add_column :transforms, :s3_bucket_name, :string
     add_column :transforms, :s3_file_path, :string
     add_column :transforms, :s3_file_name, :string
+
+    remove_column :transforms, :data_file_id
 
     drop_table :data_files
   end
@@ -29,6 +31,10 @@ class MergeDataFileIntoTransform < ActiveRecord::Migration
     add_index :data_files, :customer_id
 
     add_foreign_key :data_files, :customers
+
+    add_column :transforms, :data_file_id, :integer
+    add_index :transforms, :data_file_id
+    add_foreign_key :transforms, :data_files
 
     remove_column :transforms, :s3_region_name
     remove_column :transforms, :s3_bucket_name

@@ -85,15 +85,6 @@ module ApplicationHelper
     @transform_customer_id_param_val ||= params[:customer_id]&.to_i || resource_workflow&.customer_id
   end
 
-  def data_files_for_workflow
-    @data_files_for_workflow ||=
-      if transform_customer_id_param_val
-        DataFile.where(customer_id: transform_customer_id_param_val)
-      else
-        []
-      end
-  end
-
   # TranformValidations stuff
 
   def transform_id_param_val
