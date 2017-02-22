@@ -3,19 +3,15 @@ module RunnerFactory
 
   extend self
 
-  RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload)
+  RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
 
-  IMPORT_DATA_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
-  JOINED_IMPORT_DATA_FILE_RUNNERS = IMPORT_DATA_FILE_RUNNERS.join(',').freeze
+  IMPORT_S3_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
 
-  EXPORT_DATA_FILE_RUNNERS = %w(CopyTo Unload).freeze
-  JOINED_EXPORT_DATA_FILE_RUNNERS = EXPORT_DATA_FILE_RUNNERS.join(',').freeze
+  EXPORT_S3_FILE_RUNNERS = %w(CopyTo Unload).freeze
 
-  DATA_FILE_RUNNERS = (IMPORT_DATA_FILE_RUNNERS + EXPORT_DATA_FILE_RUNNERS).freeze
-  JOINED_DATA_FILE_RUNNERS = DATA_FILE_RUNNERS.join(',').freeze
+  S3_FILE_RUNNERS = (IMPORT_S3_FILE_RUNNERS + EXPORT_S3_FILE_RUNNERS).freeze
 
-  NON_DATA_FILE_RUNNERS = %w(RailsMigration Sql)
-  JOINED_NON_DATA_FILE_RUNNERS = NON_DATA_FILE_RUNNERS.join(',')
+  NON_S3_FILE_RUNNERS = %w(RailsMigration Sql).freeze
 
   def runner_for(runner_name)
     return nil if runner_name.blank?
