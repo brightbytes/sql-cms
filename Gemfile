@@ -42,6 +42,8 @@ group :development, :test do
   gem 'foreman' # another appserver
 
   # The newer stuff fixes model annotations with funky indexes, but breaks route annotation.  FML
+  # The annoying procedure is to comment-out everything after `gem 'annotate'` when I want to recomment routes ... and then comment back in to get the models.  Damnit!!
+  # Also, it seems the yml config file doesn't re-annotate the specs, but running `annotate -ik` does.  WTF?!
   gem 'annotate', github: 'ctran/annotate_models', ref: "d108ba8bdec760ded4c8c786b1d7cc72cadba4df"
 
   gem 'pry-rails'

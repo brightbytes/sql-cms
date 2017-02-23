@@ -45,5 +45,51 @@ describe RunStepLog do
 
   describe "associations" do
     it { should belong_to(:run) }
+    it { should have_one(:workflow).through(:run) }
+  end
+
+  describe "instance methods" do
+
+    context "Run#plan-related methods" do
+
+      let!(:transform) do
+        create(
+          :transform,
+          runner: 'RailsMigration',
+          sql: "create_table :staging_boces_mappings do |t|\n  t.integer :clarity_org_id, index: true\n  t.integer :co_org_id, index: true\nend\n",
+          name: "CREATE TABLE staging_boces_mappings"
+        )
+      end
+
+      let!(:workflow) { transform.workflow }
+
+      let!(:run) { create(:run, workflow: workflow, execution_plan: ActiveModelSerializers::SerializableResource.new(workflow).as_json) }
+
+      let!(:run_step_log) { create(:run_step_log, run: run, step_type: 'transform', step_index: 0, step_id: transform.id) }
+
+      let!(:expected_run_step_log_plan) do
+        run.execution_plan.with_indifferent_access[:ordered_transform_groups].first.first.with_indifferent_access
+      end
+
+      it "should return the plan :name as the step_name" do
+        expect(run_step_log.step_name).to eq(expected_run_step_log_plan[:name])
+      end
+
+      it "should return the plan :sql as the step_sql" do
+        expect(run_step_log.step_sql).to eq(expected_run_step_log_plan[:sql])
+      end
+
+      it "should use the step_name as the #to_s" do
+        expect(run_step_log.to_s).to eq(expected_run_step_log_plan[:name])
+      end
+
+      it "should have the expected plan" do
+        expect(run_step_log.step_plan).to eq(expected_run_step_log_plan.symbolize_keys)
+      end
+
+      it "should return the transform as the #likely_step" do
+        expect(run_step_log.likely_step).to eq(transform)
+      end
+    end
   end
 end
