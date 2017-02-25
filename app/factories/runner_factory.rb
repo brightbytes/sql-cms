@@ -3,11 +3,13 @@ module RunnerFactory
 
   extend self
 
-  RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
+  # RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
+  RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo).freeze
 
   IMPORT_S3_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
 
-  EXPORT_S3_FILE_RUNNERS = %w(CopyTo Unload).freeze
+  # EXPORT_S3_FILE_RUNNERS = %w(CopyTo Unload).freeze
+  EXPORT_S3_FILE_RUNNERS = %w(CopyTo).freeze
 
   S3_FILE_RUNNERS = (IMPORT_S3_FILE_RUNNERS + EXPORT_S3_FILE_RUNNERS).freeze
 
@@ -85,7 +87,7 @@ module RunnerFactory
     end
   end
 
-  # Loads a table from a data file
+  # Imports a table from a data file
   module CopyFromRunner
 
     extend self
@@ -116,7 +118,7 @@ module RunnerFactory
     end
   end
 
-  # Unloads a table to a data file
+  # Exports a table to a data file
   module CopyToRunner
 
     extend self
@@ -142,14 +144,14 @@ module RunnerFactory
   end
 
   # Redshift-specific version of CopyToRunner
-  module UnloadRunner
+  # module UnloadRunner
 
-    extend self
+  #   extend self
 
-    def run(run:, plan_h:)
-      raise "Not yet implemented"
-    end
-  end
+  #   def run(run:, plan_h:)
+  #     raise "Not yet implemented"
+  #   end
+  # end
 
   # Runs TransformValidations; internal-only Runner
   module ValidationRunner
