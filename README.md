@@ -60,6 +60,7 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 
 ### More Important
 
+- DIFFICULT: Port a small customer from the SIS DPL to this platform.  (Yup, it's ready to go, right now.)
 - EASY: Add support for uploading local files to a Transform-specified location on S3.  Not sure if this should occur on Transform#show or #new/#edit ... hmmmm.
 - DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3` ... but there just has to be a gem for it ...)
 - MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by SIS DPL customers without a manual copy-over
