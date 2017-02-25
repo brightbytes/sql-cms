@@ -64,14 +64,13 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 - EASY: Add support for uploading local files to a Transform-specified location on S3.  This would occur on Transform#show.
 - EASY: Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
 - DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3`.)
-- EASY: Implement the Autoload Transform runner.
+- MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by our customers
 - DIFFICULT: Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
+- MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs
 - MIDDLING: Add Redshift support, both for production and local development.
 - MIDDLING: Maybe port to Convox, especially if it would facilitate Redshift support.
-- MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by our customers
-- MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs
 - EASY: Add support for scheduling Workflows
-- EASY: Open source this application after extracting everything BB-specific to dotenv ENV vars
+- EASY: Convert the application to an Engine and open-source it, extracting everything BB-specific to dotenv ENV vars
 
 ## Environment Setup for local development
 

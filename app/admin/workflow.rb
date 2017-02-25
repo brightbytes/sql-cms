@@ -101,13 +101,11 @@ ActiveAdmin.register Workflow do
     render partial: 'admin/shared/history'
   end
 
-  sidebar("Actions", only: :show) do
-    ul do
-      li link_to("Run Workflow!", run_workflow_path(workflow))
-    end
+  config.add_action_item :run_workflow, only: :show, if: proc { resource.transforms.count > 0 } do
+    link_to("Run!", run_workflow_path(workflow), method: :put)
   end
 
-  member_action :run do
+  member_action :run, method: :put do
     run = resource.run!(current_user)
     flash[:notice] = "Run generated."
     redirect_to run_path(run)

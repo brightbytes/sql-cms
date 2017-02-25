@@ -25,7 +25,44 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      raise "Not yet implemented"
+      # FIXME - THIS IS CHEESEY, AND BEGS FOR AN OBJECT TO WRAP THE S3 ATTS
+      virtual_transform = Transform.new(
+        s3_region_name: plan_h[:s3_region_name],
+        s3_bucket_name: plan_h[:s3_bucket_name],
+        s3_file_path: plan_h[:s3_file_path],
+        s3_file_name: plan_h[:s3_file_name],
+      )
+      open(virtual_transform.s3_presigned_url) do |stream|
+        table_name = plan_h[:params][:table_name]
+        raise "The AutoLoad runner requires a :table_name param" unless table_name.present?
+
+        begin
+          # We wrap in a CSV obj only to get automatic parsing of quotes/commas/escapes for the header ... and discard the CSV object after that sole use
+          csv_wrapped_stream = CSV.new(stream)
+          header_a = csv_wrapped_stream.gets
+          raise "Empty header line for #{virtual_transform.s3_public_url}" unless header_a.present?
+
+          header_a.map! { |header| Workflow.to_sql_identifier(header) }
+
+          # FIXME - ADD A FEATURE FOR AUTO-ADDING INDEXES VIA PARAMS
+          migration_column_s = header_a.map { |header| "t.string :#{header}" }.join("\n  ")
+          migration_s = <<-SQL.strip_heredoc
+            create_table :#{table_name} do |t|
+              #{migration_column_s}
+            end
+          SQL
+          run.eval_in_schema(migration_s)
+
+          header_s = header_a.join(', ')
+          sql = "COPY #{table_name} (#{header_s}) FROM STDIN WITH CSV"
+
+          run.copy_from_in_schema(sql: sql, enumerable: stream)
+
+        ensure
+          csv_wrapped_stream.close # not sure this is actually required
+
+        end
+      end
     end
   end
 
@@ -54,8 +91,8 @@ module RunnerFactory
         s3_file_path: plan_h[:s3_file_path],
         s3_file_name: plan_h[:s3_file_name],
       )
-      open(virtual_transform.s3_presigned_url) do |file|
-        run.copy_from_in_schema(sql: sql, enumerable: file)
+      open(virtual_transform.s3_presigned_url) do |stream|
+        run.copy_from_in_schema(sql: sql, enumerable: stream)
       end
     end
   end
