@@ -35,6 +35,11 @@ ActiveAdmin.register Workflow do
       table_for(resource.transforms.independent.order(:name)) do
         column(:name, sortable: :name) { |transform| auto_link(transform) }
         column(:runner, sortable: :runner) { |transform| transform.runner }
+        column(:s3_region_name)
+        column(:s3_bucket_name)
+        column(:s3_file_path)
+        column(:s3_file_name)
+        column(:s3_file_exists?) { |transform| transform.s3_file_required? ? yes_no(transform.s3_file_exists?, yes_color: :green, no_color: :red) : 'n/a' }
         column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
       end
     end
@@ -47,7 +52,7 @@ ActiveAdmin.register Workflow do
         column(:s3_bucket_name)
         column(:s3_file_path)
         column(:s3_file_name)
-        column(:s3_file_exists?) { |transform| transform.exporting? ? 'n/a' : yes_no(transform.s3_file_exists?, yes_color: :green, no_color: :red) }
+        column(:s3_file_exists?) { |transform| yes_no(transform.s3_file_exists?, yes_color: :green, no_color: :red) }
         column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
       end
     end
@@ -72,22 +77,27 @@ ActiveAdmin.register Workflow do
       end
     end
 
-    panel 'Data Quality Reports' do
-      text_node link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
+    para link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
 
+    panel 'Data Quality Reports' do
       table_for(resource.data_quality_reports.order(:name)) do
         column(:name) { |dqr| auto_link(dqr) }
         column(:action) { |dqr| link_to("Delete", data_quality_report_path(dqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data Quality Report?' }) }
       end
     end
 
+    para link_to("Run Now", run_workflow_path(workflow), method: :put)
+
     panel 'Runs' do
       table_for(resource.runs.includes(:creator).order(id: :desc)) do
         column(:schema_name) { |run| auto_link(run) }
         column(:creator)
         column(:human_status) { |run| human_status(run) }
+        column(:action) { |run| link_to("Delete", run_path(run), method: :delete, data: { confirm: 'Are you sure you want to nuke this Run and all DB data associated with it?' }) }
       end
     end
+
+    para link_to("Add New Notifications", edit_workflow_path(workflow))
 
     panel 'Run Notifications' do
       table_for(resource.notifications.joins(:user).order('users.first_name, users.last_name')) do
@@ -102,7 +112,7 @@ ActiveAdmin.register Workflow do
   end
 
   config.add_action_item :run_workflow, only: :show, if: proc { resource.transforms.count > 0 } do
-    link_to("Run!", run_workflow_path(workflow), method: :put)
+    link_to("Run Now", run_workflow_path(workflow), method: :put)
   end
 
   member_action :run, method: :put do

@@ -34,7 +34,7 @@ The following entities exist in the **public** Postgres schema:
 
   - **CopyToRunner**: Requires specification of an s3 file location to which to export data, and requires that its sql field be a `COPY ... TO STDOUT ...` type of SQL statement
 
-  - **AutoLoadRunner**: **Not yet implemented** - Will require only the specification of a file to be imported from S3, and will introspect on the file's header, create a table with string columns based upon the sql-identifier-coerced version of the headers, and load the table from the file.
+  - **AutoLoadRunner**: Requires only the specification of a file to be imported from S3 and a :table_name param, and introspects on the file's header, creates a table with string columns based upon the sql-identifier-coerced version of the headers, and loads the table from the file.  Accepts a :name_type_map param to create the indicated columns as the indicated types, e.g. { params: { name_type_map: { my_column: :integer } } }.  Also accepts an :indexed_columns param with an array of columns to index.  At this time, additional features are deliberately not supported: if a more-complex scenario is required, define a `RailsMigrationRunner` transform and a `CopyFromRunner` transform.
 
   - **UnloadRunner**: **Not yet implemented** -  Will be a Redshift-specific version of CopyToRunner, to be added when Redshift support is added.
 
@@ -58,19 +58,20 @@ This application uses Sidekiq via Active::Job for parallelization of Runs, Trans
 
 This application comes with a Demo Workflow that was ported from an ancestral app.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide some examples of how to use this system.
 
-## Future plans, with difficulty levels
+## Future plans, roughly in order of priority, with difficulty levels
 
+- EASY: Add support for uploading local files to a Transform-specified location on S3.  Not sure if this should occur on Transform#show or #new/#edit ... hmmmm.
+- EASY: Attain complete BE test coverage (mostly there), and stub out S3 calls from tests using local files.
+- DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3` ... but there just has to be a gem for it ...)
+- MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by our customers.
+- MIDDLING: Add FE coverage (there's none yet).
 - DIFFICULT: Create CustomerWorkflow join-entity and associated TransformConfig and DataQualityReportConfig entities, moving all parameterization of Transforms (#params & #s3_*) and DataQualityReports (#params) into the respective Config classes.  Change Runs and Notifications to be associated with CustomerWorkflows This so that a single Workflow may be used by multiple Customers with different configuration.  Since this is a major refactor, I'm hesitant to do it ... but am spiking on it now.
-- EASY: Add support for uploading local files to a Transform-specified location on S3.  This would occur on Transform#show.
-- EASY: Attain complete BE test coverage (mostly there), and add FE coverage (there's none yet).
-- DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3`.)
-- MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by our customers
 - DIFFICULT: Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
-- MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs
+- MIDDLING: Convert the application to an Engine and open-source it, extracting everything BB-specific to dotenv ENV vars.
+- MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs.
 - MIDDLING: Add Redshift support, both for production and local development.
 - MIDDLING: Maybe port to Convox, especially if it would facilitate Redshift support.
 - EASY: Add support for scheduling Workflows
-- EASY: Convert the application to an Engine and open-source it, extracting everything BB-specific to dotenv ENV vars
 
 ## Environment Setup for local development
 
