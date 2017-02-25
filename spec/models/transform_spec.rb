@@ -124,6 +124,39 @@ describe Transform do
       include_examples 'yaml helper methods'
     end
 
+    context "runner-type methods" do
+      it "should have an #importing? method" do
+        RunnerFactory::IMPORT_S3_FILE_RUNNERS.each do |runner|
+          expect(build(:transform, runner: runner).importing?).to eq(true)
+        end
+        (RunnerFactory::RUNNERS - RunnerFactory::IMPORT_S3_FILE_RUNNERS).each do |runner|
+          expect(build(:transform, runner: runner).importing?).to eq(false)
+        end
+      end
+      it "should have an #exporting? method" do
+        RunnerFactory::EXPORT_S3_FILE_RUNNERS.each do |runner|
+          expect(build(:transform, runner: runner).exporting?).to eq(true)
+        end
+        (RunnerFactory::RUNNERS - RunnerFactory::EXPORT_S3_FILE_RUNNERS).each do |runner|
+          expect(build(:transform, runner: runner).exporting?).to eq(false)
+        end
+      end
+      it "should have an #s3_file_required? method" do
+        RunnerFactory::S3_FILE_RUNNERS.each do |runner|
+          expect(build(:transform, runner: runner).s3_file_required?).to eq(true)
+        end
+        (RunnerFactory::RUNNERS - RunnerFactory::S3_FILE_RUNNERS).each do |runner|
+          expect(build(:transform, runner: runner).s3_file_required?).to eq(false)
+        end
+      end
+      it "should have an #auto_load? method" do
+        expect(build(:transform, runner: 'AutoLoad').auto_load?).to eq(true)
+        (RunnerFactory::RUNNERS - ['AutoLoad']).each do |runner|
+          expect(build(:transform, runner: runner).auto_load?).to eq(false)
+        end
+      end
+    end
+
     context "#available_prerequisite_transforms && #available_unused_prerequisite_transforms" do
 
       include_examples 'cheesey dependency graph'

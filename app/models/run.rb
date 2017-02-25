@@ -220,6 +220,7 @@ class Run < ApplicationRecord
     end
   end
 
+  # This is only useful in Development for debugging runner code, hence the lack of a test for it.
   def nuke_failed_steps_and_rerun!
     if failed?
       run_step_logs.failed.delete_all
