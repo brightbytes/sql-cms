@@ -51,6 +51,16 @@ RSpec.configure do |config|
 
   config.include FactoryGirl::Syntax::Methods
 
+  config.before(:each) do
+    # Globally stubs S3 access.  Quick and dirty ... and unsatisfactory.  I feel empty inside, writing these 2 blocks.
+    allow_any_instance_of(Transform).to receive(:s3_presigned_url) do |transform|
+      Rails.root.join("spec/fixtures/files/#{transform.s3_file_name}")
+    end
+    allow_any_instance_of(Transform).to receive(:s3_object) do |transform, run|
+      s3_obj = double.tap { |o| allow(o).to receive(:put) }
+    end
+  end
+
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.

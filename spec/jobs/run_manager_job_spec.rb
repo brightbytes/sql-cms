@@ -5,13 +5,7 @@ describe RunManagerJob do
     let!(:creator) { create(:user, email: 'aaron@brightbytes.net') }
 
     context "using the Demo Workflow and S3 file stubs" do
-      before do
-        WorkflowSeeder.seed
-        # Quick and dirty ... and unsatisfactory.  I feel empty inside, writing this.
-        allow_any_instance_of(Transform).to receive(:s3_presigned_url) do |transform|
-          Rails.root.join("spec/fixtures/files/#{transform.s3_file_name}")
-        end
-      end
+      before { WorkflowSeeder.seed }
 
       it "should successfully Run the entire Workflow" do
         Sidekiq::Testing.inline! do
@@ -19,7 +13,6 @@ describe RunManagerJob do
           # We do this so that there's no schema collision on reruns
           workflow.update_attribute(:slug, "#{workflow.slug}_#{rand(10_000_000)}")
 
-          # This uses a live connection to s3, which is something no test should do.  Damnit.  VCR?  Stub?
           run = workflow.run!(creator)
           run.reload
 
