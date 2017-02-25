@@ -33,7 +33,7 @@ module RunnerFactory
         s3_file_name: plan_h[:s3_file_name],
       )
       open(virtual_transform.s3_presigned_url) do |stream|
-        table_name = plan_h[:params][:table_name]
+        table_name = plan_h[:params].fetch(:table_name, nil)
         raise "The AutoLoad runner requires a :table_name param" unless table_name.present?
 
         begin
@@ -44,8 +44,11 @@ module RunnerFactory
 
           header_a.map! { |header| Workflow.to_sql_identifier(header) }
 
-          # FIXME - ADD A FEATURE FOR AUTO-ADDING INDEXES VIA PARAMS
-          migration_column_s = header_a.map { |header| "t.string :#{header}" }.join("\n  ")
+          migration_column_s = header_a.map do |header|
+            column_type = plan_h[:params].fetch(:name_type_map, nil)&.fetch(header.to_sym, nil) || :string
+            "t.#{column_type} :#{header}"
+          end.join("\n  ")
+
           migration_s = <<-SQL.strip_heredoc
             create_table :#{table_name} do |t|
               #{migration_column_s}

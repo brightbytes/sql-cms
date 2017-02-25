@@ -1,0 +1,4 @@
+fund_name,fund_low_val,fund_high_val
+General,10,10
+Restricted,11,89
+Excluded,90,90

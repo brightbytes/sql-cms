@@ -21,50 +21,138 @@ module WorkflowSeeder
 
     # DDL Transforms
 
-    staging_boces_mappings_table_transform = create_demo_transform!(
-      name: "CREATE TABLE staging_boces_mappings",
-      runner: 'RailsMigration',
-      sql: <<-SQL.strip_heredoc
-        create_table :staging_boces_mappings do |t|
-          t.integer :clarity_org_id, index: true
-          t.integer :co_org_id, index: true
-        end
-      SQL
+    staging_boces_mappings_table_and_load_transform = create_demo_transform!(
+      name: "BOCES staging dimension table auto-loader",
+      runner: 'AutoLoad',
+      params: {
+        table_name: :staging_boces_mappings,
+        name_type_map: {
+          clarity_org_id: :integer,
+          co_org_id: :integer
+        }
+      },
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'boces_mappings.csv'
     )
 
-    staging_district_mappings_table_transform = create_demo_transform!(
-      name: "CREATE TABLE staging_district_mappings",
-      runner: 'RailsMigration',
-      sql: <<-SQL.strip_heredoc
-        create_table :staging_district_mappings do |t|
-          t.integer :clarity_org_id, index: true
-          t.integer :co_org_id, index: true
-        end
-      SQL
+    create_demo_transform_validation!(
+      transform: staging_boces_mappings_table_and_load_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_boces_mappings, column_name: :clarity_org_id }
     )
 
-    staging_school_mappings_table_transform = create_demo_transform!(
-      name: "CREATE TABLE staging_school_mappings",
-      runner: 'RailsMigration',
-      sql: <<-SQL.strip_heredoc
-        create_table :staging_school_mappings do |t|
-          t.integer :clarity_org_id, index: true
-          t.integer :co_org_id, index: true
-          t.string :added_on_date_s
-        end
-      SQL
+    create_demo_transform_validation!(
+      transform: staging_boces_mappings_table_and_load_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_boces_mappings, column_name: :co_org_id }
     )
 
-    staging_fund_mappings_table_transform = create_demo_transform!(
-      name: "CREATE TABLE staging_fund_mappings",
-      runner: 'RailsMigration',
-      sql: <<-SQL.strip_heredoc
-        create_table :staging_fund_mappings do |t|
-          t.string :fund_name
-          t.integer :fund_low_val
-          t.integer :fund_high_val
-        end
-      SQL
+    create_demo_transform_validation!(
+      transform: staging_boces_mappings_table_and_load_transform,
+      validation: Validation.uniqueness,
+      params: { table_name: :staging_boces_mappings, column_name: :co_org_id }
+    )
+
+    staging_district_mappings_table_and_load_transform = create_demo_transform!(
+      name: "District staging dimension table auto-loader",
+      runner: 'AutoLoad',
+      params: {
+        table_name: :staging_district_mappings,
+        name_type_map: {
+          clarity_org_id: :integer,
+          co_org_id: :integer
+        }
+      },
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'district_mappings.csv'
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_district_mappings_table_and_load_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_district_mappings, column_name: :clarity_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_district_mappings_table_and_load_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_district_mappings, column_name: :co_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_district_mappings_table_and_load_transform,
+      validation: Validation.uniqueness,
+      params: { table_name: :staging_district_mappings, column_name: :co_org_id }
+    )
+
+    staging_school_mappings_table_and_load_transform = create_demo_transform!(
+      name: "School staging dimension table auto-loader",
+      runner: 'AutoLoad',
+      params: {
+        table_name: :staging_school_mappings,
+        name_type_map: {
+          clarity_org_id: :integer,
+          co_org_id: :integer
+        }
+      },
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'school_mappings.csv'
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_school_mappings_table_and_load_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_school_mappings, column_name: :clarity_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_school_mappings_table_and_load_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_school_mappings, column_name: :co_org_id }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_school_mappings_table_and_load_transform,
+      validation: Validation.uniqueness,
+      params: { table_name: :staging_school_mappings, column_name: :co_org_id }
+    )
+
+    staging_fund_mappings_table_and_load_transform = create_demo_transform!(
+      name: "Fund staging dimension table loader",
+      runner: 'AutoLoad',
+      params: {
+        table_name: :staging_fund_mappings,
+        name_type_map: {
+          fund_low_val: :integer,
+          fund_high_val: :integer
+        }
+      },
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+      s3_file_name: 'fund_mappings.csv'
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_fund_mappings_table_and_load_transform,
+      validation: Validation.presence,
+      params: { table_name: :staging_fund_mappings, column_name: :fund_name },
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_fund_mappings_table_and_load_transform,
+      validation: Validation.non_null,
+      params: { table_name: :staging_fund_mappings, column_name: :fund_low_val }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_fund_mappings_table_and_load_transform,
+      validation: Validation.uniqueness,
+      params: { table_name: :staging_fund_mappings, column_name: :fund_high_val }
+    )
+
+    create_demo_transform_validation!(
+      transform: staging_fund_mappings_table_and_load_transform,
+      validation: Validation.non_overlapping,
+      params: { table_name: :staging_fund_mappings, low_column_name: :fund_low_val, high_column_name: :fund_high_val }
     )
 
     staging_facts_table_transform = create_demo_transform!(
@@ -103,7 +191,7 @@ module WorkflowSeeder
     )
 
     # Because of the foreign key
-    create_demo_dependency!(prerequisite_transform: staging_school_mappings_table_transform, postrequisite_transform: school_mappings_table_transform)
+    create_demo_dependency!(prerequisite_transform: staging_school_mappings_table_and_load_transform, postrequisite_transform: school_mappings_table_transform)
 
     school_parent_mappings_table_transform = create_demo_transform!(
       name: "CREATE TABLE school_parent_mappings",
@@ -153,124 +241,6 @@ module WorkflowSeeder
     )
 
     # CopyFrom Transforms
-
-    staging_boces_mappings_loader_transform = create_demo_transform!(
-      name: "BOCES staging dimension table loader",
-      runner: "CopyFrom",
-      sql: "COPY staging_boces_mappings (clarity_org_id, co_org_id) FROM STDIN WITH CSV HEADER",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
-      s3_file_name: 'boces_mappings.csv'
-    )
-
-    create_demo_dependency!(prerequisite_transform: staging_boces_mappings_table_transform, postrequisite_transform: staging_boces_mappings_loader_transform)
-
-    create_demo_transform_validation!(
-      transform: staging_boces_mappings_loader_transform,
-      validation: Validation.non_null,
-      params: { table_name: :staging_boces_mappings, column_name: :clarity_org_id }
-    )
-
-    create_demo_transform_validation!(
-      transform: staging_boces_mappings_loader_transform,
-      validation: Validation.non_null,
-      params: { table_name: :staging_boces_mappings, column_name: :co_org_id }
-    )
-
-    create_demo_transform_validation!(
-      transform: staging_boces_mappings_loader_transform,
-      validation: Validation.uniqueness,
-      params: { table_name: :staging_boces_mappings, column_name: :co_org_id }
-    )
-
-    staging_district_mappings_loader_transform = create_demo_transform!(
-      name: "District staging dimension table loader",
-      runner: "CopyFrom",
-      sql: "COPY staging_district_mappings (clarity_org_id, co_org_id) FROM STDIN WITH CSV HEADER",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
-      s3_file_name: 'district_mappings.csv'
-    )
-
-    create_demo_dependency!(prerequisite_transform: staging_district_mappings_table_transform, postrequisite_transform: staging_district_mappings_loader_transform)
-
-    create_demo_transform_validation!(
-      transform: staging_district_mappings_loader_transform,
-      validation: Validation.non_null,
-      params: { table_name: :staging_district_mappings, column_name: :clarity_org_id }
-    )
-
-    create_demo_transform_validation!(
-      transform: staging_district_mappings_loader_transform,
-      validation: Validation.non_null,
-      params: { table_name: :staging_district_mappings, column_name: :co_org_id }
-    )
-
-    create_demo_transform_validation!(
-      transform: staging_district_mappings_loader_transform,
-      validation: Validation.uniqueness,
-      params: { table_name: :staging_district_mappings, column_name: :co_org_id }
-    )
-
-    staging_school_mappings_loader_transform = create_demo_transform!(
-      name: "School staging dimension table loader",
-      runner: "CopyFrom",
-      sql: "COPY staging_school_mappings (clarity_org_id, co_org_id, added_on_date_s) FROM STDIN WITH CSV HEADER",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
-      s3_file_name: 'school_mappings.csv'
-    )
-
-    create_demo_dependency!(prerequisite_transform: staging_school_mappings_table_transform, postrequisite_transform: staging_school_mappings_loader_transform)
-
-    create_demo_transform_validation!(
-      transform: staging_school_mappings_loader_transform,
-      validation: Validation.non_null,
-      params: { table_name: :staging_school_mappings, column_name: :clarity_org_id }
-    )
-
-    create_demo_transform_validation!(
-      transform: staging_school_mappings_loader_transform,
-      validation: Validation.non_null,
-      params: { table_name: :staging_school_mappings, column_name: :co_org_id }
-    )
-
-    create_demo_transform_validation!(
-      transform: staging_school_mappings_loader_transform,
-      validation: Validation.uniqueness,
-      params: { table_name: :staging_school_mappings, column_name: :co_org_id }
-    )
-
-    staging_fund_mappings_loader_transform = create_demo_transform!(
-      name: "Fund staging dimension table loader",
-      runner: "CopyFrom",
-      sql: "COPY staging_fund_mappings (fund_name, fund_low_val, fund_high_val) FROM STDIN WITH CSV HEADER",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
-      s3_file_name: 'fund_mappings.csv'
-    )
-
-    create_demo_dependency!(prerequisite_transform: staging_fund_mappings_table_transform, postrequisite_transform: staging_fund_mappings_loader_transform)
-
-    create_demo_transform_validation!(
-      transform: staging_fund_mappings_loader_transform,
-      validation: Validation.presence,
-      params: { table_name: :staging_fund_mappings, column_name: :fund_name },
-    )
-
-    create_demo_transform_validation!(
-      transform: staging_fund_mappings_loader_transform,
-      validation: Validation.non_null,
-      params: { table_name: :staging_fund_mappings, column_name: :fund_low_val }
-    )
-
-    create_demo_transform_validation!(
-      transform: staging_fund_mappings_loader_transform,
-      validation: Validation.uniqueness,
-      params: { table_name: :staging_fund_mappings, column_name: :fund_high_val }
-    )
-
-    create_demo_transform_validation!(
-      transform: staging_fund_mappings_loader_transform,
-      validation: Validation.non_overlapping,
-      params: { table_name: :staging_fund_mappings, low_column_name: :fund_low_val, high_column_name: :fund_high_val }
-    )
 
     staging_facts_loader_transform = create_demo_transform!(
       name: "BOCES 9035 fact table loader",
@@ -331,7 +301,7 @@ module WorkflowSeeder
     )
 
     create_demo_dependency!(prerequisite_transform: school_mappings_table_transform, postrequisite_transform: school_mappings_initial_map_transform)
-    create_demo_dependency!(prerequisite_transform: staging_school_mappings_loader_transform, postrequisite_transform: school_mappings_initial_map_transform)
+    create_demo_dependency!(prerequisite_transform: staging_school_mappings_table_and_load_transform, postrequisite_transform: school_mappings_initial_map_transform)
 
     # Note that we don't bother with validations of the staging_school_mapping_id column because its NOT NULL, UNIQUE and FK constraints are all in the DB.
 
@@ -362,8 +332,8 @@ module WorkflowSeeder
     )
 
     create_demo_dependency!(prerequisite_transform: school_parent_mappings_table_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
-    create_demo_dependency!(prerequisite_transform: staging_district_mappings_loader_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
-    create_demo_dependency!(prerequisite_transform: staging_boces_mappings_loader_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
+    create_demo_dependency!(prerequisite_transform: staging_district_mappings_table_and_load_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
+    create_demo_dependency!(prerequisite_transform: staging_boces_mappings_table_and_load_transform, postrequisite_transform: school_parent_mappings_initial_map_transform)
 
     # Note that we don't bother with validations of the staging_school_parent_mapping_id column because its NOT NULL, UNIQUE and FK constraints are all in the DB.
 
