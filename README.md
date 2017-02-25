@@ -60,14 +60,18 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 
 ## Future plans, roughly in order of priority, with difficulty levels
 
+### More Important
+
 - EASY: Add support for uploading local files to a Transform-specified location on S3.  Not sure if this should occur on Transform#show or #new/#edit ... hmmmm.
-- EASY: Attain complete BE test coverage (mostly there), and stub out S3 calls from tests using local files.
 - DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3` ... but there just has to be a gem for it ...)
-- MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by our customers.
-- MIDDLING: Add FE coverage (there's none yet).
-- DIFFICULT: Create CustomerWorkflow join-entity and associated TransformConfig and DataQualityReportConfig entities, moving all parameterization of Transforms (#params & #s3_*) and DataQualityReports (#params) into the respective Config classes.  Change Runs and Notifications to be associated with CustomerWorkflows This so that a single Workflow may be used by multiple Customers with different configuration.  Since this is a major refactor, I'm hesitant to do it ... but am spiking on it now.
+- MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by SIS DPL customers without a manual copy-over
+- MIDDLING: Add FE coverage (there's none yet - yeah, I suck ... but TTM is more critical at the moment).
+
+### Less Important
+
 - DIFFICULT: Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
 - MIDDLING: Convert the application to an Engine and open-source it, extracting everything BB-specific to dotenv ENV vars.
+- DIFFICULT: Create CustomerWorkflow join-entity and associated TransformConfig and DataQualityReportConfig entities, moving all parameterization of Transforms (#params & #s3_*) and DataQualityReports (#params) into the respective Config classes.  Change Runs and Notifications to be associated with CustomerWorkflows This so that a single Workflow may be used by multiple Customers with different configuration.  Since this is a major refactor for a feature I don't need right now, I'm hesitant to do it, especially after a serious spike.  Bah.
 - MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs.
 - MIDDLING: Add Redshift support, both for production and local development.
 - MIDDLING: Maybe port to Convox, especially if it would facilitate Redshift support.

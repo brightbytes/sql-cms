@@ -4,8 +4,14 @@ describe RunManagerJob do
 
     let!(:creator) { create(:user, email: 'aaron@brightbytes.net') }
 
-    context "using the Demo Workflow" do
-      before { WorkflowSeeder.seed }
+    context "using the Demo Workflow and S3 file stubs" do
+      before do
+        WorkflowSeeder.seed
+        # Quick and dirty ... and unsatisfactory.  I feel empty inside, writing this.
+        allow_any_instance_of(Transform).to receive(:s3_presigned_url) do |transform|
+          Rails.root.join("spec/fixtures/files/#{transform.s3_file_name}")
+        end
+      end
 
       it "should successfully Run the entire Workflow" do
         Sidekiq::Testing.inline! do

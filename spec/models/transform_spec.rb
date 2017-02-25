@@ -26,9 +26,6 @@
 
 describe Transform do
 
-  # Figure out how to do this ...
-  # S3Logic.instance_variable_set(:@client, Aws::S3::Client.new(stub_responses: true))
-
   describe 'versioned by PaperTrail' do
     it { is_expected.to be_versioned }
   end
@@ -65,24 +62,24 @@ describe Transform do
     context "before_validation" do
       it "should parse a valid supplied s3-resource URL if possible" do
         transform = build(:copy_from_transform, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil)
-        transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-rawdata/ca_some_sis/v_2_201610212151_custom/calendars_2017.tsv"
+        transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-bucket/ca_some_sis/some_data_source/shoobie.tsv"
         expect(transform.valid?).to eq(true)
         expect(transform.s3_region_name).to eq('us-west-2')
-        expect(transform.s3_bucket_name).to eq('bb-rawdata')
-        expect(transform.s3_file_path).to eq('ca_some_sis/v_2_201610212151_custom')
-        expect(transform.s3_file_name).to eq('calendars_2017.tsv')
+        expect(transform.s3_bucket_name).to eq('bb-bucket')
+        expect(transform.s3_file_path).to eq('ca_some_sis/some_data_source')
+        expect(transform.s3_file_name).to eq('shoobie.tsv')
 
         transform = build(:copy_from_transform, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil)
-        transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-rawdata/calendars_2017.tsv"
+        transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-bucket/shoobie.tsv"
         expect(transform.valid?).to eq(true)
         expect(transform.s3_region_name).to eq('us-west-2')
-        expect(transform.s3_bucket_name).to eq('bb-rawdata')
+        expect(transform.s3_bucket_name).to eq('bb-bucket')
         expect(transform.s3_file_path).to eq(nil)
-        expect(transform.s3_file_name).to eq('calendars_2017.tsv')
+        expect(transform.s3_file_name).to eq('shoobie.tsv')
 
         # This is a validation test, but it's here just because it feels right
         transform = build(:copy_from_transform, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil)
-        transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-pipeline-production-rawdata"
+        transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/bb-bucket"
         expect(transform.valid?).to eq(false)
       end
 
@@ -95,7 +92,7 @@ describe Transform do
         expect(transform.s3_file_name).to eq(nil)
         expect(transform.supplied_s3_url).to eq(nil)
 
-        transform = build(:transform, supplied_s3_url: "https://s3-us-west-2.amazonaws.com/bb-rawdata/calendars_2017.tsv")
+        transform = build(:transform, supplied_s3_url: "https://s3-us-west-2.amazonaws.com/bb-bucket/shoobie.tsv")
         expect(transform).to be_valid
         expect(transform.s3_region_name).to eq(nil)
         expect(transform.s3_bucket_name).to eq(nil)
