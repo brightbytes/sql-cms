@@ -37,6 +37,7 @@ describe Validation do
     it "should be immutable when flagged as such" do
       validation = create(:validation)
       expect(validation.immutable?).to eq(false)
+      expect(validation.read_only?).to eq(false)
       validation.update_attribute(:immutable, true)
       expect { validation.destroy }.to raise_error("You may not destroy an immutable Validation")
       expect { validation.delete }.to raise_error("You may not bypass callbacks to delete a Class.")

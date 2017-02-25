@@ -25,6 +25,10 @@
 
 describe Run do
 
+  # Having this in `spec_helper.rb` breaks other tests in this suite.  However, it's necessary here for defining `ApplicationJob.queue_adapter`'s enqueued_jobs method.
+  # ... and that's necessary in turn because Sidekiq's #jobs method is unavailable with ActiveJob.  Fun!
+  include ActiveJob::TestHelper
+
   describe 'versioned by PaperTrail' do
     it { is_expected.to be_versioned }
   end
@@ -249,21 +253,23 @@ describe Run do
     end
 
     describe "#with_run_step_log_tracking and #ordered_step_logs" do
-      it "should create a new RunStepLog for the Run and flag it as successful when no exception is raised" do
+      it "should create a new RunStepLog for the Run and flag it as successful when no exception is raised, and do so idempotently" do
         run = create(:run)
 
-        expect(run.with_run_step_log_tracking(step_type: 'transform') { nil }).to eq(true)
+        2.times do
+          expect(run.with_run_step_log_tracking(step_type: 'transform') { nil }).to eq(true)
 
-        statuses = run.ordered_step_logs
-        expect(statuses.size).to eq(1)
-        status = statuses.first
-        expect(status.run).to eq(run) # duh
-        expect(status.step_type).to eq('transform')
-        expect(status.successful?).to eq(true)
-        expect(status.failed?).to eq(false)
-        expect(status.running_or_crashed?).to eq(false)
-        expect(status.step_exceptions).to eq(nil)
-        expect(status.step_validation_failures).to eq(nil)
+          statuses = run.reload.ordered_step_logs
+          expect(statuses.size).to eq(1)
+          status = statuses.first
+          expect(status.run).to eq(run) # duh
+          expect(status.step_type).to eq('transform')
+          expect(status.successful?).to eq(true)
+          expect(status.failed?).to eq(false)
+          expect(status.running_or_crashed?).to eq(false)
+          expect(status.step_exceptions).to eq(nil)
+          expect(status.step_validation_failures).to eq(nil)
+        end
       end
 
       it "should create a new RunStepLog for the Run and flag it as unsuccessful and preserve the erring IDs in the error" do
@@ -305,6 +311,20 @@ describe Run do
         expect(errors['message']).to eq("Boom!")
         expect(errors['backtrace']).to_not be_empty
         expect(status.step_validation_failures).to eq(nil)
+      end
+
+      it "should not create a RunStepLog when a deadlock exception is raised, and instead queue up a new TransformJob" do
+        Sidekiq::Testing.fake!
+
+        run = create(:run)
+        error_text = "PG::TRDeadlockDetected - blah blah blither blah"
+
+        expect(ApplicationJob.queue_adapter.enqueued_jobs.size).to eq(0)
+
+        expect(run.with_run_step_log_tracking(step_type: 'transform') { raise error_text }).to eq(true)
+
+        expect(run.ordered_step_logs.count).to eq(0)
+        expect(ApplicationJob.queue_adapter.enqueued_jobs.size).to eq(1)
       end
     end
 

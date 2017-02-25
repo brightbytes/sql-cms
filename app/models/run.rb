@@ -179,13 +179,12 @@ class Run < ApplicationRecord
 
     rescue Exception => exception
 
-      # This hack is, quite frankly, utterly humiliating, since it undermines part of my (apparently bogus) theory about how to maintainably write Transforms.
-      # Specifically, I *assumed* that modern DBs would provide an option to implement field-lock or at least column-lock semantics, since Oracle did a couple decades ago.
-      # However, Postgres certainly doesn't, and Redshift doesn't appear to.
+      # This hack undermines part of my (apparently bogus) theory about how to maintainably write Transforms.  Specifically, I *assumed* that modern DBs would provide
+      #  an option to implement field-lock or at least column-lock semantics, since Oracle did a couple decades ago. However, neither Postgres nor Redshift do.
       # So, while I can still argue that writing Transforms on a column-by-column basis makes them easier to maintain because each Transform only concerns a single
       #  aspect of the data, I can no longer argue that any performance gains adhere.
       # Plus, I might not even have a leg to stand on as regards maintainability, since in some cases complex joins would need to be copy/pasted between Transforms
-      #  that pertain to the same target table. FML ** 1,000,000,000
+      #  that pertain to the same target table.
       if exception.message =~ /^PG::TRDeadlockDetected/
         run_step_log.destroy
         TransformJob.perform_later(run_id: id, step_index: step_index, step_id: step_id)
