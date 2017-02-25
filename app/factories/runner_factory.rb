@@ -49,10 +49,15 @@ module RunnerFactory
             "t.#{column_type} :#{header}"
           end.join("\n  ")
 
+          if indexes = plan_h[:params].fetch(:indexed_columns, nil)
+            indexes_s = indexes.map { |column| "add_index :#{table_name}, :#{column}\n" }
+          end
+
           migration_s = <<-SQL.strip_heredoc
             create_table :#{table_name} do |t|
               #{migration_column_s}
             end
+            #{indexes_s}
           SQL
           run.eval_in_schema(migration_s)
 

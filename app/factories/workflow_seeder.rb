@@ -29,7 +29,8 @@ module WorkflowSeeder
         name_type_map: {
           clarity_org_id: :integer,
           co_org_id: :integer
-        }
+        },
+        indexed_columns: [:clarity_org_id, :co_org_id]
       },
       s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
       s3_file_name: 'boces_mappings.csv'
@@ -61,7 +62,8 @@ module WorkflowSeeder
         name_type_map: {
           clarity_org_id: :integer,
           co_org_id: :integer
-        }
+        },
+        indexed_columns: [:clarity_org_id, :co_org_id]
       },
       s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
       s3_file_name: 'district_mappings.csv'
@@ -93,7 +95,8 @@ module WorkflowSeeder
         name_type_map: {
           clarity_org_id: :integer,
           co_org_id: :integer
-        }
+        },
+        indexed_columns: [:clarity_org_id, :co_org_id]
       },
       s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
       s3_file_name: 'school_mappings.csv'
