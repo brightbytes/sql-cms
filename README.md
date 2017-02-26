@@ -61,7 +61,7 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 ### More Important
 
 - DIFFICULT: Port a small customer from the SIS DPL to this platform.  (Yup, it's ready to go, right now.)
-- EASY: Add support for uploading local files to a Transform-specified location on S3 on Transform#show
+- EASY: Add support for uploading local files to a Transform-specified location on S3 on Transform#show; requires a bit of JS on Transform#new & Transform#edit
 - MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by SIS DPL customers without a manual copy-over
 - MIDDLING: Add FE coverage (there's none yet - yeah, I suck ... but TTM is more critical at the moment).
 - MIDDLING: Convert the application to an Engine and open-source it, extracting everything BB-specific to dotenv ENV vars.

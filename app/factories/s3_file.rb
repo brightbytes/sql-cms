@@ -52,6 +52,8 @@ class S3File
 
   class S3ExportFile < S3File
 
+    attr_accessor :run
+
     def initialize(**atts)
       super
       @run = atts[:run]
@@ -62,7 +64,7 @@ class S3File
       @s3_object ||
         begin
           s3_bucket = s3.bucket(s3_bucket_name)
-          @s3_object = s3_bucket.object("#{s3_file_path}/run_#{for_run.id}/#{s3_file_name}")
+          @s3_object = s3_bucket.object("#{s3_file_path}/run_#{run.id}/#{s3_file_name}")
         end
     end
 

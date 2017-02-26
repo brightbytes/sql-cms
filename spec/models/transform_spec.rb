@@ -157,6 +157,10 @@ describe Transform do
       end
     end
 
+    context "Methods returning an S3File" do
+
+    end
+
     context "#available_prerequisite_transforms && #available_unused_prerequisite_transforms" do
 
       include_examples 'cheesey dependency graph'

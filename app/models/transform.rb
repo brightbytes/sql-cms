@@ -139,16 +139,16 @@ class Transform < ApplicationRecord
     runner.in?(RunnerFactory::S3_FILE_RUNNERS)
   end
 
-  def s3_attributes
-    attributes.with_indifferent_access.slice(:s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name)
-  end
-
   def s3_import_file
-    S3File.create('import', s3_attributes)
+    S3File.create('import', **s3_attributes)
   end
 
   def s3_export_file(for_run)
-    S3File.create('export', s3_attributes.merge(run: for_run))
+    S3File.create('export', **s3_attributes.merge(run: for_run))
+  end
+
+  private def s3_attributes
+    attributes.with_indifferent_access.slice(:s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name).symbolize_keys
   end
 
   accepts_nested_attributes_for :prerequisite_transforms
