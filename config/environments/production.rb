@@ -84,9 +84,9 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  BB_HOST = 'dpl-cms.herokuapp.com'
-  config.action_mailer.default_url_options = { :host => BB_HOST }
-  Rails.application.routes.default_url_options[:host] = BB_HOST
+  host = ENV['PRODUCTION_HOST']
+  config.action_mailer.default_url_options = { :host => host }
+  Rails.application.routes.default_url_options[:host] = host
   ActionMailer::Base.delivery_method = :smtp
   ActionMailer::Base.smtp_settings = {
     address: 'smtp.sendgrid.net',

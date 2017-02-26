@@ -34,9 +34,9 @@ Rails.application.configure do
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
-  BB_HOST = 'localhost:3000'.freeze
-  config.action_mailer.default_url_options = { host: BB_HOST }
-  Rails.application.routes.default_url_options[:host] = BB_HOST
+  host = 'localhost:3000'.freeze
+  config.action_mailer.default_url_options = { host: host }
+  Rails.application.routes.default_url_options[:host] = host
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr

@@ -24,8 +24,12 @@ namespace :db do
     task dump: :environment do
       raise "This task is only for use in a development environment" unless Rails.env.development?
 
-      dputs "Dumping PostgreSQL for the DPL CMS Application ..."
-      run("PGPASSWORD=#{DB_CONFIG["password"]} pg_dump -c -o -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} --no-owner -f #{FULL_DUMP_PATH}")
+      if File.exists?(FULL_DUMP_PATH)
+        dputs "Dumping PostgreSQL for the DPL CMS Application ..."
+        run("PGPASSWORD=#{DB_CONFIG["password"]} pg_dump -c -o -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} --no-owner -f #{FULL_DUMP_PATH}")
+      else
+        raise "You can't dump your local DB because #{FULL_DUMP_PATH} doesn't exist."
+      end
     end
 
     desc "Loads tables from the bb_data dump file"
@@ -33,9 +37,12 @@ namespace :db do
     task load_dump: :environment do
       raise "This task is only for use in a development environment" unless Rails.env.development?
 
-      dputs "Loading PostgreSQL for DPL CMS Application ..."
-
-      run("PGPASSWORD=#{DB_CONFIG["password"]} pg_restore -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} #{FULL_DUMP_PATH}")
+      if File.exists?(FULL_DUMP_PATH)
+        dputs "Loading PostgreSQL for DPL CMS Application ..."
+        run("PGPASSWORD=#{DB_CONFIG["password"]} pg_restore -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} #{FULL_DUMP_PATH}")
+      else
+        dputs "Skipping load of dumpfile, since it doesn't exist."
+      end
     end
 
   end

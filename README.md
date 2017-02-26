@@ -64,7 +64,7 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 - EASY: Add support for uploading local files to a Transform-specified location on S3 on Transform#show; requires a bit of JS on Transform#new & Transform#edit
 - MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by SIS DPL customers without a manual copy-over
 - MIDDLING: Add FE coverage (there's none yet - yeah, I suck ... but TTM is more critical at the moment).
-- MIDDLING: Convert the application to an Engine and open-source it, extracting everything BB-specific to dotenv ENV vars.
+- MIDDLING: Convert the application to an Engine and open-source it.
 - DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3` ... but there just has to be a gem for it ...)
 
 ### Less Important
@@ -235,17 +235,24 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
   * Create a .env file in your dpl-cms project folder with the following contents:
 
     ```
-    export PORT=3000
-    export RACK_ENV=development
+    PORT=3000
+    RACK_ENV=development
 
-    # You must supply these to connect to S3:
-    #  (If you are a SIS DPL dude, you already have these set up in your ~/.bb_ops/aws_user.env file, so move along: nothing to see here.)
-    export AWS_ACCESS_KEY_ID=<your access ID here>
-    export AWS_SECRET_ACCESS_KEY=<your secret access key here>
+    DEFAULT_S3_REGION='us-west-2'
+    DEFAULT_S3_BUCKET=<your preferred default bucket here>
 
-    # These aren't required, but I have them locally, and they may be necessary for something I haven't run into yet:
-    export AWS_ACCOUNT_ID=<your account ID here>
-    export AWS_REGION="us-west-2"
+    MAIL_SENDER='someone@somewhere.com'
+
+    # Only set this if you deploy somewhere
+    PRODUCTION_HOST='your-app-name.herokuapp.com'
+
+    # You must supply these. (If you are a SIS DPL dude, you already have these set up globally in your env, so move along: nothing to see here.)
+    AWS_ACCESS_KEY_ID=<your access ID here>
+    AWS_SECRET_ACCESS_KEY=<your secret access key here>
+
+    # I have these globally in my ENV, and they may be necessary for something I haven't run into yet ... but I suspect not
+    AWS_ACCOUNT_ID=<your account ID here>
+    AWS_REGION="us-west-2"
     ```
 
   * Use [dotenv](https://github.com/bkeepers/dotenv) to import this file automatically when you enter the `dpl-cms` directory.

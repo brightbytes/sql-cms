@@ -508,7 +508,7 @@ module WorkflowSeeder
   end
 
   def create_demo_transform!(**options)
-    Transform.where(name: options.delete(:name)).first_or_create!(options.merge(workflow: demo_workflow, s3_bucket_name: 'bb-dpl-cms'))
+    Transform.where(name: options.delete(:name)).first_or_create!(options.merge(workflow: demo_workflow))
   end
 
   def create_demo_dependency!(**options)

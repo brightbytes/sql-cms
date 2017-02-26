@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: 'dpl-cms@brightbytes.net'
+  default from: ENV['MAIL_SENDER']
   layout 'mailer'
 end

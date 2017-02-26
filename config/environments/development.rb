@@ -31,9 +31,9 @@ Rails.application.configure do
   config.action_mailer.preview_path = Rails.root.join('spec/mailers/previews').to_s
   config.action_mailer.perform_caching = false
 
-  BB_HOST = ENV['BRIGHTBYTES_HOST'] || 'localhost:3000'
-  config.action_mailer.default_url_options = { host: BB_HOST }
-  Rails.application.routes.default_url_options[:host] = BB_HOST
+  host = ENV['LOCALHOST_AND_PORT'] || 'localhost:3000'
+  config.action_mailer.default_url_options = { host: host }
+  Rails.application.routes.default_url_options[:host] = host
 
   config.action_mailer.perform_deliveries = false
 
