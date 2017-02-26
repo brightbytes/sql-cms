@@ -52,11 +52,11 @@ RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
 
   config.before(:each) do
-    # Globally stubs S3 access.  Quick and dirty ... and unsatisfactory.  I feel empty inside, writing these 2 blocks.
-    allow_any_instance_of(Transform).to receive(:s3_presigned_url) do |transform|
-      Rails.root.join("spec/fixtures/files/#{transform.s3_file_name}")
+    # Globally stubs S3 access
+    allow_any_instance_of(S3File::S3ImportFile).to receive(:s3_presigned_url) do |s3_file|
+      Rails.root.join("spec/fixtures/files/#{s3_file.s3_file_name}")
     end
-    allow_any_instance_of(Transform).to receive(:s3_object) do |transform, run|
+    allow_any_instance_of(S3File::S3ExportFile).to receive(:s3_object) do |s3_file|
       s3_obj = double.tap { |o| allow(o).to receive(:put) }
     end
   end

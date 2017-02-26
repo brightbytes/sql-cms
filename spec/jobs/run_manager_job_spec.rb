@@ -16,6 +16,10 @@ describe RunManagerJob do
           run = workflow.run!(creator)
           run.reload
 
+          # Default debugging of global refactoring goof-ups, baby!!
+          errors =  run.run_step_logs.erring.to_a
+          dpp errors if errors.present?
+
           expect(run.successful?).to eq(true)
           expect(run.failed?).to eq(false)
           expect(run.running_or_crashed?).to eq(false)

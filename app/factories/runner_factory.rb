@@ -27,14 +27,15 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      # FIXME - THIS IS CHEESEY, AND BEGS FOR AN OBJECT TO WRAP THE S3 ATTS
-      virtual_transform = Transform.new(
+      s3_file = S3File.create(
+        'import',
         s3_region_name: plan_h[:s3_region_name],
         s3_bucket_name: plan_h[:s3_bucket_name],
         s3_file_path: plan_h[:s3_file_path],
-        s3_file_name: plan_h[:s3_file_name],
+        s3_file_name: plan_h[:s3_file_name]
       )
-      open(virtual_transform.s3_presigned_url) do |stream|
+
+      open(s3_file.s3_presigned_url) do |stream|
         table_name = plan_h[:params].fetch(:table_name, nil)
         raise "The AutoLoad runner requires a :table_name param" unless table_name.present?
 
@@ -42,7 +43,7 @@ module RunnerFactory
           # We wrap in a CSV obj only to get automatic parsing of quotes/commas/escapes for the header ... and discard the CSV object after that sole use
           csv_wrapped_stream = CSV.new(stream)
           header_a = csv_wrapped_stream.gets
-          raise "Empty header line for #{virtual_transform.s3_public_url}" unless header_a.present?
+          raise "Empty header line for #{s3_file.s3_public_url}" unless header_a.present?
 
           header_a.map! { |header| Workflow.to_sql_identifier(header) }
 
@@ -94,14 +95,16 @@ module RunnerFactory
 
     def run(run:, plan_h:)
       sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
-      # FIXME - THIS IS CHEESEY, AND BEGS FOR AN OBJECT TO WRAP THE S3 ATTS
-      virtual_transform = Transform.new(
+
+      s3_file = S3File.create(
+        'import',
         s3_region_name: plan_h[:s3_region_name],
         s3_bucket_name: plan_h[:s3_bucket_name],
         s3_file_path: plan_h[:s3_file_path],
-        s3_file_name: plan_h[:s3_file_name],
+        s3_file_name: plan_h[:s3_file_name]
       )
-      open(virtual_transform.s3_presigned_url) do |stream|
+
+      open(s3_file.s3_presigned_url) do |stream|
         run.copy_from_in_schema(sql: sql, enumerable: stream)
       end
     end
@@ -125,19 +128,21 @@ module RunnerFactory
 
     def run(run:, plan_h:)
       sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
-      # FIXME - THIS IS CHEESEY, AND BEGS FOR AN OBJECT TO WRAP THE S3 ATTS
-      virtual_transform = Transform.new(
+
+      s3_file = S3File.create(
+        'export',
         s3_region_name: plan_h[:s3_region_name],
         s3_bucket_name: plan_h[:s3_bucket_name],
         s3_file_path: plan_h[:s3_file_path],
         s3_file_name: plan_h[:s3_file_name],
+        run: run
       )
 
       # Tragically, we can't use IO.pipe b/c AWS needs to know the file size in advance so as to chunk the data when appropriate
-      Tempfile.open(virtual_transform.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
+      Tempfile.open(s3_file.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
         run.copy_to_in_schema(sql: sql, writeable_io: stream).tap do
           stream.rewind
-          virtual_transform.s3_object(run).put(body: stream)
+          s3_file.s3_object.put(body: stream)
         end
       end
     end

@@ -121,6 +121,36 @@ class Transform < ApplicationRecord
 
   # Instance Methods
 
+  attr_accessor :supplied_s3_url
+
+  def importing?
+    runner.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
+  end
+
+  def exporting?
+    runner.in?(RunnerFactory::EXPORT_S3_FILE_RUNNERS)
+  end
+
+  def auto_load?
+    runner == 'AutoLoad'
+  end
+
+  def s3_file_required?
+    runner.in?(RunnerFactory::S3_FILE_RUNNERS)
+  end
+
+  def s3_attributes
+    attributes.with_indifferent_access.slice(:s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name)
+  end
+
+  def s3_import_file
+    S3File.create('import', s3_attributes)
+  end
+
+  def s3_export_file(for_run)
+    S3File.create('export', s3_attributes.merge(run: for_run))
+  end
+
   accepts_nested_attributes_for :prerequisite_transforms
 
   # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite is itself available as a prerequisite (and may already be such).
@@ -158,65 +188,6 @@ class Transform < ApplicationRecord
     return false if dependents.empty?
     return true if dependents.include?(self)
     dependents.any? { |dependent_transform| already_my_prerequisite?(dependent_transform) }
-  end
-
-  public
-
-  def importing?
-    runner.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
-  end
-
-  def exporting?
-    runner.in?(RunnerFactory::EXPORT_S3_FILE_RUNNERS)
-  end
-
-  def s3_file_required?
-    runner.in?(RunnerFactory::S3_FILE_RUNNERS)
-  end
-
-  def auto_load?
-    runner == 'AutoLoad'
-  end
-
-  attr_accessor :supplied_s3_url
-
-  # FIXME - EXTRACT ALL METHODS THAT ACTUALLY DEAL WITH THE REMOTE S3 OBJECT INTO THEIR OWN HELPER-OBJECT, PERHAPS IN THE app/models/s3 directory
-
-  # FIXME - I'm not happy about how I did this method overloading for importing? and exporting?
-  def s3_object(for_run = nil)
-    return nil unless all_required_s3_fields_present?
-    raise "You must supply a Run object for export files!" if exporting? && !for_run
-
-    @s3_object ||
-      begin
-        s3_bucket = s3.bucket(s3_bucket_name)
-        path = (exporting? ? "#{s3_file_path}/run_#{for_run.id}" : s3_file_path)
-        @s3_object = s3_bucket.object("#{path}/#{s3_file_name}")
-      end
-  end
-
-  def s3_presigned_url
-    return false unless all_required_s3_fields_present?
-    @s3_presigned_url ||= s3_object.presigned_url(:get) if s3_object.exists?
-  end
-
-  def s3_file_exists?
-    importing? && !!s3_presigned_url
-  end
-
-  def s3_public_url
-    return false unless all_required_s3_fields_present?
-    @s3_public_url ||= s3_object.public_url if s3_object.exists?
-  end
-
-  private
-
-  def s3
-    @s3 ||= Aws::S3::Resource.new(region: s3_region_name)
-  end
-
-  def all_required_s3_fields_present?
-    [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
   end
 
 end

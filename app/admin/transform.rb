@@ -43,7 +43,7 @@ ActiveAdmin.register Transform do
         row :s3_bucket_name
         row :s3_file_path
         row :s3_file_name
-        row(:s3_file_exists?) { yes_no(resource.s3_file_exists?, yes_color: :green, no_color: :red) } if transform.importing?
+        row(:s3_file_exists?) { yes_no(resource.s3_import_file.s3_file_exists?, yes_color: :green, no_color: :red) } if transform.importing?
       end
 
       row :created_at
@@ -89,7 +89,7 @@ ActiveAdmin.register Transform do
 
   sidebar("Actions", only: :show) do
     ul do
-      li link_to("Upload File to S3") if resource.importing? && !resource.s3_file_exists?
+      li link_to("Upload File to S3") if resource.importing? && !resource.s3_import_file.s3_file_exists?
     end
   end
 
