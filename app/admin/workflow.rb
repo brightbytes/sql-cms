@@ -29,38 +29,12 @@ ActiveAdmin.register Workflow do
 
     para link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
 
-    # FIXME - GET RID OF COPY/PASTE
-
     panel 'Independent Transforms' do
-      table_for(resource.transforms.independent.order(:name)) do
-        column(:name, sortable: :name) { |transform| auto_link(transform) }
-        column(:runner, sortable: :runner) { |transform| transform.runner }
-        column(:s3_region_name)
-        column(:s3_bucket_name)
-        column(:s3_file_path)
-        column(:s3_file_name)
-        column(:s3_file_exists?) do |transform|
-          if transform.importing?
-            yes_no(transform.s3_import_file.s3_file_exists?, yes_color: :green, no_color: :red)
-          elsif transform.exporting?
-            'n/a'
-          end
-        end
-        column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
-      end
+      render partial: 'admin/workflow/s3_transform_panel', locals: { transforms: resource.transforms.independent.order(:name) }
     end
 
     panel 'Data-Importing Transforms' do
-      table_for(resource.transforms.importing.order(:name)) do
-        column(:name, sortable: :name) { |transform| auto_link(transform) }
-        column(:runner, sortable: :runner) { |transform| transform.runner }
-        column(:s3_region_name)
-        column(:s3_bucket_name)
-        column(:s3_file_path)
-        column(:s3_file_name)
-        column(:s3_file_exists?) { |transform| yes_no(transform.s3_import_file.s3_file_exists?, yes_color: :green, no_color: :red) }
-        column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
-      end
+      render partial: 'admin/workflow/s3_transform_panel', locals: { transforms: resource.transforms.importing.order(:name) }
     end
 
     panel 'Dependent, non-Importing/Exporting Transforms' do
@@ -72,15 +46,7 @@ ActiveAdmin.register Workflow do
     end
 
     panel 'Data-Exporting Transforms' do
-      table_for(resource.transforms.exporting.order(:name)) do
-        column(:name, sortable: :name) { |transform| auto_link(transform) }
-        column(:runner, sortable: :runner) { |transform| transform.runner }
-        column(:s3_region_name)
-        column(:s3_bucket_name)
-        column(:s3_file_path)
-        column(:s3_file_name)
-        column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
-      end
+      render partial: 'admin/workflow/s3_transform_panel', locals: { transforms: resource.transforms.exporting.order(:name) }
     end
 
     para link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
