@@ -17,16 +17,6 @@ module UserSeeder
       email: 'aaron@brightbytes.net',
       first_name: 'Aaron',
       last_name: 'Cohen'
-    },
-    {
-      email: 'buckley@brightbytes.net',
-      first_name: 'Buckley',
-      last_name: 'Robinson'
-    },
-    {
-      email: 'nato@brightbytes.net',
-      first_name: 'Nato',
-      last_name: 'Powell'
     }
   ]
 
