@@ -27,7 +27,20 @@ class S3File
   class S3ImportFile < S3File
 
     def s3_presigned_url
-      @s3_presigned_url ||= s3_object.presigned_url(:get) if s3_object.exists?
+      @s3_presigned_url ||=
+        begin
+          exists = s3_object.exists?
+          s3_object.presigned_url(:get) if exists
+        rescue Aws::S3::Errors::Http301Error
+          false
+        end
+    end
+
+    def s3_object_valid?
+      s3_object.exists?
+      true
+    rescue Aws::S3::Errors::Http301Error
+      false
     end
 
     def s3_file_exists?

@@ -49,7 +49,7 @@ class Transform < ApplicationRecord
     errors.add(:s3_file_name, S3_ATTRIBUTES_PRESENT_ERROR_MSG) if s3_file_name.blank?
   end
 
-  validate :supplied_s3_url_is_not_hosed, if: :s3_file_required?
+  validate :supplied_s3_url_is_not_hosed, if: :s3_file_specified_by_url?
 
   private def supplied_s3_url_is_not_hosed
     errors.add(:supplied_s3_url, "must be provided") if supplied_s3_url.blank? && s3_bucket_name.blank? && s3_file_name.blank?
@@ -67,7 +67,7 @@ class Transform < ApplicationRecord
     end
   end
 
-  before_validation :parse_supplied_s3_url, if: :s3_file_required?
+  before_validation :parse_supplied_s3_url, if: :s3_file_specified_by_url?
 
   private def parse_supplied_s3_url
     if supplied_s3_url.present?
@@ -121,7 +121,7 @@ class Transform < ApplicationRecord
 
   # Instance Methods
 
-  attr_accessor :supplied_s3_url
+  attr_accessor :specify_s3_file_by, :supplied_s3_url
 
   def importing?
     runner.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
@@ -137,6 +137,10 @@ class Transform < ApplicationRecord
 
   def s3_file_required?
     runner.in?(RunnerFactory::S3_FILE_RUNNERS)
+  end
+
+  def s3_file_specified_by_url?
+    specify_s3_file_by == 'url'
   end
 
   def s3_import_file

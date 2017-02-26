@@ -61,7 +61,7 @@ describe Transform do
 
     context "before_validation" do
       it "should parse a valid supplied s3-resource URL if possible" do
-        transform = build(:copy_from_transform, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil)
+        transform = build(:copy_from_transform, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
         transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/some-bucket/ca_some_sis/some_data_source/shoobie.tsv"
         expect(transform.valid?).to eq(true)
         expect(transform.s3_region_name).to eq('us-west-2')
@@ -69,7 +69,7 @@ describe Transform do
         expect(transform.s3_file_path).to eq('ca_some_sis/some_data_source')
         expect(transform.s3_file_name).to eq('shoobie.tsv')
 
-        transform = build(:copy_from_transform, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil)
+        transform = build(:copy_from_transform, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
         transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/some-bucket/shoobie.tsv"
         expect(transform.valid?).to eq(true)
         expect(transform.s3_region_name).to eq('us-west-2')
@@ -78,7 +78,7 @@ describe Transform do
         expect(transform.s3_file_name).to eq('shoobie.tsv')
 
         # This is a validation test, but it's here just because it feels right
-        transform = build(:copy_from_transform, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil)
+        transform = build(:copy_from_transform, s3_bucket_name: nil, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
         transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/some-bucket"
         expect(transform.valid?).to eq(false)
       end

@@ -4,7 +4,7 @@ ActiveAdmin.register Transform do
 
   actions :all
 
-  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name, prerequisite_transform_ids: []
+  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :specify_s3_file_by, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name, prerequisite_transform_ids: []
 
   filter :name, as: :string
   filter :runner, as: :select, collection: RunnerFactory::RUNNERS
@@ -39,8 +39,15 @@ ActiveAdmin.register Transform do
       simple_format_row(:interpolated_sql) if resource.params.present?
 
       if transform.importing? || transform.exporting?
-        row :s3_region_name
-        row :s3_bucket_name
+        error_msg = "<br /><span style='color: red'>Either the s3_region_name or the s3_bucket_name is not valid because S3 pukes on it!</span>".html_safe
+        row(:s3_region_name) do
+          text_node(transform.s3_region_name)
+          text_node(error_msg) if transform.importing? && !transform.s3_import_file.s3_object_valid?
+        end
+        row(:s3_bucket_name)do
+          text_node(transform.s3_bucket_name)
+          text_node(error_msg) if transform.importing? && !transform.s3_import_file.s3_object_valid?
+        end
         row :s3_file_path
         row :s3_file_name
         row(:s3_file_exists?) { yes_no(resource.s3_import_file.s3_file_exists?, yes_color: :green, no_color: :red) } if transform.importing?
@@ -100,7 +107,7 @@ ActiveAdmin.register Transform do
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
 
       input :name, as: :string
-      input :runner, as: :select, collection: RunnerFactory::RUNNERS
+      input :runner, as: :select, collection: RunnerFactory::RUNNERS, input_html: { disabled: f.object.persisted? }
 
       # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
       #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
@@ -117,14 +124,22 @@ ActiveAdmin.register Transform do
 
       else
 
+        show_s3_url = f.object.supplied_s3_url.present?
+        show_s3_file = !show_s3_url && f.object.s3_file_name.present?
+        show_s3_selector = ((show_s3_url || show_s3_file) ? {} : { style: 'display:none' })
+        input :specify_s3_file_by, as: :select, collection: [['HTTPS URL for existing S3 file', :url], ['S3 file location for future upload', :s3_fields]], wrapper_html: show_s3_selector, required: true, include_blank: false
+
         # For import files ...
-        input :supplied_s3_url, label: "S3 File URL", required: true, wrapper_html: { style: 'display:none' }, hint: "Copy/paste the https:// URL from S3"
+        url_display_h = (show_s3_url ? {} : { style: 'display:none' })
+        input :supplied_s3_url, label: "S3 File URL", required: true, wrapper_html: url_display_h, hint: "Copy/paste the https:// URL from S3"
 
         # For export files ...
-        input :s3_region_name, as: :string, wrapper_html: { style: 'display:none' } # should be a drop-down
-        input :s3_bucket_name, as: :string, wrapper_html: { style: 'display:none' }
-        input :s3_file_path, as: :string, wrapper_html: { style: 'display:none' }
-        input :s3_file_name, as: :string, wrapper_html: { style: 'display:none' }
+        file_display_h = (show_s3_file ? {} : { style: 'display:none' })
+        input :s3_region_name, as: :string, wrapper_html: file_display_h # should be a drop-down
+        input :s3_bucket_name, as: :string, wrapper_html: file_display_h
+        input :s3_file_path, as: :string, wrapper_html: file_display_h
+
+        input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on the next page."
 
       end
 
