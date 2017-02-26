@@ -52,13 +52,12 @@ RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
 
   config.before(:each) do
-    # Globally stubs S3 access
+    # Globally stub S3 access in import files
     allow_any_instance_of(S3File::S3ImportFile).to receive(:s3_presigned_url) do |s3_file|
       Rails.root.join("spec/fixtures/files/#{s3_file.s3_file_name}")
     end
-    allow_any_instance_of(S3File::S3ExportFile).to receive(:s3_object) do |s3_file|
-      s3_obj = double.tap { |o| allow(o).to receive(:put) }
-    end
+    # Globally stub S3 access in export files
+    allow_any_instance_of(S3File::S3ExportFile).to receive(:put)
   end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
