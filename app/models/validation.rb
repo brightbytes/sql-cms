@@ -57,7 +57,7 @@ class Validation < ApplicationRecord
     def presence
       @presence ||= Validation.where(name: 'String Field Value is Present').first_or_create!(
         immutable: true,
-        sql: "SELECT id FROM :table_name WHERE (:column_name <> '') IS NOT TRUE"
+        sql: "SELECT id FROM :table_name WHERE (TRIM(:column_name) <> '') IS NOT TRUE"
       )
     end
 
