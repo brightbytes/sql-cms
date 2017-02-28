@@ -27,17 +27,12 @@ ActiveAdmin.register Workflow do
       row :updated_at
     end
 
-    para link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
+    render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Independent Transforms', transforms: resource.transforms.independent.order(:name) }
 
-    panel 'Independent Transforms' do
-      render partial: 'admin/workflow/s3_transform_panel', locals: { transforms: resource.transforms.independent.order(:name) }
-    end
-
-    panel 'Data-Importing Transforms' do
-      render partial: 'admin/workflow/s3_transform_panel', locals: { transforms: resource.transforms.importing.order(:name) }
-    end
+    render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Data-Importing Transforms', transforms: resource.transforms.importing.order(:name) }
 
     panel 'Dependent, non-Importing/Exporting Transforms' do
+      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
       table_for(resource.transforms.dependent_non_file_related.order(:name)) do
         column(:name, sortable: :name) { |transform| auto_link(transform) }
         column(:runner, sortable: :runner) { |transform| transform.runner }
@@ -45,22 +40,18 @@ ActiveAdmin.register Workflow do
       end
     end
 
-    panel 'Data-Exporting Transforms' do
-      render partial: 'admin/workflow/s3_transform_panel', locals: { transforms: resource.transforms.exporting.order(:name) }
-    end
-
-    para link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
+    render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Data-Exporting Transforms', transforms: resource.transforms.exporting.order(:name) }
 
     panel 'Data Quality Reports' do
+      text_node link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
       table_for(resource.data_quality_reports.order(:name)) do
         column(:name) { |dqr| auto_link(dqr) }
         column(:action) { |dqr| link_to("Delete", data_quality_report_path(dqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data Quality Report?' }) }
       end
     end
 
-    para link_to("Run Now", run_workflow_path(workflow), method: :put)
-
     panel 'Runs' do
+      text_node link_to("Run Now", run_workflow_path(workflow), method: :put)
       table_for(resource.runs.includes(:creator).order(id: :desc)) do
         column(:schema_name) { |run| auto_link(run) }
         column(:creator)
@@ -69,9 +60,8 @@ ActiveAdmin.register Workflow do
       end
     end
 
-    para link_to("Add New Notifications", edit_workflow_path(workflow))
-
     panel 'Run Notifications' do
+      text_node link_to("Add New Notifications", edit_workflow_path(workflow))
       table_for(resource.notifications.joins(:user).order('users.first_name, users.last_name')) do
         column(:user) { |notification| auto_link(notification.user) }
         column(:action) { |notification| link_to("Delete", notification_path(notification), method: :delete, data: { confirm: 'Are you sure you want to nuke this Notification?' }) }

@@ -1,16 +1,19 @@
-table_for(transforms) do
-  column(:name, sortable: :name) { |transform| auto_link(transform) }
-  column(:runner, sortable: :runner) { |transform| transform.runner }
-  column(:s3_region_name)
-  column(:s3_bucket_name)
-  column(:s3_file_path)
-  column(:s3_file_name)
-  column(:s3_file_exists?) do |transform|
-    if transform.importing?
-      yes_no(transform.s3_import_file.s3_file_exists?, yes_color: :green, no_color: :red)
-    elsif transform.exporting?
-      'n/a'
+panel panel_name do
+  text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
+  table_for(transforms) do
+    column(:name, sortable: :name) { |transform| auto_link(transform) }
+    column(:runner, sortable: :runner) { |transform| transform.runner }
+    column(:s3_region_name)
+    column(:s3_bucket_name)
+    column(:s3_file_path)
+    column(:s3_file_name)
+    column(:s3_file_exists?) do |transform|
+      if transform.importing?
+        yes_no(transform.s3_import_file.s3_file_exists?, yes_color: :green, no_color: :red)
+      elsif transform.exporting?
+        'n/a'
+      end
     end
+    column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
   end
-  column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
 end
