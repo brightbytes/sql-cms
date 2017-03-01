@@ -117,10 +117,11 @@ ActiveAdmin.register Transform do
 
       if f.object.persisted?
 
-        input :s3_region_name, as: :string # This should be a drop-down
-        input :s3_bucket_name, as: :string
-        input :s3_file_path, as: :string
-        input :s3_file_name, as: :string
+        file_display_h = (f.object.s3_file_name.present? ? {} : { style: 'display:none' })
+        input :s3_region_name, as: :string, wrapper_html: file_display_h # This should be a drop-down
+        input :s3_bucket_name, as: :string, wrapper_html: file_display_h
+        input :s3_file_path, as: :string, wrapper_html: file_display_h
+        input :s3_file_name, as: :string, wrapper_html: file_display_h
 
       else
 
