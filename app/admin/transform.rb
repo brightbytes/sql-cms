@@ -102,6 +102,9 @@ ActiveAdmin.register Transform do
 
   form do |f|
     inputs 'Details' do
+      # Comment-in when attempting to debug the accepts_nested_attributes_for on #create issue:
+      # semantic_errors *f.object.errors.keys
+
       input :customer_id, as: :hidden, input_html: { value: transform_customer_id_param_val }
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
@@ -146,10 +149,11 @@ ActiveAdmin.register Transform do
 
     end
 
-    # We don't know the :workflow if we're creating, so we can't populate these
-    # (Yes, we do know params[:workflow_id] if we get here from the Workflow, BUT, the .save goes sideways because Rails tries to save the assn before the main obj,
-    #  and it's just not worth my time to debug.)
-    if f.object.persisted?
+    # We comment out the ability to .save on #create because Rails tries to save the join obj before the main obj has been saved (I think)
+    # HOWEVER, the "has_many :through accepts_nested_attributes_for" thing works GREAT on Workflow#create for Workflow#notified_users ...
+    #          and I can't suss what's different here. (The associations and inverse_ofs are identically structured, and removing the :collection above
+    #          doesn't fix the problem.  Nor did a half dozen other tweaks I made.  My only guess is that the issue is b/c a Transform is at either end of the join.)
+    if f.object.persisted? # || workflow_id_param_val
       inputs 'Dependencies' do
         input :prerequisite_transforms, as: :check_boxes, collection: f.object.available_prerequisite_transforms
       end
@@ -167,6 +171,17 @@ ActiveAdmin.register Transform do
     def scoped_collection
       super.joins(workflow: :customer)
     end
+
+    def new
+      @transform = Transform.new(workflow_id: params[:workflow_id].presence.try(:to_i))
+    end
+
+    # For debuging ... sigh
+    # def create
+    #   params[:transform][:prerequisite_transform_ids].reject!(&:blank?)
+    #   super
+    #   dpp @transform.id, @transform.prerequisite_dependencies.each { |td| td.errors.full_messages }
+    # end
 
     def destroy
       super do |success, failure|
