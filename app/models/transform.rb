@@ -140,7 +140,7 @@ class Transform < ApplicationRecord
   end
 
   def s3_file_specified_by_url?
-    specify_s3_file_by == 'url'
+    s3_file_required? && specify_s3_file_by == 'url'
   end
 
   def s3_import_file
