@@ -50,6 +50,7 @@ ActiveAdmin.register Workflow do
       text_node link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
       table_for(resource.data_quality_reports.order(:name)) do
         column(:name) { |dqr| auto_link(dqr) }
+        column(:sql) { |dqr| dqr.sql.truncate(100) }
         column(:actions) do |dqr|
           text_node(link_to("Edit", edit_data_quality_report_path(dqr, source: :workflow, workflow_id: dqr.workflow_id)))
           text_node(' | ')
