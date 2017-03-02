@@ -9,13 +9,14 @@ panel panel_name do
       column(:s3_bucket_name)
       column(:s3_file_path)
       column(:s3_file_name)
-      column(:s3_file_exists?) do |transform|
-        if transform.importing?
-          yes_no(transform.s3_import_file.s3_file_exists?, yes_color: :green, no_color: :red)
-        elsif transform.exporting?
-          'n/a'
-        end
-      end
+      # Slows down Workflow#show page.  Damnit.
+      # column(:s3_file_exists?) do |transform|
+      #   if transform.importing?
+      #     yes_no(transform.s3_import_file.s3_file_exists?, yes_color: :green, no_color: :red)
+      #   elsif transform.exporting?
+      #     'n/a'
+      #   end
+      # end
     end
     column(:actions) do |transform|
       text_node(link_to("Edit", edit_transform_path(transform, source: :workflow, workflow_id: transform.workflow_id)))
