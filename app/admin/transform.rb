@@ -94,9 +94,9 @@ ActiveAdmin.register Transform do
     render partial: 'admin/shared/history'
   end
 
-  sidebar("Actions", only: :show) do
+  sidebar("Actions", only: :show, if: -> { resource.importing? && !resource.s3_import_file.s3_file_exists? }) do
     ul do
-      li link_to("Upload File to S3") if resource.importing? && !resource.s3_import_file.s3_file_exists?
+      li link_to("Upload File to S3")
     end
   end
 
@@ -171,6 +171,13 @@ ActiveAdmin.register Transform do
       super.joins(workflow: :customer)
     end
 
+    def action_methods
+      result = super
+      # Don't show the New button on the Transform page, so that creating a New Transform always takes you back to the Workflow page
+      result -= ['new'] if action_name == 'index'
+      result
+    end
+
     def new
       @transform = Transform.new(workflow_id: params[:workflow_id].presence.try(:to_i))
     end
@@ -181,6 +188,23 @@ ActiveAdmin.register Transform do
     #   super
     #   dpp @transform.id, @transform.prerequisite_dependencies.each { |td| td.errors.full_messages }
     # end
+
+    def create
+      super do |success, failure|
+        success.html do
+          redirect_to(workflow_path(resource.workflow))
+        end
+      end
+    end
+
+    def update
+      super do |success, failure|
+        success.html do
+          # params[:source] isn't persisted from #edit to #update ... but I'll be damned if I add an attr_accessor for it on the model ... hmm
+          redirect_to(params[:source] == 'workflow' ? workflow_path(resource.workflow) : transform_path(resource))
+        end
+      end
+    end
 
     def destroy
       super do |success, failure|
