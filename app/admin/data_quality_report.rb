@@ -38,12 +38,6 @@ ActiveAdmin.register DataQualityReport do
     render partial: 'admin/shared/history'
   end
 
-  sidebar("Actions", only: :show) do
-    ul do
-      li link_to("Copy to Another Workflow")
-    end
-  end
-
   form do |f|
     inputs 'Details' do
 
