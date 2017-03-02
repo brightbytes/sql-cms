@@ -27,7 +27,7 @@ describe DataQualityReport do
   end
 
   describe "validations" do
-    [:name, :sql, :workflow].each do |att|
+    [:name, :workflow].each do |att|
       it { should validate_presence_of(att) }
     end
 
@@ -36,6 +36,16 @@ describe DataQualityReport do
       it { should validate_uniqueness_of(:name).case_insensitive }
     end
 
+  end
+
+  describe "callbacks" do
+    context "before_validation" do
+      it "should generate the default table-count SQL if no #sql is present" do
+        dqr = build(:data_quality_report, sql: nil)
+        expect(dqr.valid?).to eq(true)
+        expect(dqr.sql).to eq(DataQualityReport::DEFAULT_TABLE_COUNT_SQL)
+      end
+    end
   end
 
   describe "associations" do

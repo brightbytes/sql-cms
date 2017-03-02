@@ -100,6 +100,18 @@ describe Transform do
         expect(transform.s3_file_name).to eq(nil)
         expect(transform.supplied_s3_url).to eq(nil)
       end
+
+      it "should generate the default TSV SQL if no #sql is present and the runner is 'CopyFrom' and the import file is a TSV" do
+        transform = build(:transform, sql: nil, runner: 'CopyFrom', specify_s3_file_by: 'url', supplied_s3_url: "https://s3-us-west-2.amazonaws.com/some-bucket/shoobie.tsv")
+        expect(transform.valid?).to eq(true)
+        expect(transform.sql).to eq(Transform::DEFAULT_TSV_SQL)
+      end
+
+      it "should generate the default CSV SQL if no #sql is present and the runner is 'CopyFrom' and the import file is a CSV" do
+        transform = build(:transform, sql: nil, runner: 'CopyFrom', specify_s3_file_by: 'url', supplied_s3_url: "https://s3-us-west-2.amazonaws.com/some-bucket/shoobie.csv")
+        expect(transform.valid?).to eq(true)
+        expect(transform.sql).to eq(Transform::DEFAULT_CSV_SQL)
+      end
     end
 
   end

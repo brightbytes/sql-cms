@@ -96,10 +96,13 @@ class Transform < ApplicationRecord
 
   before_validation :maybe_generate_default_sql, if: :copy_from?
 
+  DEFAULT_TSV_SQL = %q{COPY :table_name FROM STDIN WITH DELIMITER E'\t' NULL ''}
+  DEFAULT_CSV_SQL = "COPY :table_name FROM STDIN WITH CSV"
+
   def maybe_generate_default_sql
     if sql.blank?
-      self.sql = %q{COPY :table_name FROM STDIN WITH DELIMITER E'\t' NULL ''} if s3_import_file.tsv?
-      self.sql = "COPY :table_name FROM STDIN WITH CSV" if s3_import_file.csv?
+      self.sql = DEFAULT_TSV_SQL if s3_import_file.tsv?
+      self.sql = DEFAULT_CSV_SQL if s3_import_file.csv?
     end
   end
 

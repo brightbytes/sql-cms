@@ -54,9 +54,9 @@ ActiveAdmin.register DataQualityReport do
 
       # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
       #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
-      input :params_yaml, as: :text
+      input :params_yaml, as: :text, hint: 'Add `table_name: your_table_name` here and leave the SQL field blank to auto-generate table-count SQL'
 
-      input :sql, as: :text
+      input :sql, as: :text, hint: "If you leave this blank, it will auto-generate table-count SQL."
     end
 
     actions do

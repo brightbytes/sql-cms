@@ -33,6 +33,16 @@ class DataQualityReport < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
+  # Callbacks
+
+  before_validation :maybe_generate_default_sql
+
+  DEFAULT_TABLE_COUNT_SQL = "SELECT COUNT(1) FROM :table_name"
+
+  def maybe_generate_default_sql
+    self.sql = DEFAULT_TABLE_COUNT_SQL if sql.blank?
+  end
+
   # Associations
 
   belongs_to :workflow, inverse_of: :data_quality_reports
