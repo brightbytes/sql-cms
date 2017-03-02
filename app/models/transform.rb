@@ -98,7 +98,7 @@ class Transform < ApplicationRecord
 
   def maybe_generate_default_sql
     if sql.blank?
-      self.sql = "COPY :table_name FROM STDIN WITH DELIMITER E'\t' NULL ''" if s3_import_file.tsv?
+      self.sql = %q{COPY :table_name FROM STDIN WITH DELIMITER E'\t' NULL ''} if s3_import_file.tsv?
       self.sql = "COPY :table_name FROM STDIN WITH CSV" if s3_import_file.csv?
     end
   end
