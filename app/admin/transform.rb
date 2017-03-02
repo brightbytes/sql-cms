@@ -115,7 +115,7 @@ ActiveAdmin.register Transform do
       #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
       input :params_yaml, as: :text
 
-      input :sql, as: :text
+      input :sql, as: :text, hint: "If you leave this blank for TSV and CSV CopyFrom Transforms, it will auto-generate SQL under the assumption that the source file has its columns in the same order as the table declares columns."
 
       if f.object.persisted?
 
