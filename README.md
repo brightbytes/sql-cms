@@ -60,8 +60,7 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 
 ### More Important
 
-- DIFFICULT: Port a small customer from the SIS DPL LDR/STG to this platform, and then use it as a local-machine, integration-test framework for first extracting SQL from PFP and then creating a new workflow for Publish.
-- MIDDLING: Create the notion of a WorkflowTemplate that may be added to a given Workflow, and that contains everything a Workflow may contain.
+- MIDDLING: Create the notion of a WorkflowTemplate that contains everything a Workflow may contain and whose contents may be added to a given Workflow
 - EASY: Add support for uploading local files to a Transform-specified location on S3 on Transform#show.
 - MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by SIS DPL customers without a manual copy-over
 - MIDDLING: Add FE coverage (there's none yet - yeah, I suck ... but TTM is more critical at the moment).
@@ -73,7 +72,7 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 - DIFFICULT: Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
 - DIFFICULT: Create CustomerWorkflow join-entity and associated TransformConfig and DataQualityReportConfig entities, moving all parameterization of Transforms (#params & #s3_*) and DataQualityReports (#params) into the respective Config classes.  Change Runs and Notifications to be associated with CustomerWorkflows This so that a single Workflow may be used by multiple Customers with different configuration.  Since this is a major refactor for a feature I don't need right now, I'm hesitant to do it, especially after a serious spike.  Bah.
 - MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs.
-- MIDDLING: Add Redshift support, both for production and local development.
+- MIDDLING: Add Redshift support, both for production and local development.  I'm hesitant to do this without a demonstrated, significant performance disadvantage of using Postgres for larger data sets.
 - MIDDLING: Maybe port to Convox, especially if it would facilitate Redshift support.
 - EASY: Add support for scheduling Workflows
 
