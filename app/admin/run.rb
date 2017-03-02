@@ -41,8 +41,6 @@ ActiveAdmin.register Run do
       row :updated_at
     end
 
-    active_admin_comments
-
     panel 'Run Step Logs' do
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.run_step_logs.order('id'), sortable: true) do
@@ -57,6 +55,8 @@ ActiveAdmin.register Run do
     attributes_table do
       row(:execution_plan) { code(pretty_print_as_json(resource.execution_plan)) }
     end
+
+    active_admin_comments
 
     render partial: 'admin/shared/history'
   end
