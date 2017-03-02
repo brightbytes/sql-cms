@@ -17,6 +17,10 @@ panel panel_name do
         end
       end
     end
-    column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
+    column(:actions) do |transform|
+      text_node(link_to("Edit", edit_transform_path(transform, source: :workflow, workflow_id: transform.workflow_id)))
+      text_node(' | ')
+      text_node(link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }))
+    end
   end
 end

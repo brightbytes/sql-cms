@@ -36,7 +36,11 @@ ActiveAdmin.register Workflow do
       table_for(resource.transforms.dependent.non_file_related.order(:name)) do
         column(:name, sortable: :name) { |transform| auto_link(transform) }
         column(:runner, sortable: :runner) { |transform| transform.runner }
-        column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
+        column(:actions) do |transform|
+          text_node(link_to("Edit", edit_transform_path(transform, source: :workflow, workflow_id: transform.workflow_id)))
+          text_node(' | ')
+          text_node(link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }))
+        end
       end
     end
 
@@ -46,7 +50,12 @@ ActiveAdmin.register Workflow do
       text_node link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
       table_for(resource.data_quality_reports.order(:name)) do
         column(:name) { |dqr| auto_link(dqr) }
-        column(:action) { |dqr| link_to("Delete", data_quality_report_path(dqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data Quality Report?' }) }
+        column(:actions) do |dqr|
+          text_node(link_to("Edit", edit_data_quality_report_path(dqr, source: :workflow, workflow_id: dqr.workflow_id)))
+          text_node(' | ')
+          text_node(link_to("Delete", data_quality_report_path(dqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data Quality Report?' }))
+        end
+
       end
     end
 
