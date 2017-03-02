@@ -105,7 +105,6 @@ ActiveAdmin.register Transform do
       # Comment-in when attempting to debug the accepts_nested_attributes_for on #create issue:
       # semantic_errors *f.object.errors.keys
 
-      # input :customer_id, as: :hidden, input_html: { value: transform_customer_id_param_val }
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
 
