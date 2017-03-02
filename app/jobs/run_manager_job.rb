@@ -5,8 +5,8 @@ class RunManagerJob < ApplicationJob
   POLLING_FREQUENCY = 3.seconds
 
   def perform(run_id)
-    run = Run.find(run_id)
-
+    run = Run.find_by(id: run_id)
+    return nil unless run
     return false if run.failed?
 
     if manage_state_machine(run)
