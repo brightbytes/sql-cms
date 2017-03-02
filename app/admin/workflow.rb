@@ -29,18 +29,18 @@ ActiveAdmin.register Workflow do
 
     render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Independent Transforms', transforms: resource.transforms.independent.order(:name) }
 
-    render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Data-Importing Transforms', transforms: resource.transforms.importing.order(:name) }
+    render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Dependent, Data-Importing Transforms', transforms: resource.transforms.dependent.importing.order(:name) }
 
     panel 'Dependent, non-Importing/Exporting Transforms' do
       text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
-      table_for(resource.transforms.dependent_non_file_related.order(:name)) do
+      table_for(resource.transforms.dependent.non_file_related.order(:name)) do
         column(:name, sortable: :name) { |transform| auto_link(transform) }
         column(:runner, sortable: :runner) { |transform| transform.runner }
         column(:action) { |transform| link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }) }
       end
     end
 
-    render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Data-Exporting Transforms', transforms: resource.transforms.exporting.order(:name) }
+    render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.order(:name) }
 
     panel 'Data Quality Reports' do
       text_node link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))

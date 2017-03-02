@@ -124,9 +124,11 @@ class Transform < ApplicationRecord
 
   scope :exporting, -> { where(runner: RunnerFactory::EXPORT_S3_FILE_RUNNERS) }
 
+  scope :non_file_related, -> { where(runner: RunnerFactory::NON_S3_FILE_RUNNERS) }
+
   scope :independent, -> { where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)") }
 
-  scope :dependent_non_file_related, -> { where("EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)").where(runner: RunnerFactory::NON_S3_FILE_RUNNERS) }
+  scope :dependent, -> { where("EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)") }
 
   # Instance Methods
 
