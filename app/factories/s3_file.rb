@@ -1,7 +1,7 @@
 # Encapsulates how a Transform works with a remote S3 File
 class S3File
 
-  attr_accessor :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
+  attr_reader :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
 
   def initialize(**atts)
     @s3_region_name = atts[:s3_region_name]
@@ -9,6 +9,33 @@ class S3File
     @s3_file_path = atts[:s3_file_path]
     @s3_file_name = atts[:s3_file_name]
     raise "Missing s3_region_name, s3_bucket_name, and/or s3_file_name: #{atts.inspect}" unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
+  end
+
+  def s3_file_extension
+    @s3_file_extension ||=
+      if s3_file_name.present?
+        if match = /.+\.(.+)$/.match(s3_file_name)
+          match[1].tap(&:downcase!)
+        end
+      end
+  end
+
+  TSV = 'tsv'
+
+  def tsv?
+    s3_file_extension == TSV
+  end
+
+  CSV = 'csv'
+
+  def csv?
+    s3_file_extension == CSV
+  end
+
+  private
+
+  def s3
+    @s3 ||= Aws::S3::Resource.new(region: s3_region_name)
   end
 
   class << self
@@ -65,7 +92,7 @@ class S3File
 
   class S3ExportFile < S3File
 
-    attr_accessor :run
+    attr_reader :run
 
     def initialize(**atts)
       super
@@ -88,12 +115,6 @@ class S3File
         end
     end
 
-  end
-
-  private
-
-  def s3
-    @s3 ||= Aws::S3::Resource.new(region: s3_region_name)
   end
 
 end
