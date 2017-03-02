@@ -22,8 +22,9 @@ namespace :heroku do
 
   task download: :environment do
 
-    puts "Downloading latest backup ..."
+    puts "Backing up the production DB and downloading that latest backup ..."
 
+    heroku_run("heroku pg:backups:capture")
     heroku_run("heroku pg:backups:download -o #{DOWNLOAD_DUMPFILE}")
 
   end
