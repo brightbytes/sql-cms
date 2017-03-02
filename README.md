@@ -61,6 +61,7 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 ### More Important
 
 - DIFFICULT: Port a small customer from the SIS DPL LDR/STG to this platform, and then use it as a local-machine, integration-test framework for first extracting SQL from PFP and then creating a new workflow for Publish.
+- MIDDLING: Create the notion of a WorkflowTemplate that may be added to a given Workflow, and that contains everything a Workflow may contain.
 - EASY: Add support for uploading local files to a Transform-specified location on S3 on Transform#show.
 - MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by SIS DPL customers without a manual copy-over
 - MIDDLING: Add FE coverage (there's none yet - yeah, I suck ... but TTM is more critical at the moment).
