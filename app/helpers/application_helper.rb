@@ -81,9 +81,9 @@ module ApplicationHelper
     @resource_workflow ||= resource.workflow || Workflow.find_by(id: params[:workflow_id])
   end
 
-  def transform_customer_id_param_val
-    @transform_customer_id_param_val ||= params[:customer_id]&.to_i || resource_workflow&.customer_id
-  end
+  # def transform_customer_id_param_val
+  #   @transform_customer_id_param_val ||= params[:customer_id]&.to_i || resource_workflow&.customer_id
+  # end
 
   # TranformValidations stuff
 
