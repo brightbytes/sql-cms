@@ -77,7 +77,7 @@ class Workflow < ApplicationRecord
 
   accepts_nested_attributes_for :notified_users
 
-  # The rest of this file is eligible for extraction to a service.
+  # The rest of this file is eligible for extraction to services.
 
   def run!(creator)
     plan = ActiveModelSerializers::SerializableResource.new(self).as_json
@@ -120,9 +120,7 @@ class Workflow < ApplicationRecord
     groups_arr.map { |arr| Set.new(arr) }
   end
 
-  private
-
-  def next_transform_group(transform_groups_thus_far:, unused_transform_ids:)
+  private def next_transform_group(transform_groups_thus_far:, unused_transform_ids:)
     used_transform_ids = transform_groups_thus_far.flatten.map(&:id)
     joined_used_transform_ids = used_transform_ids.join(',')
     joined_unused_transform_ids = unused_transform_ids.join(',')
@@ -131,5 +129,7 @@ class Workflow < ApplicationRecord
       where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id NOT IN (#{joined_used_transform_ids}) AND postrequisite_transform_id = transforms.id)").
       to_a
   end
+
+
 
 end

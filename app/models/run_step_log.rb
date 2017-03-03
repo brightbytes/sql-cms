@@ -89,20 +89,28 @@ class RunStepLog < ApplicationRecord
     step_name
   end
 
+  def transform_log?
+    step_type == 'transform'
+  end
+
+  def data_quality_report_log?
+    step_type == 'data_quality_report'
+  end
+
   def step_plan
     return nil unless run
     @step_plan ||=
-      if step_type == 'transform'
+      if transform_log?
         run.transform_plan(step_index: step_index, transform_id: step_id)
-      elsif step_type == 'data_quality_report'
+      elsif data_quality_report_log?
         run.data_quality_report_plan(step_id)
       end
   end
 
   def likely_step
     return nil unless step_plan
-    klass = (step_type == 'transform' ? Transform : DataQualityReport)
-    klass.find_by(id: step_plan[:id])
+    klass = (transform_log? ? Transform : data_quality_report_log? ? DataQualityReport : nil)
+    @likely_step ||= klass.find_by(id: step_plan[:id]) if klass
   end
 
 end
