@@ -109,7 +109,7 @@ ActiveAdmin.register Transform do
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
 
       input :name, as: :string
-      input :runner, as: :select, collection: RunnerFactory::RUNNERS, input_html: { disabled: f.object.persisted? }
+      input :runner, as: :radio, collection: RunnerFactory::RUNNERS, input_html: { disabled: f.object.persisted? }
 
       # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
       #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)

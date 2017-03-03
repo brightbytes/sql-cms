@@ -60,7 +60,6 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 
 ### More Important
 
-- EASY: Create the notion of a Workflow Template - a type of Workflow simply flagged as a Template, and all of whose child objects may be copied into a specified Workflow.  While flagged as a Template, a Workflow and all its child objects will be immutable, and it will not be runnable.  Flagging to be entirely reversible.
 - EASY: Add support for uploading local files to a Transform-specified location on S3 on Transform#show.
 - MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by SIS DPL customers without a manual copy-over
 - MIDDLING: Add FE coverage (there's none yet - yeah, I suck ... but TTM is more critical at the moment).

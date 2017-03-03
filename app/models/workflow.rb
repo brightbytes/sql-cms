@@ -8,6 +8,7 @@
 #  customer_id :integer          not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  template    :boolean          default(FALSE), not null
 #
 # Indexes
 #
@@ -44,6 +45,10 @@ class Workflow < ApplicationRecord
     errors.add(:slug, "Is not a valid SQL identifier") unless slug =~ /^[a-z_]([a-z0-9_])*$/
   end
 
+  # Callbacks
+
+  include Concerns::ImmutableCallbacks
+
   # Associations
 
   belongs_to :customer, inverse_of: :workflows
@@ -58,6 +63,11 @@ class Workflow < ApplicationRecord
   has_many :runs, inverse_of: :workflow, dependent: :destroy
 
   # Instance Methods
+
+  define_attribute_methods
+  alias_method(:immutable?, :template?)
+  alias_method(:immutable_was, :template_was)
+  alias_method(:immutable=, :template=)
 
   def to_s
     "#{customer.slug}_#{slug}".freeze
