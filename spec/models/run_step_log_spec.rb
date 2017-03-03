@@ -75,8 +75,8 @@ describe RunStepLog do
         expect(run_step_log.step_name).to eq(expected_run_step_log_plan[:name])
       end
 
-      it "should return the plan :sql as the step_sql" do
-        expect(run_step_log.step_sql).to eq(expected_run_step_log_plan[:sql])
+      it "should return the plan :sql as the step_interpolated_sql" do
+        expect(run_step_log.step_interpolated_sql).to eq(expected_run_step_log_plan[:interpolated_sql])
       end
 
       it "should use the step_name as the #to_s" do

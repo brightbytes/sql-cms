@@ -80,9 +80,9 @@ class RunStepLog < ApplicationRecord
     @step_name ||= step_plan[:name]
   end
 
-  def step_sql
+  def step_interpolated_sql
     return nil unless run
-    @step_sql ||= step_plan[:sql]
+    @step_interpolated_sql ||= step_plan[:interpolated_sql]
   end
 
   def to_s

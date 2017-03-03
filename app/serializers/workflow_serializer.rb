@@ -36,13 +36,13 @@ end
 
 class DataQualityReportSerializer < ActiveModel::Serializer
 
-  attributes :id, :name, :params, :sql
+  attributes :id, :name, :params, :sql, :interpolated_sql
 
 end
 
 class TransformSerializer < ActiveModel::Serializer
 
-  attributes :id, :name, :runner, :params, :sql, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
+  attributes :id, :name, :runner, :params, :sql, :interpolated_sql, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
 
   has_many :transform_validations
 
@@ -50,6 +50,6 @@ end
 
 class TransformValidationSerializer < ActiveModel::Serializer
 
-  attributes :name, :params, :sql
+  attributes :name, :params, :sql, :interpolated_sql
 
 end
