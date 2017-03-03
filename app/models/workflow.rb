@@ -65,9 +65,11 @@ class Workflow < ApplicationRecord
   # Instance Methods
 
   define_attribute_methods
-  alias_method(:immutable?, :template?)
-  alias_method(:immutable_was, :template_was)
-  alias_method(:immutable=, :template=)
+  if instance_methods(false).include?(:template) # So we can deploy and run migrations
+    alias_method(:immutable?, :template?)
+    alias_method(:immutable_was, :template_was)
+    alias_method(:immutable=, :template=)
+  end
 
   def to_s
     "#{customer.slug}_#{slug}".freeze
