@@ -56,15 +56,20 @@ This application uses Sidekiq via Active::Job for parallelization of Runs, Trans
 
 This application comes with a Demo Workflow that was ported from an ancestral app.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide some examples of how to use this system.
 
+## Heroku Deployment
+
+There are a number of rake tasks for managing a Heroku deployment in `lib/tasks/heroku.rake`.  To deploy to Heroku, you'll need 3 AddOns: Postgres, Redis (for Sidekiq), and SendGrid.  You'll only need 1 Sidekiq Worker dyno, but I've made mine a 2X - not because I know it needs to be, but rather just because I suspect more memory would be better.
+
 ## Future plans, roughly in order of priority, with difficulty levels
 
 ### More Important
 
 - EASY: Add support for uploading local files to a Transform-specified location on S3 on Transform#show.
-- MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by SIS DPL customers without a manual copy-over
 - MIDDLING: Add FE coverage (there's none yet - yeah, I suck ... but TTM is more critical at the moment).
+- DIFFICULT: Create CustomerWorkflow join-entity, and change Runs and Notifications to be associated with CustomerWorkflows.  That will allow a Workflow Template to not have to be associated with a Customer, and will also allow a Workflow to be used by multiple Customers. Additionally, possibly create TransformConfig and DataQualityReportConfig entities that bridge their respective classes and CustomerWorkflows, moving all parameterization of Transforms (#params & #s3_*) and DataQualityReports (#params) into the respective Config classes: that would allow different Workflow configurations for different Customer. Since the latter bit is a major refactor for a feature I don't need right now, I'm hesitant to do it, especially after a serious spike, from which I may just extract the CustomerWorkflow piece.
 - MIDDLING: Convert the application to an Engine and open-source it.
 - DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3` ... but there just has to be a gem for it ...)
+- MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by SIS DPL customers without a manual copy-over
 
 ### Less Important
 
@@ -235,6 +240,8 @@ As cribbed from the clarity repo, to get the DPL CMS running natively on your lo
     ```
     PORT=3000
     RACK_ENV=development
+    LANG='en_US.UTF-8'
+    TZ='US/Pacific' # Or whatever
 
     DEFAULT_S3_REGION='us-west-2'
     DEFAULT_S3_BUCKET=<your preferred default bucket here>

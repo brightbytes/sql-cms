@@ -49,6 +49,8 @@ class Workflow < ApplicationRecord
 
   include Concerns::ImmutableCallbacks
 
+  immutable_attribute_name :template
+
   # Associations
 
   belongs_to :customer, inverse_of: :workflows
@@ -63,13 +65,6 @@ class Workflow < ApplicationRecord
   has_many :runs, inverse_of: :workflow, dependent: :destroy
 
   # Instance Methods
-
-  define_attribute_methods
-  if instance_methods(false).include?(:template) # So we can deploy and run migrations
-    alias_method(:immutable?, :template?)
-    alias_method(:immutable_was, :template_was)
-    alias_method(:immutable=, :template=)
-  end
 
   def to_s
     "#{customer.slug}_#{slug}".freeze

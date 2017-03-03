@@ -3,6 +3,24 @@ module Concerns::ImmutableCallbacks
 
   extend ActiveSupport::Concern
 
+  module ClassMethods
+    def immutable_attribute_name(att)
+      if att.present? && att.to_s != 'immutable'
+        class_eval %Q{
+          def immutable?
+            #{att}?
+          end
+          def immutable_was
+            #{att}_was
+          end
+          def immutable=(val)
+            self.#{att} = val
+          end
+        }
+      end
+    end
+  end
+
   include Concerns::InviolateCallbacks
 
   included do
