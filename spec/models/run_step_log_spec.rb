@@ -92,4 +92,14 @@ describe RunStepLog do
       end
     end
   end
+
+  describe "step-related methods" do
+    context "a transform step" do
+
+    end
+
+    context "a data_quality_report step" do
+
+    end
+  end
 end

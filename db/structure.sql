@@ -783,7 +783,8 @@ CREATE TABLE workflows (
     slug character varying NOT NULL,
     customer_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    template boolean DEFAULT false NOT NULL
 );
 
 
@@ -1615,6 +1616,7 @@ INSERT INTO schema_migrations (version) VALUES
 ('20170113013703'),
 ('20170113235922'),
 ('20170217203644'),
-('20170221232223');
+('20170221232223'),
+('20170303002731');
 
 

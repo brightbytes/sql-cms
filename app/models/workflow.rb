@@ -8,6 +8,7 @@
 #  customer_id :integer          not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  template    :boolean          default(FALSE), not null
 #
 # Indexes
 #
@@ -44,6 +45,10 @@ class Workflow < ApplicationRecord
     errors.add(:slug, "Is not a valid SQL identifier") unless slug =~ /^[a-z_]([a-z0-9_])*$/
   end
 
+  # Callbacks
+
+  include Concerns::ImmutableCallbacks
+
   # Associations
 
   belongs_to :customer, inverse_of: :workflows
@@ -59,13 +64,20 @@ class Workflow < ApplicationRecord
 
   # Instance Methods
 
+  define_attribute_methods
+  if instance_methods(false).include?(:template) # So we can deploy and run migrations
+    alias_method(:immutable?, :template?)
+    alias_method(:immutable_was, :template_was)
+    alias_method(:immutable=, :template=)
+  end
+
   def to_s
     "#{customer.slug}_#{slug}".freeze
   end
 
   accepts_nested_attributes_for :notified_users
 
-  # The rest of this file is eligible for extraction to a service.
+  # The rest of this file is eligible for extraction to services.
 
   def run!(creator)
     plan = ActiveModelSerializers::SerializableResource.new(self).as_json
@@ -108,9 +120,7 @@ class Workflow < ApplicationRecord
     groups_arr.map { |arr| Set.new(arr) }
   end
 
-  private
-
-  def next_transform_group(transform_groups_thus_far:, unused_transform_ids:)
+  private def next_transform_group(transform_groups_thus_far:, unused_transform_ids:)
     used_transform_ids = transform_groups_thus_far.flatten.map(&:id)
     joined_used_transform_ids = used_transform_ids.join(',')
     joined_unused_transform_ids = unused_transform_ids.join(',')
@@ -119,5 +129,7 @@ class Workflow < ApplicationRecord
       where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id NOT IN (#{joined_used_transform_ids}) AND postrequisite_transform_id = transforms.id)").
       to_a
   end
+
+
 
 end
