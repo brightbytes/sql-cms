@@ -107,7 +107,7 @@ ActiveAdmin.register Workflow do
       input :customer, as: :select, collection: customers_with_single_select, include_blank: params[:customer_id].blank?, input_html: { disabled: editing }
       input :name, as: :string
       input :template, as: :radio, collection: [["Yes", true], ["No", false]], include_blank: false
-      input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated."
+      input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated. And DON'T MAKE IT TOO LONG, or creating the Posgres schema will puke."
     end
     inputs 'Run Notifications' do
       # The preselect doesn't work, for obvious reasons

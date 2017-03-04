@@ -58,7 +58,7 @@ ActiveAdmin.register Customer do
   form do |f|
     inputs 'Details' do
       input :name, as: :string
-      input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated."
+      input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated. And DON'T MAKE IT TOO LONG, or creating the Posgres schema will puke."
     end
     actions
   end
