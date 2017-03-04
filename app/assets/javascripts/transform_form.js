@@ -14,6 +14,8 @@ $(function() {
     $('#transform_s3_file_path_input').toggle(exporting);
     $('#transform_s3_file_name_input').toggle(exporting);
 
+    $('#transform_params_yaml_input').toggle($(this).val() != 'RailsMigration');
+
   });
 
   $('#transform_specify_s3_file_by').on('change', function(e) {
