@@ -7,7 +7,7 @@ ActiveAdmin.register Transform do
   permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :specify_s3_file_by, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name, prerequisite_transform_ids: []
 
   filter :name, as: :string
-  filter :runner, as: :select, collection: RunnerFactory::RUNNERS
+  filter :runner, as: :select, collection: RunnerFactory::RUNNERS_FOR_SELECT
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :sql, as: :string
   filter :s3_region_name, as: :select
@@ -109,7 +109,7 @@ ActiveAdmin.register Transform do
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
 
       input :name, as: :string
-      input :runner, as: :radio, collection: RunnerFactory::RUNNERS, input_html: { disabled: f.object.persisted? }
+      input :runner, as: :radio, collection: RunnerFactory::RUNNERS_FOR_SELECT, input_html: { disabled: f.object.persisted? }
 
       # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
       #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)

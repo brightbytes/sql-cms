@@ -4,6 +4,10 @@ module Concerns::ImmutableCallbacks
   extend ActiveSupport::Concern
 
   module ClassMethods
+    def immutable(*args)
+      inviolate *args
+    end
+
     def immutable_attribute_name(att)
       if att.present? && att.to_s != 'immutable'
         class_eval %Q{
@@ -22,10 +26,6 @@ module Concerns::ImmutableCallbacks
   end
 
   include Concerns::InviolateCallbacks
-
-  included do
-    inviolate :update, :destroy
-  end
 
   def read_only?
     immutable?

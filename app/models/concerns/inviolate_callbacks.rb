@@ -32,17 +32,19 @@ module Concerns::InviolateCallbacks
           ]
         end
 
-        next unless m == :update
-        class_eval %[
-          def update_column(*args)
-            raise("You may not bypass callbacks to update a #{self.class}.")
-          end
-        ]
-        instance_eval %[
-          def update_all(updates)
-            raise("You may not bypass callbacks to update all the #{self} that exist, since some may be inviolate.")
-          end
-        ]
+        if m == :update
+          class_eval %[
+            def update_column(*args)
+              raise("You may not bypass callbacks to update a #{self.class}.")
+            end
+          ]
+
+          instance_eval %[
+            def update_all(updates)
+              raise("You may not bypass callbacks to update all the #{self} that exist, since some may be inviolate.")
+            end
+          ]
+        end
       end
     end
   end

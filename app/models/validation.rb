@@ -31,6 +31,7 @@ class Validation < ApplicationRecord
   # Callbacks
 
   include Concerns::ImmutableCallbacks
+  immutable :update, :destroy
 
   # Associations
 

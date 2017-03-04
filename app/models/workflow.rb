@@ -48,7 +48,7 @@ class Workflow < ApplicationRecord
   # Callbacks
 
   include Concerns::ImmutableCallbacks
-
+  immutable :destroy
   immutable_attribute_name :template
 
   # Associations

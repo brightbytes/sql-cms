@@ -40,21 +40,17 @@ describe Workflow do
   end
 
   describe "callbacks" do
-    it "should be immutable when flagged as such" do
+    it "should be immutable against destroy when flagged as such" do
       workflow = create(:workflow)
       expect(workflow.immutable?).to eq(false)
       expect(workflow.read_only?).to eq(false)
       workflow.update_attribute(:immutable, true)
       expect { workflow.destroy }.to raise_error("You may not destroy an immutable Workflow")
       expect { workflow.delete }.to raise_error("You may not bypass callbacks to delete a Class.")
-      expect { workflow.update_attribute(:slug, "/* Blah */") }.to raise_error("You may not update an immutable Workflow")
-      expect { workflow.update_attributes(slug: "/* Blah */") }.to raise_error("You may not update an immutable Workflow")
-      expect { workflow.update_column(:slug, "/* Blah */") }.to raise_error("You may not bypass callbacks to update a Class.")
     end
 
-    it "should prevent bulk-updates" do
+    it "should prevent bulk-deletes" do
       expect { Workflow.delete_all }.to raise_error("You may not bypass callbacks to delete all the Workflow that exist, since some may be inviolate.")
-      expect { Workflow.update_all(sql: "/* Blah */") }.to raise_error("You may not bypass callbacks to update all the Workflow that exist, since some may be inviolate.")
     end
   end
 
