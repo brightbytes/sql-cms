@@ -11,7 +11,7 @@ module Concerns::SqlHelpers
 
     def to_sql_identifier(s)
       return nil unless s.present?
-      s.to_s.downcase.gsub(/[^a-z0-9]+/, '_').sub(/^[^a-z_]/, '_')
+      s.to_s.downcase.gsub(/[^a-z0-9]+/, '_').sub(/^[^a-z_]/, '_').sub(/_+$/, '')
     end
 
   end

@@ -44,9 +44,9 @@ describe Customer do
   describe "instance methods" do
     it "should coerce invalid slugs to valid slugs on set" do
       customer = build(:customer, slug: "0foo 1$BAR_")
-      expect(customer.slug).to eq("_foo_1_bar_")
+      expect(customer.slug).to eq("_foo_1_bar")
       customer = build(:customer, slug: "foo 123 %@#_")
-      expect(customer.slug).to eq("foo_123_")
+      expect(customer.slug).to eq("foo_123")
     end
 
     context "#to_s" do

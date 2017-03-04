@@ -67,9 +67,9 @@ describe Workflow do
 
     it "should coerce invalid slugs to valid slugs on set" do
       workflow = build(:workflow, slug: "0foo 1$BAR_")
-      expect(workflow.slug).to eq("_foo_1_bar_")
+      expect(workflow.slug).to eq("_foo_1_bar")
       workflow = build(:workflow, slug: "foo 123 %@#_")
-      expect(workflow.slug).to eq("foo_123_")
+      expect(workflow.slug).to eq("foo_123")
     end
 
     context "#to_s" do
