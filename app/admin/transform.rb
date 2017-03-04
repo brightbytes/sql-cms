@@ -113,7 +113,7 @@ ActiveAdmin.register Transform do
 
       # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
       #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
-      input :params_yaml, as: :text
+      input :params_yaml, as: :text, hint: 'Add `table_name: your_table_name` here when auto-generating SQL for TSV and CSV CopyFrom Transforms'
 
       input :sql, as: :text, hint: "If you leave this blank for TSV and CSV CopyFrom Transforms, it will auto-generate SQL under the assumption that the source file has its columns in the same order as the table declares columns."
 
