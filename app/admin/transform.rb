@@ -112,9 +112,8 @@ ActiveAdmin.register Transform do
       # FIXME - Want these to be radio buttons, but dunno how to get the JS to work
       input :runner, as: :select, collection: RunnerFactory::RUNNERS_FOR_SELECT, input_html: { disabled: f.object.persisted? }, include_blank: false
 
-      # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
-      #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
-      input :params_yaml, as: :text, hint: 'Add `table_name: your_table_name` here when auto-generating SQL for TSV and CSV CopyFrom Transforms'
+      show_params_yaml_selector = ((!f.object.persisted? || f.object.runner != 'RailsMigration') ? {} : { style: 'display:none' })
+      input :params_yaml, as: :text, wrapper_html: show_params_yaml_selector, hint: 'Add `table_name: your_table_name` here when auto-generating SQL for TSV and CSV CopyFrom Transforms'
 
       input :sql, as: :text, hint: "If you leave this blank for TSV and CSV CopyFrom Transforms, it will auto-generate SQL under the assumption that the source file has its columns in the same order as the table declares columns."
 
