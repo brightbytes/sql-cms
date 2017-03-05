@@ -43,6 +43,10 @@ class Workflow < ApplicationRecord
     errors.add(:slug, "Is not a valid SQL identifier") unless slug =~ /^[a-z_]([a-z0-9_])*$/
   end
 
+  validates :customer, presence: true, unless: :shared?
+
+  validates :customer, absence: true, if: :shared?
+
   # Callbacks
 
   include Concerns::ImmutableCallbacks

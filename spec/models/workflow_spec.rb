@@ -31,6 +31,20 @@ describe Workflow do
       it { should validate_presence_of(att) }
     end
 
+    it "should validate the presence of the customer when the workflow isn't shared" do
+      workflow = build(:workflow, customer: nil, shared: false)
+      expect(workflow).to_not be_valid
+      workflow.customer = create(:customer)
+      expect(workflow).to be_valid
+    end
+
+    it "should validate the absence of the customer when the workflow is shared" do
+      workflow = build(:workflow, customer: create(:customer), shared: true)
+      expect(workflow).to_not be_valid
+      workflow.customer = nil
+      expect(workflow).to be_valid
+    end
+
     context 'with a workflow already extant' do
       let!(:subject) { create(:workflow) }
       it { should validate_uniqueness_of(:name).case_insensitive }
