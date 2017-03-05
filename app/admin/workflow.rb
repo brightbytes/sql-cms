@@ -4,7 +4,7 @@ ActiveAdmin.register Workflow do
 
   actions :all
 
-  permit_params :name, :customer_id, :slug, :template, notified_user_ids: []
+  permit_params :name, :customer_id, :slug, :shared, notified_user_ids: []
 
   filter :name, as: :string
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
@@ -15,7 +15,7 @@ ActiveAdmin.register Workflow do
     column(:name, sortable: :slug) { |workflow| auto_link(workflow) }
     column(:customer, sortable: 'customers.slug')
     column :slug
-    boolean_column :template
+    boolean_column :shared
   end
 
   show do
@@ -27,7 +27,7 @@ ActiveAdmin.register Workflow do
       row :name
       row :slug
 
-      row :template
+      row :shared
 
       row :created_at
       row :updated_at
@@ -106,7 +106,7 @@ ActiveAdmin.register Workflow do
       editing = action_name.in?(%w(edit update))
       input :customer, as: :select, collection: customers_with_single_select, include_blank: params[:customer_id].blank?, input_html: { disabled: editing }
       input :name, as: :string
-      input :template, as: :radio, collection: [["Yes", true], ["No", false]], include_blank: false
+      input :shared, as: :radio, collection: [["Yes", true], ["No", false]], include_blank: false
       input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated. And DON'T MAKE IT TOO LONG, or creating the Posgres schema will puke."
     end
     inputs 'Run Notifications' do

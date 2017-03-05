@@ -5,10 +5,10 @@
 #  id          :integer          not null, primary key
 #  name        :string           not null
 #  slug        :string           not null
-#  customer_id :integer          not null
+#  customer_id :integer
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
-#  template    :boolean          default(FALSE), not null
+#  shared      :boolean          default(FALSE), not null
 #
 # Indexes
 #
@@ -33,8 +33,6 @@ class Workflow < ApplicationRecord
 
   # Validations
 
-  validates :customer, presence: true
-
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
   validates :slug, presence: true, uniqueness: { case_sensitive: false }
@@ -49,7 +47,7 @@ class Workflow < ApplicationRecord
 
   include Concerns::ImmutableCallbacks
   immutable :destroy
-  immutable_attribute_name :template
+  immutable_attribute_name :shared
 
   # Associations
 
