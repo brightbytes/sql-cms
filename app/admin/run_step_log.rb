@@ -13,7 +13,10 @@ ActiveAdmin.register RunStepLog do
       row :step_type
       row :step_index
       row :step_id
-      row :likely_step
+      row(:likely_step) do
+        text_node(auto_link(run_step_log.likely_step))
+        # FIXME - Add Edit Link Here
+      end
 
       row(:human_status) { human_status(resource) }
 
