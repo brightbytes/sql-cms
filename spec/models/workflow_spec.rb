@@ -75,6 +75,11 @@ describe Workflow do
     it { should have_many(:transforms) }
     it { should have_many(:data_quality_reports) }
     it { should have_many(:runs) }
+
+    it { should have_many(:independencies) }
+    it { should have_many(:independent_workflows).through(:independencies) }
+    it { should have_many(:dependencies) }
+    it { should have_many(:dependent_workflows).through(:dependencies) }
   end
 
   describe 'instance methods' do

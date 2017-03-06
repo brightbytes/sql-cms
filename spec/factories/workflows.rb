@@ -24,4 +24,9 @@ FactoryGirl.define do
     sequence(:name) { |n| "Workflow #{n}" }
     association :customer
   end
+
+  factory :workflow_dependency do
+    association :independent_workflow, factory: :workflow
+    association :dependent_workflow, factory: :workflow
+  end
 end

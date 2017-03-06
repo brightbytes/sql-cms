@@ -66,6 +66,13 @@ class Workflow < ApplicationRecord
 
   has_many :runs, inverse_of: :workflow, dependent: :destroy
 
+  # FIXME - "independencies" is not a word ... but I'm in a hurry now. :-(
+  has_many :independencies, class_name: 'WorkflowDependency', foreign_key: :dependent_workflow_id, dependent: :delete_all
+  has_many :independent_workflows, through: :independencies, source: :independent_workflow
+
+  has_many :dependencies, class_name: 'WorkflowDependency', foreign_key: :independent_workflow_id, dependent: :delete_all
+  has_many :dependent_workflows, through: :dependencies, source: :dependent_workflow
+
   # Instance Methods
 
   def to_s
