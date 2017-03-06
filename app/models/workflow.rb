@@ -73,6 +73,10 @@ class Workflow < ApplicationRecord
   has_many :dependencies, class_name: 'WorkflowDependency', foreign_key: :independent_workflow_id, dependent: :delete_all
   has_many :dependent_workflows, through: :dependencies, source: :dependent_workflow
 
+  # Scopes
+
+  scope :shared, -> { where(shared: true) }
+
   # Instance Methods
 
   def to_s
@@ -88,6 +92,10 @@ class Workflow < ApplicationRecord
     runs.create!(creator: creator, execution_plan: plan).tap do |run|
       RunManagerJob.perform_later(run.id)
     end
+  end
+
+  def available_dependent_workflows
+    Workflow.shared.where("NOT EXISTS (SELECT 1 FROM workflow_dependencies WHERE independent_workflow_id = workflows.id AND dependent_workflow_id = #{id})")
   end
 
   # The following methods are used by the serializer

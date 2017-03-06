@@ -110,6 +110,22 @@ describe Workflow do
       end
     end
 
+    context "#available_dependent_workflows" do
+      let!(:shared_workflow_used) { create(:shared_workflow) }
+      let!(:dependent_workflow_used) { create(:workflow) }
+      let!(:shared_workflow_unused) { create(:shared_workflow) }
+      let!(:dependent_workflow) { create(:workflow) }
+
+      before do
+        create(:workflow_dependency, independent_workflow: shared_workflow_used, dependent_workflow: dependent_workflow_used)
+        dependent_workflow_used.reload
+      end
+
+      it "should return those shared Workflows not already associated with a given workflow" do
+        expect(dependent_workflow_used.available_dependent_workflows).to eq([shared_workflow_unused])
+      end
+    end
+
     context "#ordered_transform_groups" do
 
       context "with a linear graph" do
