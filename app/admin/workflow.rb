@@ -81,6 +81,7 @@ ActiveAdmin.register Workflow do
       table_for(resource.runs.includes(:creator).order(id: :desc)) do
         column(:schema_name) { |run| auto_link(run) }
         column(:creator)
+        column(:created_at)
         column(:human_status) { |run| human_status(run) }
         column(:action) { |run| link_to("Delete", run_path(run), method: :delete, data: { confirm: 'Are you sure you want to nuke this Run and all DB data associated with it?' }) }
       end

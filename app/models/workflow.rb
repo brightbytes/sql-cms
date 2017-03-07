@@ -84,22 +84,20 @@ class Workflow < ApplicationRecord
   end
 
   accepts_nested_attributes_for :notified_users
+  accepts_nested_attributes_for :included_workflows
 
-  # The rest of this file is eligible for extraction to services.
-
+  # This method should technically be a service ... but it's soooooo tiny, I just can't bring myself to make it one.
   def run!(creator)
     runs.create!(creator: creator, execution_plan: ExecutionPlan.create(self).to_hash).tap do |run|
       RunManagerJob.perform_later(run.id)
     end
   end
 
+  # The following methods are used by the serializer.  I suppose they thus should be part of the serializer.  Refactor.
+
   def serialize_and_symbolize
     ActiveModelSerializers::SerializableResource.new(self).as_json.deep_symbolize_keys
   end
-
-  accepts_nested_attributes_for :included_workflows
-
-  # The following methods are used by the serializer
 
   def emails_to_notify
     notified_users.pluck(:email)

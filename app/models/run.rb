@@ -109,36 +109,17 @@ class Run < ApplicationRecord
     read_attribute(:execution_plan)&.with_indifferent_access # This should be automatic.  Grrr.
   end
 
-  # FIXME - Extract all the following Run#execution_plan helpers into the ExecutionPlan factory!
-
-  def transform_group(step_index)
-    execution_plan[:ordered_transform_groups][step_index] if execution_plan.present?
+  def execution_plan_object
+    @execution_plan_object ||= ExecutionPlan.new(execution_plan)
   end
 
-  def transform_group_transform_ids(step_index)
-    transform_group(step_index)&.map { |h| h.fetch(:id, nil) }
-  end
-
-  def transform_plan(step_index:, transform_id:)
-    transform_group(step_index)&.detect { |h| h[:id] == transform_id }&.deep_symbolize_keys
-  end
+  delegate :transform_group, :transform_group_transform_ids, :transform_plan, :data_quality_reports, :data_quality_report_plan, :data_quality_report_ids,
+           to: :execution_plan_object
 
   def transform_group_successful?(step_index)
     return nil if execution_plan.blank?
     ids = transform_group_transform_ids(step_index)
     run_step_logs.successful.where(step_type: 'transform', step_index: step_index, step_id: ids).count == ids.size
-  end
-
-  def data_quality_reports
-    execution_plan[:data_quality_reports] if execution_plan.present?
-  end
-
-  def data_quality_report_plan(data_quality_report_id)
-    data_quality_reports&.detect { |h| h[:id] == data_quality_report_id }&.symbolize_keys
-  end
-
-  def data_quality_report_ids
-    data_quality_reports&.map { |h| h.fetch(:id, nil) }
   end
 
   def data_quality_reports_successful?
