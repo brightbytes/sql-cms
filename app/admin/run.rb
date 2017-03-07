@@ -80,7 +80,7 @@ ActiveAdmin.register Run do
   controller do
 
     def scoped_collection
-      super.joins(:creator, { workflow: :customer })
+      super.includes(:creator, { workflow: :customer })
     end
 
     def destroy
