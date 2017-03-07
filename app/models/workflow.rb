@@ -79,7 +79,8 @@ class Workflow < ApplicationRecord
   # Instance Methods
 
   def to_s
-    "#{customer.slug}_#{slug}".freeze
+    prefix = customer&.slug || "shared"
+    "#{prefix}_#{slug}".freeze
   end
 
   accepts_nested_attributes_for :notified_users
