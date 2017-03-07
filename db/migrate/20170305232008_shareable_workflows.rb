@@ -6,13 +6,13 @@ class ShareableWorkflows < ActiveRecord::Migration
 
     create_table :workflow_dependencies do |t|
       t.with_options(null: false) do |tt|
-        tt.integer :independent_workflow_id, foreign_key: true
-        tt.integer :dependent_workflow_id, foreign_key: true, index: true
+        tt.integer :included_workflow_id, foreign_key: true
+        tt.integer :including_workflow_id, foreign_key: true, index: true
         tt.datetime :created_at
       end
     end
 
-    add_index :workflow_dependencies, [:independent_workflow_id, :dependent_workflow_id], unique: true, name: :index_workflow_depenencies_on_independent_id_dependent_id
+    add_index :workflow_dependencies, [:included_workflow_id, :including_workflow_id], unique: true, name: :index_workflow_depenencies_on_independent_id_dependent_id
   end
 
   def down

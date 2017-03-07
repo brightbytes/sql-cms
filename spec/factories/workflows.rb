@@ -32,7 +32,7 @@ FactoryGirl.define do
   end
 
   factory :workflow_dependency do
-    association :independent_workflow, factory: :shared_workflow
-    association :dependent_workflow, factory: :workflow
+    association :included_workflow, factory: :shared_workflow
+    association :including_workflow, factory: :workflow
   end
 end

@@ -2,42 +2,42 @@
 #
 # Table name: workflow_dependencies
 #
-#  id                      :integer          not null, primary key
-#  independent_workflow_id :integer          not null
-#  dependent_workflow_id   :integer          not null
-#  created_at              :datetime         not null
+#  id                    :integer          not null, primary key
+#  included_workflow_id  :integer          not null
+#  including_workflow_id :integer          not null
+#  created_at            :datetime         not null
 #
 # Indexes
 #
-#  index_workflow_dependencies_on_dependent_workflow_id       (dependent_workflow_id)
-#  index_workflow_depenencies_on_independent_id_dependent_id  (independent_workflow_id,dependent_workflow_id) UNIQUE
+#  index_workflow_dependencies_on_including_workflow_id       (including_workflow_id)
+#  index_workflow_depenencies_on_independent_id_dependent_id  (included_workflow_id,including_workflow_id) UNIQUE
 #
 
 class WorkflowDependency < ApplicationRecord
 
   # Validations
 
-  validates :dependent_workflow, :independent_workflow, presence: true
+  validates :including_workflow, :included_workflow, presence: true
 
-  validates :independent_workflow, uniqueness: { scope: :dependent_workflow_id }
+  validates :included_workflow, uniqueness: { scope: :including_workflow_id }
 
-  validate :independent_workflow_is_shared, if: :independent_workflow_id?
+  validate :included_workflow_is_shared, if: :included_workflow_id?
 
-  def independent_workflow_is_shared
-    errors.add(:independent_workflow, "must be a Shared Workflow") unless independent_workflow.shared?
+  def included_workflow_is_shared
+    errors.add(:included_workflow, "must be a Shared Workflow") unless included_workflow.shared?
   end
 
-  validate :dependent_workflow_is_unshared, if: :dependent_workflow_id?
+  validate :including_workflow_is_unshared, if: :including_workflow_id?
 
   # We could allow recursive composition of shared workflows, but it's not worth the coding headache at this point.  Revisit if it ever seems pertinent.
-  def dependent_workflow_is_unshared
+  def including_workflow_is_unshared
     # The &. is for the idiotic `validate_presence_of` spec to pass
-    errors.add(:dependent_workflow, "must be an Unshared Workflow") if dependent_workflow&.shared?
+    errors.add(:including_workflow, "must be an Unshared Workflow") if including_workflow&.shared?
   end
 
   # Associations
 
-  belongs_to :dependent_workflow, class_name: 'Workflow', inverse_of: :independencies
-  belongs_to :independent_workflow, class_name: 'Workflow', inverse_of: :dependencies
+  belongs_to :including_workflow, class_name: 'Workflow', inverse_of: :included_dependencies
+  belongs_to :included_workflow, class_name: 'Workflow', inverse_of: :including_dependencies
 
 end

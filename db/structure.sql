@@ -779,8 +779,8 @@ ALTER SEQUENCE versions_id_seq OWNED BY versions.id;
 
 CREATE TABLE workflow_dependencies (
     id integer NOT NULL,
-    independent_workflow_id integer NOT NULL,
-    dependent_workflow_id integer NOT NULL,
+    included_workflow_id integer NOT NULL,
+    including_workflow_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL
 );
 
@@ -1499,17 +1499,17 @@ CREATE INDEX index_versions_on_user_id ON versions USING btree (user_id);
 
 
 --
--- Name: index_workflow_dependencies_on_dependent_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_workflow_dependencies_on_including_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_workflow_dependencies_on_dependent_workflow_id ON workflow_dependencies USING btree (dependent_workflow_id);
+CREATE INDEX index_workflow_dependencies_on_including_workflow_id ON workflow_dependencies USING btree (including_workflow_id);
 
 
 --
 -- Name: index_workflow_depenencies_on_independent_id_dependent_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_workflow_depenencies_on_independent_id_dependent_id ON workflow_dependencies USING btree (independent_workflow_id, dependent_workflow_id);
+CREATE UNIQUE INDEX index_workflow_depenencies_on_independent_id_dependent_id ON workflow_dependencies USING btree (included_workflow_id, including_workflow_id);
 
 
 --

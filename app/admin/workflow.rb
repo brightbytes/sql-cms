@@ -4,7 +4,7 @@ ActiveAdmin.register Workflow do
 
   actions :all
 
-  permit_params :name, :customer_id, :slug, :shared, notified_user_ids: []
+  permit_params :name, :customer_id, :slug, :shared, notified_user_ids: [], included_workflow_ids: []
 
   filter :name, as: :string
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
@@ -31,6 +31,16 @@ ActiveAdmin.register Workflow do
 
       row :created_at
       row :updated_at
+    end
+
+    if workflow.included_workflows.exists?
+      panel 'Associated Shared Workflows' do
+        table_for(resource.included_workflows.order(:name)) do
+          column(:name) { |workflow| auto_link(workflow) }
+          column(:slug)
+          boolean_column(:shared)
+        end
+      end
     end
 
     render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Independent Transforms', transforms: resource.transforms.independent.order(:name) }
@@ -101,18 +111,28 @@ ActiveAdmin.register Workflow do
 
   form do |f|
     # For debugging:
-    # semantic_errors *f.object.errors.keys
+    semantic_errors *f.object.errors.keys
+
     inputs 'Details' do
-      editing = action_name.in?(%w(edit update))
-      input :customer, as: :select, collection: customers_with_single_select, include_blank: params[:customer_id].blank?, input_html: { disabled: editing }
+      input :customer, as: :select, collection: customers_with_single_select, include_blank: !customer_id_from_param
+      # FIXME - I'd like this to be as: :radio, but I don't know how to do the JS
+      input :shared, as: :select, collection: [["Yes", true], ["No", false]], include_blank: false, input_html: { disabled: customer_id_from_param }
       input :name, as: :string
-      input :shared, as: :radio, collection: [["Yes", true], ["No", false]], include_blank: false
       input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated. And DON'T MAKE IT TOO LONG, or creating the Posgres schema will puke."
+
+      # Same comment here as for TransformController's form: this doesn't work on #create b/c a Workflow is at either end of the join. Whereas, when the objects
+      #  on either side of the join table are different, this works beautifully. IOW, Rails BUG
+      if f.object.persisted? && Workflow.shared.exists?
+        included_workflows_display_h = (f.object.shared? ? { style: 'display:none' } : {})
+        input :included_workflows, as: :check_boxes, collection: Workflow.shared, wrapper_html: included_workflows_display_h
+      end
     end
+
     inputs 'Run Notifications' do
       # The preselect doesn't work, for obvious reasons
       input :notified_users, as: :check_boxes #, collection: users_with_preselect
     end
+
     actions do
       action(:submit)
       path = (params[:source] == 'customer' ? customer_path(params[:customer_id]) : f.object.new_record? ? workflows_path : workflow_path(f.object))
@@ -123,7 +143,7 @@ ActiveAdmin.register Workflow do
   controller do
 
     def scoped_collection
-      super.joins(:customer)
+      super.includes(:customer)
     end
 
     def destroy

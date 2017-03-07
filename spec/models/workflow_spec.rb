@@ -76,10 +76,10 @@ describe Workflow do
     it { should have_many(:data_quality_reports) }
     it { should have_many(:runs) }
 
-    it { should have_many(:independencies) }
-    it { should have_many(:independent_workflows).through(:independencies) }
-    it { should have_many(:dependencies) }
-    it { should have_many(:dependent_workflows).through(:dependencies) }
+    it { should have_many(:included_dependencies) }
+    it { should have_many(:included_workflows).through(:included_dependencies) }
+    it { should have_many(:including_dependencies) }
+    it { should have_many(:including_workflows).through(:including_dependencies) }
   end
 
   describe 'instance methods' do
@@ -107,22 +107,6 @@ describe Workflow do
         notification_3 = create(:notification, workflow: workflow)
         ignored_notification = create(:notification)
         expect(Set.new(workflow.emails_to_notify)).to eq(Set.new([notification_1, notification_2, notification_3].map(&:user).map(&:email)))
-      end
-    end
-
-    context "#available_dependent_workflows" do
-      let!(:shared_workflow_used) { create(:shared_workflow) }
-      let!(:dependent_workflow_used) { create(:workflow) }
-      let!(:shared_workflow_unused) { create(:shared_workflow) }
-      let!(:dependent_workflow) { create(:workflow) }
-
-      before do
-        create(:workflow_dependency, independent_workflow: shared_workflow_used, dependent_workflow: dependent_workflow_used)
-        dependent_workflow_used.reload
-      end
-
-      it "should return those shared Workflows not already associated with a given workflow" do
-        expect(dependent_workflow_used.available_dependent_workflows).to eq([shared_workflow_unused])
       end
     end
 

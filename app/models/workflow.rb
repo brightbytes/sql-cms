@@ -45,7 +45,7 @@ class Workflow < ApplicationRecord
 
   validates :customer, presence: true, unless: :shared?
 
-  validates :customer, absence: true, if: :shared?
+  validates :customer, absence: { message: "must be blank for Shared Workflows" }, if: :shared?
 
   # Callbacks
 
@@ -66,12 +66,11 @@ class Workflow < ApplicationRecord
 
   has_many :runs, inverse_of: :workflow, dependent: :destroy
 
-  # FIXME - "independencies" is not a word ... but I'm in a hurry now. :-(
-  has_many :independencies, class_name: 'WorkflowDependency', foreign_key: :dependent_workflow_id, dependent: :delete_all
-  has_many :independent_workflows, through: :independencies, source: :independent_workflow
+  has_many :included_dependencies, class_name: 'WorkflowDependency', foreign_key: :including_workflow_id, dependent: :delete_all
+  has_many :included_workflows, through: :included_dependencies, source: :included_workflow
 
-  has_many :dependencies, class_name: 'WorkflowDependency', foreign_key: :independent_workflow_id, dependent: :delete_all
-  has_many :dependent_workflows, through: :dependencies, source: :dependent_workflow
+  has_many :including_dependencies, class_name: 'WorkflowDependency', foreign_key: :included_workflow_id, dependent: :delete_all
+  has_many :including_workflows, through: :including_dependencies, source: :including_workflow
 
   # Scopes
 
@@ -94,9 +93,7 @@ class Workflow < ApplicationRecord
     end
   end
 
-  def available_dependent_workflows
-    Workflow.shared.where("NOT EXISTS (SELECT 1 FROM workflow_dependencies WHERE independent_workflow_id = workflows.id AND dependent_workflow_id = #{id})")
-  end
+  accepts_nested_attributes_for :included_workflows
 
   # The following methods are used by the serializer
 
