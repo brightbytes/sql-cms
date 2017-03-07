@@ -32,7 +32,11 @@ class ExecutionPlan
       if including_plan_h[:ordered_transform_groups].present? || included_plan_h[:ordered_transform_groups].present?
         num_iterations = [including_plan_h[:ordered_transform_groups].size, included_plan_h[:ordered_transform_groups].size].max - 1
         (0..num_iterations).each do |i|
-          including_plan_h[:ordered_transform_groups][i] += included_plan_h[:ordered_transform_groups][i]
+          included_ordered_transform_groups = included_plan_h[:ordered_transform_groups][i]
+          if included_ordered_transform_groups.present?
+            including_plan_h[:ordered_transform_groups][i] ||= Set.new
+            including_plan_h[:ordered_transform_groups][i] += included_ordered_transform_groups
+          end
         end
       end
     end
