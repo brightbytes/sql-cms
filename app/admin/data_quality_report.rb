@@ -63,7 +63,7 @@ ActiveAdmin.register DataQualityReport do
   controller do
 
     def scoped_collection
-      super.joins(workflow: :customer)
+      super.includes(workflow: :customer)
     end
 
     def destroy
