@@ -105,11 +105,11 @@ class Run < ApplicationRecord
   #   read_attribute(:step_result)&.map(&:with_indifferent_access) # This should be automatic.  Grrr.
   # end
 
-  # execution_plan helpers
-
   def execution_plan
     read_attribute(:execution_plan)&.with_indifferent_access # This should be automatic.  Grrr.
   end
+
+  # FIXME - Extract all the following Run#execution_plan helpers into the ExecutionPlan factory!
 
   def transform_group(step_index)
     execution_plan[:ordered_transform_groups][step_index] if execution_plan.present?

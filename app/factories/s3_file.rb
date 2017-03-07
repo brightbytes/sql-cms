@@ -1,6 +1,19 @@
 # Encapsulates how a Transform works with a remote S3 File
 class S3File
 
+  class << self
+    def create(type = 'import', **atts)
+      case type
+      when 'import'
+        S3ImportFile.new(atts)
+      when 'export'
+        S3ExportFile.new(atts)
+      else
+        raise "Unknown S3 File Type: #{type}"
+      end
+    end
+  end
+
   attr_reader :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
 
   def initialize(**atts)
@@ -36,19 +49,6 @@ class S3File
 
   def s3
     @s3 ||= Aws::S3::Resource.new(region: s3_region_name)
-  end
-
-  class << self
-    def create(type = 'import', **atts)
-      case type
-      when 'import'
-        S3ImportFile.new(atts)
-      when 'export'
-        S3ExportFile.new(atts)
-      else
-        raise "Unknown S3 File Type: #{type}"
-      end
-    end
   end
 
   class S3ImportFile < S3File

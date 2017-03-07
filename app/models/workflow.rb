@@ -88,10 +88,13 @@ class Workflow < ApplicationRecord
   # The rest of this file is eligible for extraction to services.
 
   def run!(creator)
-    plan = ActiveModelSerializers::SerializableResource.new(self).as_json
-    runs.create!(creator: creator, execution_plan: plan).tap do |run|
+    runs.create!(creator: creator, execution_plan: ExecutionPlan.create(self).to_hash).tap do |run|
       RunManagerJob.perform_later(run.id)
     end
+  end
+
+  def serialize_and_symbolize
+    ActiveModelSerializers::SerializableResource.new(self).as_json.deep_symbolize_keys
   end
 
   accepts_nested_attributes_for :included_workflows
