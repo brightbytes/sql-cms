@@ -3,13 +3,14 @@ class ExecutionPlan
   class << self
 
     def create(workflow)
-      workflow.serialize_and_symbolize.tap do |including_plan_h|
+      execution_plan_h = workflow.serialize_and_symbolize.tap do |including_plan_h|
         workflow.included_workflows.each do |included_workflow|
           included_plan_h = workflow.serialize_and_symbolize
           merge_data_quality_reports!(including_plan_h, included_plan_h)
           merge_transforms!(including_plan_h, included_plan_h)
         end
       end
+      new(execution_plan_h)
     end
 
     private
