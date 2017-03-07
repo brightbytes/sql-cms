@@ -5,10 +5,10 @@
 #  id          :integer          not null, primary key
 #  name        :string           not null
 #  slug        :string           not null
-#  customer_id :integer          not null
+#  customer_id :integer
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
-#  template    :boolean          default(FALSE), not null
+#  shared      :boolean          default(FALSE), not null
 #
 # Indexes
 #
@@ -33,8 +33,6 @@ class Workflow < ApplicationRecord
 
   # Validations
 
-  validates :customer, presence: true
-
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
   validates :slug, presence: true, uniqueness: { case_sensitive: false }
@@ -45,11 +43,15 @@ class Workflow < ApplicationRecord
     errors.add(:slug, "Is not a valid SQL identifier") unless slug =~ /^[a-z_]([a-z0-9_])*$/
   end
 
+  validates :customer, presence: true, unless: :shared?
+
+  validates :customer, absence: { message: "must be blank for Shared Workflows" }, if: :shared?
+
   # Callbacks
 
   include Concerns::ImmutableCallbacks
   immutable :destroy
-  immutable_attribute_name :template
+  immutable_attribute_name :shared
 
   # Associations
 
@@ -63,6 +65,16 @@ class Workflow < ApplicationRecord
   has_many :data_quality_reports, inverse_of: :workflow, dependent: :delete_all
 
   has_many :runs, inverse_of: :workflow, dependent: :destroy
+
+  has_many :included_dependencies, class_name: 'WorkflowDependency', foreign_key: :including_workflow_id, dependent: :delete_all
+  has_many :included_workflows, through: :included_dependencies, source: :included_workflow
+
+  has_many :including_dependencies, class_name: 'WorkflowDependency', foreign_key: :included_workflow_id, dependent: :delete_all
+  has_many :including_workflows, through: :including_dependencies, source: :including_workflow
+
+  # Scopes
+
+  scope :shared, -> { where(shared: true) }
 
   # Instance Methods
 
@@ -80,6 +92,8 @@ class Workflow < ApplicationRecord
       RunManagerJob.perform_later(run.id)
     end
   end
+
+  accepts_nested_attributes_for :included_workflows
 
   # The following methods are used by the serializer
 

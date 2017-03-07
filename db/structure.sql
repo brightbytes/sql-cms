@@ -774,6 +774,37 @@ ALTER SEQUENCE versions_id_seq OWNED BY versions.id;
 
 
 --
+-- Name: workflow_dependencies; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE workflow_dependencies (
+    id integer NOT NULL,
+    included_workflow_id integer NOT NULL,
+    including_workflow_id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: workflow_dependencies_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE workflow_dependencies_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: workflow_dependencies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE workflow_dependencies_id_seq OWNED BY workflow_dependencies.id;
+
+
+--
 -- Name: workflows; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -781,10 +812,10 @@ CREATE TABLE workflows (
     id integer NOT NULL,
     name character varying NOT NULL,
     slug character varying NOT NULL,
-    customer_id integer NOT NULL,
+    customer_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    template boolean DEFAULT false NOT NULL
+    shared boolean DEFAULT false NOT NULL
 );
 
 
@@ -956,6 +987,13 @@ ALTER TABLE ONLY validations ALTER COLUMN id SET DEFAULT nextval('validations_id
 --
 
 ALTER TABLE ONLY versions ALTER COLUMN id SET DEFAULT nextval('versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflow_dependencies ALTER COLUMN id SET DEFAULT nextval('workflow_dependencies_id_seq'::regclass);
 
 
 --
@@ -1151,6 +1189,14 @@ ALTER TABLE ONLY validations
 
 ALTER TABLE ONLY versions
     ADD CONSTRAINT versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: workflow_dependencies_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY workflow_dependencies
+    ADD CONSTRAINT workflow_dependencies_pkey PRIMARY KEY (id);
 
 
 --
@@ -1453,6 +1499,20 @@ CREATE INDEX index_versions_on_user_id ON versions USING btree (user_id);
 
 
 --
+-- Name: index_workflow_dependencies_on_including_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_workflow_dependencies_on_including_workflow_id ON workflow_dependencies USING btree (including_workflow_id);
+
+
+--
+-- Name: index_workflow_depenencies_on_independent_id_dependent_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_workflow_depenencies_on_independent_id_dependent_id ON workflow_dependencies USING btree (included_workflow_id, including_workflow_id);
+
+
+--
 -- Name: index_workflows_on_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1617,6 +1677,7 @@ INSERT INTO schema_migrations (version) VALUES
 ('20170113235922'),
 ('20170217203644'),
 ('20170221232223'),
-('20170303002731');
+('20170303002731'),
+('20170305232008');
 
 

@@ -53,9 +53,14 @@ module ApplicationHelper
 
   # Customer stuff
 
+  # Currently, this is only passed when clicking Create New Workflow from the Customer page.
+  def customer_id_from_param
+    params[:customer_id].presence&.to_i
+  end
+
   # FIXME - DO SAME TREATMENT AS resource_workflow HERE; GOTTA RUN NOW
   def customers_with_single_select
-    if param_val = params[:customer_id].presence&.to_i
+    if param_val = customer_id_from_param
       if customer = Customer.find_by(id: param_val)
         return [[customer.name, customer.id, selected: true]]
       end

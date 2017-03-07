@@ -192,9 +192,9 @@ class Transform < ApplicationRecord
   # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite and is not already a prerequisite of this Transform
   #  is itself available as a new prerequisite.
   # Turns out we may not need this method; only #available_prerequisite_transforms is in fact necessary
-  def available_unused_prerequisite_transforms
-    available_prerequisite_transforms.reject { |eligible_transform| already_my_prerequisite?(eligible_transform) }
-  end
+  # def available_unused_prerequisite_transforms
+  #   available_prerequisite_transforms.reject { |eligible_transform| already_my_prerequisite?(eligible_transform) }
+  # end
 
   private
 
@@ -205,11 +205,11 @@ class Transform < ApplicationRecord
     dependents.any? { |dependent_transform| already_my_postrequisite?(dependent_transform) }
   end
 
-  def already_my_prerequisite?(transform)
-    dependents = transform.postrequisite_transforms
-    return false if dependents.empty?
-    return true if dependents.include?(self)
-    dependents.any? { |dependent_transform| already_my_prerequisite?(dependent_transform) }
-  end
+  # def already_my_prerequisite?(transform)
+  #   dependents = transform.postrequisite_transforms
+  #   return false if dependents.empty?
+  #   return true if dependents.include?(self)
+  #   dependents.any? { |dependent_transform| already_my_prerequisite?(dependent_transform) }
+  # end
 
 end

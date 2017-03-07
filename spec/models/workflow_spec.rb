@@ -5,10 +5,10 @@
 #  id          :integer          not null, primary key
 #  name        :string           not null
 #  slug        :string           not null
-#  customer_id :integer          not null
+#  customer_id :integer
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
-#  template    :boolean          default(FALSE), not null
+#  shared      :boolean          default(FALSE), not null
 #
 # Indexes
 #
@@ -27,8 +27,22 @@ describe Workflow do
   end
 
   describe 'validations' do
-    [:name, :customer, :slug].each do |att|
+    [:name, :slug].each do |att|
       it { should validate_presence_of(att) }
+    end
+
+    it "should validate the presence of the customer when the workflow isn't shared" do
+      workflow = build(:workflow, customer: nil, shared: false)
+      expect(workflow).to_not be_valid
+      workflow.customer = create(:customer)
+      expect(workflow).to be_valid
+    end
+
+    it "should validate the absence of the customer when the workflow is shared" do
+      workflow = build(:workflow, customer: create(:customer), shared: true)
+      expect(workflow).to_not be_valid
+      workflow.customer = nil
+      expect(workflow).to be_valid
     end
 
     context 'with a workflow already extant' do
@@ -61,6 +75,11 @@ describe Workflow do
     it { should have_many(:transforms) }
     it { should have_many(:data_quality_reports) }
     it { should have_many(:runs) }
+
+    it { should have_many(:included_dependencies) }
+    it { should have_many(:included_workflows).through(:included_dependencies) }
+    it { should have_many(:including_dependencies) }
+    it { should have_many(:including_workflows).through(:including_dependencies) }
   end
 
   describe 'instance methods' do
