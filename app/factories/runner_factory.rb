@@ -37,10 +37,10 @@ module RunnerFactory
         s3_file_name: plan_h[:s3_file_name]
       )
 
-      open(s3_file.s3_presigned_url) do |stream|
-        table_name = plan_h[:params].fetch(:table_name, nil)
-        raise "The AutoLoad runner requires a :table_name param" unless table_name.present?
+      table_name = plan_h[:params].fetch(:table_name, nil)
+      raise "The AutoLoad runner requires a :table_name param" unless table_name.present?
 
+      open(s3_file.s3_presigned_url) do |stream|
         begin
           # We wrap in a CSV obj only to get automatic parsing of quotes/commas/escapes for the header ... and discard the CSV object after that sole use
           csv_wrapped_stream = CSV.new(stream)
