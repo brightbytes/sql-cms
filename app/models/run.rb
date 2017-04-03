@@ -110,7 +110,7 @@ class Run < ApplicationRecord
   end
 
   def execution_plan_object
-    @execution_plan_object ||= ExecutionPlan.new(execution_plan)
+    @execution_plan_object ||= ExecutionPlan.wrap(execution_plan)
   end
 
   delegate :transform_group, :transform_group_transform_ids, :transform_plan, :data_quality_reports, :data_quality_report_plan, :data_quality_report_ids,

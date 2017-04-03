@@ -13,6 +13,10 @@ class ExecutionPlan
       new(execution_plan)
     end
 
+    def wrap(execution_plan_h)
+      new(execution_plan_h)
+    end
+
     private
 
     # NB: Side-effect!
@@ -43,8 +47,8 @@ class ExecutionPlan
 
   attr_reader :execution_plan
 
-  def initialize(execution_plan)
-    @execution_plan = execution_plan
+  def initialize(execution_plan_h)
+    @execution_plan = execution_plan_h
   end
 
   alias_method :to_hash, :execution_plan
