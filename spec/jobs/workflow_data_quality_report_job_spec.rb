@@ -1,9 +1,11 @@
-describe DataQualityReportJob do
+describe WorkflowDataQualityReportJob do
 
   describe "#perform" do
     let!(:creator) { create(:user) }
     let!(:workflow) { create(:workflow) }
-    let!(:data_quality_report) { create(:data_quality_report, workflow: workflow, sql: "SELECT COUNT(1) FROM :table", params: { table: :quick_test }) }
+    let!(:workflow_data_quality_report) do
+      create(:workflow_data_quality_report, workflow: workflow, data_quality_report: DataQualityReport.table_count, params: { table_name: :quick_test })
+    end
 
     before do
       run.create_schema
@@ -18,9 +20,9 @@ describe DataQualityReportJob do
 
     it "should store the result in the RunStepLog when invoked with valid SQL" do
       Sidekiq::Testing.inline! do
-        DataQualityReportJob.perform_later(run_id: run.id, step_id: data_quality_report.id)
+        WorkflowDataQualityReportJob.perform_later(run_id: run.id, step_id: workflow_data_quality_report.id)
         run.reload
-        logs = run.run_step_logs.where(step_type: 'data_quality_report').to_a
+        logs = run.run_step_logs.where(step_type: 'workflow_data_quality_report').to_a
         expect(logs.size).to eq(1)
         log = logs.first
         expect(log.step_exceptions).to eq(nil)

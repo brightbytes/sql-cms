@@ -45,8 +45,6 @@ describe Run do
     it { should have_many(:run_step_logs) }
     it { should belong_to(:creator) }
     it { should belong_to(:workflow) }
-    it { should have_many(:transforms) }
-    it { should have_many(:data_quality_reports) }
   end
 
   describe "callbacks" do
@@ -199,54 +197,54 @@ describe Run do
 
       end
 
-      describe "#data_quality_reports" do
-        it "should return the expected data_quality_reports hash" do
-          expect(run.data_quality_reports).to eq(run.execution_plan[:data_quality_reports])
+      describe "#workflow_data_quality_reports" do
+        it "should return the expected workflow_data_quality_reports hash" do
+          expect(run.workflow_data_quality_reports).to eq(run.execution_plan[:workflow_data_quality_reports])
         end
       end
 
-      describe "#data_quality_report_ids" do
-        it "should return the expected data_quality_report ids" do
-          expect(Set.new(run.data_quality_report_ids)).to eq(Set.new([data_quality_report_1, data_quality_report_2, data_quality_report_3].map(&:id)))
+      describe "#workflow_data_quality_report_ids" do
+        it "should return the expected workflow_data_quality_report ids" do
+          expect(Set.new(run.workflow_data_quality_report_ids)).to eq(Set.new([workflow_data_quality_report_1, workflow_data_quality_report_2, workflow_data_quality_report_3].map(&:id)))
         end
       end
 
-      describe "#data_quality_report_plan" do
-        it "should return the expected data_quality_report hashes" do
-          expect(run.data_quality_report_plan(data_quality_report_1.id)).to eq(ActiveModelSerializers::SerializableResource.new(data_quality_report_1).as_json)
-          expect(run.data_quality_report_plan(data_quality_report_2.id)).to eq(ActiveModelSerializers::SerializableResource.new(data_quality_report_2).as_json)
-          expect(run.data_quality_report_plan(data_quality_report_3.id)).to eq(ActiveModelSerializers::SerializableResource.new(data_quality_report_3).as_json)
-          expect(run.data_quality_report_plan(123421234324)).to eq(nil)
+      describe "#workflow_data_quality_report_plan" do
+        it "should return the expected workflow_data_quality_report hashes" do
+          expect(run.workflow_data_quality_report_plan(workflow_data_quality_report_1.id)).to eq(ActiveModelSerializers::SerializableResource.new(workflow_data_quality_report_1).as_json)
+          expect(run.workflow_data_quality_report_plan(workflow_data_quality_report_2.id)).to eq(ActiveModelSerializers::SerializableResource.new(workflow_data_quality_report_2).as_json)
+          expect(run.workflow_data_quality_report_plan(workflow_data_quality_report_3.id)).to eq(ActiveModelSerializers::SerializableResource.new(workflow_data_quality_report_3).as_json)
+          expect(run.workflow_data_quality_report_plan(123421234324)).to eq(nil)
         end
       end
 
-      describe "data_quality_reports_successful?" do
+      describe "workflow_data_quality_reports_successful?" do
         it "should return true when all data quality report steps are successful" do
-          create(:run_step_log, run: run, successful: true, step_type: 'data_quality_report', step_id: data_quality_report_1.id)
-          create(:run_step_log, run: run, successful: true, step_type: 'data_quality_report', step_id: data_quality_report_2.id)
-          create(:run_step_log, run: run, successful: true, step_type: 'data_quality_report', step_id: data_quality_report_3.id)
-          expect(run.data_quality_reports_successful?).to eq(true)
+          create(:run_step_log, run: run, successful: true, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_1.id)
+          create(:run_step_log, run: run, successful: true, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_2.id)
+          create(:run_step_log, run: run, successful: true, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_3.id)
+          expect(run.workflow_data_quality_reports_successful?).to eq(true)
         end
 
         it "should return false when one of the data quality reports has an exception" do
-          create(:run_step_log, run: run, successful: true, step_type: 'data_quality_report', step_id: data_quality_report_1.id)
-          create(:run_step_log, run: run, step_exceptions: { too_bad: :dude }, step_type: 'data_quality_report', step_id: data_quality_report_2.id)
-          create(:run_step_log, run: run, successful: true, step_type: 'data_quality_report', step_id: data_quality_report_3.id)
-          expect(run.data_quality_reports_successful?).to eq(false)
+          create(:run_step_log, run: run, successful: true, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_1.id)
+          create(:run_step_log, run: run, step_exceptions: { too_bad: :dude }, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_2.id)
+          create(:run_step_log, run: run, successful: true, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_3.id)
+          expect(run.workflow_data_quality_reports_successful?).to eq(false)
         end
 
         it "should return false when one of the data quality reports has a validation failure" do
-          create(:run_step_log, run: run, successful: true, step_type: 'data_quality_report', step_id: data_quality_report_1.id)
-          create(:run_step_log, run: run, step_validation_failures: { too_bad: :dude }, step_type: 'data_quality_report', step_id: data_quality_report_2.id)
-          create(:run_step_log, run: run, successful: true, step_type: 'data_quality_report', step_id: data_quality_report_3.id)
-          expect(run.data_quality_reports_successful?).to eq(false)
+          create(:run_step_log, run: run, successful: true, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_1.id)
+          create(:run_step_log, run: run, step_validation_failures: { too_bad: :dude }, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_2.id)
+          create(:run_step_log, run: run, successful: true, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_3.id)
+          expect(run.workflow_data_quality_reports_successful?).to eq(false)
         end
 
         it "should return false when one of the data quality reports has not yet successful" do
-          create(:run_step_log, run: run, successful: true, step_type: 'data_quality_report', step_id: data_quality_report_1.id)
-          create(:run_step_log, run: run, successful: false, step_type: 'data_quality_report', step_id: data_quality_report_2.id)
-          create(:run_step_log, run: run, successful: true, step_type: 'data_quality_report', step_id: data_quality_report_3.id)
-          expect(run.data_quality_reports_successful?).to eq(false)
+          create(:run_step_log, run: run, successful: true, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_1.id)
+          create(:run_step_log, run: run, successful: false, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_2.id)
+          create(:run_step_log, run: run, successful: true, step_type: 'workflow_data_quality_report', step_id: workflow_data_quality_report_3.id)
+          expect(run.workflow_data_quality_reports_successful?).to eq(false)
         end
       end
 

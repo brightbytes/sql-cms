@@ -41,13 +41,10 @@ RSpec.configure do |config|
 
   config.before(:each) do
     Sidekiq::Worker.clear_all
-    User.flush_cache
-    Validation.flush_cache
+    [User, Validation, DataQualityReport].each(&:flush_cache)
   end
 
-  config.before(:each, versioning: true) do
-    PaperTrail.enabled = true
-  end
+  config.before(:each, versioning: true) { PaperTrail.enabled = true }
 
   config.include FactoryGirl::Syntax::Methods
 

@@ -177,8 +177,8 @@ module RunnerFactory
     end
   end
 
-  # Runs DataQualityReports; internal-only Runner
-  module DataQualityReportRunner
+  # Runs WorkflowDataQualityReports; internal-only Runner
+  module WorkflowDataQualityReportRunner
 
     extend self
 

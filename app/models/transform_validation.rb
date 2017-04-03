@@ -12,6 +12,7 @@
 #
 # Indexes
 #
+#  index_transform_validations_on_transform_id   (transform_id)
 #  index_transform_validations_on_validation_id  (validation_id)
 #
 # Foreign Keys

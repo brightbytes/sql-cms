@@ -64,12 +64,6 @@ class Run < ApplicationRecord
 
   belongs_to :workflow, inverse_of: :runs
 
-  has_one :customer, through: :workflow
-
-  has_many :transforms, through: :workflow
-
-  has_many :data_quality_reports, through: :workflow
-
   # Instance Methods
 
   def to_s
@@ -113,19 +107,20 @@ class Run < ApplicationRecord
     @execution_plan_object ||= ExecutionPlan.wrap(execution_plan)
   end
 
-  delegate :transform_group, :transform_group_transform_ids, :transform_plan, :data_quality_reports, :data_quality_report_plan, :data_quality_report_ids,
+  delegate :transform_group, :transform_group_transform_ids, :transform_plan,
+           :workflow_data_quality_reports, :workflow_data_quality_report_plan, :workflow_data_quality_report_ids,
            to: :execution_plan_object
 
   def transform_group_successful?(step_index)
     return nil if execution_plan.blank?
     ids = transform_group_transform_ids(step_index)
-    run_step_logs.successful.where(step_type: 'transform', step_index: step_index, step_id: ids).count == ids.size
+    run_step_logs.successful.transforms.where(step_index: step_index, step_id: ids).count == ids.size
   end
 
-  def data_quality_reports_successful?
+  def workflow_data_quality_reports_successful?
     return nil if execution_plan.blank?
-    ids = data_quality_report_ids
-    run_step_logs.successful.where(step_type: 'data_quality_report', step_id: ids).count == ids.size
+    ids = workflow_data_quality_report_ids
+    run_step_logs.successful.workflow_data_quality_reports.where(step_id: ids).count == ids.size
   end
 
   # This method is critically important, since it wraps the execution of every single step in the workflow

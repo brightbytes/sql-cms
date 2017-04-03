@@ -41,18 +41,18 @@ class RunManagerJob < ApplicationJob
         if run.transform_group_transform_ids(next_step_index)
           run.update_attribute(:status, "unstarted_ordered_transform_groups[#{next_step_index}]")
         else
-          run.update_attribute(:status, "unstarted_data_quality_reports")
+          run.update_attribute(:status, "unstarted_workflow_data_quality_reports")
         end
       end
 
-    when 'unstarted_data_quality_reports'
-      run.data_quality_report_ids.each do |data_quality_report_id|
-        DataQualityReportJob.perform_later(run_id: run.id, step_id: data_quality_report_id)
+    when 'unstarted_workflow_data_quality_reports'
+      run.workflow_data_quality_report_ids.each do |workflow_data_quality_report_id|
+        WorkflowDataQualityReportJob.perform_later(run_id: run.id, step_id: workflow_data_quality_report_id)
       end
-      run.update_attribute(:status, "started_data_quality_reports")
+      run.update_attribute(:status, "started_workflow_data_quality_reports")
 
-    when 'started_data_quality_reports'
-      if run.data_quality_reports_successful?
+    when 'started_workflow_data_quality_reports'
+      if run.workflow_data_quality_reports_successful?
         run.update_attribute(:status, "finished")
         run.notify_completed!
         return false # don't self-relog

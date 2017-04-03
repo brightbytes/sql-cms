@@ -268,29 +268,29 @@ module WorkflowSeeder
 
     # DataQualityReports for CopyFrom Transforms
 
-    create_data_quality_report!(
-      name: "Staging BOCES Mappings table count",
-      sql: "SELECT count(1) FROM staging_boces_mappings"
+    create_workflow_data_quality_report!(
+      params: { table_name: :staging_boces_mappings },
+      data_quality_report: DataQualityReport.table_count
     )
 
-    create_data_quality_report!(
-      name: "Staging District Mappings table count",
-      sql: "SELECT count(1) FROM staging_district_mappings"
+    create_workflow_data_quality_report!(
+      params: { table_name: :staging_district_mappings },
+      data_quality_report: DataQualityReport.table_count
     )
 
-    create_data_quality_report!(
-      name: "Staging School Mappings table count",
-      sql: "SELECT count(1) FROM staging_school_mappings"
+    create_workflow_data_quality_report!(
+      params: { table_name: :staging_school_mappings },
+      data_quality_report: DataQualityReport.table_count
     )
 
-    create_data_quality_report!(
-      name: "Staging Fund Mappings table count",
-      sql: "SELECT count(1) FROM staging_fund_mappings"
+    create_workflow_data_quality_report!(
+      params: { table_name: :staging_fund_mappings },
+      data_quality_report: DataQualityReport.table_count
     )
 
-    create_data_quality_report!(
-      name: "Staging Fact Mappings table count",
-      sql: "SELECT count(1) FROM staging_facts"
+    create_workflow_data_quality_report!(
+      params: { table_name: :staging_facts },
+      data_quality_report: DataQualityReport.table_count
     )
 
     # Dimension Initial Mapping Transforms
@@ -475,19 +475,19 @@ module WorkflowSeeder
 
     # DataQualityReports for Mapping Transforms
 
-    create_data_quality_report!(
-      name: "School Mappings table count",
-      sql: "SELECT count(1) FROM school_mappings"
+    create_workflow_data_quality_report!(
+      params: { table_name: :school_mappings },
+      data_quality_report: DataQualityReport.table_count
     )
 
-    create_data_quality_report!(
-      name: "School Parent Mappings table count",
-      sql: "SELECT count(1) FROM school_parent_mappings"
+    create_workflow_data_quality_report!(
+      params: { table_name: :school_parent_mappings },
+      data_quality_report: DataQualityReport.table_count
     )
 
-    create_data_quality_report!(
-      name: "Mapped Facts table count",
-      sql: "SELECT count(1) FROM mapped_facts"
+    create_workflow_data_quality_report!(
+      params: { table_name: :mapped_facts },
+      data_quality_report: DataQualityReport.table_count
     )
 
     # Export Transform
@@ -519,8 +519,8 @@ module WorkflowSeeder
     TransformValidation.where(transform: options.delete(:transform), validation: options.delete(:validation)).first_or_create!(options)
   end
 
-  def create_data_quality_report!(**options)
-    DataQualityReport.where(name: options.delete(:name)).first_or_create!(options.merge(workflow: demo_workflow))
+  def create_workflow_data_quality_report!(**options)
+    WorkflowDataQualityReport.where(workflow: demo_workflow, data_quality_report: options.delete(:data_quality_report)).first_or_create!(options)
   end
 
 end

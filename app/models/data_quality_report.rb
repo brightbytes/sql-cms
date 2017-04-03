@@ -3,51 +3,66 @@
 #
 # Table name: public.data_quality_reports
 #
-#  id          :integer          not null, primary key
-#  workflow_id :integer          not null
-#  name        :string           not null
-#  sql         :text             not null
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  params      :jsonb
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  sql        :text             not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  immutable  :boolean          default(FALSE)
 #
 # Indexes
 #
 #  index_data_quality_reports_on_lowercase_name  (lower((name)::text)) UNIQUE
-#  index_data_quality_reports_on_workflow_id     (workflow_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (workflow_id => workflows.id)
 #
 
 class DataQualityReport < ApplicationRecord
-
-  include Concerns::ParamsHelpers
 
   auto_normalize
 
   # Validations
 
-  validates :sql, :workflow, presence: true
+  validates :sql, presence: true
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
   # Callbacks
 
-  before_validation :maybe_generate_default_sql
-
-  DEFAULT_TABLE_COUNT_SQL = "SELECT COUNT(1) FROM :table_name"
-
-  def maybe_generate_default_sql
-    self.sql = DEFAULT_TABLE_COUNT_SQL if sql.blank?
-  end
+  include Concerns::ImmutableCallbacks
+  immutable :update, :destroy
 
   # Associations
 
-  belongs_to :workflow, inverse_of: :data_quality_reports
+  has_many :workflow_data_quality_reports, inverse_of: :data_quality_report, dependent: :delete_all
+  has_many :workflows, through: :workflow_data_quality_reports
 
-  has_one :customer, through: :workflow
+  # Class Methods
 
+  class << self
 
+    def table_count
+      @table_count ||= where(name: 'Table Count').first_or_create!(
+        immutable: true,
+        sql: 'SELECT COUNT(1) FROM :table_name'
+      )
+    end
+
+    def column_value_distribution
+      @column_value_distribution ||= where(name: 'Column Value Distribution').first_or_create!(
+        immutable: true,
+        sql: "SELECT :column_name, COUNT(:column_name) AS count FROM :table_name GROUP BY :column_name ORDER BY count DESC"
+      )
+    end
+
+    def column_non_unique_value_distribution
+      @column_non_unique_value_distribution ||= where(name: 'Column Non-Unique Value Distribution').first_or_create!(
+        immutable: true,
+        sql: "SELECT :column_name, COUNT(:column_name) AS count FROM :table_name GROUP BY :column_name HAVING COUNT(:column_name) > 1 ORDER BY count DESC"
+      )
+    end
+
+    def flush_cache
+      @table_count = @column_value_distribution = @column_non_unique_value_distribution = nil
+    end
+
+  end
 end
