@@ -43,7 +43,7 @@ describe TransformJob do
       context "with a validation that fails" do
         let!(:transform_validation) do
           ValidationSeeder.seed
-          create(:transform_validation, transform: transform, validation: Validation.find_by(name: 'Field Value Less Than'), params: { table_name: :target_table, column_name: :col_target, value: 1 })
+          create(:transform_validation, transform: transform, validation: Validation.find_by(name: 'Column :table_name.:column_name is Less Than :value'), params: { table_name: :target_table, column_name: :col_target, value: 1 })
         end
 
         let!(:run) do
