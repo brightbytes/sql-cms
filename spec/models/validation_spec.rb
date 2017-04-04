@@ -56,4 +56,18 @@ describe Validation do
     it { should have_many(:transform_validations) }
     it { should have_many(:transforms) }
   end
+
+  describe "instance methods" do
+
+    context "#usage_count" do
+      it "should return the number of times the DataQualityReport is used" do
+        dqr = create(:data_quality_report)
+        expect(dqr.usage_count).to eq(0)
+        3.times { create(:workflow_data_quality_report, data_quality_report: dqr) }
+        expect(dqr.reload.usage_count).to eq(3)
+      end
+    end
+
+  end
+
 end
