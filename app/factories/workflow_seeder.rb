@@ -524,8 +524,7 @@ module WorkflowSeeder
   def create_workflow_data_quality_report!(**options)
     join_options = { workflow: demo_workflow, data_quality_report: DataQualityReport.table_count }
     wdqrs = WorkflowDataQualityReport.where(join_options).to_a
-    # FIXME - FIGURE OUT HOW TO deep_symbolize_keys! on all params fields
-    WorkflowDataQualityReport.create!(join_options.merge(options)) if wdqrs.none? { |wdqr| wdqr.params['table_name'] == options[:params][:table_name] }
+    WorkflowDataQualityReport.create!(join_options.merge(options)) if wdqrs.none? { |wdqr| wdqr.params[:table_name] == options[:params][:table_name].to_s }
   end
 
 end

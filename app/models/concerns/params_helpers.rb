@@ -5,8 +5,14 @@ module Concerns::ParamsHelpers
 
   include Concerns::ValidateYaml
 
+  def params
+    super&.with_indifferent_access
+  end
+
   def params_yaml
-    params.to_yaml if params.present?
+    # We use the raw value to avoid the crap added by converting the hash to one with indifferent access in #params, ^^
+    raw_params = read_attribute(:params)
+    raw_params.to_yaml if raw_params.present?
   end
 
   def params_yaml=(val)
