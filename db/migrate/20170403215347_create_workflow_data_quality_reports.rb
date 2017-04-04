@@ -23,8 +23,8 @@ class CreateWorkflowDataQualityReports < ActiveRecord::Migration
     dqrs.each do |dqr|
       WorkflowDataQualityReport.create!(
         workflow_id: dqr.workflow_id,
-        data_quality_report_id: dqr.id,
-        params: dqr.params || { table_name: :fix_me_dude }
+        data_quality_report: DataQualityReport.table_count,
+        params: dqr.params || { table_name: :fix_me }
       )
       dqr.destroy
     end

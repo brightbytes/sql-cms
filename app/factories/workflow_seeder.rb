@@ -7,11 +7,21 @@ module WorkflowSeeder
     notify_me!(create_demo_workflow!)
   end
 
+  # FIXME - NUKE THIS METHOD WHEN DONE WITH RAPID-DEV OF THE DEMO WORKFLOW
+  def reseed
+    demo_workflow.destroy if demo_workflow_exists?
+    seed
+  end
+
   def demo_workflow
     Workflow.where(name: 'Demo Workflow, version 1').first_or_create!(customer: CustomerSeeder.demo_customer)
   end
 
   private
+
+  def demo_workflow_exists?
+    Workflow.where(name: 'Demo Workflow, version 1').exists?
+  end
 
   def notify_me!(workflow)
     workflow.notifications.first_or_create!(user: User.where(email: 'aaron@brightbytes.net').first)
@@ -269,28 +279,23 @@ module WorkflowSeeder
     # DataQualityReports for CopyFrom Transforms
 
     create_workflow_data_quality_report!(
-      params: { table_name: :staging_boces_mappings },
-      data_quality_report: DataQualityReport.table_count
+      params: { table_name: :staging_boces_mappings }
     )
 
     create_workflow_data_quality_report!(
-      params: { table_name: :staging_district_mappings },
-      data_quality_report: DataQualityReport.table_count
+      params: { table_name: :staging_district_mappings }
     )
 
     create_workflow_data_quality_report!(
-      params: { table_name: :staging_school_mappings },
-      data_quality_report: DataQualityReport.table_count
+      params: { table_name: :staging_school_mappings }
     )
 
     create_workflow_data_quality_report!(
-      params: { table_name: :staging_fund_mappings },
-      data_quality_report: DataQualityReport.table_count
+      params: { table_name: :staging_fund_mappings }
     )
 
     create_workflow_data_quality_report!(
-      params: { table_name: :staging_facts },
-      data_quality_report: DataQualityReport.table_count
+      params: { table_name: :staging_facts }
     )
 
     # Dimension Initial Mapping Transforms
@@ -476,18 +481,15 @@ module WorkflowSeeder
     # DataQualityReports for Mapping Transforms
 
     create_workflow_data_quality_report!(
-      params: { table_name: :school_mappings },
-      data_quality_report: DataQualityReport.table_count
+      params: { table_name: :school_mappings }
     )
 
     create_workflow_data_quality_report!(
-      params: { table_name: :school_parent_mappings },
-      data_quality_report: DataQualityReport.table_count
+      params: { table_name: :school_parent_mappings }
     )
 
     create_workflow_data_quality_report!(
-      params: { table_name: :mapped_facts },
-      data_quality_report: DataQualityReport.table_count
+      params: { table_name: :mapped_facts }
     )
 
     # Export Transform
@@ -520,7 +522,10 @@ module WorkflowSeeder
   end
 
   def create_workflow_data_quality_report!(**options)
-    WorkflowDataQualityReport.where(workflow: demo_workflow, data_quality_report: options.delete(:data_quality_report)).first_or_create!(options)
+    join_options = { workflow: demo_workflow, data_quality_report: DataQualityReport.table_count }
+    wdqrs = WorkflowDataQualityReport.where(join_options).to_a
+    # FIXME - FIGURE OUT HOW TO deep_symbolize_keys! on all params fields
+    WorkflowDataQualityReport.create!(join_options.merge(options)) if wdqrs.none? { |wdqr| wdqr.params['table_name'] == options[:params][:table_name] }
   end
 
 end

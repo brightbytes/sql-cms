@@ -61,8 +61,8 @@ ActiveAdmin.register Transform do
       text_node link_to("Add New Transform Validation", new_transform_validation_path(transform_id: resource.id))
 
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
-      table_for(resource.transform_validations.includes(:validation).order('validations.name'), sortable: true) do
-        column(:transform_validation, sortable: :name) { |tv| auto_link(tv) }
+      table_for(resource.transform_validations.includes(:validation).order('validations.name')) do
+        column(:transform_validation) { |tv| auto_link(tv) }
         # Doesn't work, FML
         # column(:params) { |tv| code(tv.params) }
         column(:params) { |tv| tv.params }

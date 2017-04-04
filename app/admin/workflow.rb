@@ -63,14 +63,18 @@ ActiveAdmin.register Workflow do
     render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.order(:name) }
 
     panel 'Data Quality Reports' do
-      text_node link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
-      table_for(resource.data_quality_reports.order(:name)) do
-        column(:name) { |dqr| auto_link(dqr) }
-        column(:interpolated_sql) { |dqr| dqr.interpolated_sql.truncate(100) }
-        column(:actions) do |dqr|
-          text_node(link_to("Edit", edit_data_quality_report_path(dqr, source: :workflow, workflow_id: dqr.workflow_id)))
-          text_node(' | ')
-          text_node(link_to("Delete", data_quality_report_path(dqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data Quality Report?' }))
+      text_node link_to("Create New Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
+      table_for(resource.workflow_data_quality_reports.includes(:data_quality_report).order('data_quality_reports.name')) do
+
+        column(:workflow_data_quality_report) { |wdqr| auto_link(wdqr) }
+        column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(100) }
+        column(:validation_immutable) { |wdqr| yes_no(wdqr.data_quality_report.immutable?) }
+
+        # Work back in?
+        # text_node(link_to("Edit", edit_data_quality_report_path(dqr, source: :workflow, workflow_id: dqr.workflow_id)))
+
+        column(:action) do |wdqr|
+          text_node(link_to("Delete", data_quality_report_path(wdqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data Quality Report?' }))
         end
 
       end
