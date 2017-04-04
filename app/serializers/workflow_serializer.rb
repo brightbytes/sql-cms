@@ -37,7 +37,7 @@ end
 
 class WorkflowDataQualityReportSerializer < ActiveModel::Serializer
 
-  attributes :id, :name, :params, :sql, :interpolated_sql
+  attributes :id, :params, :name, :interpolated_name, :sql, :interpolated_sql
 
 end
 
@@ -51,6 +51,6 @@ end
 
 class TransformValidationSerializer < ActiveModel::Serializer
 
-  attributes :id, :name, :params, :sql, :interpolated_sql
+  attributes :id, :params, :name, :interpolated_name, :sql, :interpolated_sql
 
 end
