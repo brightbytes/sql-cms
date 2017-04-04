@@ -6,12 +6,13 @@ ActiveAdmin.register WorkflowDataQualityReport do
 
   permit_params :workflow_id, :data_quality_report_id, :params_yaml
 
-  show do
+  show title: :interpolated_name do
     attributes_table do
       row :id
       row :workflow
       row :data_quality_report
       row(:params) { code(pretty_print_as_json(resource.params)) }
+      row :interpolated_name
       simple_format_row(:sql)
       simple_format_row(:interpolated_sql) if resource.params.present?
       row(:data_quality_report_immutable) { yes_no(resource.data_quality_report.immutable) }
