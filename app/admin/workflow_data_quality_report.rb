@@ -46,6 +46,12 @@ ActiveAdmin.register WorkflowDataQualityReport do
       end
     end
 
+    def update
+      super do |success, failure|
+        success.html { redirect_to(parent_workflow_path) }
+      end
+    end
+
     def destroy
       super do |success, failure|
         success.html { redirect_to(parent_workflow_path) }

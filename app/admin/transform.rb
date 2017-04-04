@@ -60,14 +60,15 @@ ActiveAdmin.register Transform do
     panel 'Transform Validations' do
       text_node link_to("Add New Transform Validation", new_transform_validation_path(transform_id: resource.id))
 
-      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
       table_for(resource.transform_validations.includes(:validation).order('validations.name')) do
         column(:transform_validation) { |tv| auto_link(tv) }
-        # Doesn't work, FML
-        # column(:params) { |tv| code(tv.params) }
-        column(:params) { |tv| tv.params }
-        column(:validation_immutable) { |tv| yes_no(tv.validation.immutable?) }
-        column(:action) { |tv| link_to("Delete", transform_validation_path(tv), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Validation?' }) }
+        column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(100) }
+        column('Immutable?') { |tv| yes_no(tv.validation.immutable?) }
+        column(:action) do |tv|
+          text_node(link_to("Edit", edit_transform_validation_path(tv, source: :transform, transform_id: tv.transform_id)))
+          text_node(' | ')
+          text_node(link_to("Delete", transform_validation_path(tv), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Validation?' }))
+        end
       end
     end
 
