@@ -64,14 +64,18 @@ There are a number of rake tasks for managing a Heroku deployment in `lib/tasks/
 
 ### More Important
 
-- EASY: Add support for uploading local files to a Transform-specified location on S3 on Transform#show.
+- EASY: Redo this README, breaking large chunks out into the Wiki
+- EASY: Add support for Transform Templates in place of the callback kludge that uses a default template per-runner-type.  (This will NOT be a clone of the Validation / Data Quality Report feature, since unlike with those, template reuse will be far more infrequent.)
+- EASY: Add support for uploading local files to a Transform-specified location on S3 on Transform#show.  This will be necessary so that the Demo Workflow can be run locally and on a new Heroku app.
+- EASY: After reverifying removal of BW or personal PII, open-source the app
+- MIDDLING: Convert the app to a Rails Engine.  This would make open-sourcing cooler, but would be a no-op for myself personally
 - MIDDLING: Add FE coverage (there's none yet - yeah, I suck ... but TTM is more critical at the moment).
-- MIDDLING: Convert the application to an Engine and open-source it.
-- DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3` ... but there just has to be a gem for it ...)
-- MIDDLING: Add support for transferring files from an SFTP server to the S3 location specified by a data-loading trasform, so that the system can read the raw files provided by SIS DPL customers without a manual copy-over
+- ANNOYING: Create a cooler Demo Workflow
 
 ### Less Important
 
+- DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3` ... but there just has to be a gem for it ...)
+- MIDDLING: Add support for reading S3 Import files from an SFTP server
 - DIFFICULT: Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
 - MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs.
 - MIDDLING: Add Redshift support, both for production and local development.  I'm hesitant to do this without a demonstrated, significant performance disadvantage of using Postgres for larger data sets.

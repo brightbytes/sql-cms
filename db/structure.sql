@@ -1055,6 +1055,14 @@ ALTER TABLE ONLY transform_dependencies
 
 
 --
+-- Name: fk_rails_83cf12c62e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflow_data_quality_reports
+    ADD CONSTRAINT fk_rails_83cf12c62e FOREIGN KEY (data_quality_report_id) REFERENCES data_quality_reports(id);
+
+
+--
 -- Name: fk_rails_8a742645db; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1092,6 +1100,14 @@ ALTER TABLE ONLY notifications
 
 ALTER TABLE ONLY run_step_logs
     ADD CONSTRAINT fk_rails_bcd9d373c4 FOREIGN KEY (run_id) REFERENCES runs(id);
+
+
+--
+-- Name: fk_rails_db221ae1ec; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflow_data_quality_reports
+    ADD CONSTRAINT fk_rails_db221ae1ec FOREIGN KEY (workflow_id) REFERENCES workflows(id);
 
 
 --

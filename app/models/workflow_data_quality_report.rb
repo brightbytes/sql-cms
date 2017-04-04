@@ -14,6 +14,11 @@
 #  index_workflow_data_quality_reports_on_data_quality_report_id  (data_quality_report_id)
 #  index_workflow_data_quality_reports_on_workflow_id             (workflow_id)
 #
+# Foreign Keys
+#
+#  fk_rails_...  (data_quality_report_id => data_quality_reports.id)
+#  fk_rails_...  (workflow_id => workflows.id)
+#
 
 class WorkflowDataQualityReport < ApplicationRecord
 
@@ -35,7 +40,7 @@ class WorkflowDataQualityReport < ApplicationRecord
 
   delegate :name, :sql, to: :data_quality_report
 
-  # FIXME - MAKE THE NAME INTERPOLATABLE
+  # FIXME - MAKE THE NAME INTERPOLATABLE, LIKE THE SQL
   def name
     "Data Quality Report '#{data_quality_report.name}' for Workflow '#{workflow.name}'"
   end

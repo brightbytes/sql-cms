@@ -41,6 +41,7 @@ class TransformValidation < ApplicationRecord
 
   delegate :name, :sql, to: :validation
 
+  # FIXME - MAKE THE NAME INTERPOLATABLE, LIKE THE SQL
   def name
     "Validation '#{validation.name}' for Transform '#{transform.name}'"
   end

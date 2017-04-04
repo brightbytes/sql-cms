@@ -7,12 +7,15 @@ class CreateWorkflowDataQualityReports < ActiveRecord::Migration
     create_table :workflow_data_quality_reports do |t|
       t.with_options(null: false) do |tt|
         # Note we can't do the traditional 2-column unique index b/c the params would need to be part of the uniqueness ... but that no-workie with JSONB
-        tt.integer :workflow_id, index: true, foreign_key: true
-        tt.integer :data_quality_report_id, index: true, foreign_key: true
+        tt.integer :workflow_id, index: true
+        tt.integer :data_quality_report_id, index: true
         tt.jsonb :params
         tt.timestamps
       end
     end
+
+    add_foreign_key :workflow_data_quality_reports, :workflows
+    add_foreign_key :workflow_data_quality_reports, :data_quality_reports
 
     # At this time, we only have the table count reports in both the demo workflow and actual production workflow, so we just patch-up on the fly here:
     change_column_null :data_quality_reports, :workflow_id, true
