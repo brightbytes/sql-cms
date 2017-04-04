@@ -144,7 +144,7 @@ module RunnerFactory
       Tempfile.open(s3_file.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
         run.copy_to_in_schema(sql: sql, writeable_io: stream).tap do
           stream.rewind
-          s3_file.put(body: stream)
+          s3_file.upload(stream)
         end
       end
     end

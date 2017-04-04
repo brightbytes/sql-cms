@@ -100,7 +100,7 @@ class S3File
       raise "You must pass a Run instance!" unless @run.present?
     end
 
-    def put(stream)
+    def upload(stream)
       raise "No stream supplied!" unless stream.present?
       s3_object.put(body: stream)
     end

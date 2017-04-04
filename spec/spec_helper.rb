@@ -54,7 +54,7 @@ RSpec.configure do |config|
       Rails.root.join("spec/fixtures/files/#{s3_file.s3_file_name}")
     end
     # Globally stub S3 access in export files
-    allow_any_instance_of(S3File::S3ExportFile).to receive(:put)
+    allow_any_instance_of(S3File::S3ExportFile).to receive(:upload)
   end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
