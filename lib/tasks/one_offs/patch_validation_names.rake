@@ -1,6 +1,5 @@
+# This is entirely nukable now ... but keeping it around a bit longer in case I have to do it again ...
 namespace :support do
-
-  # Nuke this task and retrofit the seeded Validations once this is run in prod
 
   OLD_TO_NEW_MAP = {
     # 'Field Value IS NOT NULL' => 'Column :table_name.:column_name IS NOT NULL',
