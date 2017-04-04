@@ -33,7 +33,7 @@ ActiveAdmin.register Validation do
       table_for(resource.transform_validations.includes(:transform).order('transforms.name')) do
         column(:runner) { |tv| tv.transform.runner }
         column(:transform) { |tv| auto_link(tv.transform) }
-        column(:transform_validation) { |tv| auto_link(tv) }
+        column(:transform_validation) { |tv| link_to(tv.interpolated_name, tv) }
       end
     end
 

@@ -32,7 +32,7 @@ ActiveAdmin.register DataQualityReport do
     panel 'Workflows' do
       table_for(resource.workflow_data_quality_reports.includes(:workflow).order('workflows.name')) do
         column(:workflow)
-        column(:workflow_data_quality_report) { |wdqr| auto_link(wdqr) }
+        column(:workflow_data_quality_report) { |wdqr| link_to(wdqr.interpolated_name, wdqr) }
       end
     end
 
