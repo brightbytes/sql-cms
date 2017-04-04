@@ -29,7 +29,7 @@ class RunStepLog < ApplicationRecord
 
   validates :step_index, :step_id, presence: true
 
-  STEP_TYPES = %w(transform data_quality_report)
+  STEP_TYPES = %w(transform workflow_data_quality_report)
 
   validates :step_type, presence: true, inclusion: { in: STEP_TYPES }
 
@@ -61,9 +61,9 @@ class RunStepLog < ApplicationRecord
 
   scope :invalid, -> { where("step_validation_failures IS NOT NULL") }
 
-  scope :data_quality_reports, -> { where(step_type: 'data_quality_report') }
-
   scope :transforms, -> { where(step_type: 'transform') }
+
+  scope :workflow_data_quality_reports, -> { where(step_type: 'workflow_data_quality_report') }
 
   # Instance Methods
 
@@ -76,12 +76,10 @@ class RunStepLog < ApplicationRecord
   end
 
   def step_name
-    return nil unless run
     @step_name ||= step_plan[:name]
   end
 
   def step_interpolated_sql
-    return nil unless run
     @step_interpolated_sql ||= step_plan[:interpolated_sql]
   end
 
@@ -93,23 +91,22 @@ class RunStepLog < ApplicationRecord
     step_type == 'transform'
   end
 
-  def data_quality_report_log?
-    step_type == 'data_quality_report'
+  def workflow_data_quality_report_log?
+    step_type == 'workflow_data_quality_report'
   end
 
   def step_plan
-    return nil unless run
+    raise "No associated Run object!" unless run
     @step_plan ||=
       if transform_log?
         run.transform_plan(step_index: step_index, transform_id: step_id)
-      elsif data_quality_report_log?
-        run.data_quality_report_plan(step_id)
+      elsif workflow_data_quality_report_log?
+        run.workflow_data_quality_report_plan(step_id)
       end
   end
 
   def likely_step
-    return nil unless step_plan
-    klass = (transform_log? ? Transform : data_quality_report_log? ? DataQualityReport : nil)
+    klass = (transform_log? ? Transform : workflow_data_quality_report_log? ? WorkflowDataQualityReport : nil)
     @likely_step ||= klass.find_by(id: step_plan[:id]) if klass
   end
 

@@ -5,8 +5,14 @@ module Concerns::ParamsHelpers
 
   include Concerns::ValidateYaml
 
+  def params
+    super&.with_indifferent_access
+  end
+
   def params_yaml
-    params.to_yaml if params.present?
+    # We use the raw value to avoid the crap added by converting the hash to one with indifferent access in #params, ^^
+    raw_params = read_attribute(:params)
+    raw_params.to_yaml if raw_params.present?
   end
 
   def params_yaml=(val)
@@ -21,6 +27,18 @@ module Concerns::ParamsHelpers
 
   def validate_yaml_for_params
     validate_yaml(:params, @params_yaml_invalid)
+  end
+
+  def interpolated_name
+    if params.present?
+      name.dup.tap do |name|
+        params.each_pair do |k, v|
+          name.gsub!(":#{k}", v.to_s)
+        end
+      end
+    else
+      name
+    end
   end
 
   def interpolated_sql

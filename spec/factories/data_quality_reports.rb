@@ -25,8 +25,13 @@ FactoryGirl.define do
 
   factory :data_quality_report do
     sequence(:name) { |n| "Data Quality Report #{n}" }
-    sequence(:sql)  { |n| "SELECT COUNT(1) FROM some_lame_table" }
+    sequence(:sql)  { |n| "SELECT COUNT(1) FROM :table_name" }
+  end
+
+  factory :workflow_data_quality_report do
     association :workflow
+    association :data_quality_report
+    sequence(:params) { |n| { table_name: "tmp_#{n}" } }
   end
 
 end

@@ -21,6 +21,8 @@ shared_examples 'yaml helper methods' do
     sql = "SELECT :foo FROM :whatever"
     if subject.is_a?(TransformValidation)
       subject.validation.sql = sql
+    elsif subject.is_a?(WorkflowDataQualityReport)
+      subject.data_quality_report.sql = sql
     else
       subject.sql = sql
     end

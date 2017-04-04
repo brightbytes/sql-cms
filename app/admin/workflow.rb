@@ -48,7 +48,9 @@ ActiveAdmin.register Workflow do
     render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Dependent, Data-Importing Transforms', transforms: resource.transforms.dependent.importing.order(:name) }
 
     panel 'Dependent, non-Importing/Exporting Transforms' do
+
       text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
+
       table_for(resource.transforms.dependent.non_file_related.order(:name)) do
         column(:name, sortable: :name) { |transform| auto_link(transform) }
         column(:runner, sortable: :runner) { |transform| transform.runner }
@@ -63,21 +65,26 @@ ActiveAdmin.register Workflow do
     render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.order(:name) }
 
     panel 'Data Quality Reports' do
-      text_node link_to("Create New Data Quality Report", new_data_quality_report_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
-      table_for(resource.data_quality_reports.order(:name)) do
-        column(:name) { |dqr| auto_link(dqr) }
-        column(:interpolated_sql) { |dqr| dqr.interpolated_sql.truncate(100) }
-        column(:actions) do |dqr|
-          text_node(link_to("Edit", edit_data_quality_report_path(dqr, source: :workflow, workflow_id: dqr.workflow_id)))
+
+      text_node link_to("Create New Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
+
+      table_for(resource.workflow_data_quality_reports.includes(:data_quality_report).order('data_quality_reports.name')) do
+        column(:workflow_data_quality_report) { |wdqr| link_to(wdqr.interpolated_name, wdqr) }
+        column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(120) }
+        column('Immutable?') { |wdqr| yes_no(wdqr.data_quality_report.immutable?) }
+        column(:action) do |wdqr|
+          text_node(link_to("Edit", edit_workflow_data_quality_report_path(wdqr, source: :workflow, workflow_id: wdqr.workflow_id)))
           text_node(' | ')
-          text_node(link_to("Delete", data_quality_report_path(dqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Data Quality Report?' }))
+          text_node(link_to("Delete", workflow_data_quality_report_path(wdqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Workflow Data Quality Report?' }))
         end
 
       end
     end
 
     panel 'Runs' do
+
       text_node link_to("Run Now", run_workflow_path(workflow), method: :put)
+
       table_for(resource.runs.includes(:creator).order(id: :desc)) do
         column(:schema_name) { |run| auto_link(run) }
         column(:creator)
@@ -88,7 +95,9 @@ ActiveAdmin.register Workflow do
     end
 
     panel 'Run Notifications' do
+
       text_node link_to("Add New Notifications", edit_workflow_path(workflow))
+
       table_for(resource.notifications.joins(:user).order('users.first_name, users.last_name')) do
         column(:user) { |notification| auto_link(notification.user) }
         column(:action) { |notification| link_to("Delete", notification_path(notification), method: :delete, data: { confirm: 'Are you sure you want to nuke this Notification?' }) }

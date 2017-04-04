@@ -2,22 +2,16 @@
 #
 # Table name: public.data_quality_reports
 #
-#  id          :integer          not null, primary key
-#  workflow_id :integer          not null
-#  name        :string           not null
-#  sql         :text             not null
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  params      :jsonb
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  sql        :text             not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  immutable  :boolean          default(FALSE)
 #
 # Indexes
 #
 #  index_data_quality_reports_on_lowercase_name  (lower((name)::text)) UNIQUE
-#  index_data_quality_reports_on_workflow_id     (workflow_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (workflow_id => workflows.id)
 #
 
 describe DataQualityReport do
@@ -27,7 +21,7 @@ describe DataQualityReport do
   end
 
   describe "validations" do
-    [:name, :workflow].each do |att|
+    [:name, :sql].each do |att|
       it { should validate_presence_of(att) }
     end
 
@@ -39,25 +33,34 @@ describe DataQualityReport do
   end
 
   describe "callbacks" do
-    context "before_validation" do
-      it "should generate the default table-count SQL if no #sql is present" do
-        dqr = build(:data_quality_report, sql: nil)
-        expect(dqr.valid?).to eq(true)
-        expect(dqr.sql).to eq(DataQualityReport::DEFAULT_TABLE_COUNT_SQL)
-      end
+    it "should be immutable when flagged as such" do
+      data_quality_report = create(:data_quality_report)
+      expect(data_quality_report.immutable?).to eq(false)
+      expect(data_quality_report.read_only?).to eq(false)
+      data_quality_report.update_attribute(:immutable, true)
+      expect { data_quality_report.destroy }.to raise_error("You may not destroy an immutable DataQualityReport")
+      expect { data_quality_report.delete }.to raise_error("You may not bypass callbacks to delete a Class.")
+      expect { data_quality_report.update_attribute(:sql, "/* Blah */") }.to raise_error("You may not update an immutable DataQualityReport")
+      expect { data_quality_report.update_attributes(sql: "/* Blah */") }.to raise_error("You may not update an immutable DataQualityReport")
+      expect { data_quality_report.update_column(:sql, "/* Blah */") }.to raise_error("You may not bypass callbacks to update a Class.")
+    end
+
+    it "should prevent bulk-updates" do
+      expect { DataQualityReport.delete_all }.to raise_error("You may not bypass callbacks to delete all the DataQualityReport that exist, since some may be inviolate.")
+      expect { DataQualityReport.update_all(sql: "/* Blah */") }.to raise_error("You may not bypass callbacks to update all the DataQualityReport that exist, since some may be inviolate.")
     end
   end
 
   describe "associations" do
-    it { should belong_to(:workflow) }
-    it { should have_one(:customer) }
+    it { should have_many(:workflow_data_quality_reports) }
+    it { should have_many(:workflows) }
   end
 
-  describe "instance methods" do
-    context "#params" do
-      let!(:subject) { build(:data_quality_report) }
-      include_examples 'yaml helper methods'
-    end
-  end
+  # describe "instance methods" do
+  #   context "#params" do
+  #     let!(:subject) { build(:data_quality_report) }
+  #     include_examples 'yaml helper methods'
+  #   end
+  # end
 
 end

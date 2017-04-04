@@ -62,7 +62,8 @@ class Workflow < ApplicationRecord
 
   has_many :transforms, inverse_of: :workflow, dependent: :destroy
 
-  has_many :data_quality_reports, inverse_of: :workflow, dependent: :delete_all
+  has_many :workflow_data_quality_reports, inverse_of: :workflow, dependent: :delete_all
+  has_many :data_quality_reports, through: :workflow_data_quality_reports
 
   has_many :runs, inverse_of: :workflow, dependent: :destroy
 

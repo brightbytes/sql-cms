@@ -31,11 +31,11 @@ class WorkflowSerializer < ActiveModel::Serializer
     object.ordered_transform_groups.map { |set| set.map { |transform| ActiveModelSerializers::SerializableResource.new(transform).as_json }  }
   end
 
-  has_many :data_quality_reports
+  has_many :workflow_data_quality_reports
 end
 
 
-class DataQualityReportSerializer < ActiveModel::Serializer
+class WorkflowDataQualityReportSerializer < ActiveModel::Serializer
 
   attributes :id, :name, :params, :sql, :interpolated_sql
 
@@ -51,6 +51,6 @@ end
 
 class TransformValidationSerializer < ActiveModel::Serializer
 
-  attributes :name, :params, :sql, :interpolated_sql
+  attributes :id, :name, :params, :sql, :interpolated_sql
 
 end

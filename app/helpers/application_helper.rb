@@ -86,6 +86,10 @@ module ApplicationHelper
     @resource_workflow ||= resource.workflow || Workflow.find_by(id: params[:workflow_id])
   end
 
+  def parent_workflow_path
+    @parent_workflow_path ||= workflow_path(id: workflow_id_param_val)
+  end
+
   # TranformValidations stuff
 
   def transform_id_param_val
@@ -94,14 +98,6 @@ module ApplicationHelper
 
   def resource_transform
     @resource_transform ||= resource.transform || Transform.find_by(id: params[:transform_id])
-  end
-
-  def transforms_with_preselect(disabled = false)
-    if disabled
-      [[resource_transform.name, resource_transform.id, selected: true]]
-    else
-      Transform.order(:name).map { |c| (c.id == transform_id_param_val) ? [c.name, c.id, selected: true] : [c.name, c.id] }
-    end
   end
 
   def parent_transform_path

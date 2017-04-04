@@ -6,7 +6,7 @@ class ExecutionPlan
       execution_plan = workflow.serialize_and_symbolize.tap do |including_plan_h|
         workflow.included_workflows.each do |included_workflow|
           included_plan_h = included_workflow.serialize_and_symbolize
-          merge_data_quality_reports!(including_plan_h, included_plan_h)
+          merge_workflow_data_quality_reports!(including_plan_h, included_plan_h)
           merge_transforms!(including_plan_h, included_plan_h)
         end
       end
@@ -20,11 +20,11 @@ class ExecutionPlan
     private
 
     # NB: Side-effect!
-    def merge_data_quality_reports!(including_plan_h, included_plan_h)
-      including_plan_h[:data_quality_reports] ||= []
-      included_plan_h[:data_quality_reports] ||= []
-      if including_plan_h[:data_quality_reports].present? || included_plan_h[:data_quality_reports].present?
-        including_plan_h[:data_quality_reports] += included_plan_h[:data_quality_reports]
+    def merge_workflow_data_quality_reports!(including_plan_h, included_plan_h)
+      including_plan_h[:workflow_data_quality_reports] ||= []
+      included_plan_h[:workflow_data_quality_reports] ||= []
+      if including_plan_h[:workflow_data_quality_reports].present? || included_plan_h[:workflow_data_quality_reports].present?
+        including_plan_h[:workflow_data_quality_reports] += included_plan_h[:workflow_data_quality_reports]
       end
     end
 
@@ -65,16 +65,16 @@ class ExecutionPlan
     transform_group(step_index)&.detect { |h| h[:id] == transform_id }&.deep_symbolize_keys
   end
 
-  def data_quality_reports
-    execution_plan[:data_quality_reports] if execution_plan.present?
+  def workflow_data_quality_reports
+    execution_plan[:workflow_data_quality_reports] if execution_plan.present?
   end
 
-  def data_quality_report_plan(data_quality_report_id)
-    data_quality_reports&.detect { |h| h[:id] == data_quality_report_id }&.symbolize_keys
+  def workflow_data_quality_report_plan(workflow_data_quality_report_id)
+    workflow_data_quality_reports&.detect { |h| h[:id] == workflow_data_quality_report_id }&.symbolize_keys
   end
 
-  def data_quality_report_ids
-    data_quality_reports&.map { |h| h.fetch(:id, nil) }
+  def workflow_data_quality_report_ids
+    workflow_data_quality_reports&.map { |h| h.fetch(:id, nil) }
   end
 
 end

@@ -12,6 +12,7 @@
 #
 # Indexes
 #
+#  index_transform_validations_on_transform_id   (transform_id)
 #  index_transform_validations_on_validation_id  (validation_id)
 #
 # Foreign Keys
@@ -39,9 +40,5 @@ class TransformValidation < ApplicationRecord
   # Instance Methods
 
   delegate :name, :sql, to: :validation
-
-  def name
-    "Validation '#{validation.name}' for Transform '#{transform.name}'"
-  end
 
 end

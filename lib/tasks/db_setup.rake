@@ -50,5 +50,4 @@ namespace :db do
 end
 
 desc "One Task to rule them all, One Task to find them, One Task to bring them all, and in the Darkness bind them"
-# FIXME: Change to use db:init once we have a dumpfile
 task one_ring: 'db:init'

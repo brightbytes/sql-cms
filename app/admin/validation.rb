@@ -15,7 +15,7 @@ ActiveAdmin.register Validation do
   index(download_links: false) do
     column(:name) { |validation| auto_link(validation) }
     boolean_column(:immutable)
-    column(:used_by_count) { |validation| validation.transform_validations.count }
+    column(:used_by_count) { |validation| validation.usage_count }
   end
 
   show do
@@ -23,16 +23,17 @@ ActiveAdmin.register Validation do
       row :id
       row :name
       row :immutable
+      row :usage_count
       simple_format_row(:sql)
       row :created_at
       row :updated_at
     end
 
     panel 'Transforms' do
-      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
-      table_for(resource.transform_validations.includes(:transform).order('transforms.name'), sortable: true) do
-        column(:name, sortable: :name) { |tv| auto_link(tv.transform) }
-        column(:runner, sortable: :runner) { |tv| tv.transform.runner }
+      table_for(resource.transform_validations.includes(:transform).order('transforms.name')) do
+        column(:runner) { |tv| tv.transform.runner }
+        column(:transform) { |tv| auto_link(tv.transform) }
+        column(:transform_validation) { |tv| link_to(tv.interpolated_name, tv) }
       end
     end
 
@@ -43,7 +44,6 @@ ActiveAdmin.register Validation do
 
   form do |f|
     inputs 'Details' do
-      editing = action_name.in?(%w(edit update))
       input :name, as: :string
       input :sql, as: :text
       input :immutable, input_html: { disabled: f.object.immutable? }, hint: "Checking this indicates that this Validation should not and can not be altered"

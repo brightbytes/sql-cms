@@ -27,13 +27,13 @@ describe RunManagerJob do
           logs = run.run_step_logs
           expect(logs.size > 0).to eq(true)
 
-          transforms = run.transforms
-          expect(transforms.size > 0).to eq(true)
+          transform_count = run.execution_plan[:ordered_transform_groups].flatten.size
+          expect(transform_count > 0).to eq(true)
+          
+          wdqr_count = run.execution_plan[:workflow_data_quality_reports].size
+          expect(wdqr_count > 0).to eq(true)
 
-          data_quality_reports = run.data_quality_reports
-          expect(data_quality_reports.size > 0).to eq(true)
-
-          expect(logs.size).to eq(transforms.size + data_quality_reports.size)
+          expect(logs.size).to eq(transform_count + wdqr_count)
         end
       end
     end
