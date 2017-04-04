@@ -4,33 +4,36 @@ ActiveAdmin.register DataQualityReport do
 
   actions :all
 
-  permit_params :name, :workflow_id, :params_yaml, :sql
+  permit_params :name, :sql, :immutable
 
   filter :name, as: :string
-  filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :sql, as: :string
+  filter :immutable
 
-  config.sort_order = 'workflows.slug_asc,name_asc'
+  config.sort_order = 'name_asc'
 
   index(download_links: false) do
-    column(:name) { |transform| auto_link(transform) }
-    column(:workflow, sortable: 'workflows.slug')
-    column(:customer, sortable: 'customers.slug')
+    column(:name) { |dqr| auto_link(dqr) }
+    boolean_column(:immutable)
+    column(:used_by_count) { |dqr| dqr.usage_count }
   end
 
   show do
     attributes_table do
       row :id
       row :name
-      row :workflow
-      row :customer
-
-      row(:params) { code(pretty_print_as_json(resource.params)) }
+      row :immutable
+      row :usage_count
       simple_format_row(:sql)
-      simple_format_row(:interpolated_sql) if resource.params.present?
-
       row :created_at
       row :updated_at
+    end
+
+    panel 'Workflows' do
+      table_for(resource.workflow_data_quality_reports.includes(:workflow).order('workflows.name')) do
+        column(:workflow)
+        column(:workflow_data_quality_report) { |wdqr| auto_link(wdqr) }
+      end
     end
 
     active_admin_comments
@@ -40,38 +43,23 @@ ActiveAdmin.register DataQualityReport do
 
   form do |f|
     inputs 'Details' do
-
-      input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
-      input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
-
       input :name, as: :string
-
-      # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
-      #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
-      input :params_yaml, as: :text, hint: 'Add `table_name: your_table_name` here and leave the SQL field blank to auto-generate table-count SQL'
-
-      input :sql, as: :text, hint: "If you leave this blank, it will auto-generate table-count SQL."
+      input :sql, as: :text
+      input :immutable, input_html: { disabled: f.object.immutable? }, hint: "Checking this indicates that this Data Quality Report should not and can not be altered"
     end
 
     actions do
       action(:submit)
-      path = (params[:source] == 'workflow' ? workflow_path(params[:workflow_id]) : f.object.new_record? ? data_quality_reports_path : data_quality_report_path(f.object))
-      cancel_link(path)
+      cancel_link(f.object.new_record? ? data_quality_reports_path : data_quality_report_path(f.object))
     end
   end
 
   controller do
 
-    def scoped_collection
-      super.includes(workflow: :customer)
-    end
-
-    def destroy
-      super do |success, failure|
-        success.html do
-          redirect_to(params[:source] == 'workflow' ? workflow_path(resource.workflow) : data_quality_reports_path)
-        end
-      end
+    def action_methods
+      result = super
+      result -= ['edit', 'update', 'destroy'] if action_name == 'show' && resource.immutable?
+      result
     end
 
   end

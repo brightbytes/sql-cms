@@ -40,7 +40,9 @@ class Validation < ApplicationRecord
 
   # Instance Methods
 
-
+  def usage_count
+    transform_validations.count
+  end
 
   # Class Methods
 

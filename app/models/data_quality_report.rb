@@ -35,6 +35,12 @@ class DataQualityReport < ApplicationRecord
   has_many :workflow_data_quality_reports, inverse_of: :data_quality_report, dependent: :delete_all
   has_many :workflows, through: :workflow_data_quality_reports
 
+  # Instance Methods
+
+  def usage_count
+    workflow_data_quality_reports.count
+  end
+
   # Class Methods
 
   class << self
