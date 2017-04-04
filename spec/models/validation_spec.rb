@@ -60,11 +60,11 @@ describe Validation do
   describe "instance methods" do
 
     context "#usage_count" do
-      it "should return the number of times the DataQualityReport is used" do
-        dqr = create(:data_quality_report)
-        expect(dqr.usage_count).to eq(0)
-        3.times { create(:workflow_data_quality_report, data_quality_report: dqr) }
-        expect(dqr.reload.usage_count).to eq(3)
+      it "should return the number of times the Validation is used" do
+        validation = create(:validation)
+        expect(validation.usage_count).to eq(0)
+        3.times { create(:transform_validation, validation: validation) }
+        expect(validation.reload.usage_count).to eq(3)
       end
     end
 
