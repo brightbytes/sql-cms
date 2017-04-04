@@ -46,21 +46,21 @@ class DataQualityReport < ApplicationRecord
   class << self
 
     def table_count
-      @table_count ||= where(name: 'Table Count').first_or_create!(
+      @table_count ||= where(name: 'Table :table_name Count').first_or_create!(
         immutable: true,
         sql: 'SELECT COUNT(1) FROM :table_name'
       )
     end
 
     def column_value_distribution
-      @column_value_distribution ||= where(name: 'Column Value Distribution').first_or_create!(
+      @column_value_distribution ||= where(name: 'Column :table_name.:column_name Value Distribution').first_or_create!(
         immutable: true,
         sql: "SELECT :column_name, COUNT(:column_name) AS count FROM :table_name GROUP BY :column_name ORDER BY count DESC"
       )
     end
 
     def column_non_unique_value_distribution
-      @column_non_unique_value_distribution ||= where(name: 'Column Non-Unique Value Distribution').first_or_create!(
+      @column_non_unique_value_distribution ||= where(name: 'Column :table_name.:column_name Non-Unique Value Distribution').first_or_create!(
         immutable: true,
         sql: "SELECT :column_name, COUNT(:column_name) AS count FROM :table_name GROUP BY :column_name HAVING COUNT(:column_name) > 1 ORDER BY count DESC"
       )

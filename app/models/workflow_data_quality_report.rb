@@ -40,9 +40,4 @@ class WorkflowDataQualityReport < ApplicationRecord
 
   delegate :name, :sql, to: :data_quality_report
 
-  # FIXME - MAKE THE NAME INTERPOLATABLE, LIKE THE SQL
-  def name
-    "Data Quality Report '#{data_quality_report.name}' for Workflow '#{workflow.name}'"
-  end
-
 end

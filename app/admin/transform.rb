@@ -61,8 +61,8 @@ ActiveAdmin.register Transform do
       text_node link_to("Add New Transform Validation", new_transform_validation_path(transform_id: resource.id))
 
       table_for(resource.transform_validations.includes(:validation).order('validations.name')) do
-        column(:transform_validation) { |tv| auto_link(tv) }
-        column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(100) }
+        column(:transform_validation) { |tv| link_to(tv.interpolated_name, tv) }
+        column(:interpolated_sql) { |tv| tv.interpolated_sql.truncate(120) }
         column('Immutable?') { |tv| yes_no(tv.validation.immutable?) }
         column(:action) do |tv|
           text_node(link_to("Edit", edit_transform_validation_path(tv, source: :transform, transform_id: tv.transform_id)))

@@ -29,6 +29,18 @@ module Concerns::ParamsHelpers
     validate_yaml(:params, @params_yaml_invalid)
   end
 
+  def interpolated_name
+    if params.present?
+      name.dup.tap do |name|
+        params.each_pair do |k, v|
+          name.gsub!(":#{k}", v.to_s)
+        end
+      end
+    else
+      name
+    end
+  end
+
   def interpolated_sql
     self.class.interpolate(sql: sql, params: params)
   end

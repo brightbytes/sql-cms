@@ -69,8 +69,8 @@ ActiveAdmin.register Workflow do
       text_node link_to("Create New Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
 
       table_for(resource.workflow_data_quality_reports.includes(:data_quality_report).order('data_quality_reports.name')) do
-        column(:workflow_data_quality_report) { |wdqr| auto_link(wdqr) }
-        column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(100) }
+        column(:workflow_data_quality_report) { |wdqr| link_to(wdqr.interpolated_name, wdqr) }
+        column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(120) }
         column('Immutable?') { |wdqr| yes_no(wdqr.data_quality_report.immutable?) }
         column(:action) do |wdqr|
           text_node(link_to("Edit", edit_workflow_data_quality_report_path(wdqr, source: :workflow, workflow_id: wdqr.workflow_id)))
