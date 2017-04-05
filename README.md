@@ -12,7 +12,7 @@ The following entities exist in the **public** Postgres schema:
 
 - **Customer**: The Customer with which every Workflow must be associated
 
-- **Workflow**: A named, per-Customer collection of the following, each via a `has_many` relationship, and each described in detail below:
+- **Customer Workflow**: A named, per-Customer collection of the following, each via a `has_many` relationship, and each described in detail below:
 
   - Various types of SQL Transform and their TransformDependencies and TransformValidations
 
@@ -21,6 +21,12 @@ The following entities exist in the **public** Postgres schema:
   - Notifications
 
   - Runs and their RunStepLogs
+
+- **Shared Workflow**: Identical two Customer Workflows in all respects except two:
+
+  - They may not be associated with a Customer.
+
+  - They may be "reused" by any Customer Workflow via the WorkflowDependency model.  Currently, only one reuse mode is supported: merging of Transform Groups.  When needed, another reuse mode will be introduced wherewith the Shared Workflow is executed in full before the Customer Workflow is executed.
 
 - **Notification**: An association of a Workflow with a User for the purpose of notifying the User whenenever a Run of that Workflow successfully or unsuccessfully completes.
 
@@ -40,9 +46,9 @@ The following entities exist in the **public** Postgres schema:
 
 - **TransformValidation**: An association of a Transform to a parameterized Validation that specifies the parameters required for the Validation.  When a TransformValidation fails, the system fails its associated Transform, and execution halts in failure after that Transform's group completes execution.
 
-- **Validation**: A named, reusable, manditorily-parametrized SQL query that validates the result of a Transform via an intermediating TransformValidation's params, e.g. to verify that all rows in a table have a value for a given column, are unique, reference values in another table, etc.  Similar in intent to Rails Validations.  Upon failure, returns the IDs of all invalid rows.
+- **Validation**: A named, reusable, manditorily-parametrized SQL SELECT statement that validates the result of a Transform via an intermediating TransformValidation's params, e.g. to verify that all rows in a table have a value for a given column, are unique, reference values in another table, etc.  Similar in intent to Rails Validations.  Upon failure, returns the IDs of all invalid rows.
 
-- **DataQualityReport**: A named, optionally-parametrized SELECT SQL statement that is run after all Transforms have completed.  The system will store the tabular data returned by the SQL and also include that data in the Notification email that is sent after a successful Run.
+- **DataQualityReport**: A named, reusable, manditorily-parametrized SQL SELECT statement the system runs via an intermediating WorkflowDataQualityReport's params after all Transforms have completed.  The system will store the tabular Report data returned by the SQL, and also include that data in a Notification email that is sent after a successful Run.
 
 - **Run**: A record of the postgres-schema_name (useful for debugging/examining data), current status, and execution_plan of a given Run of a Workflow.  When a User creates a Run for a Workflow, the system serializes the Workflow and **all** its dependent objects into the Run#execution_plan field, and execution of the Run proceeds against that field.  This allows a Workflow to be changed at any time without affecting any current Runs.
 
