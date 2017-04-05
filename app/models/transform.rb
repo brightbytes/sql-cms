@@ -165,9 +165,10 @@ class Transform < ApplicationRecord
     S3File.create('import', **s3_attributes) if importing?
   end
 
-  def s3_export_file(for_run)
-    S3File.create('export', **s3_attributes.merge(run: for_run)) if exporting?
-  end
+  # Not currently used.  Probably unnecessary ... though, hmm, perhaps useful off the Run object and a Likely Transform for a quick local download?
+  # def s3_export_file(for_run)
+  #   S3File.create('export', **s3_attributes.merge(run: for_run)) if exporting?
+  # end
 
   private def s3_attributes
     attributes.with_indifferent_access.slice(:s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name).symbolize_keys
