@@ -82,7 +82,7 @@ There are a number of rake tasks for managing a Heroku deployment in `lib/tasks/
 - MIDDLING: Maybe port to Convox, especially if it would facilitate Redshift support.
 - EASY: Add support for scheduling Workflows
 
-## [Environment Setup for local development] (https://github.com/brightbytes/dpl-cms/wiki/Local-Dev-Env-Setup)
+## [Environment Setup for local development](https://github.com/brightbytes/dpl-cms/wiki/Local-Dev-Env-Setup)
 
 ## Project Setup
 
