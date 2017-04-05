@@ -1,12 +1,10 @@
 # dpl-cms
 
-This application is intended to be used by SQL Analysts with no knowledge of programming; only knowledge of SQL and the entity types presented below are required.
+The purpose of this application is to allow SQL Analysts to create Workflows of interdependent SQL Transforms that are parallelized at runtime to convert a set of pre-existing import files on S3 into a set of newly-generated export files on S3.  Essentially, this is a SQL-based approach to the T in ETL.
 
-With it, one may create per-Customer Workflows of interdependent SQL Transforms that convert a set of pre-existing import files on S3 to a set of newly-generated export files on S3.
+A Workflow may be Run multiple times, and each time the system will deposit its export files in a new, namespaced S3 "directory". Every Run occurs within a newly-created Postgres schema that may be examined afterwards, and removed as a whole when it is no longer necessary.
 
-A Workflow may be Run multiple times, and each time the system will deposit its export files in a namespaced S3 "directory". Every Run occurs within a newly-created Postgres schema.
-
-The following entities exist in the **public** Postgres schema:
+The following entities exist in the **public** Postgres schema, and together they realize the application:
 
 - **User**: An Analyst possessing basic knowledge of SQL
 
@@ -26,7 +24,7 @@ The following entities exist in the **public** Postgres schema:
 
   - They may not be associated with a Customer.
 
-  - They may be "reused" by any Customer Workflow via the WorkflowDependency model.  Currently, only one reuse mode is supported: merging of Transform Groups.  When needed, another reuse mode will be introduced wherewith the Shared Workflow is executed in full before the Customer Workflow is executed.
+  - They may be "reused" by any Customer Workflow via the **WorkflowDependency** model.  Currently, only one reuse mode is supported: merging of Transform Groups.  When needed, another reuse mode will be introduced wherewith the Shared Workflow is executed in full before the Customer Workflow is executed.
 
 - **Notification**: An association of a Workflow with a User for the purpose of notifying the User whenenever a Run of that Workflow successfully or unsuccessfully completes.
 
@@ -60,11 +58,11 @@ This application uses Sidekiq via Active::Job for parallelization of Runs, Trans
 
 ## Demo Workflow
 
-This application comes with a Demo Workflow that was ported from an ancestral app.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide some examples of how to use this system.
+This application comes with a somewhat lame Demo Workflow that was ported from an ancestral app.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide a few examples of how to use this system.
 
 ## Heroku Deployment
 
-There are a number of rake tasks for managing a Heroku deployment in `lib/tasks/heroku.rake`.
+There are a number of rake tasks in `lib/tasks/heroku.rake` for managing a Heroku deployment.
 
 To deploy to Heroku, you'll need 3 AddOns: Postgres, Redis (for Sidekiq), and SendGrid.
 
@@ -80,7 +78,7 @@ You'll want to configure the same environment variables on Heroku as you do for 
 
 1) <a name="env_vars"></a>Add environment variables
 
-  * Create a .env file in your dpl-cms project folder with the following contents:
+  * Create a .env file in your dpl-cms project folder with the following contents; it will be automatically used by the `dotenv` gem:
 
     ```
     PORT=3000
@@ -105,15 +103,9 @@ You'll want to configure the same environment variables on Heroku as you do for 
     AWS_REGION="us-west-2"
     ```
 
-  * Use [dotenv](https://github.com/bkeepers/dotenv) to import this file automatically when you enter the `dpl-cms` directory.
+2) Reset your environment and load Postgres with the Demo Workflow
 
-  * OR, simply add your .env file to your .bashrc or .bash_profile
-
-    ```
-    source ~/<path_to_your>/.env
-    ```
-
-2) Reset your environment and load Postgres with the Demo Workflow:
+  * This is useful for ongoing dev when if ever you hose your environment, and is also useful when rapidly iterating on a new migration in a branch:
 
   ```
   rake one_ring
