@@ -58,35 +58,21 @@ This application comes with a Demo Workflow that was ported from an ancestral ap
 
 ## Heroku Deployment
 
-There are a number of rake tasks for managing a Heroku deployment in `lib/tasks/heroku.rake`.  To deploy to Heroku, you'll need 3 AddOns: Postgres, Redis (for Sidekiq), and SendGrid.  You'll only need 1 Sidekiq Worker dyno, but I've made mine a 2X - not because I know it needs to be, but rather just because I suspect more memory would be better.
+There are a number of rake tasks for managing a Heroku deployment in `lib/tasks/heroku.rake`.
 
-## Future plans, roughly in order of priority, with difficulty levels
+To deploy to Heroku, you'll need 3 AddOns: Postgres, Redis (for Sidekiq), and SendGrid.
 
-### More Important
+You'll only need 1 Sidekiq Worker dyno, but I've made mine a 2X - not because I know it needs to be, but rather just because I suspect more memory would be better.
 
-- EASY: Redo this README, breaking large chunks out into the Wiki
-- EASY: Add support for Transform Templates in place of the callback kludge that uses a default template per-runner-type.  (This will NOT be a clone of the Validation / Data Quality Report feature, since unlike with those, template reuse will be far more infrequent.)
-- EASY: Add support for uploading local files to a Transform-specified location on S3 on Transform#show.  This will be necessary so that the Demo Workflow can be run locally and on a new Heroku app.
-- EASY: After reverifying removal of BW or personal PII, open-source the app
-- MIDDLING: Convert the app to a Rails Engine.  This would make open-sourcing cooler, but would be a no-op for myself personally
-- MIDDLING: Add FE coverage (there's none yet - yeah, I suck ... but TTM is more critical at the moment).
-- ANNOYING: Create a cooler Demo Workflow
+You'll want to configure the same environment variables on Heroku as you do for your local setup, [here](#env_vars)
 
-### Less Important
-
-- DIFFICULT: Implement an S3 browser for the selecting an S3 file on the #create and #edit pages of data-loading Transforms, so S3 URLs needn't be copy/pasted in.  (The BE work has commenced in `app/models/s3` ... but there just has to be a gem for it ...)
-- MIDDLING: Add support for reading S3 Import files from an SFTP server
-- DIFFICULT: Add a TransformDependency visualizer so that the entire Transform DAG of a Workflow may be viewed at once.
-- MIDDLING: Add an API and/or SQS integration for remote-triggering of Workflow Runs.
-- MIDDLING: Add Redshift support, both for production and local development.  I'm hesitant to do this without a demonstrated, significant performance disadvantage of using Postgres for larger data sets.
-- MIDDLING: Maybe port to Convox, especially if it would facilitate Redshift support.
-- EASY: Add support for scheduling Workflows
+## [Future plans](https://github.com/brightbytes/dpl-cms/wiki/Future-Plans)
 
 ## [Environment Setup for local development](https://github.com/brightbytes/dpl-cms/wiki/Local-Dev-Env-Setup)
 
-## Project Setup
+## Local Project Setup
 
-1) Add environment variables
+1) <a name="env_vars"></a>Add environment variables
 
   * Create a .env file in your dpl-cms project folder with the following contents:
 
