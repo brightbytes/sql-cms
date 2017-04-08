@@ -1,4 +1,4 @@
-# dpl-cms
+# sql-cms
 
 The purpose of this application is to allow SQL Analysts to create Workflows of interdependent SQL Transforms that are parallelized at runtime to convert a set of pre-existing import files on S3 into a set of newly-generated export files on S3.  Essentially, this is a SQL-based approach to the T in ETL.
 
@@ -70,15 +70,15 @@ You'll only need 1 Sidekiq Worker dyno, but I've made mine a 2X - not because I 
 
 You'll want to configure the same environment variables on Heroku as you do for your local setup, [here](#env_vars)
 
-## [Future plans](https://github.com/brightbytes/dpl-cms/wiki/Future-Plans)
+## [Future plans](https://github.com/brightbytes/sql-cms/wiki/Future-Plans)
 
-## [Environment Setup for local development](https://github.com/brightbytes/dpl-cms/wiki/Local-Dev-Env-Setup)
+## [Environment Setup for local development](https://github.com/brightbytes/sql-cms/wiki/Local-Dev-Env-Setup)
 
 ## Local Project Setup
 
 1) <a name="env_vars"></a>Add environment variables
 
-  * Create a .env file in your dpl-cms project folder with the following contents; it will be automatically used by the `dotenv` gem:
+  * Create a .env file in your sql-cms project folder with the following contents; it will be automatically used by the `dotenv` gem:
 
     ```
     PORT=3000
@@ -94,7 +94,7 @@ You'll want to configure the same environment variables on Heroku as you do for 
     # Only set this if you deploy somewhere
     PRODUCTION_HOST='your-app-name.herokuapp.com'
 
-    # You must supply these. (If you are a SIS DPL dude, you already have these set up globally in your env, so move along: nothing to see here.)
+    # You must supply these. (Most folks already have these set up globally in their env.)
     AWS_ACCESS_KEY_ID=<your access ID here>
     AWS_SECRET_ACCESS_KEY=<your secret access key here>
 
@@ -112,6 +112,15 @@ You'll want to configure the same environment variables on Heroku as you do for 
   ```
 
   Run the above script every time you want to re-initialize your dev environment to baseline.
+
+  * IMPORTANT: **ONLY** if this is the very first time you are creating this app on your machine, you must first separately-invoke db:create to avoid the new production-DB check of Rails 5:
+
+  ```
+  rake db:create
+  rake one_ring
+  ```
+
+  Thereafter, `rake one_ring` will suffice.
 
 3) Start your web server and worker:
 

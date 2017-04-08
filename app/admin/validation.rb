@@ -65,5 +65,4 @@ ActiveAdmin.register Validation do
 
   end
 
-
 end

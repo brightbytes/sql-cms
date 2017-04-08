@@ -12,8 +12,8 @@ default: &default
 
 development:
   <<: *default
-  database: dpl_cms_development
+  database: sql_cms_development
 
 test:
   <<: *default
-  database: dpl_cms_test<%= ENV['TEST_ENV_NUMBER'] %>
+  database: sql_cms_test<%= ENV['TEST_ENV_NUMBER'] %>

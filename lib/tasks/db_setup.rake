@@ -16,7 +16,7 @@ namespace :db do
 
   namespace :data do
 
-    FULL_DUMP_PATH = Rails.root.join("../bb_data/db_dump/dpl_cms/dump.Fc")
+    FULL_DUMP_PATH = Rails.root.join("../bb_data/db_dump/sql_cms/dump.Fc")
     DB_CONFIG = YAML.load(ERB.new(File.read("#{Rails.root}/config/database.yml")).result)[Rails.env]
 
     desc "Dumps the local dev DB to the designated location in the bb_data repo, for later use by db:data:load"
@@ -25,7 +25,7 @@ namespace :db do
       raise "This task is only for use in a development environment" unless Rails.env.development?
 
       if File.exists?(FULL_DUMP_PATH)
-        dputs "Dumping PostgreSQL for the DPL CMS Application ..."
+        dputs "Dumping PostgreSQL for the SQL CMS Application ..."
         run("PGPASSWORD=#{DB_CONFIG["password"]} pg_dump -c -o -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} --no-owner -f #{FULL_DUMP_PATH}")
       else
         raise "You can't dump your local DB because #{FULL_DUMP_PATH} doesn't exist."
@@ -38,7 +38,7 @@ namespace :db do
       raise "This task is only for use in a development environment" unless Rails.env.development?
 
       if File.exists?(FULL_DUMP_PATH)
-        dputs "Loading PostgreSQL for DPL CMS Application ..."
+        dputs "Loading PostgreSQL for SQL CMS Application ..."
         run("PGPASSWORD=#{DB_CONFIG["password"]} pg_restore -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} #{FULL_DUMP_PATH}")
       else
         dputs "Skipping load of dumpfile, since it doesn't exist."

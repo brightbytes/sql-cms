@@ -8,20 +8,22 @@ module WorkflowSeeder
   end
 
   # FIXME - NUKE THIS METHOD WHEN DONE WITH RAPID-DEV OF THE DEMO WORKFLOW
-  def reseed
-    demo_workflow.destroy if demo_workflow_exists?
-    seed
-  end
+  # def reseed
+  #   demo_workflow.destroy if demo_workflow_exists?
+  #   seed
+  # end
+
+  DEMO_WORKFLOW_NAME = 'Demo Workflow'
 
   def demo_workflow
-    Workflow.where(name: 'Demo Workflow, version 1').first_or_create!(customer: CustomerSeeder.demo_customer)
+    Workflow.where(name: DEMO_WORKFLOW_NAME).first_or_create!(customer: CustomerSeeder.demo_customer)
+  end
+
+  def demo_workflow_exists?
+    Workflow.where(name: DEMO_WORKFLOW_NAME).exists?
   end
 
   private
-
-  def demo_workflow_exists?
-    Workflow.where(name: 'Demo Workflow, version 1').exists?
-  end
 
   def notify_me!(workflow)
     workflow.notifications.first_or_create!(user: User.where(email: 'aaron@brightbytes.net').first)

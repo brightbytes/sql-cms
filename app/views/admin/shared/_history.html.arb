@@ -1,4 +1,4 @@
-# FIXME - REFACTOR THIS VIEW INTO 2 VIEWS, AS IS DONE IN dpl-conductor
+# FIXME - REFACTOR THIS VIEW INTO 2 VIEWS, AS IS DONE IN CONDUCTOR
 panel "History" do
   versions = resource.versions
   unless versions.empty?

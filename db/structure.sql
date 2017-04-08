@@ -1132,7 +1132,7 @@ ALTER TABLE ONLY transform_dependencies
 
 SET search_path TO "$user",public;
 
-INSERT INTO schema_migrations (version) VALUES
+INSERT INTO "schema_migrations" (version) VALUES
 ('20170112005400'),
 ('20170112022558'),
 ('20170113013703'),

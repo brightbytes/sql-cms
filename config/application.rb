@@ -8,7 +8,7 @@ ActiveSupport::Deprecation.silence do
   Bundler.require(*Rails.groups)
 end
 
-module DplCms
+module SqlCms
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
