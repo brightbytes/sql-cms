@@ -1,14 +1,14 @@
 # sql-cms
 
-The purpose of this application is to allow SQL Analysts to create Workflows of interdependent SQL Transforms that are parallelized at runtime to convert a set of pre-existing import files on S3 into a set of newly-generated export files on S3.  Essentially, this is a SQL-based approach to the T in ETL.
+The purpose of this application is to allow SQL Analysts and ETL SQL Developers to create Workflows of interdependent SQL Transforms that are parallelized at runtime to convert a set of pre-existing import files on S3 into a set of newly-generated export files on S3.  Essentially, this is a SQL-based approach to the T in ETL.
 
 A Workflow may be Run multiple times, and each time the system will deposit its export files in a new, namespaced S3 "directory". Every Run occurs within a newly-created Postgres schema that may be examined afterwards, and removed as a whole when it is no longer necessary.
 
 The following entities exist in the **public** Postgres schema, and together they realize the application:
 
-- **User**: An Analyst possessing basic knowledge of SQL
+- **User**: An Analyst possessing basic knowledge of SQL, or an ETL SQL Developer.  No knowledge of programming is required to use this application: only knowledge of SQL.
 
-- **Customer**: The Customer with which every Workflow must be associated
+- **Customer**: The Customer with which every non-Shared Workflow must be associated
 
 - **Customer Workflow**: A named, per-Customer collection of the following, each via a `has_many` relationship, and each described in detail below:
 
@@ -20,7 +20,7 @@ The following entities exist in the **public** Postgres schema, and together the
 
   - Runs and their RunStepLogs
 
-- **Shared Workflow**: Identical two Customer Workflows in all respects except two:
+- **Shared Workflow**: Identical to Customer Workflows in all respects except two:
 
   - They may not be associated with a Customer.
 
