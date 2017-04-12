@@ -45,6 +45,10 @@ class S3File
     s3_file_extension == CSV
   end
 
+  def to_s
+    "'s3://#{s3_bucket_name}/#{s3_file_path_and_name}' in region #{s3_region_name}"
+  end
+
   private
 
   def s3
@@ -80,11 +84,15 @@ class S3File
 
     private
 
+    def s3_file_path_and_name
+      "#{s3_file_path}/#{s3_file_name}"
+    end
+
     def s3_object
       @s3_object ||
         begin
           s3_bucket = s3.bucket(s3_bucket_name)
-          @s3_object = s3_bucket.object("#{s3_file_path}/#{s3_file_name}")
+          @s3_object = s3_bucket.object(s3_file_path_and_name)
         end
     end
 
@@ -107,11 +115,15 @@ class S3File
 
     private
 
+    def s3_file_path_and_name
+      "#{s3_file_path}/run_#{run.id}/#{s3_file_name}"
+    end
+
     def s3_object
       @s3_object ||
         begin
           s3_bucket = s3.bucket(s3_bucket_name)
-          @s3_object = s3_bucket.object("#{s3_file_path}/run_#{run.id}/#{s3_file_name}")
+          @s3_object = s3_bucket.object(s3_file_path_and_name)
         end
     end
 
