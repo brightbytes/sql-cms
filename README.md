@@ -1,6 +1,6 @@
 # sql-cms
 
-The purpose of this application is to allow SQL Analysts and ETL SQL Developers to create Workflows of interdependent SQL Transforms that are parallelized at runtime to convert a set of pre-existing import files on S3 into a set of newly-generated export files on S3.  Essentially, this is a SQL-based approach to the T in ETL.
+The purpose of this application is to allow ETL SQL Developers and SQL Analysts to create Workflows of interdependent SQL Transforms that are parallelized at runtime to convert a set of pre-existing import files on S3 into a set of newly-generated export files on S3.  Essentially, this is a SQL-based approach to the T in ETL.
 
 A Workflow may be Run multiple times, and each time the system will deposit its export files in a new, namespaced S3 "directory". Every Run occurs within a newly-created Postgres schema that may be examined afterwards, and removed as a whole when it is no longer necessary.
 
@@ -24,7 +24,7 @@ The following entities exist in the **public** Postgres schema, and together the
 
   - They may not be associated with a Customer.
 
-  - They may be "reused" by any Customer Workflow via the **WorkflowDependency** model.  Currently, only one reuse mode is supported: merging of Transform Groups.  When needed, another reuse mode will be introduced wherewith the Shared Workflow is executed in full before the Customer Workflow is executed.
+  - They may be "reused" by any Customer Workflow via the **WorkflowDependency** model.  If more than one Shared Workflow is associated with a given Customer Workflow, the Transform Groups of all Shared Workflows will be merged at execution time.  Thereafter, at execution time the Transform Groups of the merged Shared Workflows will be executed in succession before the Customer Workflow's Transform Groups are then executed in succession.
 
 - **Notification**: An association of a Workflow with a User for the purpose of notifying the User whenenever a Run of that Workflow successfully or unsuccessfully completes.
 

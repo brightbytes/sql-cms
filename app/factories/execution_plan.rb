@@ -4,10 +4,12 @@ class ExecutionPlan
 
     def create(workflow)
       execution_plan = workflow.serialize_and_symbolize.tap do |including_plan_h|
-        workflow.included_workflows.each do |included_workflow|
-          included_plan_h = included_workflow.serialize_and_symbolize
-          merge_workflow_data_quality_reports!(including_plan_h, included_plan_h)
-          merge_transforms!(including_plan_h, included_plan_h)
+        # First, we merge all included workflows' Transform Groups and Data Quality Reports
+        if merged_included_workflow_h = merge_included_workflows!(workflow.included_workflows)
+          # Then, we change the including_plan_h so that all merged Transform Groups come before the including_workflow's Transform Groups
+          reorder_workflow_transform_groups!(including_plan_h, merged_included_workflow_h)
+          # And, we just merge Data Quality Reports, since no order is required
+          merge_workflow_data_quality_reports!(including_plan_h, merged_included_workflow_h)
         end
       end
       new(execution_plan)
@@ -19,6 +21,18 @@ class ExecutionPlan
 
     private
 
+    def merge_included_workflows!(included_workflows)
+      return nil if included_workflows.empty?
+      first_workflow, rest_workflows = included_workflows.first, included_workflows.last(included_workflows.size - 1)
+      first_plan_h = first_workflow.serialize_and_symbolize
+      rest_workflows.each do |rest_workflow|
+        rest_plan_h = rest_workflow.serialize_and_symbolize
+        merge_workflow_data_quality_reports!(first_plan_h, rest_plan_h)
+        merge_workflow_transform_groups!(first_plan_h, rest_plan_h)
+      end
+      first_plan_h
+    end
+
     # NB: Side-effect!
     def merge_workflow_data_quality_reports!(including_plan_h, included_plan_h)
       including_plan_h[:workflow_data_quality_reports] ||= []
@@ -29,7 +43,7 @@ class ExecutionPlan
     end
 
     # NB: Side-effect!
-    def merge_transforms!(including_plan_h, included_plan_h)
+    def merge_workflow_transform_groups!(including_plan_h, included_plan_h)
       including_plan_h[:ordered_transform_groups] ||= []
       included_plan_h[:ordered_transform_groups] ||= []
       if including_plan_h[:ordered_transform_groups].present? || included_plan_h[:ordered_transform_groups].present?
@@ -42,6 +56,15 @@ class ExecutionPlan
           end
         end
       end
+    end
+
+    # NB: Side-effect!
+    def reorder_workflow_transform_groups!(including_plan_h, included_plan_h)
+      return unless included_groups = included_plan_h[:ordered_transform_groups]
+
+      # LMAO - I really overthought this the first couple minutes I looked at it. Sigh.
+      including_groups = (including_plan_h[:ordered_transform_groups] ||= [])
+      including_plan_h[:ordered_transform_groups] = including_groups + including_groups
     end
   end
 
