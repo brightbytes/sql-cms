@@ -112,9 +112,7 @@ module RunnerFactory
       url = s3_file.s3_presigned_url
       raise "Unable to locate #{s3_file}!" unless url
 
-      open(url) do |stream|
-        run.copy_from_in_schema(sql: sql, enumerable: stream)
-      end
+      open(url) { |stream| run.copy_from_in_schema(sql: sql, enumerable: stream) }
     end
   end
 

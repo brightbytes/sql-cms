@@ -60,11 +60,9 @@ class ExecutionPlan
 
     # NB: Side-effect!
     def reorder_workflow_transform_groups!(including_plan_h, included_plan_h)
-      return unless included_groups = included_plan_h[:ordered_transform_groups]
-
-      # LMAO - I really overthought this the first couple minutes I looked at it. Sigh.
-      including_groups = (including_plan_h[:ordered_transform_groups] ||= [])
-      including_plan_h[:ordered_transform_groups] = including_groups + including_groups
+      if included_groups = included_plan_h[:ordered_transform_groups]
+        including_plan_h[:ordered_transform_groups] = included_groups + (including_plan_h[:ordered_transform_groups] || [])
+      end
     end
   end
 
