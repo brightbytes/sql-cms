@@ -13,8 +13,8 @@ ActiveAdmin.register RunStepLog do
       row :step_type
       row :step_index
       row :step_id
-      row(:likely_step) do
-        text_node(auto_link(run_step_log.likely_step))
+      row(:plan_source_step) do
+        text_node(auto_link(run_step_log.plan_source_step))
         # FIXME - Add Edit Link Here
       end
 

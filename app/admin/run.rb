@@ -24,7 +24,7 @@ ActiveAdmin.register Run do
       row :id
 
       row(:schema_name) do
-        text_node("<span style='color: blue'>SET search_path TO</span> <span style='color: red'>#{resource.schema_name}</span><span style='color: blue'>,public</span>".html_safe)
+        text_node("<span style='color: blue'>SET search_path TO</span> <span style='color: red'>#{resource.schema_name}</span>;".html_safe)
       end
 
       row :workflow

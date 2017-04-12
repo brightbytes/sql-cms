@@ -76,7 +76,11 @@ class RunStepLog < ApplicationRecord
   end
 
   def step_name
-    @step_name ||= step_plan[:name]
+    @step_name ||=
+      begin
+        field = (transform_log? ? :name : workflow_data_quality_report_log? ? :interpolated_name : nil)
+        step_plan[field]
+      end
   end
 
   def step_interpolated_sql
@@ -105,9 +109,12 @@ class RunStepLog < ApplicationRecord
       end
   end
 
-  def likely_step
-    klass = (transform_log? ? Transform : workflow_data_quality_report_log? ? WorkflowDataQualityReport : nil)
-    @likely_step ||= klass.find_by(id: step_plan[:id]) if klass
+  def plan_source_step
+    @plan_source_step ||=
+      begin
+        klass = (transform_log? ? Transform : workflow_data_quality_report_log? ? WorkflowDataQualityReport : nil)
+        klass.find_by(id: step_plan[:id]) if klass
+      end
   end
 
 end
