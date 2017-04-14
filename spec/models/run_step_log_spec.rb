@@ -87,8 +87,8 @@ describe RunStepLog do
         expect(run_step_log.step_plan).to eq(expected_run_step_log_plan.symbolize_keys)
       end
 
-      it "should return the transform as the #likely_step" do
-        expect(run_step_log.likely_step).to eq(transform)
+      it "should return the transform as the #plan_source_step" do
+        expect(run_step_log.plan_source_step).to eq(transform)
       end
     end
   end
