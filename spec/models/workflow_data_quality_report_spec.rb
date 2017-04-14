@@ -14,6 +14,11 @@
 #  index_workflow_data_quality_reports_on_data_quality_report_id  (data_quality_report_id)
 #  index_workflow_data_quality_reports_on_workflow_id             (workflow_id)
 #
+# Foreign Keys
+#
+#  fk_rails_...  (data_quality_report_id => data_quality_reports.id)
+#  fk_rails_...  (workflow_id => workflows.id)
+#
 
 describe WorkflowDataQualityReport do
 

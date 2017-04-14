@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/activeadmin/activeadmin.git
-  revision: 5c0a82b437c3b60a7dd3798b79a258bf3ce2d594
+  revision: d4473e90787426833c8d261e8e9c864dd504e3ca
   specs:
     activeadmin (1.0.0.pre5)
       arbre (>= 1.1.1)
@@ -19,9 +19,9 @@ GIT
 
 GIT
   remote: git://github.com/activeadmin/inherited_resources.git
-  revision: eea3aa21f3867dc182e4db24d1c765bdbcb3df34
+  revision: 0839b077a791013e741ea12cb793b6809a007317
   specs:
-    inherited_resources (1.7.0)
+    inherited_resources (1.7.1)
       actionpack (>= 3.2, < 5.1)
       has_scope (~> 0.6)
       railties (>= 3.2, < 5.1)
@@ -29,12 +29,12 @@ GIT
 
 GIT
   remote: git://github.com/ctran/annotate_models.git
-  revision: d108ba8bdec760ded4c8c786b1d7cc72cadba4df
-  ref: d108ba8bdec760ded4c8c786b1d7cc72cadba4df
+  revision: 8341983f263e662c5e528b04d0eeec908daec1ad
+  ref: 8341983f263e662c5e528b04d0eeec908daec1ad
   specs:
     annotate (2.7.1)
       activerecord (>= 3.2, < 6.0)
-      rake (>= 10.4, < 12.1)
+      rake (>= 10.4)
 
 GEM
   remote: https://rubygems.org/
@@ -93,13 +93,13 @@ GEM
     arbre (1.1.1)
       activesupport (>= 3.0.0)
     arel (7.1.4)
-    aws-sdk (2.9.6)
-      aws-sdk-resources (= 2.9.6)
-    aws-sdk-core (2.9.6)
+    aws-sdk (2.9.7)
+      aws-sdk-resources (= 2.9.7)
+    aws-sdk-core (2.9.7)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.9.6)
-      aws-sdk-core (= 2.9.6)
+    aws-sdk-resources (2.9.7)
+      aws-sdk-core (= 2.9.7)
     aws-sigv4 (1.0.0)
     bcrypt (3.1.11)
     bindex (0.5.0)
@@ -172,7 +172,7 @@ GEM
       thor (>= 0.14, < 2.0)
     jquery-ui-rails (6.0.1)
       railties (>= 3.2.16)
-    json (2.0.3)
+    json (2.0.4)
     jsonapi-renderer (0.1.2)
     kaminari (1.0.1)
       activesupport (>= 4.1.0)
@@ -201,12 +201,12 @@ GEM
     mini_portile2 (2.1.0)
     minitest (5.10.1)
     multi_json (1.12.1)
-    newrelic_rpm (4.0.0.332)
+    newrelic_rpm (4.1.0.333)
     nio4r (2.0.0)
     nokogiri (1.7.1)
       mini_portile2 (~> 2.1.0)
     orm_adapter (0.5.0)
-    paper_trail (7.0.0)
+    paper_trail (7.0.1)
       activerecord (>= 4.0, < 5.2)
       request_store (~> 1.1)
     pg (0.20.0)
@@ -343,7 +343,7 @@ GEM
     turbolinks-source (5.0.0)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)
-    uglifier (3.1.13)
+    uglifier (3.2.0)
       execjs (>= 0.3.0, < 3)
     unicorn (5.3.0)
       kgio (~> 2.6)
@@ -414,7 +414,7 @@ DEPENDENCIES
   web-console (>= 3.3.0)
 
 RUBY VERSION
-   ruby 2.3.3p222
+   ruby 2.4.1p111
 
 BUNDLED WITH
-   1.13.7
+   1.14.6

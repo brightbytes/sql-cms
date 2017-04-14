@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby "2.3.3"
+ruby "2.4.1"
 
 gem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'
 
@@ -41,10 +41,8 @@ group :development, :test do
   gem 'thin' # appserver
   gem 'foreman' # another appserver
 
-  # The newer stuff fixes model annotations with funky indexes, but breaks route annotation.  FML
-  # The annoying procedure is to comment-out everything after `gem 'annotate'` when I want to recomment routes ... and then comment back in to get the models.  Damnit!!
-  # Also, it seems the yml config file doesn't re-annotate the specs, but running `annotate -ik` does.  WTF?!
-  gem 'annotate', github: 'ctran/annotate_models', ref: "d108ba8bdec760ded4c8c786b1d7cc72cadba4df"
+  # This newer, unreleased version fixes model annotations of funky indexes, and (unlike an earlier ref) doesn't break route annotation.
+  gem 'annotate', github: 'ctran/annotate_models', ref: "8341983f263e662c5e528b04d0eeec908daec1ad"
 
   gem 'pry-rails'
 
