@@ -38,7 +38,7 @@ class ExecutionPlan
       including_plan_h[:workflow_data_quality_reports] ||= []
       included_plan_h[:workflow_data_quality_reports] ||= []
       if including_plan_h[:workflow_data_quality_reports].present? || included_plan_h[:workflow_data_quality_reports].present?
-        including_plan_h[:workflow_data_quality_reports] += included_plan_h[:workflow_data_quality_reports]
+        including_plan_h[:workflow_data_quality_reports] = included_plan_h[:workflow_data_quality_reports] + including_plan_h[:workflow_data_quality_reports]
       end
     end
 

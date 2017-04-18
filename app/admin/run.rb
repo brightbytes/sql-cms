@@ -8,7 +8,7 @@ ActiveAdmin.register Run do
   filter :creator, as: :select, collection: proc { User.order(:first_name, :last_name).all }
   filter :status, as: :string
 
-  config.sort_order = 'workflows.slug_asc,id_asc'
+  config.sort_order = 'workflows.slug_asc,id_desc'
 
   index(download_links: false) do
     column(:schema_name, sortable: 'schema_name') { |run| auto_link(run) }
