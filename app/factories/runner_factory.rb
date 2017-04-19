@@ -52,6 +52,8 @@ module RunnerFactory
 
           header_a.map! { |header| Workflow.to_sql_identifier(header) }
 
+          # The :name_type_map & :indexed_columns params are merely POC about how to configure a schema; they could both be far more expressive/useful
+          # Build them out as needed, and also introduce the ability to define a schema in its entirity via a JSON config
           migration_column_s = header_a.map do |header|
             column_type = plan_h[:params].fetch(:name_type_map, nil)&.fetch(header.to_sym, nil) || :string
             "t.#{column_type} :#{header}"

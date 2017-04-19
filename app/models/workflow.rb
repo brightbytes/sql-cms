@@ -108,40 +108,45 @@ class Workflow < ApplicationRecord
     notified_users.map(&:rfc_email_address)
   end
 
-  def ordered_transform_groups
-    unused_transform_ids = transforms.map(&:id)
-    return [] if unused_transform_ids.empty?
+  # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html
+  # But, it's so much more satisfying to figure it out all by myself ...
+  concerning :TransformTopologicalSort do
 
-    groups_arr = []
+    def ordered_transform_groups
+      unused_transform_ids = transforms.map(&:id)
+      return [] if unused_transform_ids.empty?
 
-    independent_transforms = transforms.independent.to_a
+      groups_arr = []
 
-    raise "Your alleged DAG is a cyclical graph because it has no leaf nodes." if independent_transforms.empty?
+      independent_transforms = transforms.independent.to_a
 
-    groups_arr << independent_transforms
-    unused_transform_ids -= independent_transforms.map(&:id)
+      raise "Your alleged DAG is a cyclical graph because it has no leaf nodes." if independent_transforms.empty?
 
-    # Ah, my old nemesis, the while loop, ever insidiously scheming to iterate indefinitely.
-    while unused_transform_ids.present?
-      next_group = next_transform_group(transform_groups_thus_far: groups_arr, unused_transform_ids: unused_transform_ids)
-      raise "Your alleged DAG is a cyclical graph because no transform group may be formed from the remaining transforms." if next_group.empty?
-      groups_arr << next_group
-      unused_transform_ids -= next_group.map(&:id)
+      groups_arr << independent_transforms
+      unused_transform_ids -= independent_transforms.map(&:id)
+
+      # Ah, my old nemesis, the while loop, ever insidiously scheming to iterate indefinitely.
+      while unused_transform_ids.present?
+        next_group = next_transform_group(transform_groups_thus_far: groups_arr, unused_transform_ids: unused_transform_ids)
+        raise "Your alleged DAG is a cyclical graph because no transform group may be formed from the remaining transforms." if next_group.empty?
+        groups_arr << next_group
+        unused_transform_ids -= next_group.map(&:id)
+      end
+
+      groups_arr.map { |arr| Set.new(arr) }
     end
 
-    groups_arr.map { |arr| Set.new(arr) }
-  end
+    private def next_transform_group(transform_groups_thus_far:, unused_transform_ids:)
+      used_transform_ids = transform_groups_thus_far.flatten.map(&:id)
+      joined_used_transform_ids = used_transform_ids.join(',')
+      joined_unused_transform_ids = unused_transform_ids.join(',')
+      transforms.
+        where("id IN (#{joined_unused_transform_ids})").
+        where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id NOT IN (#{joined_used_transform_ids}) AND postrequisite_transform_id = transforms.id)").
+        to_a
+    end
 
-  private def next_transform_group(transform_groups_thus_far:, unused_transform_ids:)
-    used_transform_ids = transform_groups_thus_far.flatten.map(&:id)
-    joined_used_transform_ids = used_transform_ids.join(',')
-    joined_unused_transform_ids = unused_transform_ids.join(',')
-    transforms.
-      where("id IN (#{joined_unused_transform_ids})").
-      where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id NOT IN (#{joined_used_transform_ids}) AND postrequisite_transform_id = transforms.id)").
-      to_a
   end
-
 
 
 end
