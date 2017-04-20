@@ -186,14 +186,6 @@ ActiveAdmin.register Transform do
     #   dpp @transform.id, @transform.prerequisite_dependencies.each { |td| td.errors.full_messages }
     # end
 
-    def create
-      super do |success, failure|
-        success.html do
-          redirect_to(workflow_path(resource.workflow))
-        end
-      end
-    end
-
     def update
       super do |success, failure|
         success.html do
