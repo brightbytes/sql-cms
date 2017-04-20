@@ -206,7 +206,7 @@ ActiveAdmin.register Transform do
     def destroy
       super do |success, failure|
         success.html do
-          redirect_to(params[:source] == 'workflow' ? workflow_path(resource.workflow) : transforms_path)
+          redirect_to(workflow_path(resource.workflow))
         end
       end
     end

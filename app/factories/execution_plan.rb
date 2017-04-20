@@ -2,6 +2,8 @@ class ExecutionPlan
 
   class << self
 
+    # FIXME - WE SHOULD SUPPORT A GENERAL WorkflowDependency DAG JUST AS WE DO FOR TransformDependencies.  WE DON'T HERE YET B/C WE HAVEN'T NEEDED ANYTHING MORE
+    #          THAN THE PRIMITIVE CAPABILITIES USED HERE.
     def create(workflow)
       execution_plan = workflow.serialize_and_symbolize.tap do |including_plan_h|
         # First, we merge all included workflows' Transform Groups and Data Quality Reports
