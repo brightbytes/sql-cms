@@ -44,17 +44,7 @@ module ActiveAdmin::Views
     def simple_format_row(attribute)
       row(attribute) do |model|
         if val = model.send(attribute)
-          code(simple_format(val), class: 'wrapped')
-        end
-      end
-    end
-
-    def ruby_format_row(attribute)
-      row(attribute) do |model|
-        if val = model.send(attribute)
-          wish_this_were_perl_not_ruby =
-            val.gsub(/^(?:  )/, '&nbsp;&nbsp;').gsub(/^(?:    )/, '&nbsp;&nbsp;&nbsp;&nbsp;').gsub(/^(?:      )/, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
-          code(simple_format(wish_this_were_perl_not_ruby))
+          code(val, class: "wrapped")
         end
       end
     end
