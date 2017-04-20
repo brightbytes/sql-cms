@@ -33,9 +33,21 @@ ActiveAdmin.register Workflow do
       row :updated_at
     end
 
+    # FIXME - PARTIALIZE THE FOLLOWING AND THE CUSTOMER WORKFLOW PANEL
+
     if workflow.included_workflows.exists?
       panel 'Associated Shared Workflows' do
         table_for(resource.included_workflows.order(:name)) do
+          column(:name) { |workflow| auto_link(workflow) }
+          column(:slug)
+          boolean_column(:shared)
+        end
+      end
+    end
+
+    if workflow.including_workflows.exists?
+      panel 'Associated Customer Workflows' do
+        table_for(resource.including_workflows.order(:name)) do
           column(:name) { |workflow| auto_link(workflow) }
           column(:slug)
           boolean_column(:shared)
