@@ -54,7 +54,7 @@ module ActiveAdmin::Views
         if val = model.send(attribute)
           wish_this_were_perl_not_ruby =
             val.gsub(/^(?:  )/, '&nbsp;&nbsp;').gsub(/^(?:    )/, '&nbsp;&nbsp;&nbsp;&nbsp;').gsub(/^(?:      )/, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
-          code(simple_format(wish_this_were_perl_not_ruby), class: 'wrapped')
+          code(simple_format(wish_this_were_perl_not_ruby))
         end
       end
     end
