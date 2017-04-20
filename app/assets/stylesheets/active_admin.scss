@@ -16,8 +16,11 @@
 //
 //   .status_tag { background: #6090DB; }
 
-.wrapped {
+.code-block {
   white-space: pre-wrap;
+  background-color: white;
+  font-size: 14px;
+  display: block;
 }
 
 .hidden {
