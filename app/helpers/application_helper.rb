@@ -20,7 +20,7 @@ module ApplicationHelper
   def human_status(obj)
     case
     when obj.running_or_crashed?
-      "<span style='color: blue'>Running (or Crashed)</span>".html_safe
+      "<span style='color: blue'>Running</span>".html_safe
     when obj.successful?
       "<span style='color: green'>Successful</span>".html_safe
     when obj.failed?

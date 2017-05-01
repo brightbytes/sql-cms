@@ -9,7 +9,7 @@ panel "History" do
       column("Modified at") { |v| v.created_at.localtime.to_s }
       column("Modified by") do |v|
         if v.user_id
-          if u = User.find_by_id(v.user_id)
+          if u = User.find_by(id: v.user_id)
             link_to(u.full_name, user_path(u))
           else
             "**Deleted**"
