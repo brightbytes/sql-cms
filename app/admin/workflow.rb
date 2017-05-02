@@ -4,7 +4,7 @@ ActiveAdmin.register Workflow do
 
   actions :all
 
-  permit_params :name, :customer_id, :slug, :shared, notified_user_ids: [], included_workflow_ids: []
+  permit_params :name, :customer_id, :slug, :shared, :s3_region_name, :s3_bucket_name, notified_user_ids: [], included_workflow_ids: []
 
   filter :name, as: :string
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
