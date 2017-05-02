@@ -2,13 +2,15 @@
 #
 # Table name: public.workflows
 #
-#  id          :integer          not null, primary key
-#  name        :string           not null
-#  slug        :string           not null
-#  customer_id :integer
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  shared      :boolean          default(FALSE), not null
+#  id             :integer          not null, primary key
+#  name           :string           not null
+#  slug           :string           not null
+#  customer_id    :integer
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  shared         :boolean          default(FALSE), not null
+#  s3_region_name :string           not null
+#  s3_bucket_name :string           not null
 #
 # Indexes
 #
@@ -27,7 +29,7 @@ describe Workflow do
   end
 
   describe 'validations' do
-    [:name, :slug].each do |att|
+    [:name, :slug, :s3_region_name, :s3_bucket_name].each do |att|
       it { should validate_presence_of(att) }
     end
 

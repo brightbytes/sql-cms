@@ -9,8 +9,6 @@ $(function() {
     // var exporting = ($(this).val() == 'Unload' || $(this).val() == 'CopyTo');
     var exporting = ($(this).val() == 'CopyTo');
 
-    $('#transform_s3_region_name_input').toggle(exporting);
-    $('#transform_s3_bucket_name_input').toggle(exporting);
     $('#transform_s3_file_path_input').toggle(exporting);
     $('#transform_s3_file_name_input').toggle(exporting);
 
@@ -24,8 +22,6 @@ $(function() {
 
     $('#transform_supplied_s3_url_input').toggle(by_url);
 
-    $('#transform_s3_region_name_input').toggle(!by_url);
-    $('#transform_s3_bucket_name_input').toggle(!by_url);
     $('#transform_s3_file_path_input').toggle(!by_url);
     $('#transform_s3_file_name_input').toggle(!by_url);
 

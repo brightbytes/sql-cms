@@ -8,6 +8,9 @@ ActiveAdmin.register Workflow do
 
   filter :name, as: :string
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
+  filter :shared, as: :select, collection: [["Yes", true], ["No", false]]
+  filter :s3_region_name, as: :select
+  filter :s3_bucket_name, as: :select
 
   config.sort_order = 'customers.slug_asc,slug_asc'
 
@@ -16,6 +19,8 @@ ActiveAdmin.register Workflow do
     column(:customer, sortable: 'customers.slug')
     column :slug
     boolean_column :shared
+    column :s3_region_name
+    column :s3_bucket_name
   end
 
   show do
@@ -28,6 +33,9 @@ ActiveAdmin.register Workflow do
       row :slug
 
       row :shared
+
+      row :s3_region_name
+      row :s3_bucket_name
 
       row :created_at
       row :updated_at
@@ -141,6 +149,9 @@ ActiveAdmin.register Workflow do
       input :shared, as: :select, collection: [["Yes", true], ["No", false]], include_blank: false, input_html: { disabled: customer_id_from_param }
       input :name, as: :string
       input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated. And DON'T MAKE IT TOO LONG, or creating the Posgres schema will puke."
+
+      input :s3_region_name, as: :string # This should be a drop-down
+      input :s3_bucket_name, as: :string
 
       # Same comment here as for TransformController's form: this doesn't work on #create b/c a Workflow is at either end of the join. Whereas, when the objects
       #  on either side of the join table are different, this works beautifully. IOW, Rails BUG

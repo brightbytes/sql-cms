@@ -4,14 +4,12 @@ ActiveAdmin.register Transform do
 
   actions :all
 
-  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :specify_s3_file_by, :supplied_s3_url, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name, prerequisite_transform_ids: []
+  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :specify_s3_file_by, :supplied_s3_url, :s3_file_path, :s3_file_name, prerequisite_transform_ids: []
 
   filter :name, as: :string
   filter :runner, as: :select, collection: RunnerFactory::RUNNERS_FOR_SELECT
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :sql, as: :string
-  filter :s3_region_name, as: :select
-  filter :s3_bucket_name, as: :select
 
   config.sort_order = 'workflows.slug_asc,name_asc'
 
@@ -117,8 +115,6 @@ ActiveAdmin.register Transform do
       if f.object.persisted?
 
         file_display_h = (f.object.s3_file_name.present? ? {} : { style: 'display:none' })
-        input :s3_region_name, as: :string, wrapper_html: file_display_h # This should be a drop-down
-        input :s3_bucket_name, as: :string, wrapper_html: file_display_h
         input :s3_file_path, as: :string, wrapper_html: file_display_h
         input :s3_file_name, as: :string, wrapper_html: file_display_h
 
@@ -135,8 +131,6 @@ ActiveAdmin.register Transform do
 
         # For export files ...
         file_display_h = (show_s3_file ? {} : { style: 'display:none' })
-        input :s3_region_name, as: :string, wrapper_html: file_display_h # should be a drop-down
-        input :s3_bucket_name, as: :string, wrapper_html: file_display_h
         input :s3_file_path, as: :string, wrapper_html: file_display_h
 
         input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on the next page."

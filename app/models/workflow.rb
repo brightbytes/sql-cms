@@ -2,13 +2,15 @@
 #
 # Table name: public.workflows
 #
-#  id          :integer          not null, primary key
-#  name        :string           not null
-#  slug        :string           not null
-#  customer_id :integer
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  shared      :boolean          default(FALSE), not null
+#  id             :integer          not null, primary key
+#  name           :string           not null
+#  slug           :string           not null
+#  customer_id    :integer
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  shared         :boolean          default(FALSE), not null
+#  s3_region_name :string           not null
+#  s3_bucket_name :string           not null
 #
 # Indexes
 #
@@ -35,6 +37,8 @@ class Workflow < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
+  validates :s3_region_name, :s3_bucket_name, presence: true
+
   validates :slug, presence: true, uniqueness: { case_sensitive: false }
 
   validate :slug_valid_sql_identifier
@@ -52,6 +56,15 @@ class Workflow < ApplicationRecord
   include Concerns::ImmutableCallbacks
   immutable :destroy
   immutable_attribute_name :shared
+
+  after_initialize :set_defaults
+
+  private def set_defaults
+    if new_record?
+      self.s3_region_name ||= ENV.fetch('DEFAULT_S3_REGION', 'us-west-2')
+      self.s3_bucket_name ||= ENV['DEFAULT_S3_BUCKET']
+    end
+  end
 
   # Associations
 

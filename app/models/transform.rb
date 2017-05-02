@@ -2,18 +2,16 @@
 #
 # Table name: public.transforms
 #
-#  id             :integer          not null, primary key
-#  name           :string           not null
-#  runner         :string           default("Sql"), not null
-#  workflow_id    :integer          not null
-#  sql            :text             not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  params         :jsonb
-#  s3_region_name :string
-#  s3_bucket_name :string
-#  s3_file_path   :string
-#  s3_file_name   :string
+#  id           :integer          not null, primary key
+#  name         :string           not null
+#  runner       :string           default("Sql"), not null
+#  workflow_id  :integer          not null
+#  sql          :text             not null
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  params       :jsonb
+#  s3_file_path :string
+#  s3_file_name :string
 #
 # Indexes
 #
@@ -38,34 +36,29 @@ class Transform < ApplicationRecord
 
   validates :runner, presence: true, inclusion: { in: RunnerFactory::RUNNERS }
 
-  validate :s3_attributes_present, if: :s3_file_required?
-
   JOINED_S3_FILE_RUNNERS = RunnerFactory::S3_FILE_RUNNERS.join(',').freeze
   S3_ATTRIBUTES_PRESENT_ERROR_MSG = "is required for runners of type: #{JOINED_S3_FILE_RUNNERS}".freeze
 
-  def s3_attributes_present
-    errors.add(:s3_region_name, S3_ATTRIBUTES_PRESENT_ERROR_MSG) if s3_region_name.blank?
-    errors.add(:s3_bucket_name, S3_ATTRIBUTES_PRESENT_ERROR_MSG) if s3_bucket_name.blank?
-    errors.add(:s3_file_name, S3_ATTRIBUTES_PRESENT_ERROR_MSG) if s3_file_name.blank?
-  end
+  validates :s3_file_name, presence: { message: S3_ATTRIBUTES_PRESENT_ERROR_MSG }, if: :s3_file_required?
 
   validate :supplied_s3_url_is_not_hosed, if: :s3_file_specified_by_url?
 
   private def supplied_s3_url_is_not_hosed
-    errors.add(:supplied_s3_url, "must be provided") if supplied_s3_url.blank? && s3_bucket_name.blank? && s3_file_name.blank?
-    errors.add(:supplied_s3_url, "is not a valid S3 URL") if supplied_s3_url.present? && s3_bucket_name.blank? && s3_file_name.blank?
+
+    if supplied_s3_url.blank?
+      errors.add(:supplied_s3_url, "must be provided")
+    else
+      if s3_file_name.blank?
+        errors.add(:supplied_s3_url, "is not a valid S3 URL")
+      else
+        errors.add(:supplied_s3_url, "specifies a different S3 region than the Workflow") unless @parsed_s3_region_name == workflow.s3_region_name
+        errors.add(:supplied_s3_url, "specifies a different S3 bucket than the Workflow") unless @parsed_s3_bucket_name == workflow.s3_bucket_name
+      end
+    end
+
   end
 
   # Callbacks
-
-  after_initialize :set_defaults
-
-  private def set_defaults
-    if new_record?
-      self.s3_region_name ||= ENV.fetch('DEFAULT_S3_REGION', 'us-west-2')
-      self.s3_bucket_name ||= ENV['DEFAULT_S3_BUCKET']
-    end
-  end
 
   before_validation :parse_supplied_s3_url, if: :s3_file_specified_by_url?
 
@@ -73,8 +66,8 @@ class Transform < ApplicationRecord
     if supplied_s3_url.present?
       http_match = %r{\Ahttp(?:s)?://s3-([-\w]+).amazonaws.com/([-\w]+)/(.{10,})\Z}.match(supplied_s3_url)
       if http_match
-        self.s3_region_name = http_match[1]
-        self.s3_bucket_name = http_match[2]
+        @parsed_s3_region_name = http_match[1]
+        @parsed_s3_bucket_name = http_match[2]
         file_path_and_name = http_match[3].split('/').reject(&:blank?)
         self.s3_file_path = file_path_and_name[0..-2].join('/') unless file_path_and_name.size == 1
         self.s3_file_name = file_path_and_name.last
@@ -85,7 +78,7 @@ class Transform < ApplicationRecord
   before_validation :clear_s3_attributes, unless: :s3_file_required?
 
   private def clear_s3_attributes
-    self.s3_region_name = self.s3_bucket_name = self.s3_file_path = self.s3_file_name = self.supplied_s3_url = nil
+    self.s3_file_path = self.s3_file_name = self.supplied_s3_url = nil
   end
 
   before_validation :add_placeholder_sql, if: :auto_load?
@@ -127,6 +120,8 @@ class Transform < ApplicationRecord
 
   scope :exporting, -> { where(runner: RunnerFactory::EXPORT_S3_FILE_RUNNERS) }
 
+  scope :file_related, -> { where(runner: RunnerFactory::S3_FILE_RUNNERS) }
+
   scope :non_file_related, -> { where(runner: RunnerFactory::NON_S3_FILE_RUNNERS) }
 
   scope :independent, -> { where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)") }
@@ -136,6 +131,8 @@ class Transform < ApplicationRecord
   # Instance Methods
 
   attr_accessor :specify_s3_file_by, :supplied_s3_url
+
+  delegate :s3_region_name, :s3_bucket_name, to: :workflow
 
   def importing?
     runner.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
@@ -171,7 +168,9 @@ class Transform < ApplicationRecord
   # end
 
   private def s3_attributes
-    attributes.with_indifferent_access.slice(:s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name).symbolize_keys
+    attributes.with_indifferent_access.slice(:s3_file_path, :s3_file_name).merge(
+      workflow.attributes.with_indifferent_access.slice(:s3_region_name, :s3_bucket_name)
+    ).symbolize_keys
   end
 
   accepts_nested_attributes_for :prerequisite_transforms
