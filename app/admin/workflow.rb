@@ -90,9 +90,9 @@ ActiveAdmin.register Workflow do
             text_node(link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }))
           end
         end
-      end
 
-      text_node "#{transforms.size} total"
+        text_node "#{transforms.size} total"
+      end
     end
 
     render partial: 'admin/workflow/s3_transform_panel',
@@ -114,9 +114,9 @@ ActiveAdmin.register Workflow do
             text_node(link_to("Delete", workflow_data_quality_report_path(wdqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Workflow Data Quality Report?' }))
           end
         end
-      end
 
-      text_node "#{reports.size} total"
+        text_node "#{reports.size} total"
+      end
     end
 
     panel 'Runs' do
@@ -133,8 +133,6 @@ ActiveAdmin.register Workflow do
           column(:action) { |run| link_to("Delete", run_path(run), method: :delete, data: { confirm: 'Are you sure you want to nuke this Run and all DB data associated with it?' }) }
         end
       end
-
-      text_node "#{runs.size} total"
     end
 
     panel 'Run Notifications' do
