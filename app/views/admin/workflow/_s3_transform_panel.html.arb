@@ -24,4 +24,6 @@ panel panel_name do
       text_node(link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }))
     end
   end
+
+  text_node "#{transforms.size} total"
 end

@@ -71,7 +71,8 @@ ActiveAdmin.register Workflow do
 
       text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
 
-      table_for(resource.transforms.dependent.non_file_related.order(:name)) do
+      transforms = resource.transforms.dependent.non_file_related.order(:name)
+      table_for(transforms) do
         column(:name, sortable: :name) { |transform| auto_link(transform) }
         column(:runner, sortable: :runner) { |transform| transform.runner }
         column(:actions) do |transform|
@@ -80,6 +81,8 @@ ActiveAdmin.register Workflow do
           text_node(link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }))
         end
       end
+
+      text_node "#{transforms.size} total"
     end
 
     render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.order(:name) }
@@ -88,7 +91,8 @@ ActiveAdmin.register Workflow do
 
       text_node link_to("Create New Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
 
-      table_for(resource.workflow_data_quality_reports.includes(:data_quality_report).order('data_quality_reports.name')) do
+      reports = resource.workflow_data_quality_reports.includes(:data_quality_report).to_a.sort_by(&:interpolated_name)
+      table_for(reports) do
         column(:workflow_data_quality_report) { |wdqr| link_to(wdqr.interpolated_name, wdqr) }
         column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(120) }
         column('Immutable?') { |wdqr| yes_no(wdqr.data_quality_report.immutable?) }
@@ -97,21 +101,25 @@ ActiveAdmin.register Workflow do
           text_node(' | ')
           text_node(link_to("Delete", workflow_data_quality_report_path(wdqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Workflow Data Quality Report?' }))
         end
-
       end
+
+      text_node "#{reports.size} total"
     end
 
     panel 'Runs' do
 
       text_node link_to("Run Now", run_workflow_path(workflow), method: :put)
 
-      table_for(resource.runs.includes(:creator).order(id: :desc)) do
+      runs = resource.runs.includes(:creator).order(id: :desc)
+      table_for(runs) do
         column(:schema_name) { |run| auto_link(run) }
         column(:creator)
         column(:created_at)
         column(:human_status) { |run| human_status(run) }
         column(:action) { |run| link_to("Delete", run_path(run), method: :delete, data: { confirm: 'Are you sure you want to nuke this Run and all DB data associated with it?' }) }
       end
+
+      text_node "#{runs.size} total"
     end
 
     panel 'Run Notifications' do
