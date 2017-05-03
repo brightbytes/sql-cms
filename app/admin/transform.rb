@@ -54,33 +54,48 @@ ActiveAdmin.register Transform do
     panel 'Transform Validations' do
       text_node link_to("Add New Transform Validation", new_transform_validation_path(transform_id: resource.id))
 
-      table_for(resource.transform_validations.includes(:validation).order('validations.name')) do
-        column(:transform_validation) { |tv| link_to(tv.interpolated_name, tv) }
-        column(:interpolated_sql) { |tv| tv.interpolated_sql.truncate(120) }
-        column('Immutable?') { |tv| yes_no(tv.validation.immutable?) }
-        column(:action) do |tv|
-          text_node(link_to("Edit", edit_transform_validation_path(tv, source: :transform, transform_id: tv.transform_id)))
-          text_node(' | ')
-          text_node(link_to("Delete", transform_validation_path(tv), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Validation?' }))
+      transform_validations = resource.transform_validations.includes(:validation).order('validations.name').to_a
+      unless transform_validations.empty?
+        table_for(transform_validations) do
+          column(:transform_validation) { |tv| link_to(tv.interpolated_name, tv) }
+          column(:interpolated_sql) { |tv| tv.interpolated_sql.truncate(120) }
+          column('Immutable?') { |tv| yes_no(tv.validation.immutable?) }
+          column(:action) do |tv|
+            text_node(link_to("Edit", edit_transform_validation_path(tv, source: :transform, transform_id: tv.transform_id)))
+            text_node(' | ')
+            text_node(link_to("Delete", transform_validation_path(tv), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Validation?' }))
+          end
         end
       end
     end
 
     panel 'Prerequisite Transform Dependencies' do
-      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
-      table_for(resource.prerequisite_dependencies.includes(:prerequisite_transform).order('transforms.name'), sortable: true) do
-        column(:name, sortable: :name) { |pd| auto_link(pd.prerequisite_transform) }
-        column(:runner, sortable: :runner) { |pd| pd.prerequisite_transform.runner }
-        column(:action) { |pd| link_to("Delete", transform_dependency_path(pd, source: :postrequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' }) }
+
+      # FIXME - If ever we can get dependencies created with the Transform, this should add params here
+      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.workflow_id))
+
+      prereqs = resource.prerequisite_dependencies.includes(:prerequisite_transform).order('transforms.name').to_a
+      unless prereqs.empty?
+        table_for(prereqs) do
+          column(:name) { |pd| auto_link(pd.prerequisite_transform) }
+          column(:runner) { |pd| pd.prerequisite_transform.runner }
+          column(:action) { |pd| link_to("Delete", transform_dependency_path(pd, source: :postrequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' }) }
+        end
       end
     end
 
     panel 'Postrequisite Transforms Dependencies' do
-      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
-      table_for(resource.postrequisite_dependencies.includes(:postrequisite_transform).order('transforms.name'), sortable: true) do
-        column(:name, sortable: :name) { |pd| auto_link(pd.postrequisite_transform) }
-        column(:runner, sortable: :runner) { |pd| pd.postrequisite_transform.runner }
-        column(:action) { |pd| link_to("Delete", transform_dependency_path(pd, source: :prerequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' }) }
+
+      # FIXME - If ever we can get dependencies created with the Transform, this should add params here
+      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.workflow_id))
+
+      postreqs = resource.postrequisite_dependencies.includes(:postrequisite_transform).order('transforms.name').to_a
+      unless postreqs.empty?
+        table_for(postreqs) do
+          column(:name) { |pd| auto_link(pd.postrequisite_transform) }
+          column(:runner) { |pd| pd.postrequisite_transform.runner }
+          column(:action) { |pd| link_to("Delete", transform_dependency_path(pd, source: :prerequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' }) }
+        end
       end
     end
 

@@ -43,63 +43,76 @@ ActiveAdmin.register Workflow do
 
     # FIXME - PARTIALIZE THE FOLLOWING AND THE CUSTOMER WORKFLOW PANEL
 
-    if workflow.included_workflows.exists?
+    included_workflows = workflow.included_workflows.order(:name).to_a
+    unless included_workflows.empty?
       panel 'Associated Shared Workflows' do
-        table_for(resource.included_workflows.order(:name)) do
+        table_for(included_workflows) do
           column(:name) { |workflow| auto_link(workflow) }
           column(:slug)
           boolean_column(:shared)
+          column :s3_region_name
+          column :s3_bucket_name
         end
       end
     end
 
-    if workflow.including_workflows.exists?
+    including_workflows = resource.including_workflows.order(:name).to_a
+    unless including_workflows.empty?
       panel 'Associated Customer Workflows' do
-        table_for(resource.including_workflows.order(:name)) do
+        table_for(including_workflows) do
           column(:name) { |workflow| auto_link(workflow) }
           column(:slug)
           boolean_column(:shared)
+          column :s3_region_name
+          column :s3_bucket_name
         end
       end
     end
 
-    render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Independent Transforms', transforms: resource.transforms.independent.order(:name) }
+    render partial: 'admin/workflow/s3_transform_panel',
+           locals: { panel_name: 'Independent Transforms', transforms: resource.transforms.independent.order(:name).to_a }
 
-    render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Dependent, Data-Importing Transforms', transforms: resource.transforms.dependent.importing.order(:name) }
+    render partial: 'admin/workflow/s3_transform_panel',
+           locals: { panel_name: 'Dependent, Data-Importing Transforms', transforms: resource.transforms.dependent.importing.order(:name).to_a }
 
     panel 'Dependent, non-Importing/Exporting Transforms' do
 
-      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, customer_id: resource.customer_id, source: :workflow))
+      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, source: :workflow))
 
-      transforms = resource.transforms.dependent.non_file_related.order(:name)
-      table_for(transforms) do
-        column(:name, sortable: :name) { |transform| auto_link(transform) }
-        column(:runner, sortable: :runner) { |transform| transform.runner }
-        column(:actions) do |transform|
-          text_node(link_to("Edit", edit_transform_path(transform, source: :workflow, workflow_id: transform.workflow_id)))
-          text_node(' | ')
-          text_node(link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }))
+      transforms = resource.transforms.dependent.non_file_related.order(:name).to_a
+      unless transforms.empty?
+        table_for(transforms) do
+          column(:name, sortable: :name) { |transform| auto_link(transform) }
+          column(:runner, sortable: :runner) { |transform| transform.runner }
+          column(:actions) do |transform|
+            text_node(link_to("Edit", edit_transform_path(transform, source: :workflow, workflow_id: transform.workflow_id)))
+            text_node(' | ')
+            text_node(link_to("Delete", transform_path(transform, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform?' }))
+          end
         end
       end
 
       text_node "#{transforms.size} total"
     end
 
-    render partial: 'admin/workflow/s3_transform_panel', locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.order(:name) }
+    render partial: 'admin/workflow/s3_transform_panel',
+           locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.order(:name).to_a }
 
     panel 'Data Quality Reports' do
 
       text_node link_to("Create New Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
 
-      reports = resource.workflow_data_quality_reports.includes(:data_quality_report).to_a.sort_by(&:interpolated_name)
-      table_for(reports) do
-        column(:workflow_data_quality_report) { |wdqr| link_to(wdqr.interpolated_name, wdqr) }
-        column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(120) }
-        column('Immutable?') { |wdqr| yes_no(wdqr.data_quality_report.immutable?) }
-        column(:action) do |wdqr|
-          text_node(link_to("Edit", edit_workflow_data_quality_report_path(wdqr, source: :workflow, workflow_id: wdqr.workflow_id)))
-          text_node(' | ')
-          text_node(link_to("Delete", workflow_data_quality_report_path(wdqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Workflow Data Quality Report?' }))
+      reports = resource.workflow_data_quality_reports.includes(:data_quality_report).to_a.sort_by(&:interpolated_name).to_a
+      unless reports.empty?
+        table_for(reports) do
+          column(:workflow_data_quality_report) { |wdqr| link_to(wdqr.interpolated_name, wdqr) }
+          column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(120) }
+          column('Immutable?') { |wdqr| yes_no(wdqr.data_quality_report.immutable?) }
+          column(:action) do |wdqr|
+            text_node(link_to("Edit", edit_workflow_data_quality_report_path(wdqr, source: :workflow, workflow_id: wdqr.workflow_id)))
+            text_node(' | ')
+            text_node(link_to("Delete", workflow_data_quality_report_path(wdqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Workflow Data Quality Report?' }))
+          end
         end
       end
 
@@ -110,13 +123,15 @@ ActiveAdmin.register Workflow do
 
       text_node link_to("Run Now", run_workflow_path(workflow), method: :put)
 
-      runs = resource.runs.includes(:creator).order(id: :desc)
-      table_for(runs) do
-        column(:schema_name) { |run| auto_link(run) }
-        column(:creator)
-        column(:created_at)
-        column(:human_status) { |run| human_status(run) }
-        column(:action) { |run| link_to("Delete", run_path(run), method: :delete, data: { confirm: 'Are you sure you want to nuke this Run and all DB data associated with it?' }) }
+      runs = resource.runs.includes(:creator).order(id: :desc).to_a
+      unless runs.empty?
+        table_for(runs) do
+          column(:schema_name) { |run| auto_link(run) }
+          column(:creator)
+          column(:created_at)
+          column(:human_status) { |run| human_status(run) }
+          column(:action) { |run| link_to("Delete", run_path(run), method: :delete, data: { confirm: 'Are you sure you want to nuke this Run and all DB data associated with it?' }) }
+        end
       end
 
       text_node "#{runs.size} total"
@@ -126,9 +141,12 @@ ActiveAdmin.register Workflow do
 
       text_node link_to("Add New Notifications", edit_workflow_path(workflow))
 
-      table_for(resource.notifications.joins(:user).order('users.first_name, users.last_name')) do
-        column(:user) { |notification| auto_link(notification.user) }
-        column(:action) { |notification| link_to("Delete", notification_path(notification), method: :delete, data: { confirm: 'Are you sure you want to nuke this Notification?' }) }
+      notifications = resource.notifications.joins(:user).order('users.first_name, users.last_name').to_a
+      unless notifications.empty?
+        table_for(notifications) do
+          column(:user) { |notification| auto_link(notification.user) }
+          column(:action) { |notification| link_to("Delete", notification_path(notification), method: :delete, data: { confirm: 'Are you sure you want to nuke this Notification?' }) }
+        end
       end
     end
 
