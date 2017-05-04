@@ -16,7 +16,10 @@ module WorkflowSeeder
   DEMO_WORKFLOW_NAME = 'Demo Workflow'
 
   def demo_workflow
-    Workflow.where(name: DEMO_WORKFLOW_NAME).first_or_create!(customer: CustomerSeeder.demo_customer)
+    Workflow.where(name: DEMO_WORKFLOW_NAME).first_or_create!(
+      customer: CustomerSeeder.demo_customer,
+      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files'
+    )
   end
 
   def demo_workflow_exists?
@@ -44,7 +47,6 @@ module WorkflowSeeder
         },
         indexed_columns: [:clarity_org_id, :co_org_id]
       },
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
       s3_file_name: 'boces_mappings.csv'
     )
 
@@ -77,7 +79,6 @@ module WorkflowSeeder
         },
         indexed_columns: [:clarity_org_id, :co_org_id]
       },
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
       s3_file_name: 'district_mappings.csv'
     )
 
@@ -110,7 +111,6 @@ module WorkflowSeeder
         },
         indexed_columns: [:clarity_org_id, :co_org_id]
       },
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
       s3_file_name: 'school_mappings.csv'
     )
 
@@ -142,7 +142,6 @@ module WorkflowSeeder
           fund_high_val: :integer
         }
       },
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
       s3_file_name: 'fund_mappings.csv'
     )
 
@@ -261,7 +260,6 @@ module WorkflowSeeder
       name: "BOCES 9035 fact table loader",
       runner: "CopyFrom",
       sql: "COPY staging_facts (boces_id, admin_unit, school_code, fund_code, location_code, sre_code, program_code, object_source_code, job_class_code, grant_code, amount_cents) FROM STDIN WITH CSV HEADER",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
       s3_file_name: 'boces_9035_sample.csv'
     )
 
@@ -500,7 +498,6 @@ module WorkflowSeeder
       name: "Mapped Fact Exporter",
       runner: "CopyTo",
       sql: "COPY (SELECT * FROM mapped_facts) TO STDOUT WITH CSV HEADER",
-      s3_file_path: 'fake_customer/demo_workflow_version_1/exported_data_files',
       s3_file_name: 'mapped_facts.csv'
     )
 

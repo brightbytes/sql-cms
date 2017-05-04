@@ -11,6 +11,7 @@
 #  shared         :boolean          default(FALSE), not null
 #  s3_region_name :string           not null
 #  s3_bucket_name :string           not null
+#  s3_file_path   :string
 #
 # Indexes
 #

@@ -634,7 +634,6 @@ CREATE TABLE transforms (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     params jsonb,
-    s3_file_path character varying,
     s3_file_name character varying
 );
 
@@ -847,7 +846,8 @@ CREATE TABLE workflows (
     updated_at timestamp without time zone NOT NULL,
     shared boolean DEFAULT false NOT NULL,
     s3_region_name character varying NOT NULL,
-    s3_bucket_name character varying NOT NULL
+    s3_bucket_name character varying NOT NULL,
+    s3_file_path character varying
 );
 
 
@@ -1749,6 +1749,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170303002731'),
 ('20170305232008'),
 ('20170403215347'),
-('20170502012231');
+('20170502012231'),
+('20170504001059');
 
 

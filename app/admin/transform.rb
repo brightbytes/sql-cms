@@ -4,7 +4,7 @@ ActiveAdmin.register Transform do
 
   actions :all
 
-  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :specify_s3_file_by, :supplied_s3_url, :s3_file_path, :s3_file_name, prerequisite_transform_ids: []
+  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :s3_file_name, prerequisite_transform_ids: []
 
   filter :name, as: :string
   filter :runner, as: :select, collection: RunnerFactory::RUNNERS_FOR_SELECT
@@ -127,30 +127,8 @@ ActiveAdmin.register Transform do
 
       input :sql, as: :text, input_html: { rows: 40 }, hint: "If you leave this blank for TSV and CSV CopyFrom Transforms, it will auto-generate SQL under the assumption that the source file has its columns in the same order as the table declares columns."
 
-      if f.object.persisted?
-
-        file_display_h = (f.object.s3_file_name.present? ? {} : { style: 'display:none' })
-        input :s3_file_path, as: :string, wrapper_html: file_display_h
-        input :s3_file_name, as: :string, wrapper_html: file_display_h
-
-      else
-
-        show_s3_url = f.object.supplied_s3_url.present?
-        show_s3_file = !show_s3_url && f.object.s3_file_name.present?
-        show_s3_selector = ((show_s3_url || show_s3_file) ? {} : { style: 'display:none' })
-        input :specify_s3_file_by, as: :select, collection: [['HTTPS URL for existing S3 file', :url], ['S3 file location for future upload', :s3_fields]], wrapper_html: show_s3_selector, required: true, include_blank: false
-
-        # For import files ...
-        url_display_h = (show_s3_url ? {} : { style: 'display:none' })
-        input :supplied_s3_url, label: "S3 File URL", required: true, wrapper_html: url_display_h, hint: "Copy/paste the https:// URL from S3"
-
-        # For export files ...
-        file_display_h = (show_s3_file ? {} : { style: 'display:none' })
-        input :s3_file_path, as: :string, wrapper_html: file_display_h
-
-        input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on the next page."
-
-      end
+      file_display_h = ((f.object.s3_file_required? || f.object.s3_file_name.present?) ? {} : { style: 'display:none' })
+      input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on the next page."
 
     end
 

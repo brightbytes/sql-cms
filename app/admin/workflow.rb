@@ -4,13 +4,14 @@ ActiveAdmin.register Workflow do
 
   actions :all
 
-  permit_params :name, :customer_id, :slug, :shared, :s3_region_name, :s3_bucket_name, notified_user_ids: [], included_workflow_ids: []
+  permit_params :name, :customer_id, :slug, :shared, :s3_region_name, :s3_bucket_name, :s3_file_path, notified_user_ids: [], included_workflow_ids: []
 
   filter :name, as: :string
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
   filter :shared, as: :select, collection: [["Yes", true], ["No", false]]
   filter :s3_region_name, as: :select
   filter :s3_bucket_name, as: :select
+  filter :s3_file_path, as: :select
 
   config.sort_order = 'customers.slug_asc,slug_asc'
 
@@ -21,6 +22,7 @@ ActiveAdmin.register Workflow do
     boolean_column :shared
     column :s3_region_name
     column :s3_bucket_name
+    column :s3_file_path
   end
 
   show do
@@ -36,6 +38,7 @@ ActiveAdmin.register Workflow do
 
       row :s3_region_name
       row :s3_bucket_name
+      row :s3_file_path
 
       row :created_at
       row :updated_at
@@ -52,6 +55,7 @@ ActiveAdmin.register Workflow do
           boolean_column(:shared)
           column :s3_region_name
           column :s3_bucket_name
+          column :s3_file_path
         end
       end
     end
@@ -65,6 +69,7 @@ ActiveAdmin.register Workflow do
           boolean_column(:shared)
           column :s3_region_name
           column :s3_bucket_name
+          column :s3_file_path
         end
       end
     end
@@ -176,6 +181,7 @@ ActiveAdmin.register Workflow do
 
       input :s3_region_name, as: :string # This should be a drop-down
       input :s3_bucket_name, as: :string
+      input :s3_file_path, as: :string
 
       # Same comment here as for TransformController's form: this doesn't work on #create b/c a Workflow is at either end of the join. Whereas, when the objects
       #  on either side of the join table are different, this works beautifully. IOW, Rails BUG

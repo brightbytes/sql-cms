@@ -10,7 +10,6 @@
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #  params       :jsonb
-#  s3_file_path :string
 #  s3_file_name :string
 #
 # Indexes
@@ -51,70 +50,60 @@ describe Transform do
       end
     end
 
-    it "should add an error if a supplied_s3_url's region or bucket differ from the workflow's region or bucket, respectively" do
-      transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
-      transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}.amazonaws.com/#{transform.workflow.s3_bucket_name}/ca_some_sis/some_data_source/shoobie.tsv"
-      expect(transform.valid?).to eq(true)
+    # FIXME - We may reuse this in Workflow ... but not right now
+    # it "should add an error if a supplied_s3_url's region or bucket differ from the workflow's region or bucket, respectively" do
+    #   transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
+    #   transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}.amazonaws.com/#{transform.workflow.s3_bucket_name}/ca_some_sis/some_data_source/shoobie.tsv"
+    #   expect(transform.valid?).to eq(true)
 
-      transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
-      transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}-junk.amazonaws.com/#{transform.workflow.s3_bucket_name}/ca_some_sis/some_data_source/shoobie.tsv"
-      expect(transform.valid?).to_not eq(true)
+    #   transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
+    #   transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}-junk.amazonaws.com/#{transform.workflow.s3_bucket_name}/ca_some_sis/some_data_source/shoobie.tsv"
+    #   expect(transform.valid?).to_not eq(true)
 
-      transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
-      transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}.amazonaws.com/#{transform.workflow.s3_bucket_name}-junk/ca_some_sis/some_data_source/shoobie.tsv"
-      expect(transform.valid?).to_not eq(true)
-    end
+    #   transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
+    #   transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}.amazonaws.com/#{transform.workflow.s3_bucket_name}-junk/ca_some_sis/some_data_source/shoobie.tsv"
+    #   expect(transform.valid?).to_not eq(true)
+    # end
 
   end
 
   describe "callbacks" do
 
     context "before_validation" do
-      it "should parse a valid supplied s3-resource URL if possible" do
-        transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
-        transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}.amazonaws.com/#{transform.workflow.s3_bucket_name}/ca_some_sis/some_data_source/shoobie.tsv"
-        expect(transform.valid?).to eq(true)
-        expect(transform.s3_file_path).to eq('ca_some_sis/some_data_source')
-        expect(transform.s3_file_name).to eq('shoobie.tsv')
+      # FIXME - We may reuse this in Workflow ... but not right now
+      # it "should parse a valid supplied s3-resource URL if possible" do
+      #   transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
+      #   transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}.amazonaws.com/#{transform.workflow.s3_bucket_name}/ca_some_sis/some_data_source/shoobie.tsv"
+      #   expect(transform.valid?).to eq(true)
+      #   expect(transform.s3_file_path).to eq('ca_some_sis/some_data_source')
+      #   expect(transform.s3_file_name).to eq('shoobie.tsv')
 
-        transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
-        transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}.amazonaws.com/#{transform.workflow.s3_bucket_name}/shoobie.tsv"
-        expect(transform.valid?).to eq(true)
-        expect(transform.s3_file_path).to eq(nil)
-        expect(transform.s3_file_name).to eq('shoobie.tsv')
+      #   transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
+      #   transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}.amazonaws.com/#{transform.workflow.s3_bucket_name}/shoobie.tsv"
+      #   expect(transform.valid?).to eq(true)
+      #   expect(transform.s3_file_path).to eq(nil)
+      #   expect(transform.s3_file_name).to eq('shoobie.tsv')
 
-        # This is a validation test, but it's here just because it feels right
-        transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
-        transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/some-bucket"
-        expect(transform.valid?).to eq(false)
-      end
+      #   # This is a validation test, but it's here just because it feels right
+      #   transform = build(:copy_from_transform, s3_file_path: nil, s3_file_name: nil, specify_s3_file_by: 'url')
+      #   transform.supplied_s3_url = "https://s3-us-west-2.amazonaws.com/some-bucket"
+      #   expect(transform.valid?).to eq(false)
+      # end
 
-      it "should clear s3 attributes for Transform Runners that don't use S3" do
-        transform = build(:transform, s3_file_path: 'blah', s3_file_name: 'dude')
+      it "should clear s3 attribute for Transform Runners that don't use S3" do
+        transform = build(:transform, s3_file_name: 'dude')
         expect(transform).to be_valid
-        expect(transform.s3_file_path).to eq(nil)
         expect(transform.s3_file_name).to eq(nil)
-        expect(transform.supplied_s3_url).to eq(nil)
-
-        transform = build(:transform, supplied_s3_url: "https://s3-us-west-2.amazonaws.com/some-bucket/shoobie.tsv")
-        expect(transform).to be_valid
-        expect(transform.s3_file_path).to eq(nil)
-        expect(transform.s3_file_name).to eq(nil)
-        expect(transform.supplied_s3_url).to eq(nil)
       end
 
       it "should generate the default TSV SQL if no #sql is present and the runner is 'CopyFrom' and the import file is a TSV" do
-        transform = build(:copy_from_transform, sql: nil, specify_s3_file_by: 'url')
-        transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}.amazonaws.com/#{transform.workflow.s3_bucket_name}/shoobie.tsv"
-
+        transform = build(:copy_from_transform, sql: nil, s3_file_name: 'shoobie.tsv')
         expect(transform.valid?).to eq(true)
         expect(transform.sql).to eq(Transform::DEFAULT_TSV_SQL)
       end
 
       it "should generate the default CSV SQL if no #sql is present and the runner is 'CopyFrom' and the import file is a CSV" do
-        transform = build(:copy_from_transform, sql: nil, specify_s3_file_by: 'url')
-        transform.supplied_s3_url = "https://s3-#{transform.workflow.s3_region_name}.amazonaws.com/#{transform.workflow.s3_bucket_name}/shoobie.csv"
-
+        transform = build(:copy_from_transform, sql: nil, s3_file_name: 'shoobie.csv')
         expect(transform.valid?).to eq(true)
         expect(transform.sql).to eq(Transform::DEFAULT_CSV_SQL)
       end

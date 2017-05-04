@@ -42,7 +42,6 @@ FactoryGirl.define do
   factory :copy_from_transform, parent: :transform do
     runner 'CopyFrom'
     sequence(:sql)  { |n| "COPY foo (bar, dude) FROM STDIN" }
-    s3_file_path "ca_some_sis/subdirectory"
     s3_file_name "some_silly_file.tsv"
   end
 
