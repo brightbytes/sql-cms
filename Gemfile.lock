@@ -1,8 +1,8 @@
 GIT
   remote: git://github.com/activeadmin/activeadmin.git
-  revision: d4473e90787426833c8d261e8e9c864dd504e3ca
+  revision: adcc7e379d1a3f2fab478f0b5c4d11af1bf488ea
   specs:
-    activeadmin (1.0.0.pre5)
+    activeadmin (1.0.0)
       arbre (>= 1.1.1)
       bourbon
       coffee-rails
@@ -12,19 +12,19 @@ GIT
       jquery-rails
       jquery-ui-rails
       kaminari (>= 0.15, < 2.0)
-      railties (>= 4.2, < 5.1)
+      railties (>= 4.2, < 5.2)
       ransack (~> 1.3)
       sass-rails
       sprockets (< 4.1)
 
 GIT
   remote: git://github.com/activeadmin/inherited_resources.git
-  revision: 0839b077a791013e741ea12cb793b6809a007317
+  revision: 2c6c8caeeb2fe6d3ae8aabc138bf7ea08e781b9b
   specs:
-    inherited_resources (1.7.1)
-      actionpack (>= 3.2, < 5.1)
+    inherited_resources (1.7.2)
+      actionpack (>= 3.2, < 5.2.x)
       has_scope (~> 0.6)
-      railties (>= 3.2, < 5.1)
+      railties (>= 3.2, < 5.2.x)
       responders
 
 GIT
@@ -36,47 +36,59 @@ GIT
       activerecord (>= 3.2, < 6.0)
       rake (>= 10.4)
 
+GIT
+  remote: https://github.com/gogovan/devise.git
+  revision: 931ae3985872ea1f0039cd3a749779c0023a622a
+  branch: rails-5.1
+  specs:
+    devise (4.2.0)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 4.1.0, < 5.2)
+      responders
+      warden (~> 1.2.3)
+
 GEM
   remote: https://rubygems.org/
   specs:
-    actioncable (5.0.2)
-      actionpack (= 5.0.2)
-      nio4r (>= 1.2, < 3.0)
+    actioncable (5.1.0)
+      actionpack (= 5.1.0)
+      nio4r (~> 2.0)
       websocket-driver (~> 0.6.1)
-    actionmailer (5.0.2)
-      actionpack (= 5.0.2)
-      actionview (= 5.0.2)
-      activejob (= 5.0.2)
+    actionmailer (5.1.0)
+      actionpack (= 5.1.0)
+      actionview (= 5.1.0)
+      activejob (= 5.1.0)
       mail (~> 2.5, >= 2.5.4)
       rails-dom-testing (~> 2.0)
-    actionpack (5.0.2)
-      actionview (= 5.0.2)
-      activesupport (= 5.0.2)
+    actionpack (5.1.0)
+      actionview (= 5.1.0)
+      activesupport (= 5.1.0)
       rack (~> 2.0)
       rack-test (~> 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    actionview (5.0.2)
-      activesupport (= 5.0.2)
+    actionview (5.1.0)
+      activesupport (= 5.1.0)
       builder (~> 3.1)
-      erubis (~> 2.7.0)
+      erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    active_model_serializers (0.10.5)
+    active_model_serializers (0.10.6)
       actionpack (>= 4.1, < 6)
       activemodel (>= 4.1, < 6)
       case_transform (>= 0.2)
       jsonapi-renderer (>= 0.1.1.beta1, < 0.2)
-    activejob (5.0.2)
-      activesupport (= 5.0.2)
+    activejob (5.1.0)
+      activesupport (= 5.1.0)
       globalid (>= 0.3.6)
-    activemodel (5.0.2)
-      activesupport (= 5.0.2)
-    activerecord (5.0.2)
-      activemodel (= 5.0.2)
-      activesupport (= 5.0.2)
-      arel (~> 7.0)
-    activesupport (5.0.2)
+    activemodel (5.1.0)
+      activesupport (= 5.1.0)
+    activerecord (5.1.0)
+      activemodel (= 5.1.0)
+      activesupport (= 5.1.0)
+      arel (~> 8.0)
+    activesupport (5.1.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (~> 0.7)
       minitest (~> 5.1)
@@ -84,22 +96,19 @@ GEM
     acts_as_fu (0.0.9)
       activerecord
       sqlite3
-    acts_as_paranoid (0.5.0)
-      activerecord (>= 4.0, < 5.1)
-      activesupport (>= 4.0, < 5.1)
     apartment (1.2.0)
       activerecord (>= 3.1.2, < 6.0)
       rack (>= 1.3.6)
     arbre (1.1.1)
       activesupport (>= 3.0.0)
-    arel (7.1.4)
-    aws-sdk (2.9.7)
-      aws-sdk-resources (= 2.9.7)
-    aws-sdk-core (2.9.7)
+    arel (8.0.0)
+    aws-sdk (2.9.14)
+      aws-sdk-resources (= 2.9.14)
+    aws-sdk-core (2.9.14)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.9.7)
-      aws-sdk-core (= 2.9.7)
+    aws-sdk-resources (2.9.14)
+      aws-sdk-core (= 2.9.14)
     aws-sigv4 (1.0.0)
     bcrypt (3.1.11)
     bindex (0.5.0)
@@ -122,21 +131,14 @@ GEM
     concurrent-ruby (1.0.5)
     connection_pool (2.2.1)
     daemons (1.2.4)
-    database_cleaner (1.5.3)
-    devise (4.2.1)
-      bcrypt (~> 3.0)
-      orm_adapter (~> 0.1)
-      railties (>= 4.1.0, < 5.1)
-      responders
-      warden (~> 1.2.3)
-    devise-async (0.7.0)
-      devise (>= 2.2)
+    database_cleaner (1.6.0)
     diff-lcs (1.3)
     docile (1.1.5)
-    dotenv (2.2.0)
-    dotenv-rails (2.2.0)
-      dotenv (= 2.2.0)
-      railties (>= 3.2, < 5.1)
+    dotenv (2.2.1)
+    dotenv-rails (2.2.1)
+      dotenv (= 2.2.1)
+      railties (>= 3.2, < 5.2)
+    erubi (1.6.0)
     erubis (2.7.0)
     eventmachine (1.2.3)
     execjs (2.7.0)
@@ -155,9 +157,9 @@ GEM
     formtastic_i18n (0.6.0)
     globalid (0.4.0)
       activesupport (>= 4.2.0)
-    has_scope (0.7.0)
-      actionpack (>= 4.1, < 5.1)
-      activesupport (>= 4.1, < 5.1)
+    has_scope (0.7.1)
+      actionpack (>= 4.1, < 5.2)
+      activesupport (>= 4.1, < 5.2)
     highline (1.7.8)
     i18n (0.8.1)
     immigrant (0.3.6)
@@ -172,7 +174,7 @@ GEM
       thor (>= 0.14, < 2.0)
     jquery-ui-rails (6.0.1)
       railties (>= 3.2.16)
-    json (2.0.4)
+    json (2.1.0)
     jsonapi-renderer (0.1.2)
     kaminari (1.0.1)
       activesupport (>= 4.1.0)
@@ -192,7 +194,7 @@ GEM
       rb-inotify (~> 0.9, >= 0.9.7)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
-    mail (2.6.4)
+    mail (2.6.5)
       mime-types (>= 1.16, < 4)
     method_source (0.8.2)
     mime-types (3.1)
@@ -206,9 +208,11 @@ GEM
     nokogiri (1.7.1)
       mini_portile2 (~> 2.1.0)
     orm_adapter (0.5.0)
-    paper_trail (7.0.1)
+    paper_trail (7.0.2)
       activerecord (>= 4.0, < 5.2)
       request_store (~> 1.1)
+    paranoia (2.3.1)
+      activerecord (>= 4.0, < 5.2)
     pg (0.20.0)
     polyamorous (1.3.1)
       activerecord (>= 3.0)
@@ -229,17 +233,17 @@ GEM
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
-    rails (5.0.2)
-      actioncable (= 5.0.2)
-      actionmailer (= 5.0.2)
-      actionpack (= 5.0.2)
-      actionview (= 5.0.2)
-      activejob (= 5.0.2)
-      activemodel (= 5.0.2)
-      activerecord (= 5.0.2)
-      activesupport (= 5.0.2)
+    rails (5.1.0)
+      actioncable (= 5.1.0)
+      actionmailer (= 5.1.0)
+      actionpack (= 5.1.0)
+      actionview (= 5.1.0)
+      activejob (= 5.1.0)
+      activemodel (= 5.1.0)
+      activerecord (= 5.1.0)
+      activesupport (= 5.1.0)
       bundler (>= 1.3.0, < 2.0)
-      railties (= 5.0.2)
+      railties (= 5.1.0)
       sprockets-rails (>= 2.0.0)
     rails-dom-testing (2.0.2)
       activesupport (>= 4.2.0, < 6.0)
@@ -251,9 +255,9 @@ GEM
       rails_stdout_logging
     rails_serve_static_assets (0.0.5)
     rails_stdout_logging (0.0.5)
-    railties (5.0.2)
-      actionpack (= 5.0.2)
-      activesupport (= 5.0.2)
+    railties (5.1.0)
+      actionpack (= 5.1.0)
+      activesupport (= 5.1.0)
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
@@ -270,8 +274,9 @@ GEM
       ffi (>= 0.5.0)
     redis (3.3.3)
     request_store (1.3.2)
-    responders (2.3.0)
-      railties (>= 4.2.0, < 5.1)
+    responders (2.4.0)
+      actionpack (>= 4.2.0, < 5.3)
+      railties (>= 4.2.0, < 5.3)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
       rspec-expectations (~> 3.5.0)
@@ -306,11 +311,11 @@ GEM
     shoulda-context (1.2.2)
     shoulda-matchers (2.8.0)
       activesupport (>= 3.0.0)
-    sidekiq (4.2.10)
+    sidekiq (5.0.0)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
       rack-protection (>= 1.5.0)
-      redis (~> 3.2, >= 3.2.1)
+      redis (~> 3.3, >= 3.3.3)
     simplecov (0.14.1)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
@@ -340,7 +345,7 @@ GEM
     timecop (0.8.1)
     turbolinks (5.0.1)
       turbolinks-source (~> 5)
-    turbolinks-source (5.0.0)
+    turbolinks-source (5.0.3)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)
     uglifier (3.2.0)
@@ -366,7 +371,6 @@ DEPENDENCIES
   active_model_serializers (~> 0.10.0)
   activeadmin!
   acts_as_fu
-  acts_as_paranoid
   annotate!
   apartment
   aws-sdk
@@ -375,9 +379,9 @@ DEPENDENCIES
   coffee-rails (~> 4.2)
   connection_pool
   database_cleaner
-  devise
-  devise-async
+  devise!
   dotenv-rails
+  erubis
   factory_girl_rails
   fast_blank
   ffaker
@@ -390,11 +394,12 @@ DEPENDENCIES
   listen (~> 3.0.5)
   newrelic_rpm
   paper_trail
+  paranoia
   pg
   postgres-copy
   postgresql_cursor
   pry-rails
-  rails (~> 5.0.1)
+  rails
   rails_12factor
   rspec
   rspec-mocks

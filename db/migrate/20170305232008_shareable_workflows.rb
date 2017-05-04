@@ -1,4 +1,4 @@
-class ShareableWorkflows < ActiveRecord::Migration
+class ShareableWorkflows < ActiveRecord::Migration[4.2]
 
   def up
     change_column_null :workflows, :customer_id, true

@@ -1,4 +1,4 @@
-class MoveS3RegionAndBucketToWorkflow < ActiveRecord::Migration
+class MoveS3RegionAndBucketToWorkflow < ActiveRecord::Migration[4.2]
   def up
     add_column :workflows, :s3_region_name, :string
     add_column :workflows, :s3_bucket_name, :string

@@ -1,4 +1,4 @@
-class CreateWorkflowDataQualityReports < ActiveRecord::Migration
+class CreateWorkflowDataQualityReports < ActiveRecord::Migration[4.2]
 
   def up
     # LOL - just realized this was missing; whoops

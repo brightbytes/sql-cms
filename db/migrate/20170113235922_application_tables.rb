@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class ApplicationTables < ActiveRecord::Migration
+class ApplicationTables < ActiveRecord::Migration[4.2]
 
   def change
 

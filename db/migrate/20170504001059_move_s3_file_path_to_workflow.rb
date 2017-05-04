@@ -1,4 +1,4 @@
-class MoveS3FilePathToWorkflow < ActiveRecord::Migration
+class MoveS3FilePathToWorkflow < ActiveRecord::Migration[4.2]
   def up
     add_column :workflows, :s3_file_path, :string
 

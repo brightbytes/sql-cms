@@ -9,7 +9,7 @@ gem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'
 # Or maybe not, since Rails isn't threadsafe ...
 gem "unicorn" # app server
 
-gem 'rails', '~> 5.0.1'
+gem 'rails'
 # gem 'acts_as_list'
 
 # bundle exec rake doc:rails generates the API under doc/api.
@@ -20,7 +20,9 @@ gem "pg" # Postgres
 gem 'immigrant' # FK constraints
 gem 'postgres-copy' # bulk import
 gem 'postgresql_cursor' # postgres cursors!!
-gem 'acts_as_paranoid' # logical delete
+# Commented out because it doesn't work with Rails 5.1
+# gem 'acts_as_paranoid' # logical delete
+gem 'paranoia' # logical delete
 gem 'apartment' # multi-tenancy (i.e. Postgres Schemas)
 
 gem 'active_model_serializers', '~> 0.10.0'
@@ -86,8 +88,10 @@ group :staging, :qa, :production do
 end
 
 # Authentication
-gem 'devise'
-gem 'devise-async'
+gem 'devise', git: 'https://github.com/gogovan/devise.git', branch: 'rails-5.1' # This and the following line are to support rails 5.1
+gem 'erubis'
+# This is removed because ^^ doesn't support it
+# gem 'devise-async'
 
 # Authorization
 gem "cancan"

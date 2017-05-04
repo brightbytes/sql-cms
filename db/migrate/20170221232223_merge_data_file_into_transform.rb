@@ -1,4 +1,4 @@
-class MergeDataFileIntoTransform < ActiveRecord::Migration
+class MergeDataFileIntoTransform < ActiveRecord::Migration[4.2]
   def up
     # Nuke these b/c only the Demo Workflow exists at this time, and it's easier to just re-seed
     WorkflowSeeder.demo_workflow.destroy! if WorkflowSeeder.demo_workflow_exists?
