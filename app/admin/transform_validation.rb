@@ -11,8 +11,8 @@ ActiveAdmin.register TransformValidation do
       row :id
       row :transform
       row :validation
-      row(:params) { code(pretty_print_as_json(resource.params)) }
       row :interpolated_name
+      row(:params) { code(pretty_print_as_json(resource.params)) }
       simple_format_row(:sql)
       simple_format_row(:interpolated_sql) if resource.params.present?
       row(:validation_immutable) { yes_no(resource.validation.immutable) }

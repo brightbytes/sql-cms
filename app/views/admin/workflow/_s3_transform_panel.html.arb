@@ -9,10 +9,10 @@ panel panel_name do
       column(:name, sortable: :name) { |transform| auto_link(transform) }
       column(:runner, sortable: :runner) { |transform| transform.runner }
       if show_s3_fields
-        column(:s3_region_name)
-        column(:s3_bucket_name)
-        column(:s3_file_path)
-        column(:s3_file_name)
+        column(:s3_region_name) { |transform| transform.s3_region_name if transform.s3_file_required? }
+        column(:s3_bucket_name) { |transform| transform.s3_bucket_name if transform.s3_file_required? }
+        column(:s3_file_path) { |transform| transform.s3_file_path if transform.s3_file_required? }
+        column(:s3_file_name) { |transform| transform.s3_file_name if transform.s3_file_required? }
         # Slows down Workflow#show page.  Damnit.
         # column(:s3_file_exists?) do |transform|
         #   if transform.importing?

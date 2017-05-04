@@ -138,6 +138,11 @@ class Transform < ApplicationRecord
 
   delegate :s3_region_name, :s3_bucket_name, :s3_file_path, to: :workflow
 
+  def to_s
+    interpolated_name
+  end
+  alias_method :display_name, :to_s
+
   def importing?
     runner.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
   end

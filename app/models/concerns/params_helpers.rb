@@ -45,6 +45,11 @@ module Concerns::ParamsHelpers
     self.class.interpolate(sql: sql, params: params)
   end
 
+  def to_s
+    interpolated_name
+  end
+  alias_method :display_name, :to_s
+
   module ClassMethods
     def interpolate(sql:, params: nil)
       if params.present?

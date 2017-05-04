@@ -14,7 +14,7 @@ ActiveAdmin.register Transform do
   config.sort_order = 'workflows.slug_asc,name_asc'
 
   index(download_links: false) do
-    column(:name) { |transform| auto_link(transform) }
+    column(:interpolated_name) { |transform| auto_link(transform) }
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
     column(:runner)
@@ -24,6 +24,7 @@ ActiveAdmin.register Transform do
     attributes_table do
       row :id
       row :name
+      row :interpolated_name
       row :workflow
       row :customer
 
@@ -57,7 +58,7 @@ ActiveAdmin.register Transform do
       transform_validations = resource.transform_validations.includes(:validation).order('validations.name').to_a
       unless transform_validations.empty?
         table_for(transform_validations) do
-          column(:transform_validation) { |tv| link_to(tv.interpolated_name, tv) }
+          column(:transform_validation) { |tv| auto_link(tv) }
           column(:interpolated_sql) { |tv| tv.interpolated_sql.truncate(120) }
           column('Immutable?') { |tv| yes_no(tv.validation.immutable?) }
           column(:action) do |tv|
@@ -74,7 +75,7 @@ ActiveAdmin.register Transform do
       # FIXME - If ever we can get dependencies created with the Transform, this should add params here
       text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.workflow_id))
 
-      prereqs = resource.prerequisite_dependencies.includes(:prerequisite_transform).order('transforms.name').to_a
+      prereqs = resource.prerequisite_dependencies.includes(:prerequisite_transform).to_a.sort_by { |td| td.prerequisite_transform.interpolated_name }
       unless prereqs.empty?
         table_for(prereqs) do
           column(:name) { |pd| auto_link(pd.prerequisite_transform) }
@@ -89,7 +90,7 @@ ActiveAdmin.register Transform do
       # FIXME - If ever we can get dependencies created with the Transform, this should add params here
       text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.workflow_id))
 
-      postreqs = resource.postrequisite_dependencies.includes(:postrequisite_transform).order('transforms.name').to_a
+      postreqs = resource.postrequisite_dependencies.includes(:postrequisite_transform).to_a.sort_by { |td| td.postrequisite_transform.interpolated_name }
       unless postreqs.empty?
         table_for(postreqs) do
           column(:name) { |pd| auto_link(pd.postrequisite_transform) }

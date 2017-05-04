@@ -75,16 +75,16 @@ ActiveAdmin.register Workflow do
     end
 
     render partial: 'admin/workflow/s3_transform_panel',
-           locals: { panel_name: 'Independent Transforms', transforms: resource.transforms.independent.order(:name).to_a }
+           locals: { panel_name: 'Independent Transforms', transforms: resource.transforms.independent.to_a.sort_by(&:interpolated_name) }
 
     render partial: 'admin/workflow/s3_transform_panel',
-           locals: { panel_name: 'Dependent, Data-Importing Transforms', transforms: resource.transforms.dependent.importing.order(:name).to_a }
+           locals: { panel_name: 'Dependent, Data-Importing Transforms', transforms: resource.transforms.dependent.importing.to_a.sort_by(&:interpolated_name) }
 
     panel 'Dependent, non-Importing/Exporting Transforms' do
 
       text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, source: :workflow))
 
-      transforms = resource.transforms.dependent.non_file_related.order(:name).to_a
+      transforms = resource.transforms.dependent.non_file_related.to_a.sort_by(&:interpolated_name)
       unless transforms.empty?
         table_for(transforms) do
           column(:name, sortable: :name) { |transform| auto_link(transform) }
@@ -101,7 +101,7 @@ ActiveAdmin.register Workflow do
     end
 
     render partial: 'admin/workflow/s3_transform_panel',
-           locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.order(:name).to_a }
+           locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.to_a.sort_by(&:interpolated_name) }
 
     panel 'Data Quality Reports' do
 
@@ -110,7 +110,7 @@ ActiveAdmin.register Workflow do
       reports = resource.workflow_data_quality_reports.includes(:data_quality_report).to_a.sort_by(&:interpolated_name).to_a
       unless reports.empty?
         table_for(reports) do
-          column(:workflow_data_quality_report) { |wdqr| link_to(wdqr.interpolated_name, wdqr) }
+          column(:workflow_data_quality_report) { |wdqr| auto_link(wdqr) }
           column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(120) }
           column('Immutable?') { |wdqr| yes_no(wdqr.data_quality_report.immutable?) }
           column(:action) do |wdqr|
