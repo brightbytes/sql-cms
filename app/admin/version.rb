@@ -22,6 +22,7 @@ ActiveAdmin.register PaperTrail::Version do
           "Script or Job"
         end
       end
+      row('Changed Attributes', &:changed_attributes)
       row(:changeset) { |v| code(pretty_print_as_json(v.changeset)) }
     end
   end

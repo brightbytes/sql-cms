@@ -17,7 +17,7 @@ panel "History" do
           "Script or Job"
         end
       end
-      column('Changed Attributes') { |version| (version.changeset.keys - ['updated_at']).join(', ') }
+      column('Changed Attributes', &:changed_attributes)
     end
   end
 end

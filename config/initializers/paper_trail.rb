@@ -24,6 +24,12 @@ class PaperTrail::Version < ActiveRecord::Base
     uid = whodunnit.try(:to_i)
     self.user_id = uid unless uid == 0
   end
+
+  # Instance Methods
+
+  def changed_attributes
+    (changeset.keys - ['updated_at']).join(', ')
+  end
 end
 
 module PaperTrail::CleanupHook
