@@ -34,7 +34,7 @@ shared_examples 'yaml helper methods' do
     expect(subject.interpolated_sql).to eq("SELECT bar FROM dude")
     expect(subject.interpolated_name).to eq("Silly bar, dude, dude")
 
-    expect(subject.class.interpolate(sql: sql, params: subject.params)).to eq("SELECT bar FROM dude")
+    expect(subject.class.interpolate(string: sql, params: subject.params)).to eq("SELECT bar FROM dude")
 
     # Transforms are the only subject where params can be empty
     if subject.is_a?(Transform)

@@ -30,19 +30,11 @@ module Concerns::ParamsHelpers
   end
 
   def interpolated_name
-    if params.present?
-      name.dup.tap do |name|
-        params.each_pair do |k, v|
-          name.gsub!(":#{k}", v.to_s)
-        end
-      end
-    else
-      name
-    end
+    self.class.interpolate(string: name, params: params)
   end
 
   def interpolated_sql
-    self.class.interpolate(sql: sql, params: params)
+    self.class.interpolate(string: sql, params: params)
   end
 
   def to_s
@@ -51,15 +43,16 @@ module Concerns::ParamsHelpers
   alias_method :display_name, :to_s
 
   module ClassMethods
-    def interpolate(sql:, params: nil)
-      if params.present?
-        sql.dup.tap do |sql|
+    def interpolate(string:, params: nil)
+      if params.present? && string.present?
+        string.dup.tap do |string|
           params.each_pair do |k, v|
-            sql.gsub!(":#{k}", v.to_s)
+            string.gsub!(":#{k}", v.to_s)
           end
+          # FIXME - MAYBE ISSUE A WARNING HERE IF string CONTAINS AN UNINTERPOLATED PARAM
         end
       else
-        sql
+        string
       end
     end
   end

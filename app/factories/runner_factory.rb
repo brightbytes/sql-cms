@@ -101,7 +101,7 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
+      sql = Transform.interpolate(string: plan_h[:sql], params: plan_h[:params])
 
       s3_file = S3File.create(
         'import',
@@ -124,7 +124,7 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
+      sql = Transform.interpolate(string: plan_h[:sql], params: plan_h[:params])
       run.execute_in_schema(sql)
     end
   end
@@ -135,7 +135,7 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
+      sql = Transform.interpolate(string: plan_h[:sql], params: plan_h[:params])
 
       s3_file = S3File.create(
         'export',
@@ -172,7 +172,7 @@ module RunnerFactory
     extend self
 
     def run(run:, transform_validation_h:)
-      transform_validation_sql = TransformValidation.interpolate(sql: transform_validation_h[:sql], params: transform_validation_h[:params])
+      transform_validation_sql = TransformValidation.interpolate(string: transform_validation_h[:sql], params: transform_validation_h[:params])
       if ids = run.select_values_in_schema(transform_validation_sql).presence
         {
           failed_validation_name: transform_validation_h[:name],
@@ -189,7 +189,7 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      sql = Transform.interpolate(sql: plan_h[:sql], params: plan_h[:params])
+      sql = Transform.interpolate(string: plan_h[:sql], params: plan_h[:params])
       run.select_all_in_schema(sql)&.to_hash
     end
   end
