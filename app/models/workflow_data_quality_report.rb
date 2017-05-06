@@ -40,10 +40,4 @@ class WorkflowDataQualityReport < ApplicationRecord
 
   delegate :name, :sql, to: :data_quality_report
 
-  def to_s
-    interpolated_name
-  end
-
-  alias_method :display_name, :to_s
-
 end
