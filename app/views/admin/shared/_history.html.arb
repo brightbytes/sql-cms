@@ -4,8 +4,7 @@ panel "History" do
   unless versions.empty?
     table_for(versions) do
       column("#") { |v| "#{versions.index(v) + 1}." }
-      column(:event) { |v| v.event.titleize }
-      column(:changeset) { |v| code(pretty_print_as_json(v.changeset)) }
+      column(:event) { |v| link_to(v.event.titleize, paper_trail_version_path(v)) }
       column("Modified at") { |v| v.created_at.localtime.to_s }
       column("Modified by") do |v|
         if v.user_id
@@ -18,7 +17,7 @@ panel "History" do
           "Script or Job"
         end
       end
-      column("Version ID", &:id)
+      column('Changed Attributes') { |version| (version.changeset.keys - ['updated_at']).join(', ') }
     end
   end
 end
