@@ -92,7 +92,7 @@ ActiveAdmin.register User, sort_order: "id_asc" do
   end
 
   member_action :undelete, method: :put do
-    resource.recover
+    resource.restore
     flash[:notice] = "User Restored!"
     redirect_to user_path(resource)
   end

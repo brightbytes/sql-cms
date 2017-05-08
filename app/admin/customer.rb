@@ -79,7 +79,7 @@ ActiveAdmin.register Customer do
   end
 
   member_action :undelete, method: :put do
-    resource.recover
+    resource.restore
     flash[:notice] = "Customer Restored!"
     redirect_to customer_path(resource)
   end
