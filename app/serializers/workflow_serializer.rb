@@ -17,6 +17,7 @@
 #
 #  index_workflows_on_customer_id     (customer_id)
 #  index_workflows_on_lowercase_name  (lower((name)::text)) UNIQUE
+#  index_workflows_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 # Foreign Keys
 #

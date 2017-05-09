@@ -2168,7 +2168,7 @@ CREATE UNIQUE INDEX index_workflows_on_lowercase_name ON workflows USING btree (
 -- Name: index_workflows_on_lowercase_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_workflows_on_lowercase_slug ON customers USING btree (lower((slug)::text));
+CREATE UNIQUE INDEX index_workflows_on_lowercase_slug ON workflows USING btree (lower((slug)::text));
 
 
 --
@@ -2345,6 +2345,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170305232008'),
 ('20170403215347'),
 ('20170502012231'),
-('20170504001059');
+('20170504001059'),
+('20170509204400');
 
 

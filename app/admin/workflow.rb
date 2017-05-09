@@ -183,9 +183,7 @@ ActiveAdmin.register Workflow do
       input :s3_bucket_name, as: :string
       input :s3_file_path, as: :string
 
-      # Same comment here as for TransformController's form: this doesn't work on #create b/c a Workflow is at either end of the join. Whereas, when the objects
-      #  on either side of the join table are different, this works beautifully. IOW, Rails BUG
-      if f.object.persisted? && Workflow.shared.exists?
+      if Workflow.shared.exists?
         included_workflows_display_h = (f.object.shared? ? { style: 'display:none' } : {})
         input :included_workflows, as: :check_boxes, collection: Workflow.shared, wrapper_html: included_workflows_display_h
       end
@@ -207,6 +205,22 @@ ActiveAdmin.register Workflow do
 
     def scoped_collection
       super.includes(:customer)
+    end
+
+    def create
+      # This hackaround is because Rails tries to save the join obj before the main obj has been saved (I think)
+      # HOWEVER, the "has_many :through accepts_nested_attributes_for" thing works GREAT on Workflow#create for Workflow#notified_users ...
+      #          and I can't suss what's different here. (The associations and inverse_ofs are identically structured.)
+      #          My only guess is that the issue is b/c a Workflow is at either end of the join.
+      ids = params[:workflow].delete(:included_workflow_ids)&.reject(&:blank?)
+      super do |success, failure|
+        success.html do
+          # A shared workflow cannot depend upon another shared workflow b/c I haven't implemented the full topo sort capability for Workflows yet.
+          resource.included_workflow_ids = (resource.shared? ? [] : ids)
+          resource.save!
+          redirect_to workflow_path(resource)
+        end
+      end
     end
 
     def destroy

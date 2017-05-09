@@ -117,6 +117,7 @@ ActiveAdmin.register Transform do
       # semantic_errors *f.object.errors.keys
 
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
+      # We make this unchangeable because it's unclear what to do with dependencies if the User changes Workflow for the Transform on the fly.
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
 
       input :name, as: :string
@@ -130,14 +131,10 @@ ActiveAdmin.register Transform do
 
       file_display_h = ((f.object.s3_file_required? || f.object.s3_file_name.present?) ? {} : { style: 'display:none' })
       input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on the next page."
-
     end
 
-    # We comment out the ability to .save on #create because Rails tries to save the join obj before the main obj has been saved (I think)
-    # HOWEVER, the "has_many :through accepts_nested_attributes_for" thing works GREAT on Workflow#create for Workflow#notified_users ...
-    #          and I can't suss what's different here. (The associations and inverse_ofs are identically structured, and removing the :collection above
-    #          doesn't fix the problem.  Nor did a half dozen other tweaks I made.  My only guess is that the issue is b/c a Transform is at either end of the join.)
-    if f.object.persisted? # || workflow_id_param_val
+    # We need the workflow id and we need to know that it won't change before we can present the list of allowed dependencies within the current workflow.
+    if f.object.persisted? || workflow_id_param_val
       inputs 'Dependencies' do
         input :prerequisite_transforms, as: :check_boxes, collection: f.object.available_prerequisite_transforms
       end
@@ -167,12 +164,20 @@ ActiveAdmin.register Transform do
       @transform = Transform.new(workflow_id: params[:workflow_id].presence.try(:to_i))
     end
 
-    # For debuging ... sigh
-    # def create
-    #   params[:transform][:prerequisite_transform_ids].reject!(&:blank?)
-    #   super
-    #   dpp @transform.id, @transform.prerequisite_dependencies.each { |td| td.errors.full_messages }
-    # end
+    def create
+      # This hackaround is because Rails tries to save the join obj before the main obj has been saved (I think)
+      # HOWEVER, the "has_many :through accepts_nested_attributes_for" thing works GREAT on Workflow#create for Workflow#notified_users ...
+      #          and I can't suss what's different here. (The associations and inverse_ofs are identically structured.)
+      #          My only guess is that the issue is b/c a Transform is at either end of the join.
+      ids = params[:transform].delete(:prerequisite_transform_ids)&.reject(&:blank?)
+      super do |success, failure|
+        success.html do
+          resource.prerequisite_transform_ids = ids
+          resource.save!
+          redirect_to transform_path(resource)
+        end
+      end
+    end
 
     def update
       super do |success, failure|
