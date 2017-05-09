@@ -88,8 +88,7 @@ group :staging, :qa, :production do
 end
 
 # Authentication
-gem 'devise', git: 'https://github.com/gogovan/devise.git', branch: 'rails-5.1' # This and the following line are to support rails 5.1
-gem 'erubis'
+gem 'devise', git: 'https://github.com/plataformatec/devise.git', branch: 'master'
 gem 'devise-async'
 
 # Authorization
