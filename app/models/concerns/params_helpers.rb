@@ -47,9 +47,13 @@ module Concerns::ParamsHelpers
       if params.present? && string.present?
         string.dup.tap do |string|
           params.each_pair do |k, v|
-            string.gsub!(":#{k}", v.to_s)
+            # HMMMMM - This prevents matching of a key that is a subset of another key (:some_key would match :some_key_here),
+            #           and it also prevents matching a colon in the middle of a string (unlikely case, to be sure),
+            #           BUT, it may also prevent matching within a string when it's desired.  It's just that I can't think of when
+            #           I would desire that, so screw it.
+            string.gsub!(/(?<![a-zA-Z0-9_]):#{k}(?![a-zA-Z0-9_])/, v.to_s)
           end
-          # FIXME - MAYBE ISSUE A WARNING HERE IF string CONTAINS AN UNINTERPOLATED PARAM
+          # FIXME - MAYBE ISSUE A WARNING HERE IF string CONTAINS AN UNINTERPOLATED PARAM. OR, HANDLE IN THE UI
         end
       else
         string

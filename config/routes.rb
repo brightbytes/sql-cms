@@ -90,6 +90,8 @@ end
 #                                            PATCH      /validations/:id(.:format)                            validations#update
 #                                            PUT        /validations/:id(.:format)                            validations#update
 #                                            DELETE     /validations/:id(.:format)                            validations#destroy
+#          batch_action_paper_trail_versions POST       /paper_trail_versions/batch_action(.:format)          paper_trail_versions#batch_action
+#                        paper_trail_version GET        /paper_trail_versions/:id(.:format)                   paper_trail_versions#show
 #                               run_workflow PUT        /workflows/:id/run(.:format)                          workflows#run
 #                     batch_action_workflows POST       /workflows/batch_action(.:format)                     workflows#batch_action
 #                                  workflows GET        /workflows(.:format)                                  workflows#index
@@ -114,4 +116,4 @@ end
 #                                            DELETE     /comments/:id(.:format)                               comments#destroy
 #                                sidekiq_web            /sidekiq                                              Sidekiq::Web
 #                                            GET        /                                                     admin/dashboard#index
-# 
+#

@@ -44,7 +44,7 @@ group :development, :test do
   gem 'foreman' # another appserver
 
   # This newer, unreleased version fixes model annotations of funky indexes, and (unlike an earlier ref) doesn't break route annotation.
-  gem 'annotate', github: 'ctran/annotate_models', ref: "8341983f263e662c5e528b04d0eeec908daec1ad"
+  gem 'annotate', github: 'ctran/annotate_models', ref: "f2a4b2ad6f461497e46fbf507bd7216f457e9ca6"
 
   gem 'pry-rails'
 
@@ -90,8 +90,7 @@ end
 # Authentication
 gem 'devise', git: 'https://github.com/gogovan/devise.git', branch: 'rails-5.1' # This and the following line are to support rails 5.1
 gem 'erubis'
-# This is removed because ^^ doesn't support it
-# gem 'devise-async'
+gem 'devise-async'
 
 # Authorization
 gem "cancan"
