@@ -2,26 +2,16 @@
 #
 # Table name: public.workflows
 #
-#  id             :integer          not null, primary key
-#  name           :string           not null
-#  slug           :string           not null
-#  customer_id    :integer
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  shared         :boolean          default(FALSE), not null
-#  s3_region_name :string           not null
-#  s3_bucket_name :string           not null
-#  s3_file_path   :string
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  slug       :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 # Indexes
 #
-#  index_workflows_on_customer_id     (customer_id)
 #  index_workflows_on_lowercase_name  (lower((name)::text)) UNIQUE
 #  index_workflows_on_lowercase_slug  (lower((slug)::text)) UNIQUE
-#
-# Foreign Keys
-#
-#  fk_rails_...  (customer_id => customers.id)
 #
 
 describe Workflow do
@@ -31,22 +21,8 @@ describe Workflow do
   end
 
   describe 'validations' do
-    [:name, :slug, :s3_region_name, :s3_bucket_name].each do |att|
+    [:name, :slug].each do |att|
       it { should validate_presence_of(att) }
-    end
-
-    it "should validate the presence of the customer when the workflow isn't shared" do
-      workflow = build(:workflow, customer: nil, shared: false)
-      expect(workflow).to_not be_valid
-      workflow.customer = create(:customer)
-      expect(workflow).to be_valid
-    end
-
-    it "should validate the absence of the customer when the workflow is shared" do
-      workflow = build(:workflow, customer: create(:customer), shared: true)
-      expect(workflow).to_not be_valid
-      workflow.customer = nil
-      expect(workflow).to be_valid
     end
 
     context 'with a workflow already extant' do
@@ -58,27 +34,21 @@ describe Workflow do
   end
 
   describe "callbacks" do
-    it "should be immutable against destroy when flagged as such" do
-      workflow = create(:workflow)
-      expect(workflow.immutable?).to eq(false)
-      expect(workflow.read_only?).to eq(false)
-      workflow.update_attribute(:immutable, true)
-      expect { workflow.destroy }.to raise_error("You may not destroy an immutable Workflow")
-      expect { workflow.delete }.to raise_error("You may not bypass callbacks to delete a Class.")
-    end
-
-    it "should prevent bulk-deletes" do
-      expect { Workflow.delete_all }.to raise_error("You may not bypass callbacks to delete all the Workflow that exist, since some may be inviolate.")
+    it "should raise an error if an attempt is made to destroy a workflow that is included by another workflow" do
+      dependency = create(:workflow_dependency)
+      expect { dependency.included_workflow.destroy }.to raise_error(RuntimeError)
+      expect { dependency.including_workflow.destroy }.to_not raise_error
     end
   end
 
   describe 'associations' do
-    it { should belong_to(:customer) }
+    it { should have_many(:workflow_configurations) }
     it { should have_many(:notifications) }
     it { should have_many(:notified_users).through(:notifications).source(:user) }
+    it { should have_many(:runs) }
+
     it { should have_many(:transforms) }
     it { should have_many(:data_quality_reports) }
-    it { should have_many(:runs) }
 
     it { should have_many(:included_dependencies) }
     it { should have_many(:included_workflows).through(:included_dependencies) }

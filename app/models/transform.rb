@@ -40,38 +40,6 @@ class Transform < ApplicationRecord
 
   validates :s3_file_name, presence: { message: S3_ATTRIBUTES_PRESENT_ERROR_MSG }, if: :s3_file_required?
 
-  # FIXME - We may reuse this and its partner callback in Workflow ... but not right now
-  # validate :supplied_s3_url_is_not_hosed, if: :s3_file_specified_by_url?
-  # private def supplied_s3_url_is_not_hosed
-  #   if supplied_s3_url.blank?
-  #     errors.add(:supplied_s3_url, "must be provided")
-  #   else
-  #     if s3_file_name.blank?
-  #       errors.add(:supplied_s3_url, "is not a valid S3 URL")
-  #     else
-  #       errors.add(:supplied_s3_url, "specifies a different S3 region than the Workflow") unless @parsed_s3_region_name == workflow.s3_region_name
-  #       errors.add(:supplied_s3_url, "specifies a different S3 bucket than the Workflow") unless @parsed_s3_bucket_name == workflow.s3_bucket_name
-  #     end
-  #   end
-  # end
-
-  # Callbacks
-
-  # FIXME - We may reuse this and its partner validation in Workflow ... but not right now
-  # before_validation :parse_supplied_s3_url, if: :s3_file_specified_by_url?
-  # private def parse_supplied_s3_url
-  #   if supplied_s3_url.present?
-  #     http_match = %r{\Ahttp(?:s)?://s3-([-\w]+).amazonaws.com/([-\w]+)/(.{10,})\Z}.match(supplied_s3_url)
-  #     if http_match
-  #       @parsed_s3_region_name = http_match[1]
-  #       @parsed_s3_bucket_name = http_match[2]
-  #       file_path_and_name = http_match[3].split('/').reject(&:blank?)
-  #       self.s3_file_path = file_path_and_name[0..-2].join('/') unless file_path_and_name.size == 1
-  #       self.s3_file_name = file_path_and_name.last
-  #     end
-  #   end
-  # end
-
   before_validation :clear_s3_attribute, unless: :s3_file_required?
 
   private def clear_s3_attribute
@@ -101,7 +69,7 @@ class Transform < ApplicationRecord
 
   belongs_to :workflow, inverse_of: :transforms
 
-  has_one :customer, through: :workflow
+  has_many :workflow_configurations, through: :workflow
 
   has_many :prerequisite_dependencies, class_name: 'TransformDependency', foreign_key: :postrequisite_transform_id, dependent: :delete_all
   has_many :prerequisite_transforms, through: :prerequisite_dependencies, source: :prerequisite_transform
@@ -128,92 +96,97 @@ class Transform < ApplicationRecord
 
   # Instance Methods
 
-  # FIXME - We may reuse this in Workflow ... but not right now
-  # attr_accessor :specify_s3_file_by, :supplied_s3_url
+  concerning :Runners do
 
-  # FIXME - We may reuse this in Workflow ... but not right now
-  # def s3_file_specified_by_url?
-  #   s3_file_required? && specify_s3_file_by == 'url'
-  # end
-
-  delegate :s3_region_name, :s3_bucket_name, :s3_file_path, to: :workflow
-
-  def s3_file_name
-    self.class.interpolate(string: super, params: params)
-  end
-
-  def importing?
-    runner.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
-  end
-
-  def exporting?
-    runner.in?(RunnerFactory::EXPORT_S3_FILE_RUNNERS)
-  end
-
-  def auto_load?
-    runner == 'AutoLoad'
-  end
-
-  def copy_from?
-    runner == 'CopyFrom'
-  end
-
-  def s3_file_required?
-    runner.in?(RunnerFactory::S3_FILE_RUNNERS)
-  end
-
-  def s3_import_file
-    S3File.create('import', **s3_attributes) if importing?
-  end
-
-  # Not currently used.  Probably unnecessary ... though, hmm, perhaps useful off the Run object and a Likely Transform for a quick local download?
-  # def s3_export_file(for_run)
-  #   S3File.create('export', **s3_attributes.merge(run: for_run)) if exporting?
-  # end
-
-  private def s3_attributes
-    attributes.with_indifferent_access.slice(:s3_file_name).merge(
-      workflow.attributes.with_indifferent_access.slice(:s3_region_name, :s3_bucket_name, :s3_file_path)
-    ).symbolize_keys
-  end
-
-  accepts_nested_attributes_for :prerequisite_transforms
-
-  # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite is itself available as a prerequisite (and may already be such).
-  # This is how we avoid cycles in the Transform Dependency graph.
-  def available_prerequisite_transforms
-    base_arel = Transform.where(workflow_id: workflow_id).order(:name)
-    if new_record?
-      base_arel.all
-    else
-      # This is grossly inefficient.  I tried to do it with SQL for the first level, and failed.  Oh well.  Refactor later.
-      eligible_transforms = base_arel.where("id <> #{id}").all
-      # Where's that graph DB when you need it?
-      eligible_transforms.reject { |eligible_transform| already_my_postrequisite?(eligible_transform) }
+    def importing?
+      runner.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
     end
+
+    def exporting?
+      runner.in?(RunnerFactory::EXPORT_S3_FILE_RUNNERS)
+    end
+
+    def s3_file_required?
+      runner.in?(RunnerFactory::S3_FILE_RUNNERS)
+    end
+
+    def auto_load?
+      runner == 'AutoLoad'
+    end
+
+    def copy_from?
+      runner == 'CopyFrom'
+    end
+
   end
 
-  # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite and is not already a prerequisite of this Transform
-  #  is itself available as a new prerequisite.
-  # Turns out we may not need this method; only #available_prerequisite_transforms is in fact necessary
-  # def available_unused_prerequisite_transforms
-  #   available_prerequisite_transforms.reject { |eligible_transform| already_my_prerequisite?(eligible_transform) }
-  # end
+  concerning :S3Files do
 
-  private
+    def s3_file_name
+      self.class.interpolate(string: super, params: params)
+    end
 
-  def already_my_postrequisite?(transform)
-    dependents = transform.prerequisite_transforms
-    return false if dependents.empty?
-    return true if dependents.include?(self)
-    dependents.any? { |dependent_transform| already_my_postrequisite?(dependent_transform) }
+    def s3_import_file(workflow_config = nil)
+      S3File.create('import', **s3_attributes(workflow_config)) if importing?
+    end
+
+    # Not currently used.  Probably unnecessary ... though, hmm, perhaps useful off the Run object and a Likely Transform for a quick local download?
+    # def s3_export_file(run:, workflow_config: )
+    #   S3File.create('export', **s3_attributes(workflow_config).merge(run: run)) if exporting?
+    # end
+
+    private def s3_attributes(workflow_config)
+      attributes.with_indifferent_access.slice(:s3_file_name).tap do |h|
+        h.merge(workflow_config.attributes.with_indifferent_access.slice(:s3_region_name, :s3_bucket_name, :s3_file_path)) if workflow_config
+        h.symbolize_keys
+      end
+    end
+
   end
 
-  # def already_my_prerequisite?(transform)
-  #   dependents = transform.postrequisite_transforms
-  #   return false if dependents.empty?
-  #   return true if dependents.include?(self)
-  #   dependents.any? { |dependent_transform| already_my_prerequisite?(dependent_transform) }
-  # end
+  concerning :EligiblePrerequisiteTransforms do
+
+    included do
+      accepts_nested_attributes_for :prerequisite_transforms
+    end
+
+    # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite is itself available as a prerequisite (and may already be such).
+    # This is how we avoid cycles in the Transform Dependency graph.
+    def available_prerequisite_transforms
+      base_arel = Transform.where(workflow_id: workflow_id).order(:name)
+      if new_record?
+        base_arel.all
+      else
+        # This is grossly inefficient.  I tried to do it with SQL for the first level, and failed.  Oh well.  Refactor later.
+        eligible_transforms = base_arel.where("id <> #{id}").all
+        # Where's that graph DB when you need it?
+        eligible_transforms.reject { |eligible_transform| already_my_postrequisite?(eligible_transform) }
+      end
+    end
+
+    # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite and is not already a prerequisite of this Transform
+    #  is itself available as a new prerequisite.
+    # Turns out we may not need this method; only #available_prerequisite_transforms is in fact necessary
+    # def available_unused_prerequisite_transforms
+    #   available_prerequisite_transforms.reject { |eligible_transform| already_my_prerequisite?(eligible_transform) }
+    # end
+
+    private
+
+    def already_my_postrequisite?(transform)
+      dependents = transform.prerequisite_transforms
+      return false if dependents.empty?
+      return true if dependents.include?(self)
+      dependents.any? { |dependent_transform| already_my_postrequisite?(dependent_transform) }
+    end
+
+    # def already_my_prerequisite?(transform)
+    #   dependents = transform.postrequisite_transforms
+    #   return false if dependents.empty?
+    #   return true if dependents.include?(self)
+    #   dependents.any? { |dependent_transform| already_my_prerequisite?(dependent_transform) }
+    # end
+
+  end
 
 end

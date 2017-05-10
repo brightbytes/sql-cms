@@ -21,7 +21,6 @@ class S3File
     @s3_bucket_name = atts[:s3_bucket_name]
     @s3_file_path = atts[:s3_file_path]
     @s3_file_name = atts[:s3_file_name]
-    raise "Missing s3_region_name, s3_bucket_name, and/or s3_file_name: #{atts.inspect}" unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
   end
 
   def s3_file_extension
@@ -52,6 +51,8 @@ class S3File
   private
 
   def s3
+    # We put this here rather than in the base initializer so that the file extention stuff ^^ can be used without any other atts being set
+    raise "Missing s3_region_name, s3_bucket_name, and/or s3_file_name: #{atts.inspect}" unless [s3_region_name, s3_bucket_name, s3_file_name].all?(&:present?)
     @s3 ||= Aws::S3::Resource.new(region: s3_region_name)
   end
 

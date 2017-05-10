@@ -25,18 +25,10 @@
 FactoryGirl.define do
   factory :workflow do
     sequence(:name) { |n| "Workflow #{n}" }
-    association :customer
-    s3_bucket_name "my-favorite-bucket"
-    s3_file_path "ca_some_sis/subdirectory"
-  end
-
-  factory :shared_workflow, parent: :workflow do
-    shared true
-    customer nil
   end
 
   factory :workflow_dependency do
-    association :included_workflow, factory: :shared_workflow
+    association :included_workflow, factory: :workflow
     association :including_workflow, factory: :workflow
   end
 end

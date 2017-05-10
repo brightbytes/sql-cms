@@ -2,26 +2,16 @@
 #
 # Table name: public.workflows
 #
-#  id             :integer          not null, primary key
-#  name           :string           not null
-#  slug           :string           not null
-#  customer_id    :integer
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  shared         :boolean          default(FALSE), not null
-#  s3_region_name :string           not null
-#  s3_bucket_name :string           not null
-#  s3_file_path   :string
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  slug       :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 # Indexes
 #
-#  index_workflows_on_customer_id     (customer_id)
 #  index_workflows_on_lowercase_name  (lower((name)::text)) UNIQUE
 #  index_workflows_on_lowercase_slug  (lower((slug)::text)) UNIQUE
-#
-# Foreign Keys
-#
-#  fk_rails_...  (customer_id => customers.id)
 #
 
 class Workflow < ApplicationRecord
@@ -39,8 +29,6 @@ class Workflow < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
-  validates :s3_region_name, :s3_bucket_name, presence: true
-
   validates :slug, presence: true, uniqueness: { case_sensitive: false }
 
   validate :slug_valid_sql_identifier
@@ -49,15 +37,7 @@ class Workflow < ApplicationRecord
     errors.add(:slug, "Is not a valid SQL identifier") unless slug =~ /^[a-z_]([a-z0-9_])*$/
   end
 
-  validates :customer, presence: true, unless: :shared?
-
-  validates :customer, absence: { message: "must be blank for Shared Workflows" }, if: :shared?
-
   # Callbacks
-
-  include Concerns::ImmutableCallbacks
-  immutable :destroy
-  immutable_attribute_name :shared
 
   after_initialize :set_defaults
 
@@ -68,9 +48,13 @@ class Workflow < ApplicationRecord
     end
   end
 
-  # Associations
+  before_destroy :raise_if_depended_upon
 
-  belongs_to :customer, inverse_of: :workflows
+  private def raise_if_depended_upon
+    raise "You cannot destroy this Workflow because other Workflows still depend upon it." if including_dependencies.exists?
+  end
+
+  # Associations
 
   has_many :notifications, inverse_of: :workflow, dependent: :delete_all
   has_many :notified_users, through: :notifications, source: :user
@@ -88,15 +72,16 @@ class Workflow < ApplicationRecord
   has_many :including_dependencies, class_name: 'WorkflowDependency', foreign_key: :included_workflow_id, dependent: :delete_all
   has_many :including_workflows, through: :including_dependencies, source: :including_workflow
 
+  has_many :workflow_configurations, inverse_of: :workflow
+
   # Scopes
 
-  scope :shared, -> { where(shared: true) }
+
 
   # Instance Methods
 
   def to_s
-    prefix = customer&.slug || "shared"
-    "#{prefix}_#{slug}".freeze
+    slug
   end
 
   accepts_nested_attributes_for :notified_users

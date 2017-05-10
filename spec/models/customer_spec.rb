@@ -29,7 +29,7 @@ describe Customer do
   end
 
   describe "associations" do
-    it { should have_many(:workflows) }
+    it { should have_many(:workflow_configurations) }
   end
 
   describe "scopes" do
