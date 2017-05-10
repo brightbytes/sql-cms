@@ -14,7 +14,7 @@ ActiveAdmin.register Transform do
   config.sort_order = 'workflows.slug_asc,name_asc'
 
   index(download_links: false) do
-    column(:interpolated_name) { |transform| auto_link(transform) }
+    column(:name) { |transform| auto_link(transform) }
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
     column(:runner)
