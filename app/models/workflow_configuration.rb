@@ -85,6 +85,9 @@ class WorkflowConfiguration < ApplicationRecord
 
   # Instance Methods
 
+  # For ease of porting the serializer
+  delegate :name, :slug, :ordered_transform_groups, :workflow_data_quality_reports, to: :workflow
+
   def to_s
     prefix = customer&.slug || "shared"
     suffix = workflow&.slug || "unsaved_workflow"

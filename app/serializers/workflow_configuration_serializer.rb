@@ -27,15 +27,7 @@
 
 class WorkflowConfigurationSerializer < ActiveModel::Serializer
 
-  attributes :id, :s3_region_name, :s3_bucket_name, :s3_file_path, :rfc_email_addresses_to_notify
-
-  belongs_to :workflow
-
-end
-
-class WorkflowSerializer < ActiveModel::Serializer
-
-  attributes :id, :name, :slug
+  attributes :id, :workflow_id, :s3_region_name, :s3_bucket_name, :s3_file_path, :rfc_email_addresses_to_notify, :name, :slug
 
   attribute :ordered_transform_groups do
     # Totally ghetto: this should be automatic.  Bah.
@@ -43,8 +35,8 @@ class WorkflowSerializer < ActiveModel::Serializer
   end
 
   has_many :workflow_data_quality_reports
-end
 
+end
 
 class WorkflowDataQualityReportSerializer < ActiveModel::Serializer
 

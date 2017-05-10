@@ -4,10 +4,10 @@ class ExecutionPlan
 
     # FIXME - WE SHOULD SUPPORT A GENERAL WorkflowDependency DAG JUST AS WE DO FOR TransformDependencies.  WE DON'T HERE YET B/C WE HAVEN'T NEEDED ANYTHING MORE
     #          THAN THE PRIMITIVE CAPABILITIES USED HERE.
-    def create(workflow)
-      execution_plan = workflow.serialize_and_symbolize.tap do |including_plan_h|
+    def create(workflow_configuration)
+      execution_plan = workflow_configuration.serialize_and_symbolize.tap do |including_plan_h|
         # First, we merge all included workflows' Transform Groups and Data Quality Reports
-        if merged_included_workflow_h = merge_included_workflows!(workflow.included_workflows)
+        if merged_included_workflow_h = merge_included_workflows!(workflow_configuration.workflow.included_workflows)
           # Then, we change the including_plan_h so that all merged Transform Groups come before the including_workflow's Transform Groups
           reorder_workflow_transform_groups!(including_plan_h, merged_included_workflow_h)
           # And, we just merge Data Quality Reports, since no order is required
