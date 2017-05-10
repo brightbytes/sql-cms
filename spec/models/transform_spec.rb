@@ -113,7 +113,6 @@ describe Transform do
 
   describe "associations" do
     it { should belong_to(:workflow) }
-    it { should have_one(:customer) }
 
     it { should have_many(:prerequisite_dependencies) }
     it { should have_many(:prerequisite_transforms) }

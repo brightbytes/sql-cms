@@ -66,11 +66,9 @@ describe Workflow do
     end
 
     context "#to_s" do
-      it "should return the concatenation of the customer slug (or :shared for a Shared Workflow), an underscore, and the slug" do
-        normal_workflow = create(:workflow)
-        expect(normal_workflow.to_s).to eq("#{normal_workflow.customer.slug}_#{normal_workflow.slug}")
-        shared_workflow = create(:shared_workflow)
-        expect(shared_workflow.to_s).to eq("shared_#{shared_workflow.slug}")
+      it "should return the workflow slug" do
+        workflow = create(:workflow)
+        expect(workflow.to_s).to eq(workflow.slug)
       end
     end
 

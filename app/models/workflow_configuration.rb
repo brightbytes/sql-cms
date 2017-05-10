@@ -64,6 +64,15 @@ class WorkflowConfiguration < ApplicationRecord
   #   end
   # end
 
+  after_initialize :set_defaults
+
+  private def set_defaults
+    if new_record?
+      self.s3_region_name ||= ENV.fetch('DEFAULT_S3_REGION', 'us-west-2')
+      self.s3_bucket_name ||= ENV['DEFAULT_S3_BUCKET']
+    end
+  end
+
   # Associations
 
   belongs_to :customer, inverse_of: :workflow_configurations

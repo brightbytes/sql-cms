@@ -16,10 +16,14 @@ module WorkflowSeeder
   DEMO_WORKFLOW_NAME = 'Demo Workflow'
 
   def demo_workflow
-    Workflow.where(name: DEMO_WORKFLOW_NAME).first_or_create!(
-      customer: CustomerSeeder.demo_customer,
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files'
-    )
+    arel = Workflow.where(name: DEMO_WORKFLOW_NAME)
+    arel.first || arel.create!.tap do |workflow|
+      WorkflowConfiguration.create!(
+        workflow: workflow,
+        customer: CustomerSeeder.demo_customer,
+        s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files'
+      )
+    end
   end
 
   def demo_workflow_exists?
