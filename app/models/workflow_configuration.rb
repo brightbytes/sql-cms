@@ -78,6 +78,8 @@ class WorkflowConfiguration < ApplicationRecord
   belongs_to :customer, inverse_of: :workflow_configurations
   belongs_to :workflow, inverse_of: :workflow_configurations
 
+  has_many :runs, inverse_of: :workflow_configuration, dependent: :destroy
+
   has_many :notifications, inverse_of: :workflow_configuration, dependent: :delete_all
   has_many :notified_users, through: :notifications, source: :user
 
@@ -89,26 +91,34 @@ class WorkflowConfiguration < ApplicationRecord
     "#{prefix}_#{suffix}".freeze
   end
 
+  # This method should technically be a service ... but it's soooooo tiny, I just can't bring myself to make it one.
+  def run!(creator)
+    runs.create!(creator: creator, execution_plan: ExecutionPlan.create(self).to_hash).tap do |run|
+      RunManagerJob.perform_later(run.id)
+    end
+  end
+
+  def serialize_and_symbolize
+    ActiveModelSerializers::SerializableResource.new(self).as_json.deep_symbolize_keys
+  end
+
   concerning :Notifications do
 
     included do
       accepts_nested_attributes_for :notified_users
     end
 
-    def emails_to_notify
-      notified_users.pluck(:email)
-    end
-
+    # This isn't part of the serializer simply to ease testing; move it into the serializer once a test for it is created
     def rfc_email_addresses_to_notify
       notified_users.map(&:rfc_email_address)
     end
 
   end
 
-  # FIXME - We may reuse this in Workflow ... but not right now
+  # FIXME - We may reuse this in WorkflowConfig ... but not right now
   # attr_accessor :specify_s3_file_by, :supplied_s3_url
 
-  # FIXME - We may reuse this in Workflow ... but not right now
+  # FIXME - We may reuse this in WorkflowConfig ... but not right now
   # def s3_file_specified_by_url?
   #   s3_file_required? && specify_s3_file_by == 'url'
   # end

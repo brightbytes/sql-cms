@@ -1,7 +1,7 @@
 FactoryGirl.define do
 
   factory :run do
-    association :workflow
+    association :workflow_configuration
     association :creator, factory: :user
     execution_plan { { bogus: :plan } }
   end

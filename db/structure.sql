@@ -814,14 +814,14 @@ ALTER SEQUENCE run_step_logs_id_seq OWNED BY run_step_logs.id;
 
 CREATE TABLE runs (
     id integer NOT NULL,
-    workflow_id integer NOT NULL,
     creator_id integer NOT NULL,
     execution_plan jsonb NOT NULL,
     status character varying DEFAULT 'unstarted'::character varying NOT NULL,
     notification_status character varying DEFAULT 'unsent'::character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    schema_name character varying
+    schema_name character varying,
+    workflow_configuration_id integer NOT NULL
 );
 
 
@@ -2084,10 +2084,10 @@ CREATE INDEX index_runs_on_creator_id ON runs USING btree (creator_id);
 
 
 --
--- Name: index_runs_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_runs_on_workflow_configuration_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_runs_on_workflow_id ON runs USING btree (workflow_id);
+CREATE INDEX index_runs_on_workflow_configuration_id ON runs USING btree (workflow_configuration_id);
 
 
 --
@@ -2285,11 +2285,11 @@ ALTER TABLE ONLY workflow_configurations
 
 
 --
--- Name: fk_rails_404232665a; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_36b8cfa612; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY runs
-    ADD CONSTRAINT fk_rails_404232665a FOREIGN KEY (workflow_id) REFERENCES workflows(id);
+    ADD CONSTRAINT fk_rails_36b8cfa612 FOREIGN KEY (workflow_configuration_id) REFERENCES workflow_configurations(id);
 
 
 --

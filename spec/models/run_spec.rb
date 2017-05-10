@@ -2,25 +2,25 @@
 #
 # Table name: public.runs
 #
-#  id                  :integer          not null, primary key
-#  workflow_id         :integer          not null
-#  creator_id          :integer          not null
-#  execution_plan      :jsonb            not null
-#  status              :string           default("unstarted"), not null
-#  notification_status :string           default("unsent"), not null
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  schema_name         :string
+#  id                        :integer          not null, primary key
+#  creator_id                :integer          not null
+#  execution_plan            :jsonb            not null
+#  status                    :string           default("unstarted"), not null
+#  notification_status       :string           default("unsent"), not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  schema_name               :string
+#  workflow_configuration_id :integer          not null
 #
 # Indexes
 #
-#  index_runs_on_creator_id   (creator_id)
-#  index_runs_on_workflow_id  (workflow_id)
+#  index_runs_on_creator_id                 (creator_id)
+#  index_runs_on_workflow_configuration_id  (workflow_configuration_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (creator_id => users.id)
-#  fk_rails_...  (workflow_id => workflows.id)
+#  fk_rails_...  (workflow_configuration_id => workflow_configurations.id)
 #
 
 describe Run do
@@ -34,7 +34,7 @@ describe Run do
   end
 
   describe "validations" do
-    [:workflow, :creator, :execution_plan, :status, :notification_status].each do |att|
+    [:workflow_configuration, :creator, :execution_plan, :status, :notification_status].each do |att|
       it { should validate_presence_of(att) }
     end
 
@@ -44,7 +44,7 @@ describe Run do
   describe "associations" do
     it { should have_many(:run_step_logs) }
     it { should belong_to(:creator) }
-    it { should belong_to(:workflow) }
+    it { should belong_to(:workflow_configuration) }
   end
 
   describe "callbacks" do
@@ -54,7 +54,7 @@ describe Run do
         run = build(:run)
         expect(run.schema_name).to be_nil
         expect(run.save).to eq(true)
-        expect(run.schema_name).to eq("#{run.workflow}_run_#{run.id}")
+        expect(run.schema_name).to eq("#{run.workflow_configuration}_run_#{run.id}")
       end
     end
 
@@ -81,7 +81,7 @@ describe Run do
     describe "#schema_name" do
       it "should work like the boring method it is" do
         run = create(:run)
-        expect(run.schema_name).to eq("#{run.workflow}_run_#{run.id}")
+        expect(run.schema_name).to eq("#{run.workflow_configuration}_run_#{run.id}")
       end
     end
 

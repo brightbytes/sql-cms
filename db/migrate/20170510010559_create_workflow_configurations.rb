@@ -16,9 +16,16 @@ class CreateWorkflowConfigurations < ActiveRecord::Migration[5.1]
     add_foreign_key :workflow_configurations, :workflows
     add_foreign_key :workflow_configurations, :customers
 
+    WorkflowConfiguration.reset_column_information
+
     add_column :notifications, :workflow_configuration_id, :integer
     add_foreign_key :notifications, :workflow_configurations
     Notification.reset_column_information
+
+    add_column :runs, :workflow_configuration_id, :integer
+    add_index :runs, :workflow_configuration_id
+    add_foreign_key :runs, :workflow_configurations
+    Run.reset_column_information
 
     Workflow.all.each do |workflow|
       workflow_configuration = WorkflowConfiguration.create!(
@@ -32,12 +39,19 @@ class CreateWorkflowConfigurations < ActiveRecord::Migration[5.1]
         notification.workflow_configuration = workflow_configuration
         notification.save!
       end
+      Run.where(workflow_id: workflow.id).each do |run|
+        run.workflow_configuration = workflow_configuration
+        run.save!
+      end
     end
 
     remove_index :notifications, name: :index_notifications_on_workflow_id_and_user_id
     remove_column :notifications, :workflow_id
     change_column_null :notifications, :workflow_configuration_id, false
     add_index :notifications, [:workflow_configuration_id, :user_id], unique: true
+
+    remove_column :runs, :workflow_id
+    change_column_null :runs, :workflow_configuration_id, false
 
     [:customer_id, :s3_region_name, :s3_bucket_name, :s3_file_path, :shared].each { |col| remove_column :workflows, col }
   end

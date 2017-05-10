@@ -45,7 +45,7 @@ describe RunStepLog do
 
   describe "associations" do
     it { should belong_to(:run) }
-    it { should have_one(:workflow).through(:run) }
+    it { should have_one(:workflow_configuration).through(:run) }
   end
 
   describe "instance methods" do
@@ -63,7 +63,9 @@ describe RunStepLog do
 
       let!(:workflow) { transform.workflow }
 
-      let!(:run) { create(:run, workflow: workflow, execution_plan: ActiveModelSerializers::SerializableResource.new(workflow).as_json) }
+      let!(:workflow_configuration) { create(:workflow_configuration, workflow: workflow) }
+
+      let!(:run) { create(:run, workflow_configuration: workflow_configuration, execution_plan: workflow_configuration.serialize_and_symbolize) }
 
       let!(:run_step_log) { create(:run_step_log, run: run, step_type: 'transform', step_index: 0, step_id: transform.id) }
 

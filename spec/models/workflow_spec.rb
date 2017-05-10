@@ -43,7 +43,6 @@ describe Workflow do
 
   describe 'associations' do
     it { should have_many(:workflow_configurations) }
-    it { should have_many(:runs) }
 
     it { should have_many(:transforms) }
     it { should have_many(:data_quality_reports) }

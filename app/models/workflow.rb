@@ -52,8 +52,6 @@ class Workflow < ApplicationRecord
   has_many :workflow_data_quality_reports, inverse_of: :workflow, dependent: :delete_all
   has_many :data_quality_reports, through: :workflow_data_quality_reports
 
-  has_many :runs, inverse_of: :workflow, dependent: :destroy
-
   has_many :included_dependencies, class_name: 'WorkflowDependency', foreign_key: :including_workflow_id, dependent: :delete_all
   has_many :included_workflows, through: :included_dependencies, source: :included_workflow
 
@@ -73,19 +71,6 @@ class Workflow < ApplicationRecord
   end
 
   accepts_nested_attributes_for :included_workflows
-
-  # This method should technically be a service ... but it's soooooo tiny, I just can't bring myself to make it one.
-  def run!(creator)
-    runs.create!(creator: creator, execution_plan: ExecutionPlan.create(self).to_hash).tap do |run|
-      RunManagerJob.perform_later(run.id)
-    end
-  end
-
-  # The following methods are used by the serializer.  I suppose they thus should be part of the serializer.  Refactor.
-
-  def serialize_and_symbolize
-    ActiveModelSerializers::SerializableResource.new(self).as_json.deep_symbolize_keys
-  end
 
   # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html
   # But, it's so much more satisfying to figure it out all by myself ...
