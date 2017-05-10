@@ -47,9 +47,6 @@ class Workflow < ApplicationRecord
 
   # Associations
 
-  has_many :notifications, inverse_of: :workflow, dependent: :delete_all
-  has_many :notified_users, through: :notifications, source: :user
-
   has_many :transforms, inverse_of: :workflow, dependent: :destroy
 
   has_many :workflow_data_quality_reports, inverse_of: :workflow, dependent: :delete_all
@@ -75,7 +72,6 @@ class Workflow < ApplicationRecord
     slug
   end
 
-  accepts_nested_attributes_for :notified_users
   accepts_nested_attributes_for :included_workflows
 
   # This method should technically be a service ... but it's soooooo tiny, I just can't bring myself to make it one.
@@ -89,14 +85,6 @@ class Workflow < ApplicationRecord
 
   def serialize_and_symbolize
     ActiveModelSerializers::SerializableResource.new(self).as_json.deep_symbolize_keys
-  end
-
-  def emails_to_notify
-    notified_users.pluck(:email)
-  end
-
-  def rfc_email_addresses_to_notify
-    notified_users.map(&:rfc_email_address)
   end
 
   # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html

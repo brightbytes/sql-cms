@@ -4,7 +4,7 @@ module WorkflowSeeder
 
   def seed
     CustomerSeeder.seed
-    notify_me!(create_demo_workflow!)
+    create_demo_workflow!
   end
 
   # FIXME - NUKE THIS METHOD WHEN DONE WITH RAPID-DEV OF THE DEMO WORKFLOW
@@ -18,11 +18,12 @@ module WorkflowSeeder
   def demo_workflow
     arel = Workflow.where(name: DEMO_WORKFLOW_NAME)
     arel.first || arel.create!.tap do |workflow|
-      WorkflowConfiguration.create!(
+      workflow_configuration = WorkflowConfiguration.create!(
         workflow: workflow,
         customer: CustomerSeeder.demo_customer,
         s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files'
       )
+      workflow_configuration.notifications.first_or_create!(user: User.where(email: 'aaron@brightbytes.net').first)
     end
   end
 
@@ -31,10 +32,6 @@ module WorkflowSeeder
   end
 
   private
-
-  def notify_me!(workflow)
-    workflow.notifications.first_or_create!(user: User.where(email: 'aaron@brightbytes.net').first)
-  end
 
   def create_demo_workflow!
 

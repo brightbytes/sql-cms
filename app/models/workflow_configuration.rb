@@ -78,12 +78,31 @@ class WorkflowConfiguration < ApplicationRecord
   belongs_to :customer, inverse_of: :workflow_configurations
   belongs_to :workflow, inverse_of: :workflow_configurations
 
+  has_many :notifications, inverse_of: :workflow_configuration, dependent: :delete_all
+  has_many :notified_users, through: :notifications, source: :user
+
   # Instance Methods
 
   def to_s
     prefix = customer&.slug || "shared"
     suffix = workflow&.slug || "unsaved_workflow"
     "#{prefix}_#{suffix}".freeze
+  end
+
+  concerning :Notifications do
+
+    included do
+      accepts_nested_attributes_for :notified_users
+    end
+
+    def emails_to_notify
+      notified_users.pluck(:email)
+    end
+
+    def rfc_email_addresses_to_notify
+      notified_users.map(&:rfc_email_address)
+    end
+
   end
 
   # FIXME - We may reuse this in Workflow ... but not right now

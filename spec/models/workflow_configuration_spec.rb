@@ -42,6 +42,22 @@ describe WorkflowConfiguration do
   describe 'associations' do
     it { should belong_to(:workflow) }
     it { should belong_to(:customer) }
+
+    it { should have_many(:notifications) }
+    it { should have_many(:notified_users).through(:notifications).source(:user) }
+  end
+
+  describe 'instance methods' do
+    context "#emails_to_notify" do
+      it "should simply return a list of notified_user emails" do
+        notification_1 = create(:notification)
+        workflow_configuration = notification_1.workflow_configuration
+        notification_2 = create(:notification, workflow_configuration: workflow_configuration)
+        notification_3 = create(:notification, workflow_configuration: workflow_configuration)
+        ignored_notification = create(:notification)
+        expect(Set.new(workflow_configuration.emails_to_notify)).to eq(Set.new([notification_1, notification_2, notification_3].map(&:user).map(&:email)))
+      end
+    end
   end
 
 end
