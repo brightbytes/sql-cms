@@ -129,9 +129,9 @@ ActiveAdmin.register WorkflowConfiguration do
             if params[:source] == 'customer'
               customer_path(resource.customer)
             elsif params[:source] == 'workflow'
-              customer_path(resource.workflow)
+              workflow_path(resource.workflow)
             else
-              workflows_path
+              workflow_configurations_path
             end
           redirect_to(path)
         end

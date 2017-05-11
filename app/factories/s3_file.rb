@@ -14,9 +14,10 @@ class S3File
     end
   end
 
-  attr_reader :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
+  attr_reader :atts, :s3_region_name, :s3_bucket_name, :s3_file_path, :s3_file_name
 
   def initialize(**atts)
+    @atts = atts
     @s3_region_name = atts[:s3_region_name]
     @s3_bucket_name = atts[:s3_bucket_name]
     @s3_file_path = atts[:s3_file_path]

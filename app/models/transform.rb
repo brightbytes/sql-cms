@@ -137,7 +137,7 @@ class Transform < ApplicationRecord
 
     private def s3_attributes(workflow_config)
       attributes.with_indifferent_access.slice(:s3_file_name).tap do |h|
-        h.merge(workflow_config.attributes.with_indifferent_access.slice(:s3_region_name, :s3_bucket_name, :s3_file_path)) if workflow_config
+        h.merge!(workflow_config.attributes.with_indifferent_access.slice(:s3_region_name, :s3_bucket_name, :s3_file_path)) if workflow_config
       end.symbolize_keys
     end
 

@@ -16,7 +16,6 @@ ActiveAdmin.register Transform do
   index(download_links: false) do
     column(:name) { |transform| auto_link(transform) }
     column(:workflow, sortable: 'workflows.slug')
-    column(:customer, sortable: 'customers.slug')
     column(:runner)
   end
 
@@ -26,7 +25,6 @@ ActiveAdmin.register Transform do
       row :name
       row :interpolated_name
       row :workflow
-      row :customer
 
       row :runner
       row(:params) { code(pretty_print_as_json(resource.params)) }
@@ -40,7 +38,7 @@ ActiveAdmin.register Transform do
     end
 
     if transform.importing? || transform.exporting?
-      workflow_configurations = resource.workflow_configurations.includes(:customer).order('customer.slug, workflow.slug').to_a
+      workflow_configurations = resource.workflow_configurations.includes(:customer).order('customers.slug, workflows.slug').to_a
       unless workflow_configurations.empty?
         error_msg = "<br /><span style='color: red'>Either the s3_region_name or the s3_bucket_name is not valid because S3 pukes on it!</span>".html_safe
         panel 'Workflow Configuration S3 Files' do
@@ -56,7 +54,7 @@ ActiveAdmin.register Transform do
             end
             column :s3_file_path { |wc| wc.s3_file_path }
             column :s3_file_name { |wc| transform.s3_file_name }
-            column(:s3_file_exists?) { yes_no(transform.s3_import_file(wc).s3_file_exists?, yes_color: :green, no_color: :red) } if transform.importing?
+            column :s3_file_exists? { |wc| yes_no(transform.s3_import_file(wc).s3_file_exists?, yes_color: :green, no_color: :red) } if transform.importing?
           end
         end
       end
@@ -115,11 +113,11 @@ ActiveAdmin.register Transform do
     render partial: 'admin/shared/history'
   end
 
-  sidebar("Actions", only: :show, if: -> { resource.importing? && !resource.s3_import_file.s3_file_exists? }) do
-    ul do
-      li link_to("Upload File to S3")
-    end
-  end
+  # sidebar("Actions", only: :show, if: -> { resource.importing? && !resource.s3_import_file.s3_file_exists? }) do
+  #   ul do
+  #     li link_to("Upload File to S3")
+  #   end
+  # end
 
   form do |f|
     inputs 'Details' do
@@ -160,7 +158,7 @@ ActiveAdmin.register Transform do
   controller do
 
     def scoped_collection
-      super.includes(workflow: :customer)
+      super.includes(:workflow)
     end
 
     def action_methods
