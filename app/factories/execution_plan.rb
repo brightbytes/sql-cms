@@ -7,7 +7,11 @@ class ExecutionPlan
     def create(workflow_configuration)
       execution_plan = workflow_configuration.serialize_and_symbolize.tap do |including_plan_h|
         # First, we merge all included workflows' Transform Groups and Data Quality Reports
-        if merged_included_workflow_h = merge_included_workflows!(workflow_configuration.workflow.included_workflows)
+        merged_included_workflow_h = merge_included_workflows!(
+          workflow_configuration: workflow_configuration,
+          included_workflows: workflow_configuration.workflow.included_workflows
+        )
+        if merged_included_workflow_h
           # Then, we change the including_plan_h so that all merged Transform Groups come before the including_workflow's Transform Groups
           reorder_workflow_transform_groups!(including_plan_h, merged_included_workflow_h)
           # And, we just merge Data Quality Reports, since no order is required
@@ -23,12 +27,12 @@ class ExecutionPlan
 
     private
 
-    def merge_included_workflows!(included_workflows)
+    def merge_included_workflows!(workflow_configuration:, included_workflows:)
       return nil if included_workflows.empty?
       first_workflow, rest_workflows = included_workflows.first, included_workflows.last(included_workflows.size - 1)
-      first_plan_h = first_workflow.serialize_and_symbolize
+      first_plan_h = WorkflowConfiguration.new(workflow: first_workflow).serialize_and_symbolize
       rest_workflows.each do |rest_workflow|
-        rest_plan_h = rest_workflow.serialize_and_symbolize
+        rest_plan_h = WorkflowConfiguration.new(workflow: rest_workflow).serialize_and_symbolize
         merge_workflow_data_quality_reports!(first_plan_h, rest_plan_h)
         merge_workflow_transform_groups!(first_plan_h, rest_plan_h)
       end
