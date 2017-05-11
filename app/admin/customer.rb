@@ -18,13 +18,14 @@ ActiveAdmin.register Customer do
   permit_params :name, :slug
 
   filter :name, as: :string
+  filter :slug, as: :string
 
   config.sort_order = 'slug_asc'
 
   index(download_links: false) do
     id_column
     column(:name, sortable: :slug) { |customer| auto_link(customer) }
-    # column :slug
+    column :slug
   end
 
   show do
@@ -38,15 +39,27 @@ ActiveAdmin.register Customer do
       row :deleted_at
     end
 
-    panel 'Workflows' do
-      text_node link_to("Create New Workflow", new_workflow_path(customer_id: customer.id, source: :customer))
+    panel 'Workflow Configurations' do
+      text_node link_to("Create New Workflow Configuration", new_workflow_configuration_path(customer_id: customer.id, source: :customer, customer_id: resource.id))
 
-      sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
-      table_for(resource.workflows.order(sort), sortable: true) do
-        column(:name, sortable: :name) { |workflow| auto_link(workflow) }
+      table_for(resource.workflow_configurations.includes(:workflow).order('workflows.slug')) do
+        column(:name) { |workflow_configuration| auto_link(workflow_configuration) }
         column(:slug)
-        boolean_column(:shared)
-        column(:action) { |workflow| link_to("Delete", workflow_path(workflow, source: :customer), method: :delete, data: { confirm: 'Are you really, really, really sure you want to nuke this Workflow?  Really???' }) }
+        column(:action) do |workflow_configuration|
+          text_node(
+            link_to(
+              "Edit",
+              edit_workflow_configuration_path(workflow_configuration, source: :customer, customer_id: resource.id)
+            )
+          )
+          text_node(' | ')
+          link_to(
+            "Delete",
+            workflow_configuration_path(workflow_configuration, source: :customer),
+            method: :delete,
+            data: { confirm: 'Are you really sure you want to nuke this Workflow Configuration?' }
+          )
+        end
       end
     end
 

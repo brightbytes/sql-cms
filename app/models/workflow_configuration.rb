@@ -93,6 +93,7 @@ class WorkflowConfiguration < ApplicationRecord
     suffix = workflow&.slug || "unsaved_workflow"
     "#{prefix}_#{suffix}".freeze
   end
+  alias_method :display_name, :to_s
 
   # This method should technically be a service ... but it's soooooo tiny, I just can't bring myself to make it one.
   def run!(creator)
