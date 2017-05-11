@@ -64,6 +64,9 @@ class Run < ApplicationRecord
 
   belongs_to :workflow_configuration, inverse_of: :runs
 
+  has_one :customer, through: :workflow_configuration
+  has_one :workflow, through: :workflow_configuration
+
   # Instance Methods
 
   def to_s

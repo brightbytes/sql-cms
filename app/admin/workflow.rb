@@ -27,6 +27,33 @@ ActiveAdmin.register Workflow do
       row :updated_at
     end
 
+    panel 'Workflow Configurations' do
+      text_node link_to("Create New Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow))
+
+      table_for(resource.workflow_configurations.includes(:customer).order('customers.slug')) do
+        column(:name) { |workflow_configuration| auto_link(workflow_configuration) }
+        column(:customer) { |workflow_configuration| auto_link(workflow_configuration.customer) }
+        column :s3_region_name
+        column :s3_bucket_name
+        column :s3_file_path
+        column(:action) do |workflow_configuration|
+          text_node(
+            link_to(
+              "Edit",
+              edit_workflow_configuration_path(workflow_configuration, workflow_id: resource.id, source: :workflow)
+            )
+          )
+          text_node(' | ')
+          link_to(
+            "Delete",
+            workflow_configuration_path(workflow_configuration, source: :workflow),
+            method: :delete,
+            data: { confirm: 'Are you really sure you want to nuke this Workflow Configuration?' }
+          )
+        end
+      end
+    end
+
     # FIXME - PARTIALIZE THE FOLLOWING AND THE CUSTOMER WORKFLOW PANEL
 
     included_workflows = workflow.included_workflows.order(:name).to_a

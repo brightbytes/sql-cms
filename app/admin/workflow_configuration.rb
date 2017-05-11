@@ -88,7 +88,7 @@ ActiveAdmin.register WorkflowConfiguration do
 
     inputs 'Details' do
       input :customer, as: :select, collection: customers_with_single_select, include_blank: !customer_id_from_param
-      input :workflow, as: :select
+      input :workflow, as: :select, collection: workflows_with_single_select, include_blank: !workflow_id_param_val
 
       input :s3_region_name, as: :string # This should be a drop-down
       input :s3_bucket_name, as: :string
@@ -102,7 +102,16 @@ ActiveAdmin.register WorkflowConfiguration do
 
     actions do
       action(:submit)
-      path = (params[:source] == 'customer' ? customer_path(params[:customer_id]) : f.object.new_record? ? workflow_configurations_path : workflow_configuration_path(f.object))
+      path =
+        if params[:source] == 'customer'
+          customer_path(params[:customer_id])
+        elsif params[:source] == 'workflow'
+          customer_path(params[:workflow_id])
+        elsif f.object.new_record?
+          workflow_configurations_path
+        else
+          workflow_configuration_path(f.object)
+        end
       cancel_link(path)
     end
   end
@@ -115,7 +124,17 @@ ActiveAdmin.register WorkflowConfiguration do
 
     def destroy
       super do |success, failure|
-        success.html { redirect_to(params[:source] == 'customer' ? customer_path(resource.customer) : workflows_path) }
+        success.html do
+          path =
+            if params[:source] == 'customer'
+              customer_path(resource.customer)
+            elsif params[:source] == 'workflow'
+              customer_path(resource.workflow)
+            else
+              workflows_path
+            end
+          redirect_to(path)
+        end
       end
     end
 

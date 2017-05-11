@@ -40,16 +40,19 @@ ActiveAdmin.register Customer do
     end
 
     panel 'Workflow Configurations' do
-      text_node link_to("Create New Workflow Configuration", new_workflow_configuration_path(customer_id: customer.id, source: :customer, customer_id: resource.id))
+      text_node link_to("Create New Workflow Configuration", new_workflow_configuration_path(customer_id: resource.id, source: :customer))
 
       table_for(resource.workflow_configurations.includes(:workflow).order('workflows.slug')) do
-        column(:name) { |workflow_configuration| auto_link(workflow_configuration) }
-        column(:slug)
+        column(:workflow_configuration) { |workflow_configuration| auto_link(workflow_configuration) }
+        column(:workflow) { |workflow_configuration| auto_link(workflow_configuration.workflow) }
+        column :s3_region_name
+        column :s3_bucket_name
+        column :s3_file_path
         column(:action) do |workflow_configuration|
           text_node(
             link_to(
               "Edit",
-              edit_workflow_configuration_path(workflow_configuration, source: :customer, customer_id: resource.id)
+              edit_workflow_configuration_path(workflow_configuration, customer_id: resource.id, source: :customer)
             )
           )
           text_node(' | ')
