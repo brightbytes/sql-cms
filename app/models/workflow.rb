@@ -136,9 +136,8 @@ class Workflow < ApplicationRecord
     private def next_transform_group(transform_groups_thus_far:, unused_transform_ids:)
       used_transform_ids = transform_groups_thus_far.flatten.map(&:id)
       joined_used_transform_ids = used_transform_ids.join(',')
-      joined_unused_transform_ids = unused_transform_ids.join(',')
       transforms.
-        where("id IN (#{joined_unused_transform_ids})").
+        where(id: unused_transform_ids).
         where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id NOT IN (#{joined_used_transform_ids}) AND postrequisite_transform_id = transforms.id)").
         to_a
     end

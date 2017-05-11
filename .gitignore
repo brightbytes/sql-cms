@@ -1,5 +1,6 @@
 *.rbc
 capybara-*.html
+brakeman.html
 
 # Ignore all logfiles and tempfiles.
 *.log

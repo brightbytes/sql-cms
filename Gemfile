@@ -63,6 +63,8 @@ group :development do
   # gem 'slack-notifier'
 
   # gem 'rubocop'
+
+  gem 'brakeman'
 end
 
 group :test do
