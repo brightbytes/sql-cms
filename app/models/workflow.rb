@@ -70,7 +70,40 @@ class Workflow < ApplicationRecord
     slug
   end
 
-  accepts_nested_attributes_for :included_workflows
+  # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html
+  # But, it's so much more satisfying to figure it out all by myself ...
+  # FIXME - Copy/paste from Transform model; DRY up sometime
+  concerning :EligibleIncludedWorkflows do
+
+    included do
+      accepts_nested_attributes_for :included_workflows
+    end
+
+    # Any Workflow that doesn't directly or indirectly have this Workflow already included is itself available as an includable workflow (and may already be such).
+    # This is how we avoid cycles in the Workflow Dependency graph.
+    def available_included_workflows
+      base_arel = Workflow.order(:name)
+      if new_record?
+        base_arel.all
+      else
+        # This is grossly inefficient.  I tried to do it with SQL for the first level, and failed.  Oh well.  Refactor later.
+        eligible_workflows = base_arel.where("id <> #{id}").all
+        # Where's that graph DB when you need it?
+        eligible_workflows.reject { |eligible_workflow| already_including_me?(eligible_workflow) }
+      end
+    end
+
+    private
+
+    def already_including_me?(workflow)
+      dependents = workflow.included_workflows
+      return false if dependents.empty?
+      return true if dependents.include?(self)
+      dependents.any? { |dependent_workflow| already_including_me?(dependent_workflow) }
+    end
+
+  end
+
 
   # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html
   # But, it's so much more satisfying to figure it out all by myself ...

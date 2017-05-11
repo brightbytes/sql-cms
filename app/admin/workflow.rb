@@ -58,7 +58,7 @@ ActiveAdmin.register Workflow do
 
     included_workflows = workflow.included_workflows.order(:name).to_a
     unless included_workflows.empty?
-      panel 'Associated Shared Workflows' do
+      panel 'Included Workflows' do
         table_for(included_workflows) do
           column(:name) { |workflow| auto_link(workflow) }
           column(:slug)
@@ -68,7 +68,7 @@ ActiveAdmin.register Workflow do
 
     including_workflows = resource.including_workflows.order(:name).to_a
     unless including_workflows.empty?
-      panel 'Associated Customer Workflows' do
+      panel 'Including Workflows' do
         table_for(including_workflows) do
           column(:name) { |workflow| auto_link(workflow) }
           column(:slug)
@@ -121,11 +121,10 @@ ActiveAdmin.register Workflow do
     inputs 'Details' do
       input :name, as: :string
       input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated. And DON'T MAKE IT TOO LONG, or creating the Posgres schema will puke."
+    end
 
-      if Workflow.shared.exists?
-        included_workflows_display_h = (f.object.shared? ? { style: 'display:none' } : {})
-        input :included_workflows, as: :check_boxes, collection: Workflow.shared, wrapper_html: included_workflows_display_h
-      end
+    inputs 'Dependencies' do
+      input :included_workflows, as: :check_boxes, collection: f.object.available_included_workflows
     end
 
     actions
@@ -141,8 +140,7 @@ ActiveAdmin.register Workflow do
       ids = params[:workflow].delete(:included_workflow_ids)&.reject(&:blank?)
       super do |success, failure|
         success.html do
-          # A shared workflow cannot depend upon another shared workflow b/c I haven't implemented the full topo sort capability for Workflows yet.
-          resource.included_workflow_ids = (resource.shared? ? [] : ids)
+          resource.included_workflow_ids = ids
           resource.save!
           redirect_to workflow_path(resource)
         end

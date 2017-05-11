@@ -2,24 +2,16 @@
 #
 # Table name: public.workflows
 #
-#  id             :integer          not null, primary key
-#  name           :string           not null
-#  slug           :string           not null
-#  customer_id    :integer
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  shared         :boolean          default(FALSE), not null
-#  s3_region_name :string           not null
-#  s3_bucket_name :string           not null
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  slug       :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 # Indexes
 #
-#  index_workflows_on_customer_id     (customer_id)
 #  index_workflows_on_lowercase_name  (lower((name)::text)) UNIQUE
-#
-# Foreign Keys
-#
-#  fk_rails_...  (customer_id => customers.id)
+#  index_workflows_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 
 FactoryGirl.define do

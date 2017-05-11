@@ -143,6 +143,9 @@ class Transform < ApplicationRecord
 
   end
 
+  # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html
+  # But, it's so much more satisfying to figure it out all by myself ...
+  # FIXME - Copy/paste from Workflow model; DRY up sometime
   concerning :EligiblePrerequisiteTransforms do
 
     included do
@@ -163,13 +166,6 @@ class Transform < ApplicationRecord
       end
     end
 
-    # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite and is not already a prerequisite of this Transform
-    #  is itself available as a new prerequisite.
-    # Turns out we may not need this method; only #available_prerequisite_transforms is in fact necessary
-    # def available_unused_prerequisite_transforms
-    #   available_prerequisite_transforms.reject { |eligible_transform| already_my_prerequisite?(eligible_transform) }
-    # end
-
     private
 
     def already_my_postrequisite?(transform)
@@ -178,13 +174,6 @@ class Transform < ApplicationRecord
       return true if dependents.include?(self)
       dependents.any? { |dependent_transform| already_my_postrequisite?(dependent_transform) }
     end
-
-    # def already_my_prerequisite?(transform)
-    #   dependents = transform.postrequisite_transforms
-    #   return false if dependents.empty?
-    #   return true if dependents.include?(self)
-    #   dependents.any? { |dependent_transform| already_my_prerequisite?(dependent_transform) }
-    # end
 
   end
 
