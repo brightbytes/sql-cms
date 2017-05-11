@@ -12,9 +12,11 @@ The following entities exist in the **public** Postgres schema, and together the
 
 - **Workflow**: A named collection of the following, each via a `has_many` relationship:
 
-  - Various types of SQL Transform and their TransformDependencies and TransformValidations
+  - Various types of SQL Transform and their TransformDependencies and TransformValidations and their Validations
 
-  - DataQualityReports
+  - DataQualityReports, via WorkflowDataQualityReports
+
+  - Other Workflows, via WorkflowDependency
 
 - **WorkflowConfiguration**: Stores the S3 working directory and an optional Customer association; it `has_many`:
 

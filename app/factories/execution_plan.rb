@@ -2,8 +2,6 @@ class ExecutionPlan
 
   class << self
 
-    # FIXME - WE SHOULD SUPPORT A GENERAL WorkflowDependency DAG JUST AS WE DO FOR TransformDependencies.  WE DON'T HERE YET B/C WE HAVEN'T NEEDED ANYTHING MORE
-    #          THAN THE PRIMITIVE CAPABILITIES USED HERE.
     def create(workflow_configuration)
       execution_plan = workflow_configuration.serialize_and_symbolize.tap do |including_plan_h|
         # First, we merge all included workflows' Transform Groups and Data Quality Reports
@@ -30,9 +28,9 @@ class ExecutionPlan
     def merge_included_workflows!(workflow_configuration:, included_workflows:)
       return nil if included_workflows.empty?
       first_workflow, rest_workflows = included_workflows.first, included_workflows.last(included_workflows.size - 1)
-      first_plan_h = WorkflowConfiguration.new(workflow: first_workflow).serialize_and_symbolize
+      first_plan_h = create(WorkflowConfiguration.new(workflow: first_workflow)).to_hash # recursive call
       rest_workflows.each do |rest_workflow|
-        rest_plan_h = WorkflowConfiguration.new(workflow: rest_workflow).serialize_and_symbolize
+        rest_plan_h = create(WorkflowConfiguration.new(workflow: rest_workflow)).to_hash # recursive call
         merge_workflow_data_quality_reports!(first_plan_h, rest_plan_h)
         merge_workflow_transform_groups!(first_plan_h, rest_plan_h)
       end
