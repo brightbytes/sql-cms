@@ -89,7 +89,14 @@ class ExecutionPlan
   end
 
   def transform_plan(step_index:, transform_id:)
-    transform_group(step_index)&.detect { |h| h[:id] == transform_id }&.deep_symbolize_keys
+    if base_plan = transform_group(step_index)&.detect { |h| h[:id] == transform_id }
+      base_plan.merge!(
+        s3_region_name: execution_plan[:s3_region_name],
+        s3_bucket_name: execution_plan[:s3_bucket_name],
+        s3_file_path: execution_plan[:s3_file_path]
+      ) if base_plan[:s3_file_name].present?
+      base_plan.deep_symbolize_keys
+    end
   end
 
   def workflow_data_quality_reports
