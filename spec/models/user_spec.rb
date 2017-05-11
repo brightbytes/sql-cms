@@ -61,7 +61,7 @@ describe User do
 
   describe "associations" do
     it { should have_many(:notifications) }
-    it { should have_many(:observed_workflows).through(:notifications).source(:workflow) }
+    it { should have_many(:observed_workflow_configurations).through(:notifications).source(:workflow_configuration) }
     it { should have_many(:runs) }
   end
 

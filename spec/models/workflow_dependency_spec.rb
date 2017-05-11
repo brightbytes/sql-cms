@@ -29,16 +29,6 @@ describe WorkflowDependency do
       it { should validate_uniqueness_of(:included_workflow).scoped_to(:including_workflow_id) }
     end
 
-    it "should not allow an unshared workflow to be an independent workflow" do
-      expect(build(:workflow_dependency, included_workflow: create(:workflow))).to_not be_valid
-      expect(build(:workflow_dependency, included_workflow: create(:shared_workflow))).to be_valid
-    end
-
-    it "should not allow a shared workflow to be a dependent workflow" do
-      expect(build(:workflow_dependency, including_workflow: create(:shared_workflow))).to_not be_valid
-      expect(build(:workflow_dependency, including_workflow: create(:workflow))).to be_valid
-    end
-
   end
 
   describe 'associations' do

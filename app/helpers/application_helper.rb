@@ -53,7 +53,7 @@ module ApplicationHelper
 
   # Customer stuff
 
-  # Currently, this is only passed when clicking Create New Workflow from the Customer page.
+  # Currently, this is only passed when clicking Create New WorkflowConfiguration from the Customer page.
   def customer_id_from_param
     params[:customer_id].presence&.to_i
   end

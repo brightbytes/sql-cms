@@ -2,25 +2,25 @@
 #
 # Table name: public.runs
 #
-#  id                  :integer          not null, primary key
-#  workflow_id         :integer          not null
-#  creator_id          :integer          not null
-#  execution_plan      :jsonb            not null
-#  status              :string           default("unstarted"), not null
-#  notification_status :string           default("unsent"), not null
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  schema_name         :string
+#  id                        :integer          not null, primary key
+#  creator_id                :integer          not null
+#  execution_plan            :jsonb            not null
+#  status                    :string           default("unstarted"), not null
+#  notification_status       :string           default("unsent"), not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  schema_name               :string
+#  workflow_configuration_id :integer          not null
 #
 # Indexes
 #
-#  index_runs_on_creator_id   (creator_id)
-#  index_runs_on_workflow_id  (workflow_id)
+#  index_runs_on_creator_id                 (creator_id)
+#  index_runs_on_workflow_configuration_id  (workflow_configuration_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (creator_id => users.id)
-#  fk_rails_...  (workflow_id => workflows.id)
+#  fk_rails_...  (workflow_configuration_id => workflow_configurations.id)
 #
 
 # The point of this class is to execute a Workflow in an isolated namespace (think "separate DB context")
@@ -39,7 +39,7 @@ class Run < ApplicationRecord
 
   # Validations
 
-  validates :workflow, :creator, :execution_plan, :status, presence: true
+  validates :workflow_configuration, :creator, :execution_plan, :status, presence: true
 
   NOTIFICATION_STATUSES = %w(unsent sending sent)
 
@@ -50,7 +50,7 @@ class Run < ApplicationRecord
   after_create :generate_schema_name
 
   def generate_schema_name
-    update_attribute(:schema_name, "#{workflow}_run_#{id}")
+    update_attribute(:schema_name, "#{workflow_configuration}_run_#{id}")
   end
 
   # From Run::PostgresSchema; consider removing to Observer or Service
@@ -62,7 +62,10 @@ class Run < ApplicationRecord
 
   belongs_to :creator, class_name: 'User', inverse_of: :runs
 
-  belongs_to :workflow, inverse_of: :runs
+  belongs_to :workflow_configuration, inverse_of: :runs
+
+  has_one :customer, through: :workflow_configuration
+  has_one :workflow, through: :workflow_configuration
 
   # Instance Methods
 

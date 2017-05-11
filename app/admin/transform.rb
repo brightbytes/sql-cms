@@ -16,7 +16,6 @@ ActiveAdmin.register Transform do
   index(download_links: false) do
     column(:name) { |transform| auto_link(transform) }
     column(:workflow, sortable: 'workflows.slug')
-    column(:customer, sortable: 'customers.slug')
     column(:runner)
   end
 
@@ -26,30 +25,39 @@ ActiveAdmin.register Transform do
       row :name
       row :interpolated_name
       row :workflow
-      row :customer
 
       row :runner
       row(:params) { code(pretty_print_as_json(resource.params)) }
       simple_format_row(:sql)
       simple_format_row(:interpolated_sql) if resource.params.present?
 
-      if transform.importing? || transform.exporting?
-        error_msg = "<br /><span style='color: red'>Either the s3_region_name or the s3_bucket_name is not valid because S3 pukes on it!</span>".html_safe
-        row(:s3_region_name) do
-          text_node(transform.s3_region_name)
-          text_node(error_msg) if transform.importing? && !transform.s3_import_file.s3_object_valid?
-        end
-        row(:s3_bucket_name)do
-          text_node(transform.s3_bucket_name)
-          text_node(error_msg) if transform.importing? && !transform.s3_import_file.s3_object_valid?
-        end
-        row :s3_file_path
-        row :s3_file_name
-        row(:s3_file_exists?) { yes_no(resource.s3_import_file.s3_file_exists?, yes_color: :green, no_color: :red) } if transform.importing?
-      end
+      row :s3_file_name if transform.importing? || transform.exporting?
 
       row :created_at
       row :updated_at
+    end
+
+    if transform.importing? || transform.exporting?
+      workflow_configurations = resource.workflow_configurations.includes(:customer).order('customers.slug, workflows.slug').to_a
+      unless workflow_configurations.empty?
+        error_msg = "<br /><span style='color: red'>Either the s3_region_name or the s3_bucket_name is not valid because S3 pukes on it!</span>".html_safe
+        panel 'Workflow Configuration S3 Files' do
+          table_for(workflow_configurations) do
+            column(:workflow_configuration) { |wc| auto_link(wc) }
+            column(:s3_region_name) do |wc|
+              text_node(wc.s3_region_name)
+              text_node(error_msg) if transform.importing? && !transform.s3_import_file(wc).s3_object_valid?
+            end
+            column(:s3_bucket_name) do |wc|
+              text_node(wc.s3_bucket_name)
+              text_node(error_msg) if transform.importing? && !transform.s3_import_file(wc).s3_object_valid?
+            end
+            column :s3_file_path { |wc| wc.s3_file_path }
+            column :s3_file_name { |wc| transform.s3_file_name }
+            column :s3_file_exists? { |wc| yes_no(transform.s3_import_file(wc).s3_file_exists?, yes_color: :green, no_color: :red) } if transform.importing?
+          end
+        end
+      end
     end
 
     panel 'Transform Validations' do
@@ -105,11 +113,11 @@ ActiveAdmin.register Transform do
     render partial: 'admin/shared/history'
   end
 
-  sidebar("Actions", only: :show, if: -> { resource.importing? && !resource.s3_import_file.s3_file_exists? }) do
-    ul do
-      li link_to("Upload File to S3")
-    end
-  end
+  # sidebar("Actions", only: :show, if: -> { resource.importing? && !resource.s3_import_file.s3_file_exists? }) do
+  #   ul do
+  #     li link_to("Upload File to S3")
+  #   end
+  # end
 
   form do |f|
     inputs 'Details' do
@@ -150,7 +158,7 @@ ActiveAdmin.register Transform do
   controller do
 
     def scoped_collection
-      super.includes(workflow: :customer)
+      super.includes(:workflow)
     end
 
     def action_methods

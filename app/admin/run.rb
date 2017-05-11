@@ -4,19 +4,20 @@ ActiveAdmin.register Run do
 
   actions :index, :show, :destroy
 
+  filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :creator, as: :select, collection: proc { User.order(:first_name, :last_name).all }
   filter :status, as: :string
 
-  config.sort_order = 'workflows.slug_asc,id_desc'
+  config.sort_order = 'id_desc'
 
   index(download_links: false) do
     column(:schema_name, sortable: 'schema_name') { |run| auto_link(run) }
+    column(:workflow_configuration)
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
     column(:creator, sortable: 'users.first_name,users.last_name')
     column(:human_status) { |run| human_status(run) }
-    column(:human_notification_status) { |run| human_notification_status(run) }
   end
 
   show do
@@ -27,6 +28,7 @@ ActiveAdmin.register Run do
         text_node("<span style='color: blue'>SET search_path TO</span> <span style='color: red'>#{resource.schema_name}</span>;".html_safe)
       end
 
+      row :workflow_configuration
       row :workflow
       row :customer
 
@@ -80,13 +82,13 @@ ActiveAdmin.register Run do
   controller do
 
     def scoped_collection
-      super.includes(:creator, { workflow: :customer })
+      super.includes(:creator, :customer, :workflow)
     end
 
     def destroy
       super do |success, failure|
         success.html do
-          redirect_to(workflow_path(resource.workflow))
+          redirect_to(workflow_configuration_path(resource.workflow_configuration))
         end
       end
     end

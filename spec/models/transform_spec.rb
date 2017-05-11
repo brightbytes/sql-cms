@@ -113,7 +113,6 @@ describe Transform do
 
   describe "associations" do
     it { should belong_to(:workflow) }
-    it { should have_one(:customer) }
 
     it { should have_many(:prerequisite_dependencies) }
     it { should have_many(:prerequisite_transforms) }
@@ -182,21 +181,6 @@ describe Transform do
       end
 
     end
-
-    # context "#available_unused_prerequisite_transforms" do
-
-    #   include_examples 'cheesey dependency graph'
-
-    #   it "should return the correct list of prerequisites in all cases" do
-    #     expect(most_dependent_transform.available_unused_prerequisite_transforms).to eq([independent_transform])
-    #     expect(Set.new(first_child_transform.available_unused_prerequisite_transforms)).to eq(Set.new([independent_transform, less_dependent_transform, another_less_dependent_transform, least_dependent_transform]))
-    #     expect(Set.new(less_dependent_transform.available_unused_prerequisite_transforms)).to eq(Set.new([independent_transform, first_child_transform, another_less_dependent_transform]))
-    #     expect(Set.new(another_less_dependent_transform.available_unused_prerequisite_transforms)).to eq(Set.new([independent_transform, first_child_transform, less_dependent_transform]))
-    #     expect(Set.new(least_dependent_transform.available_unused_prerequisite_transforms)).to eq(Set.new([independent_transform, first_child_transform]))
-    #     expect(Set.new(independent_transform.available_unused_prerequisite_transforms)).to eq(Set.new([most_dependent_transform, first_child_transform, less_dependent_transform, another_less_dependent_transform, least_dependent_transform]))
-    #   end
-
-    # end
 
   end
 end

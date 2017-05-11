@@ -2,7 +2,8 @@ describe WorkflowDataQualityReportJob do
 
   describe "#perform" do
     let!(:creator) { create(:user) }
-    let!(:workflow) { create(:workflow) }
+    let!(:workflow_configuration) { create(:workflow_configuration) }
+    let!(:workflow) { workflow_configuration.workflow }
     let!(:workflow_data_quality_report) do
       create(:workflow_data_quality_report, workflow: workflow, data_quality_report: DataQualityReport.table_count, params: { table_name: :quick_test })
     end
@@ -14,8 +15,7 @@ describe WorkflowDataQualityReportJob do
     end
 
     let!(:run) do
-      plan = ActiveModelSerializers::SerializableResource.new(workflow).as_json
-      workflow.runs.create!(creator: creator, execution_plan: plan)
+      workflow_configuration.runs.create!(creator: creator, execution_plan: workflow_configuration.serialize_and_symbolize)
     end
 
     it "should store the result in the RunStepLog when invoked with valid SQL" do

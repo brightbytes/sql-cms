@@ -31,7 +31,7 @@ class Customer < ApplicationRecord
 
   # Associations
 
-  has_many :workflows, inverse_of: :customer
+  has_many :workflow_configurations, inverse_of: :customer
 
   # Scopes
 

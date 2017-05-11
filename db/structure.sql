@@ -746,8 +746,8 @@ ALTER SEQUENCE data_quality_reports_id_seq OWNED BY data_quality_reports.id;
 CREATE TABLE notifications (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    workflow_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone NOT NULL,
+    workflow_configuration_id integer NOT NULL
 );
 
 
@@ -814,14 +814,14 @@ ALTER SEQUENCE run_step_logs_id_seq OWNED BY run_step_logs.id;
 
 CREATE TABLE runs (
     id integer NOT NULL,
-    workflow_id integer NOT NULL,
     creator_id integer NOT NULL,
     execution_plan jsonb NOT NULL,
     status character varying DEFAULT 'unstarted'::character varying NOT NULL,
     notification_status character varying DEFAULT 'unsent'::character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    schema_name character varying
+    schema_name character varying,
+    workflow_configuration_id integer NOT NULL
 );
 
 
@@ -1066,6 +1066,41 @@ ALTER SEQUENCE versions_id_seq OWNED BY versions.id;
 
 
 --
+-- Name: workflow_configurations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE workflow_configurations (
+    id bigint NOT NULL,
+    workflow_id integer NOT NULL,
+    s3_region_name character varying NOT NULL,
+    s3_bucket_name character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    customer_id integer,
+    s3_file_path character varying
+);
+
+
+--
+-- Name: workflow_configurations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE workflow_configurations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: workflow_configurations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE workflow_configurations_id_seq OWNED BY workflow_configurations.id;
+
+
+--
 -- Name: workflow_data_quality_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1137,13 +1172,8 @@ CREATE TABLE workflows (
     id integer NOT NULL,
     name character varying NOT NULL,
     slug character varying NOT NULL,
-    customer_id integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    shared boolean DEFAULT false NOT NULL,
-    s3_region_name character varying NOT NULL,
-    s3_bucket_name character varying NOT NULL,
-    s3_file_path character varying
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -1380,6 +1410,13 @@ ALTER TABLE ONLY validations ALTER COLUMN id SET DEFAULT nextval('validations_id
 --
 
 ALTER TABLE ONLY versions ALTER COLUMN id SET DEFAULT nextval('versions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflow_configurations ALTER COLUMN id SET DEFAULT nextval('workflow_configurations_id_seq'::regclass);
 
 
 --
@@ -1663,6 +1700,14 @@ ALTER TABLE ONLY validations
 
 ALTER TABLE ONLY versions
     ADD CONSTRAINT versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: workflow_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY workflow_configurations
+    ADD CONSTRAINT workflow_configurations_pkey PRIMARY KEY (id);
 
 
 --
@@ -2018,10 +2063,10 @@ CREATE INDEX index_notifications_on_user_id ON notifications USING btree (user_i
 
 
 --
--- Name: index_notifications_on_workflow_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_notifications_on_workflow_configuration_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_notifications_on_workflow_id_and_user_id ON notifications USING btree (workflow_id, user_id);
+CREATE UNIQUE INDEX index_notifications_on_workflow_configuration_id_and_user_id ON notifications USING btree (workflow_configuration_id, user_id);
 
 
 --
@@ -2039,10 +2084,10 @@ CREATE INDEX index_runs_on_creator_id ON runs USING btree (creator_id);
 
 
 --
--- Name: index_runs_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_runs_on_workflow_configuration_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_runs_on_workflow_id ON runs USING btree (workflow_id);
+CREATE INDEX index_runs_on_workflow_configuration_id ON runs USING btree (workflow_configuration_id);
 
 
 --
@@ -2078,6 +2123,13 @@ CREATE INDEX index_transform_validations_on_validation_id ON transform_validatio
 --
 
 CREATE UNIQUE INDEX index_transforms_on_lowercase_name ON transforms USING btree (lower((name)::text));
+
+
+--
+-- Name: index_unique_workflow_configurations_on_workflow_customer; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_unique_workflow_configurations_on_workflow_customer ON workflow_configurations USING btree (workflow_id, customer_id);
 
 
 --
@@ -2123,6 +2175,13 @@ CREATE INDEX index_versions_on_user_id ON versions USING btree (user_id);
 
 
 --
+-- Name: index_workflow_configurations_on_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_workflow_configurations_on_customer_id ON workflow_configurations USING btree (customer_id);
+
+
+--
 -- Name: index_workflow_data_quality_reports_on_data_quality_report_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2148,13 +2207,6 @@ CREATE INDEX index_workflow_dependencies_on_including_workflow_id ON workflow_de
 --
 
 CREATE UNIQUE INDEX index_workflow_depenencies_on_independent_id_dependent_id ON workflow_dependencies USING btree (included_workflow_id, including_workflow_id);
-
-
---
--- Name: index_workflows_on_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_workflows_on_customer_id ON workflows USING btree (customer_id);
 
 
 --
@@ -2217,27 +2269,35 @@ ALTER TABLE ONLY school_mappings
 SET search_path = public, pg_catalog;
 
 --
--- Name: fk_rails_404232665a; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_005a70e28c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflow_configurations
+    ADD CONSTRAINT fk_rails_005a70e28c FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+
+--
+-- Name: fk_rails_316d9533d3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflow_configurations
+    ADD CONSTRAINT fk_rails_316d9533d3 FOREIGN KEY (workflow_id) REFERENCES workflows(id);
+
+
+--
+-- Name: fk_rails_36b8cfa612; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY runs
-    ADD CONSTRAINT fk_rails_404232665a FOREIGN KEY (workflow_id) REFERENCES workflows(id);
+    ADD CONSTRAINT fk_rails_36b8cfa612 FOREIGN KEY (workflow_configuration_id) REFERENCES workflow_configurations(id);
 
 
 --
--- Name: fk_rails_5040d0e343; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY workflows
-    ADD CONSTRAINT fk_rails_5040d0e343 FOREIGN KEY (customer_id) REFERENCES customers(id);
-
-
---
--- Name: fk_rails_56d6267752; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_466a60ec0d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY notifications
-    ADD CONSTRAINT fk_rails_56d6267752 FOREIGN KEY (workflow_id) REFERENCES workflows(id);
+    ADD CONSTRAINT fk_rails_466a60ec0d FOREIGN KEY (workflow_configuration_id) REFERENCES workflow_configurations(id);
 
 
 --
@@ -2332,7 +2392,7 @@ ALTER TABLE ONLY transform_dependencies
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user",public;
+SET search_path TO "public";
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20170112005400'),
@@ -2346,6 +2406,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170403215347'),
 ('20170502012231'),
 ('20170504001059'),
-('20170509204400');
+('20170509204400'),
+('20170510010559');
 
 

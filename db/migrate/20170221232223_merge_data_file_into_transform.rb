@@ -1,8 +1,5 @@
 class MergeDataFileIntoTransform < ActiveRecord::Migration[4.2]
   def up
-    # Nuke these b/c only the Demo Workflow exists at this time, and it's easier to just re-seed
-    WorkflowSeeder.demo_workflow.destroy! if WorkflowSeeder.demo_workflow_exists?
-
     add_column :transforms, :s3_region_name, :string
     add_column :transforms, :s3_bucket_name, :string
     add_column :transforms, :s3_file_path, :string

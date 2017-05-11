@@ -4,33 +4,29 @@ module WorkflowSeeder
 
   def seed
     CustomerSeeder.seed
-    notify_me!(create_demo_workflow!)
+    demo_workflow
   end
-
-  # FIXME - NUKE THIS METHOD WHEN DONE WITH RAPID-DEV OF THE DEMO WORKFLOW
-  # def reseed
-  #   demo_workflow.destroy if demo_workflow_exists?
-  #   seed
-  # end
 
   DEMO_WORKFLOW_NAME = 'Demo Workflow'
 
   def demo_workflow
-    Workflow.where(name: DEMO_WORKFLOW_NAME).first_or_create!(
-      customer: CustomerSeeder.demo_customer,
-      s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files'
-    )
+    arel = Workflow.where(name: DEMO_WORKFLOW_NAME)
+    arel.first || arel.create!.tap do |workflow|
+      workflow_configuration = WorkflowConfiguration.create!(
+        workflow: workflow,
+        customer: CustomerSeeder.demo_customer,
+        s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files'
+      )
+      workflow_configuration.notifications.first_or_create!(user: User.where(email: 'aaron@brightbytes.net').first)
+      create_demo_workflow!
+    end
   end
 
-  def demo_workflow_exists?
-    Workflow.where(name: DEMO_WORKFLOW_NAME).exists?
+  def demo_workflow_configuration
+    demo_workflow.workflow_configurations.order(:id).first
   end
 
   private
-
-  def notify_me!(workflow)
-    workflow.notifications.first_or_create!(user: User.where(email: 'aaron@brightbytes.net').first)
-  end
 
   def create_demo_workflow!
 

@@ -2,7 +2,8 @@ describe TransformJob do
 
   describe "#perform" do
     let!(:creator) { create(:user) }
-    let!(:workflow) { create(:workflow) }
+    let!(:workflow_configuration) { create(:workflow_configuration) }
+    let!(:workflow) { workflow_configuration.workflow }
 
     context "on a Transform using the 'SqlTransform' runner" do
       let!(:transform) do
@@ -15,8 +16,7 @@ describe TransformJob do
         end
 
         let!(:run) do
-          plan = ActiveModelSerializers::SerializableResource.new(workflow).as_json
-          workflow.runs.create!(creator: creator, execution_plan: plan)
+          workflow_configuration.runs.create!(creator: creator, execution_plan: workflow_configuration.serialize_and_symbolize)
         end
 
         before do
@@ -47,8 +47,7 @@ describe TransformJob do
         end
 
         let!(:run) do
-          plan = ActiveModelSerializers::SerializableResource.new(workflow).as_json
-          workflow.runs.create!(creator: creator, execution_plan: plan)
+          workflow_configuration.runs.create!(creator: creator, execution_plan: workflow_configuration.serialize_and_symbolize)
         end
 
         before do

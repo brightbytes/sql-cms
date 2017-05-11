@@ -49,7 +49,7 @@ class User < ApplicationRecord
   # Associations
 
   has_many :notifications, inverse_of: :user
-  has_many :observed_workflows, through: :notifications, source: :workflow
+  has_many :observed_workflow_configurations, through: :notifications, source: :workflow_configuration
 
   has_many :runs, foreign_key: :creator_id, inverse_of: :creator
 

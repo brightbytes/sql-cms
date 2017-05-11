@@ -13,7 +13,7 @@ describe RunManagerJob do
           # We do this so that there's no schema collision on reruns
           workflow.update_attribute(:slug, "#{workflow.slug}_#{rand(10_000_000)}")
 
-          run = workflow.run!(creator)
+          run = WorkflowSeeder.demo_workflow_configuration.run!(creator)
           run.reload
 
           # Default debugging of global refactoring goof-ups, baby!!
@@ -29,7 +29,7 @@ describe RunManagerJob do
 
           transform_count = run.execution_plan[:ordered_transform_groups].flatten.size
           expect(transform_count > 0).to eq(true)
-          
+
           wdqr_count = run.execution_plan[:workflow_data_quality_reports].size
           expect(wdqr_count > 0).to eq(true)
 

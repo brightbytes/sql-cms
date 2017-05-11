@@ -1,6 +1,8 @@
 shared_examples 'cheesey dependency graph' do
 
-  let!(:workflow) { create(:workflow) }
+  let!(:workflow_configuration) { create(:workflow_configuration) }
+
+  let!(:workflow) { workflow_configuration.workflow }
 
   let!(:most_dependent_transform) { create(:transform, workflow: workflow) }
   let!(:first_child_transform) { create(:transform, workflow: workflow) }
@@ -34,7 +36,6 @@ shared_examples 'a workflow serialized into a run' do
   let!(:creator) { create(:user) }
 
   let!(:run) do
-    plan = ActiveModelSerializers::SerializableResource.new(workflow).as_json
-    workflow.runs.create!(creator: creator, execution_plan: plan)
+    workflow_configuration.runs.create!(creator: creator, execution_plan: workflow_configuration.serialize_and_symbolize)
   end
 end

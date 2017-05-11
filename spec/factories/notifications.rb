@@ -22,6 +22,6 @@
 FactoryGirl.define do
   factory :notification do
     association :user
-    association :workflow
+    association :workflow_configuration
   end
 end

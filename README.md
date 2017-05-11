@@ -8,23 +8,21 @@ The following entities exist in the **public** Postgres schema, and together the
 
 - **User**: An Analyst possessing basic knowledge of SQL, or an ETL SQL Developer.  No knowledge of programming is required to use this application: only knowledge of SQL.
 
-- **Customer**: The Customer with which every non-Shared Workflow must be associated
+- **Customer**: The Customer with which a WorkflowConfiguration may be associated
 
-- **Customer Workflow**: A named, per-Customer collection of the following, each via a `has_many` relationship, and each described in detail below:
+- **Workflow**: A named collection of the following, each via a `has_many` relationship:
 
-  - Various types of SQL Transform and their TransformDependencies and TransformValidations
+  - Various types of SQL Transform and their TransformDependencies and TransformValidations and their Validations
 
-  - DataQualityReports
+  - DataQualityReports, via WorkflowDataQualityReports
+
+  - Other Workflows, via WorkflowDependency
+
+- **WorkflowConfiguration**: Stores the S3 working directory and an optional Customer association; it `has_many`:
 
   - Notifications
 
   - Runs and their RunStepLogs
-
-- **Shared Workflow**: Identical to Customer Workflows in all respects except two:
-
-  - They may not be associated with a Customer.
-
-  - They may be "reused" by any Customer Workflow via the **WorkflowDependency** model.  If more than one Shared Workflow is associated with a given Customer Workflow, the Transform Groups of all Shared Workflows will be merged at execution time.  Thereafter, at execution time the Transform Groups of the merged Shared Workflows will be executed in succession before the Customer Workflow's Transform Groups are then executed in succession.
 
 - **Notification**: An association of a Workflow with a User for the purpose of notifying the User whenenever a Run of that Workflow successfully or unsuccessfully completes.
 

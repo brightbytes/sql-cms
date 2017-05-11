@@ -2,7 +2,7 @@
 class UserMailerPreview < ActionMailer::Preview
 
   def run_completed
-    if run = WorkflowSeeder.demo_workflow.runs.order(:id).last
+    if run = WorkflowSeeder.demo_workflow_configuration.runs.order(:id).last
       UserMailer.run_completed(run)
     else
       raise "You'll need to generate a Run for the Demo Workflow before you can use this feature!"

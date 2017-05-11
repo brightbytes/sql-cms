@@ -2,26 +2,16 @@
 #
 # Table name: public.workflows
 #
-#  id             :integer          not null, primary key
-#  name           :string           not null
-#  slug           :string           not null
-#  customer_id    :integer
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  shared         :boolean          default(FALSE), not null
-#  s3_region_name :string           not null
-#  s3_bucket_name :string           not null
-#  s3_file_path   :string
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  slug       :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 # Indexes
 #
-#  index_workflows_on_customer_id     (customer_id)
 #  index_workflows_on_lowercase_name  (lower((name)::text)) UNIQUE
 #  index_workflows_on_lowercase_slug  (lower((slug)::text)) UNIQUE
-#
-# Foreign Keys
-#
-#  fk_rails_...  (customer_id => customers.id)
 #
 
 class Workflow < ApplicationRecord
@@ -39,8 +29,6 @@ class Workflow < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
-  validates :s3_region_name, :s3_bucket_name, presence: true
-
   validates :slug, presence: true, uniqueness: { case_sensitive: false }
 
   validate :slug_valid_sql_identifier
@@ -49,38 +37,20 @@ class Workflow < ApplicationRecord
     errors.add(:slug, "Is not a valid SQL identifier") unless slug =~ /^[a-z_]([a-z0-9_])*$/
   end
 
-  validates :customer, presence: true, unless: :shared?
-
-  validates :customer, absence: { message: "must be blank for Shared Workflows" }, if: :shared?
-
   # Callbacks
 
-  include Concerns::ImmutableCallbacks
-  immutable :destroy
-  immutable_attribute_name :shared
+  before_destroy :raise_if_depended_upon
 
-  after_initialize :set_defaults
-
-  private def set_defaults
-    if new_record?
-      self.s3_region_name ||= ENV.fetch('DEFAULT_S3_REGION', 'us-west-2')
-      self.s3_bucket_name ||= ENV['DEFAULT_S3_BUCKET']
-    end
+  private def raise_if_depended_upon
+    raise "You cannot destroy this Workflow because other Workflows still depend upon it." if including_dependencies.exists?
   end
 
   # Associations
-
-  belongs_to :customer, inverse_of: :workflows
-
-  has_many :notifications, inverse_of: :workflow, dependent: :delete_all
-  has_many :notified_users, through: :notifications, source: :user
 
   has_many :transforms, inverse_of: :workflow, dependent: :destroy
 
   has_many :workflow_data_quality_reports, inverse_of: :workflow, dependent: :delete_all
   has_many :data_quality_reports, through: :workflow_data_quality_reports
-
-  has_many :runs, inverse_of: :workflow, dependent: :destroy
 
   has_many :included_dependencies, class_name: 'WorkflowDependency', foreign_key: :including_workflow_id, dependent: :delete_all
   has_many :included_workflows, through: :included_dependencies, source: :included_workflow
@@ -88,40 +58,52 @@ class Workflow < ApplicationRecord
   has_many :including_dependencies, class_name: 'WorkflowDependency', foreign_key: :included_workflow_id, dependent: :delete_all
   has_many :including_workflows, through: :including_dependencies, source: :including_workflow
 
+  has_many :workflow_configurations, inverse_of: :workflow
+
   # Scopes
 
-  scope :shared, -> { where(shared: true) }
+
 
   # Instance Methods
 
   def to_s
-    prefix = customer&.slug || "shared"
-    "#{prefix}_#{slug}".freeze
+    slug
   end
 
-  accepts_nested_attributes_for :notified_users
-  accepts_nested_attributes_for :included_workflows
+  # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html
+  # But, it's so much more satisfying to figure it out all by myself ...
+  # FIXME - Copy/paste from Transform model; DRY up sometime
+  concerning :EligibleIncludedWorkflows do
 
-  # This method should technically be a service ... but it's soooooo tiny, I just can't bring myself to make it one.
-  def run!(creator)
-    runs.create!(creator: creator, execution_plan: ExecutionPlan.create(self).to_hash).tap do |run|
-      RunManagerJob.perform_later(run.id)
+    included do
+      accepts_nested_attributes_for :included_workflows
     end
+
+    # Any Workflow that doesn't directly or indirectly have this Workflow already included is itself available as an includable workflow (and may already be such).
+    # This is how we avoid cycles in the Workflow Dependency graph.
+    def available_included_workflows
+      base_arel = Workflow.order(:name)
+      if new_record?
+        base_arel.all
+      else
+        # This is grossly inefficient.  I tried to do it with SQL for the first level, and failed.  Oh well.  Refactor later.
+        eligible_workflows = base_arel.where("id <> #{id}").all
+        # Where's that graph DB when you need it?
+        eligible_workflows.reject { |eligible_workflow| already_including_me?(eligible_workflow) }
+      end
+    end
+
+    private
+
+    def already_including_me?(workflow)
+      dependents = workflow.included_workflows
+      return false if dependents.empty?
+      return true if dependents.include?(self)
+      dependents.any? { |dependent_workflow| already_including_me?(dependent_workflow) }
+    end
+
   end
 
-  # The following methods are used by the serializer.  I suppose they thus should be part of the serializer.  Refactor.
-
-  def serialize_and_symbolize
-    ActiveModelSerializers::SerializableResource.new(self).as_json.deep_symbolize_keys
-  end
-
-  def emails_to_notify
-    notified_users.pluck(:email)
-  end
-
-  def rfc_email_addresses_to_notify
-    notified_users.map(&:rfc_email_address)
-  end
 
   # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html
   # But, it's so much more satisfying to figure it out all by myself ...
