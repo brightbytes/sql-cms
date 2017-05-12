@@ -49,7 +49,7 @@ module Concerns::ParamsHelpers
           params.each_pair do |k, v|
             if v.is_a?(Array)
               # We assume here that the intention is for the array to be used as values, e.g. for a SQL `IN` clause.
-              v = v.map { |elm| connection.quote(elm) } if quote_arrays
+              v = v.map { |elm| connection.quote(elm.to_s) } if quote_arrays
               v = v.join(", ")
             else
               # ... whereas, here the intention most of the time is for the value to be used as a table name or column name,
