@@ -96,7 +96,7 @@ ActiveAdmin.register Workflow do
       unless reports.empty?
         table_for(reports) do
           column(:workflow_data_quality_report) { |wdqr| auto_link(wdqr) }
-          column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(120) }
+          column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql.truncate(160) }
           column('Immutable?') { |wdqr| yes_no(wdqr.data_quality_report.immutable?) }
           column(:action) do |wdqr|
             text_node(link_to("Edit", edit_workflow_data_quality_report_path(wdqr, source: :workflow, workflow_id: wdqr.workflow_id)))
