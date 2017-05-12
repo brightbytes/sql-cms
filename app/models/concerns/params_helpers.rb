@@ -52,8 +52,9 @@ module Concerns::ParamsHelpers
               v = v.map { |elm| connection.quote(elm) } if quote_arrays
               v = v.join(", ")
             else
-              # ... whereas, here the intention most of the time is for the value to be used as a table name or column name
-              v = v.to_s
+              # ... whereas, here the intention most of the time is for the value to be used as a table name or column name,
+              #     so we only escape, and don't enclose in quotes
+              v = connection.quote_string(v.to_s)
             end
             # HMMMMM - This prevents matching of a key that is a subset of another key (:some_key would match :some_key_here),
             #           and it also prevents matching a colon in the middle of a string (unlikely case, to be sure),
