@@ -67,7 +67,7 @@ ActiveAdmin.register Transform do
       unless transform_validations.empty?
         table_for(transform_validations) do
           column(:transform_validation) { |tv| auto_link(tv) }
-          column(:interpolated_sql) { |tv| tv.interpolated_sql.truncate(160) }
+          column(:interpolated_sql) { |tv| tv.interpolated_sql }
           column('Immutable?') { |tv| yes_no(tv.validation.immutable?) }
           column(:action) do |tv|
             text_node(link_to("Edit", edit_transform_validation_path(tv, source: :transform, transform_id: tv.transform_id)))
