@@ -101,8 +101,6 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      sql = Transform.interpolate(string: plan_h[:sql], params: plan_h[:params])
-
       s3_file = S3File.create(
         'import',
         s3_region_name: plan_h[:s3_region_name],
@@ -114,7 +112,7 @@ module RunnerFactory
       url = s3_file.s3_presigned_url
       raise "Unable to locate #{s3_file}!" unless url
 
-      open(url) { |stream| run.copy_from_in_schema(sql: sql, enumerable: stream) }
+      open(url) { |stream| run.copy_from_in_schema(sql: plan_h[:interpolated_sql], enumerable: stream) }
     end
   end
 
@@ -124,8 +122,7 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      sql = Transform.interpolate(string: plan_h[:sql], params: plan_h[:params])
-      run.execute_in_schema(sql)
+      run.execute_in_schema(plan_h[:interpolated_sql])
     end
   end
 
@@ -135,8 +132,6 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      sql = Transform.interpolate(string: plan_h[:sql], params: plan_h[:params])
-
       s3_file = S3File.create(
         'export',
         s3_region_name: plan_h[:s3_region_name],
@@ -148,7 +143,7 @@ module RunnerFactory
 
       # Tragically, we can't use IO.pipe b/c AWS needs to know the file size in advance so as to chunk the data when appropriate
       Tempfile.open(s3_file.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
-        run.copy_to_in_schema(sql: sql, writeable_io: stream).tap do
+        run.copy_to_in_schema(sql: plan_h[:interpolated_sql], writeable_io: stream).tap do
           stream.rewind
           s3_file.upload(stream)
         end
@@ -172,7 +167,7 @@ module RunnerFactory
     extend self
 
     def run(run:, transform_validation_h:)
-      transform_validation_sql = TransformValidation.interpolate(string: transform_validation_h[:sql], params: transform_validation_h[:params])
+      transform_validation_sql = transform_validation_h[:interpolated_sql]
       if ids = run.select_values_in_schema(transform_validation_sql).presence
         {
           failed_validation_name: transform_validation_h[:name],
@@ -189,8 +184,7 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      sql = Transform.interpolate(string: plan_h[:sql], params: plan_h[:params])
-      run.select_all_in_schema(sql)&.to_hash
+      run.select_all_in_schema(plan_h[:interpolated_sql])&.to_hash
     end
   end
 

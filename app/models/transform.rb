@@ -123,7 +123,7 @@ class Transform < ApplicationRecord
   concerning :S3Files do
 
     def s3_file_name
-      self.class.interpolate(string: super, params: params)
+      self.class.interpolate(string: super, params: params, quote_arrays: false)
     end
 
     def s3_import_file(workflow_config = nil)
