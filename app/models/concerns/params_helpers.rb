@@ -47,6 +47,7 @@ module Concerns::ParamsHelpers
       if params.present? && string.present?
         string.dup.tap do |string|
           params.each_pair do |k, v|
+            v = v.map { |elm| connection.quote(elm) }.join(",") if v.is_a?(Array)
             # HMMMMM - This prevents matching of a key that is a subset of another key (:some_key would match :some_key_here),
             #           and it also prevents matching a colon in the middle of a string (unlikely case, to be sure),
             #           BUT, it may also prevent matching within a string when it's desired.  It's just that I can't think of when

@@ -12,7 +12,7 @@ class ExecutionPlan
         if merged_included_workflow_h
           # Then, we change the including_plan_h so that all merged Transform Groups come before the including_workflow's Transform Groups
           reorder_workflow_transform_groups!(including_plan_h, merged_included_workflow_h)
-          # And, we just merge Data Quality Reports, since no order is required
+          # And, we just merge Data Quality Reports, since no order is required, yet
           merge_workflow_data_quality_reports!(including_plan_h, merged_included_workflow_h)
         end
       end
