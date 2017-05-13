@@ -49,6 +49,7 @@ ActiveAdmin.register WorkflowConfiguration do
           column(:creator)
           column(:created_at)
           column(:human_status) { |run| human_status(run) }
+          column(:status)
           column(:action) { |run| link_to("Delete", run_path(run), method: :delete, data: { confirm: 'Are you sure you want to nuke this Run and all DB data associated with it?' }) }
         end
       end
