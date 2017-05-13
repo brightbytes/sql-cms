@@ -41,4 +41,9 @@ class TransformValidation < ApplicationRecord
 
   delegate :name, :sql, to: :validation
 
+  def params
+    # This allows reuse of, e.g., :table_name from the associated Transform's #params
+    (super || {}).reverse_merge(transform&.params || {})
+  end
+
 end
