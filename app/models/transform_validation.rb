@@ -23,8 +23,6 @@
 
 class TransformValidation < ApplicationRecord
 
-  include Concerns::ParamsHelpers
-
   # Validations
 
   # Note that here, params can never be NULL/empty, unlike other JSONB columns.
@@ -41,9 +39,20 @@ class TransformValidation < ApplicationRecord
 
   delegate :name, :sql, to: :validation
 
-  def params
-    # This allows reuse of, e.g., :table_name from the associated Transform's #params
-    (super || {}).reverse_merge(transform&.params || {})
-  end
+  concerning :ParamsGettersEmbellishments do
 
+    included do
+      include Concerns::ParamsHelpers
+    end
+
+    def params
+      # This allows reuse of, e.g., :table_name from the associated Transform's #params
+      (transform&.params || {}).merge(super || {})
+    end
+
+    def params_yaml
+      # This allows reuse of, e.g., :table_name from the associated Transform's #params
+      ((transform&.params || {}).merge(read_attribute(:params) || {})).to_yaml
+    end
+  end
 end

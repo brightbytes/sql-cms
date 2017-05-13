@@ -117,6 +117,8 @@ class Workflow < ApplicationRecord
 
       independent_transforms = transforms.independent.to_a
 
+      # NB: This can also happen if a Transform Dependency is hooked-up to a Transform from another Workflow,
+      #      which is why we haven't yet sorted out moving Transforms between Workflows
       raise "Your alleged DAG is a cyclical graph because it has no leaf nodes." if independent_transforms.empty?
 
       groups_arr << independent_transforms
@@ -125,6 +127,8 @@ class Workflow < ApplicationRecord
       # Ah, my old nemesis, the while loop, ever insidiously scheming to iterate indefinitely.
       while unused_transform_ids.present?
         next_group = next_transform_group(transform_groups_thus_far: groups_arr, unused_transform_ids: unused_transform_ids)
+        # NB: This can also happen if a Transform Dependency is hooked-up to a Transform from another Workflow,
+        #      which is why we haven't yet sorted out moving Transforms between Workflows
         raise "Your alleged DAG is a cyclical graph because no transform group may be formed from the remaining transforms." if next_group.empty?
         groups_arr << next_group
         unused_transform_ids -= next_group.map(&:id)
