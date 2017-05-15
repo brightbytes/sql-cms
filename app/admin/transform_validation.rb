@@ -26,7 +26,7 @@ ActiveAdmin.register TransformValidation do
     semantic_errors *f.object.errors.keys
     inputs 'Details' do
       input :transform_id, as: :hidden, input_html: { value: transform_id_param_val }
-      input :transform, as: :select, collection: [[resource_transform.name, resource_transform.id, selected: true]], input_html: { disabled: true }
+      input :transform, as: :select, collection: [[resource.transform.name, resource.transform.id, selected: true]], input_html: { disabled: true }
       input :validation, as: :select, collection: Validation.order(:name).all
 
       # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
@@ -40,6 +40,10 @@ ActiveAdmin.register TransformValidation do
   end
 
   controller do
+
+    def new
+      @transform_validation = TransformValidation.new(transform_id: transform_id_param_val)
+    end
 
     def create
       super do |success, failure|

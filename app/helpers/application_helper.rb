@@ -96,10 +96,6 @@ module ApplicationHelper
     @transform_id_param_val ||= params[:transform_id]&.to_i || resource.transform.try(:id)
   end
 
-  def resource_transform
-    @resource_transform ||= resource.transform || Transform.find_by(id: params[:transform_id])
-  end
-
   def parent_transform_path
     @parent_transform_path ||= transform_path(id: transform_id_param_val)
   end

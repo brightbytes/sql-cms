@@ -48,6 +48,7 @@ class TransformValidation < ApplicationRecord
 
   def params_yaml
     # This allows reuse of, e.g., :table_name from the associated Transform's #params
+    dpp (transform&.read_attribute(:params) || {}), (read_attribute(:params) || {})
     ((transform&.read_attribute(:params) || {}).merge(read_attribute(:params) || {})).to_yaml
   end
 end

@@ -44,14 +44,19 @@ describe TransformValidation do
       let!(:subject) { build(:transform_validation) }
       include_examples 'yaml helper methods'
 
-      it "should reverse merge the Transform params on new and edit" do
+      it "should reverse merge the Transform params" do
         t_params = { 'foo' => 'bar' }
         t = create(:transform, params: t_params)
+
         tv_params = { 'blah' => 'whatever' }
         tv = build(:transform_validation, transform: t, params: tv_params)
         expect(tv.params).to eq(t_params.reverse_merge(tv_params))
         expect(tv.params_yaml).to eq(t_params.merge(tv_params).to_yaml)
 
+        tv_params = {}
+        tv = build(:transform_validation, transform: t, params: tv_params)
+        expect(tv.params).to eq(t_params.reverse_merge(tv_params))
+        expect(tv.params_yaml).to eq(t_params.merge(tv_params).to_yaml)
       end
     end
 
