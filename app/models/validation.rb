@@ -120,6 +120,13 @@ class Validation < ApplicationRecord
       )
     end
 
+    def percentage
+      @percentage ||= where(name: "Column :table_name.:column_name is a valid percent").first_or_create!(
+        immutable: true,
+        sql: "SELECT id FROM :table_name WHERE :column_name < 0 OR :column_name > 100"
+      )
+    end
+
     def flush_cache
       @non_null = @presence = @uniqueness = @fk = @inclusion = @integer = @integer_with_additional = @greater_than = @less_than = @non_overlapping = nil
     end
