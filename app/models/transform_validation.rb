@@ -39,20 +39,15 @@ class TransformValidation < ApplicationRecord
 
   delegate :name, :sql, to: :validation
 
-  concerning :ParamsGettersEmbellishments do
+  include Concerns::ParamsHelpers
 
-    included do
-      include Concerns::ParamsHelpers
-    end
+  def params
+    # This allows reuse of, e.g., :table_name from the associated Transform's #params
+    (transform&.params || {}).merge(super || {})
+  end
 
-    def params
-      # This allows reuse of, e.g., :table_name from the associated Transform's #params
-      (transform&.params || {}).merge(super || {})
-    end
-
-    def params_yaml
-      # This allows reuse of, e.g., :table_name from the associated Transform's #params
-      ((transform&.params || {}).merge(read_attribute(:params) || {})).to_yaml
-    end
+  def params_yaml
+    # This allows reuse of, e.g., :table_name from the associated Transform's #params
+    ((transform&.read_attribute(:params) || {}).merge(read_attribute(:params) || {})).to_yaml
   end
 end
