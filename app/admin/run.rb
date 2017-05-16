@@ -63,21 +63,21 @@ ActiveAdmin.register Run do
     render partial: 'admin/shared/history'
   end
 
-  config.add_action_item :nuke_failed_steps_and_rerun, only: :show, if: proc { resource.failed? } do
-    link_to(
-      "Nuke Failed Steps and Rerun",
-      nuke_failed_steps_and_rerun_run_path(resource),
-      method: :put,
-      data: { confirm: 'This will rerun with the same execution_plan, and thus is only useful for system-wide exceptions or validation failures you fixed directly in the DB.  Proceed?' }
-    )
-  end
+  # config.add_action_item :nuke_failed_steps_and_rerun, only: :show, if: proc { resource.failed? } do
+  #   link_to(
+  #     "Nuke Failed Steps and Rerun",
+  #     nuke_failed_steps_and_rerun_run_path(resource),
+  #     method: :put,
+  #     data: { confirm: 'This will rerun with the same execution_plan, and thus is only useful for system-wide exceptions or validation failures you fixed directly in the DB.  Proceed?' }
+  #   )
+  # end
 
-  # This is only useful for dev debugging
-  member_action :nuke_failed_steps_and_rerun, method: :put do
-    resource.nuke_failed_steps_and_rerun!
-    flash[:notice] = "Failured steps nuked; rerunning from that point onward ..."
-    redirect_to run_path(resource)
-  end
+  # # This is only useful for dev debugging
+  # member_action :nuke_failed_steps_and_rerun, method: :put do
+  #   resource.nuke_failed_steps_and_rerun!
+  #   flash[:notice] = "Failured steps nuked; rerunning from that point onward ..."
+  #   redirect_to run_path(resource)
+  # end
 
   controller do
 
@@ -85,7 +85,18 @@ ActiveAdmin.register Run do
       super.includes(:creator, :customer, :workflow)
     end
 
+    def action_methods
+      result = super
+      # Don't show the destroy button if the User is already destroyed, since a 2nd destroy will physically nuke the record
+      result -= ['destroy'] if action_name == 'show' && resource.running_or_crashed?
+      result
+    end
+
     def destroy
+      if resource.running_or_crashed?
+        flash[:alert] = "You may not destroy a Run that is currently Running"
+        return redirect_to(:back)
+      end
       super do |success, failure|
         success.html do
           redirect_to(workflow_configuration_path(resource.workflow_configuration))
