@@ -11,7 +11,7 @@ ActiveAdmin.register Transform do
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :sql, as: :string
 
-  config.sort_order = 'workflows.slug_asc,name_asc'
+  config.sort_order = 'name_asc'
 
   index(download_links: false) do
     column(:name) { |transform| auto_link(transform) }

@@ -128,7 +128,7 @@ class Validation < ApplicationRecord
     end
 
     def flush_cache
-      @non_null = @presence = @uniqueness = @fk = @inclusion = @integer = @integer_with_additional = @greater_than = @less_than = @non_overlapping = nil
+      @non_null = @presence = @uniqueness = @fk = @inclusion = @integer = @integer_with_additional = @greater_than = @less_than = @non_overlapping = @percentage = nil
     end
 
   end
