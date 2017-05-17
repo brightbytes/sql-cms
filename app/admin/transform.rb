@@ -10,6 +10,7 @@ ActiveAdmin.register Transform do
   filter :name, as: :string
   filter :runner, as: :select, collection: RunnerFactory::RUNNERS_FOR_SELECT
   filter :sql, as: :string
+  filter :s3_file_name, as: :string
 
   config.sort_order = 'name_asc'
 
@@ -23,13 +24,13 @@ ActiveAdmin.register Transform do
     attributes_table do
       row :id
       row :name
-      row :interpolated_name
+      row :interpolated_name if resource.params.present? && resource.name != resource.interpolated_name
       row :workflow
 
       row :runner
       row(:params) { code(pretty_print_as_json(resource.params)) }
       simple_format_row(:sql)
-      simple_format_row(:interpolated_sql) if resource.params.present?
+      simple_format_row(:interpolated_sql) if resource.params.present? && resource.sql != resource.interpolated_sql
 
       row :s3_file_name if transform.importing? || transform.exporting?
 
