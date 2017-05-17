@@ -46,8 +46,15 @@ class TransformValidation < ApplicationRecord
     (transform&.params || {}).merge(super || {})
   end
 
-  def params_yaml
-    # This allows reuse of, e.g., :table_name from the associated Transform's #params
-    ((transform&.read_attribute(:params) || {}).merge(read_attribute(:params) || {})).to_yaml
+  # We actually don't want to do this: it makes for a confusing UI
+  # def params_yaml
+  #   # This allows reuse of, e.g., :table_name from the associated Transform's #params
+  #   ((transform&.read_attribute(:params) || {}).merge(read_attribute(:params) || {})).to_yaml
+  # end
+
+  # Instead:
+
+  def transform_params_yaml
+    transform&.params_yaml
   end
 end

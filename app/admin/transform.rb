@@ -6,9 +6,9 @@ ActiveAdmin.register Transform do
 
   permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :s3_file_name, prerequisite_transform_ids: []
 
+  filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :name, as: :string
   filter :runner, as: :select, collection: RunnerFactory::RUNNERS_FOR_SELECT
-  filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :sql, as: :string
 
   config.sort_order = 'name_asc'
