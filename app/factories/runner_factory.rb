@@ -6,7 +6,15 @@ module RunnerFactory
   # RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
   RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo).freeze
 
-  RUNNERS_FOR_SELECT = [[' Rails Migration', 'RailsMigration'], [' Auto-load', 'AutoLoad'], [' COPY ... FROM', 'CopyFrom'], [' SQL', 'Sql'], [' COPY ... TO', 'CopyTo']]
+  RUNNERS_FOR_SELECT = [
+    [' Rails Migration', 'RailsMigration'],
+    [' Auto-load', 'AutoLoad'],
+    [' Default CopyFrom', 'DefaultCopyFrom'], # This is converted to the CopyFrom actual runner in a Transform callback
+    [' COPY ... FROM', 'CopyFrom'],
+    [' SQL', 'Sql'],
+    [' Default CopyTo', 'DefaultCopyTo'], # This is converted to the CopyTo actual runner in a Transform callback
+    [' COPY ... TO', 'CopyTo']
+  ]
 
   IMPORT_S3_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
 

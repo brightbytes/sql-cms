@@ -8,6 +8,8 @@ $(function() {
 
     $('#transform_params_yaml_input').toggle($(this).val() != 'RailsMigration');
 
+    $('#transform_sql_input').toggle($(this).val() != 'AutoLoad');
+
   });
 
 });

@@ -23,6 +23,10 @@ ActiveAdmin.register Workflow do
       row :name
       row :slug
 
+      row :default_copy_from_sql
+      row :default_copy_to_sql
+      row :default_s3_file_type
+
       row :created_at
       row :updated_at
     end
@@ -120,7 +124,14 @@ ActiveAdmin.register Workflow do
 
     inputs 'Details' do
       input :name, as: :string
+      # FIXME - DON'T ALLOW IT TO BE TOO LONG!
       input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated. And DON'T MAKE IT TOO LONG, or creating the Posgres schema will puke."
+
+      input :default_copy_from_sql, as: :string, hint: "This will be used as the SQL for the DefaultCopyFrom Runner"
+      input :default_copy_from_s3_file_type, collection: Workflow::DEFAULT_S3_FILE_TYPES, include_blank: true, hint: "This will be used as the extention for the S3 file for the DefaultCopyFrom Runner"
+
+      input :default_copy_to_sql, as: :string, hint: "This will be used as the SQL for the DefaultCopyToFrom Runner"
+      input :default_copy_to_s3_file_type, collection: Workflow::DEFAULT_S3_FILE_TYPES, include_blank: true, hint: "This will be used as the extention for the S3 file for the DefaultCopyTo Runner"
     end
 
     inputs 'Dependencies' do

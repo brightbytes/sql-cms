@@ -27,8 +27,8 @@ ActiveAdmin.register WorkflowConfiguration do
     attributes_table do
       row :id
 
-      row :customer
       row :workflow
+      row :customer
 
       row :s3_region_name
       row :s3_bucket_name

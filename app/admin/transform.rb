@@ -134,12 +134,12 @@ ActiveAdmin.register Transform do
       input :runner, as: :select, collection: RunnerFactory::RUNNERS_FOR_SELECT, input_html: { disabled: f.object.persisted? }, include_blank: false
 
       show_params_yaml_selector = ((!f.object.persisted? || f.object.runner != 'RailsMigration') ? {} : { style: 'display:none' })
-      input :params_yaml, as: :text, input_html: { rows: 10 }, wrapper_html: show_params_yaml_selector, hint: 'Add `table_name: your_table_name` here when auto-generating SQL for TSV and CSV CopyFrom Transforms'
+      input :params_yaml, as: :text, input_html: { rows: 10 }, wrapper_html: show_params_yaml_selector
 
-      input :sql, as: :text, input_html: { rows: 40 }, hint: "If you leave this blank for TSV and CSV CopyFrom Transforms, it will auto-generate SQL under the assumption that the source file has its columns in the same order as the table declares columns."
+      input :sql, as: :text, input_html: { rows: 40 }
 
       file_display_h = ((f.object.s3_file_required? || f.object.s3_file_name.present?) ? {} : { style: 'display:none' })
-      input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on the next page."
+      input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on Transform#show."
     end
 
     # We need the workflow id and we need to know that it won't change before we can present the list of allowed dependencies within the current workflow.
