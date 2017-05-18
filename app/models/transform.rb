@@ -94,15 +94,15 @@ class Transform < ApplicationRecord
   concerning :Runners do
 
     def importing?
-      runner.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
+      runner&.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
     end
 
     def exporting?
-      runner.in?(RunnerFactory::EXPORT_S3_FILE_RUNNERS)
+      runner&.in?(RunnerFactory::EXPORT_S3_FILE_RUNNERS)
     end
 
     def s3_file_required?
-      runner.in?(RunnerFactory::S3_FILE_RUNNERS)
+      runner&.in?(RunnerFactory::S3_FILE_RUNNERS)
     end
 
     def auto_load?
@@ -114,7 +114,7 @@ class Transform < ApplicationRecord
     end
 
     def defaults_runner?
-      runner.in?(RunnerFactory::DEFAULTS_RUNNERS)
+      runner&.in?(RunnerFactory::DEFAULTS_RUNNERS)
     end
 
   end
