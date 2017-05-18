@@ -4,7 +4,7 @@ ActiveAdmin.register Workflow do
 
   actions :all
 
-  permit_params :name, :slug, included_workflow_ids: []
+  permit_params :name, :slug, :default_copy_from_sql, :default_copy_from_s3_file_type, :default_copy_to_sql, :default_copy_to_s3_file_type, included_workflow_ids: []
 
   filter :name, as: :string
   filter :slug, as: :string
@@ -24,8 +24,9 @@ ActiveAdmin.register Workflow do
       row :slug
 
       row :default_copy_from_sql
+      row :default_copy_from_s3_file_type
       row :default_copy_to_sql
-      row :default_s3_file_type
+      row :default_copy_to_s3_file_type
 
       row :created_at
       row :updated_at
