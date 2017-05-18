@@ -6,6 +6,8 @@ module RunnerFactory
   # RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
   RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo).freeze
 
+  DEFAULTS_RUNNERS = %(DefaultCopyFrom DefaultCopyTo)
+
   NEW_TRANSFORM_RUNNERS_FOR_SELECT = [
     [' Rails Migration', 'RailsMigration'],
     [' Auto-load', 'AutoLoad'],
