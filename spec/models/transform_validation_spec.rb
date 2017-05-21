@@ -60,5 +60,10 @@ describe TransformValidation do
       end
     end
 
+    it "should have a convenience method for showing the parent Transform's #params_yaml" do
+      t = create(:transform, params: { foo: :bar })
+      tv = create(:transform_validation, transform: t)
+      expect(tv.transform_params_yaml).to eq(t.params_yaml)
+    end
   end
 end
