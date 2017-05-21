@@ -96,17 +96,24 @@ describe Transform do
         expect(transform.s3_file_name).to eq(nil)
       end
 
-      it "should generate the default TSV SQL if no #sql is present and the runner is 'CopyFrom' and the import file is a TSV" do
-        transform = build(:copy_from_transform, sql: nil, s3_file_name: 'shoobie.tsv')
-        expect(transform.valid?).to eq(true)
-        expect(transform.sql).to eq(Transform::DEFAULT_TSV_SQL)
+      it "should auto-fill fields for the Default runners when a table_name is specified" do
+        workflow = create(:workflow, default_copy_from_sql: "COPY :table_name FROM STDIN WITH CSV", default_copy_from_s3_file_type: "CSV")
+        transform = build(:transform, workflow: workflow, runner: 'DefaultCopyFrom', params: { table_name: "foobar_dudes" })
+
+        expect(transform).to be_valid
+        expect(transform.name).to eq("LOAD foobar_dudes")
+        expect(transform.sql).to eq(workflow.default_copy_from_sql)
+        expect(transform.s3_file_name).to eq("foobar_dudes.csv")
+
+        workflow = create(:workflow, default_copy_to_sql: %q{COPY :table_name FROM STDIN WITH DELIMITER E'\t' NULL ''}, default_copy_to_s3_file_type: "TSV")
+        transform = build(:transform, workflow: workflow, runner: 'DefaultCopyTo', params: { table_name: "foobar_dudes" })
+
+        expect(transform).to be_valid
+        expect(transform.name).to eq("UNLOAD foobar_dudes")
+        expect(transform.sql).to eq(workflow.default_copy_to_sql)
+        expect(transform.s3_file_name).to eq("foobar_dudes.tsv")
       end
 
-      it "should generate the default CSV SQL if no #sql is present and the runner is 'CopyFrom' and the import file is a CSV" do
-        transform = build(:copy_from_transform, sql: nil, s3_file_name: 'shoobie.csv')
-        expect(transform.valid?).to eq(true)
-        expect(transform.sql).to eq(Transform::DEFAULT_CSV_SQL)
-      end
     end
 
   end

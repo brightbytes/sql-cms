@@ -38,6 +38,13 @@ ActiveAdmin.register Transform do
       row :updated_at
     end
 
+    # FIXME - MOVE THIS INTO THE BLOCK BELOW ...
+    # sidebar("Actions", only: :show, if: -> { resource.importing? && !resource.s3_import_file.s3_file_exists? }) do
+    #   ul do
+    #     li link_to("Upload File to S3")
+    #   end
+    # end
+
     if transform.importing? || transform.exporting?
       workflow_configurations = resource.workflow_configurations.includes(:customer).order('customers.slug, workflows.slug').to_a
       unless workflow_configurations.empty?
@@ -114,15 +121,9 @@ ActiveAdmin.register Transform do
     render partial: 'admin/shared/history'
   end
 
-  # sidebar("Actions", only: :show, if: -> { resource.importing? && !resource.s3_import_file.s3_file_exists? }) do
-  #   ul do
-  #     li link_to("Upload File to S3")
-  #   end
-  # end
-
+  # FIXME - THE INTERACTIONS IN THIS FORM ARE TOO COMPLEX. MAYBE BREAK INTO MULTIPLE FORMS?
   form do |f|
     inputs 'Details' do
-      # Comment-in when attempting to debug the accepts_nested_attributes_for on #create issue:
       # semantic_errors *f.object.errors.keys
 
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
@@ -130,16 +131,19 @@ ActiveAdmin.register Transform do
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
 
       input :name, as: :string
+
+      runners = ((f.object.new_record? && f.object.errors.none?) ? RunnerFactory::NEW_TRANSFORM_RUNNERS_FOR_SELECT : RunnerFactory::RUNNERS_FOR_SELECT)
       # FIXME - Want these to be radio buttons, but dunno how to get the JS to work
-      input :runner, as: :select, collection: RunnerFactory::RUNNERS_FOR_SELECT, input_html: { disabled: f.object.persisted? }, include_blank: false
+      input :runner, as: :select, collection: runners, input_html: { disabled: f.object.persisted? }, include_blank: false
 
-      show_params_yaml_selector = ((!f.object.persisted? || f.object.runner != 'RailsMigration') ? {} : { style: 'display:none' })
-      input :params_yaml, as: :text, input_html: { rows: 10 }, wrapper_html: show_params_yaml_selector, hint: 'Add `table_name: your_table_name` here when auto-generating SQL for TSV and CSV CopyFrom Transforms'
+      show_params_yaml_selector = ((f.object.new_record? || f.object.runner != 'RailsMigration') ? {} : { style: 'display:none' })
+      input :params_yaml, as: :text, input_html: { rows: 10 }, wrapper_html: show_params_yaml_selector
 
-      input :sql, as: :text, input_html: { rows: 40 }, hint: "If you leave this blank for TSV and CSV CopyFrom Transforms, it will auto-generate SQL under the assumption that the source file has its columns in the same order as the table declares columns."
+      show_sql_selector = ((f.object.new_record? || f.object.runner != 'AutoLoad') ? {} : { style: 'display:none' })
+      input :sql, as: :text, input_html: { rows: 40 }, wrapper_html: show_sql_selector
 
-      file_display_h = ((f.object.s3_file_required? || f.object.s3_file_name.present?) ? {} : { style: 'display:none' })
-      input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on the next page."
+      file_display_h = (f.object.s3_file_required? ? {} : { style: 'display:none' })
+      input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on Transform#show."
     end
 
     # We need the workflow id and we need to know that it won't change before we can present the list of allowed dependencies within the current workflow.
