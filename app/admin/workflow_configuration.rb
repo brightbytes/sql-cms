@@ -6,18 +6,19 @@ ActiveAdmin.register WorkflowConfiguration do
 
   permit_params :workflow_id, :customer_id, :s3_region_name, :s3_bucket_name, :s3_file_path, notified_user_ids: []
 
-  filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
+  filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
   filter :s3_region_name, as: :select
   filter :s3_bucket_name, as: :select
   filter :s3_file_path, as: :select
 
-  config.sort_order = 'customers.slug_asc,workflow.slug_asc'
+  # This is necessary to disable default order by id
+  config.sort_order = ''
 
   index(download_links: false) do
     column(:workflow_configuration) { |workflow_configuration| auto_link(workflow_configuration) }
-    column(:customer, sortable: 'customers.slug')
     column(:workflow, sortable: 'workflows.slug')
+    column(:customer, sortable: 'customers.slug')
     column :s3_region_name
     column :s3_bucket_name
     column :s3_file_path
@@ -124,7 +125,7 @@ ActiveAdmin.register WorkflowConfiguration do
   controller do
 
     def scoped_collection
-      super.includes(:customer, :workflow)
+      super.includes(:customer, :workflow).order('workflows.slug, customers.slug')
     end
 
     def destroy
