@@ -48,6 +48,7 @@ ActiveAdmin.register Run do
       table_for(resource.run_step_logs.order('id'), sortable: true) do
         column(:step_name, sortable: :step_type) { |log| auto_link(log) }
         column(:human_status) { |log| human_status(log) }
+        column(:duration) { |log| Time.at(log.duration_seconds).getutc.strftime("%H:%M:%S") }
         column(:json_output) do |log|
           code(pretty_print_as_json(log.step_validation_failures.presence || log.step_exceptions.presence || log.step_result.presence))
         end

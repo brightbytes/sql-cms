@@ -20,6 +20,8 @@ ActiveAdmin.register RunStepLog do
 
       row(:human_status) { human_status(resource) }
 
+      row(:duration) { Time.at(resource.duration_seconds).getutc.strftime("%H:%M:%S") }
+
       row(:step_plan) { code(pretty_print_as_json(resource.step_plan)) }
 
       row(:step_result) { code(pretty_print_as_json(resource.step_result)) } if resource.step_result.present?

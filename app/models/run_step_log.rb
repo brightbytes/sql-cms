@@ -117,4 +117,9 @@ class RunStepLog < ApplicationRecord
       end
   end
 
+  # Run Step Logs are immutable after all Validations have been run, so this should be safe ... and it's quicker than creating a column for it.
+  def duration_seconds
+    updated_at - created_at
+  end
+
 end
