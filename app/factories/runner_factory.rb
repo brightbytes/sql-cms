@@ -188,7 +188,7 @@ module RunnerFactory
       transform_validation_sql = transform_validation_h[:interpolated_sql]
       if ids = run.select_values_in_schema(transform_validation_sql).presence
         {
-          failed_validation_name: transform_validation_h[:name],
+          failed_validation_name: transform_validation_h[:interpolated_name],
           failed_validation_sql: transform_validation_sql,
           ids_failing_validation: ids
         }
