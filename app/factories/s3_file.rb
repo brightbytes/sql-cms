@@ -87,7 +87,7 @@ class S3File
     private
 
     def s3_file_path_and_name
-      "#{s3_file_path}/#{s3_file_name}"
+      "#{s3_file_path}/#{s3_file_name}".gsub(/\/{2,}/, '/')
     end
 
     def s3_object
@@ -118,7 +118,7 @@ class S3File
     private
 
     def s3_file_path_and_name
-      "#{s3_file_path}/run_#{run.id}/#{s3_file_name}"
+      "#{s3_file_path}/run_#{run.id}/#{s3_file_name}".gsub(/\/{2,}/, '/')
     end
 
     def s3_object
