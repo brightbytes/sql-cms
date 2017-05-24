@@ -104,7 +104,7 @@ ActiveAdmin.register WorkflowConfiguration do
 
     inputs 'Run Notifications' do
       # The preselect doesn't work, for obvious reasons
-      input :notified_users, as: :check_boxes #, collection: users_with_preselect
+      input :notified_users, as: :check_boxes, collection: User.all.order('users.first_name, users.last_name')
     end
 
     actions do
