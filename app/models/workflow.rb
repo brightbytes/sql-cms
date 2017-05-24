@@ -83,8 +83,6 @@ class Workflow < ApplicationRecord
     slug
   end
 
-  # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html
-  # But, it's so much more satisfying to figure it out all by myself ...
   # FIXME - Copy/paste from Transform model; DRY up sometime
   concerning :EligibleIncludedWorkflows do
 

@@ -165,9 +165,9 @@ class Transform < ApplicationRecord
 
   end
 
-  # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html
-  # But, it's so much more satisfying to figure it out all by myself ...
-  # FIXME - Copy/paste from Workflow model; DRY up sometime
+  # FIXME - The performance of this really sucks for a large number of Transforms for a given Workflow.
+  #         There has to be an algorithmic way to get the "Sibling groups" starting from the leaf nodes and going up
+  # FIXME - Copy/paste to Workflow model; DRY up sometime
   concerning :EligiblePrerequisiteTransforms do
 
     included do

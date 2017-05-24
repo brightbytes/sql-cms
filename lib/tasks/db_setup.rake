@@ -27,7 +27,7 @@ namespace :db do
 
       if File.exists?(FULL_DUMP_PATH)
         dputs "Dumping PostgreSQL for the SQL CMS Application ..."
-        run("PGPASSWORD=#{DB_CONFIG["password"]} pg_dump -c -o -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} --no-owner -f #{FULL_DUMP_PATH_AND_FILE}")
+        run("PGPASSWORD=#{DB_CONFIG["password"]} pg_dump --clean --oids --format=custom --no-password --username #{DB_CONFIG["username"]} --dbname #{DB_CONFIG["database"]} --host #{DB_CONFIG["host"]} --no-owner --file #{FULL_DUMP_PATH_AND_FILE}")
       else
         raise "You can't dump your local DB because #{FULL_DUMP_PATH} doesn't exist."
       end

@@ -207,4 +207,20 @@ class Run < ApplicationRecord
       RunManagerJob.perform_later(id)
     end
   end
+
+  # This is copy/pasted from lib/tasks/db_setup.rake; DRY-up sometime
+  DB_CONFIG = YAML.load(ERB.new(File.read("#{Rails.root}/config/database.yml")).result)[Rails.env]
+
+  def schema_dump
+    common_switches = "--schema-only --schema=#{schema_name}"
+    if Rails.env.production?
+      infix ='$DATABASE_URL'
+    else
+      username, database, password = DB_CONFIG["username"], DB_CONFIG["database"], DB_CONFIG["password"]
+      infix = "--username #{username} --dbname #{database} --no-password"
+      prefix = "PGPASSWORD=#{password}"
+    end
+    `#{prefix} pg_dump #{infix} #{common_switches}`
+  end
+
 end

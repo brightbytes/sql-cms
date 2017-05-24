@@ -64,6 +64,14 @@ ActiveAdmin.register Run do
     render partial: 'admin/shared/history'
   end
 
+  config.add_action_item :dump_schema, only: :show, if: proc { !resource.running_or_crashed? } do
+    link_to("Dump Schema", dump_schema_run_path(resource), method: :put)
+  end
+
+  member_action :dump_schema, method: :put do
+    send_data resource.schema_dump, filename: "#{resource.schema_name}.sql"
+  end
+
   # config.add_action_item :nuke_failed_steps_and_rerun, only: :show, if: proc { resource.failed? } do
   #   link_to(
   #     "Nuke Failed Steps and Rerun",
