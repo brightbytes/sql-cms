@@ -14,10 +14,11 @@ ActiveAdmin.register Workflow do
   index(download_links: false) do
     column(:name, sortable: :slug) { |workflow| auto_link(workflow) }
     column :slug
-    column :default_copy_from_sql
-    column :default_copy_from_s3_file_type
-    column :default_copy_to_sql
-    column :default_copy_to_s3_file_type
+    # These budge-out the display too much.
+    # column :default_copy_from_sql
+    # column :default_copy_from_s3_file_type
+    # column :default_copy_to_sql
+    # column :default_copy_to_s3_file_type
   end
 
   show do

@@ -190,7 +190,7 @@ module RunnerFactory
         {
           failed_validation_name: transform_validation_h[:interpolated_name],
           failed_validation_sql: transform_validation_sql,
-          ids_failing_validation: ids
+          ids_failing_validation: ids.join(', ')
         }
       end
     end
