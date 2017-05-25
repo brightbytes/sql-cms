@@ -153,7 +153,7 @@ class Workflow < ApplicationRecord
       joined_used_transform_ids = used_transform_ids.join(',')
       transforms.
         where(id: unused_transform_ids).
-        where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id NOT IN (#{joined_used_transform_ids}) AND postrequisite_transform_id = transforms.id)").
+        where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE prerequisite_transform_id NOT IN (?) AND postrequisite_transform_id = transforms.id)", used_transform_ids).
         to_a
     end
 

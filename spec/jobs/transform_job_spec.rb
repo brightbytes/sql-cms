@@ -63,7 +63,7 @@ describe TransformJob do
             run.reload
             logs = run.run_step_logs.where(step_type: 'transform').to_a
             log = logs.first
-            expect(log.step_validation_failures&.first&.fetch('ids_failing_validation', nil)).to eq([2, 3])
+            expect(log.step_validation_failures&.first&.fetch('ids_failing_validation', nil)).to eq("2, 3")
             expect(log.successful?).to eq(false)
             expect(run.select_value_in_schema("SELECT COUNT(1) FROM target_table").to_i).to eq(3)
           end
