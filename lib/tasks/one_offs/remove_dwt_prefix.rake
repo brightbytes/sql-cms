@@ -19,6 +19,10 @@ namespace :db do
         params_remove_dwt(wdqr)
       end
     end
+    v = Validation.find(12)
+    v.name = v.name.gsub('dwt_', '')
+    v.sql = v.sql.gsub('dwt_', '')
+    v.save!
   end
 
   def sql_remove_dwt(o)
