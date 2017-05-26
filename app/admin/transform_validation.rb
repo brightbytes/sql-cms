@@ -29,8 +29,6 @@ ActiveAdmin.register TransformValidation do
       input :transform, as: :select, collection: [[resource.transform.name, resource.transform.id, selected: true]], input_html: { disabled: true }
       input :validation, as: :select, collection: Validation.order(:name).all
 
-      # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
-      #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
       input :params_yaml, as: :text, required: true
       input :transform_params_yaml, as: :text, collection: [[resource.transform.params_yaml, resource.transform.id, selected: true]], input_html: { disabled: true }, hint: "These params will be reverse-merged into the params_yaml in the previous field: there's no need to type them again."
     end

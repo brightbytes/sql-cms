@@ -29,8 +29,6 @@ ActiveAdmin.register WorkflowDataQualityReport do
       input :workflow, as: :select, collection: [[resource_workflow.name, resource_workflow.id, selected: true]], input_html: { disabled: true }
       input :data_quality_report, as: :select, collection: DataQualityReport.order(:name).all
 
-      # FIXME - IT'S REALLY TOO BAD THIS LINE CAN'T BE MADE TO WORK LIKE THIS: https://lorefnon.me/2015/03/02/dealing-with-json-fields-in-active-admin.html
-      #         (I TRIED, AND FAILED: DOESN'T WORK IN THE LATEST VERSION OF AA)
       input :params_yaml, as: :text, required: true
     end
     actions do

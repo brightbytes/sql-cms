@@ -1,5 +1,7 @@
 class TransformJob < ApplicationJob
 
+  # FIXME - THIS ISN'T RETRY-SAFE.  TO MAKE IT SO, WE'D NEED TO ADD A NON-NULLABLE `transforms.table_name` FIELD, AND DO A `DELETE FROM :table_name` HERE
+  #         BEFORE EXECUTING THE RUNNER
   def perform(run_id:, step_index:, step_id:)
 
     run = Run.find(run_id)

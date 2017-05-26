@@ -165,8 +165,6 @@ class Transform < ApplicationRecord
 
   end
 
-  # FIXME - The performance of this really sucks for a large number of Transforms for a given Workflow.
-  #         There has to be an algorithmic way to get the "Sibling groups" starting from the leaf nodes and going up
   # FIXME - Copy/paste to Workflow model; DRY up sometime
   concerning :EligiblePrerequisiteTransforms do
 
@@ -176,25 +174,24 @@ class Transform < ApplicationRecord
 
     # Any Transform that doesn't directly or indirectly have this Transform as a prerequisite is itself available as a prerequisite (and may already be such).
     # This is how we avoid cycles in the Transform Dependency graph.
+    # There has to be an algorithmic way to obtain the "Sibling groups" of a DAG starting from the leaf nodes and going up, as this does ... but couldn't find it
     def available_prerequisite_transforms
       base_arel = Transform.where(workflow_id: workflow_id).order(:name)
       if new_record?
         base_arel.all
       else
-        # This is grossly inefficient.  I tried to do it with SQL for the first level, and failed.  Oh well.  Refactor later.
-        eligible_transforms = base_arel.where("id <> #{id}").all
-        # Where's that graph DB when you need it?
-        eligible_transforms.reject { |eligible_transform| already_my_postrequisite?(eligible_transform) }
+        eligible_transform_ids = base_arel.where("id <> #{id}").pluck(:id)
+        eligible_transform_ids.reject { |eligible_transform_id| already_my_postrequisite?(eligible_transform_id) }.map { |tid| Transform.find_by(id: tid) }.sort_by { |t| t.interpolated_name.downcase }
       end
     end
 
     private
 
-    def already_my_postrequisite?(transform)
-      dependents = transform.prerequisite_transforms
-      return false if dependents.empty?
-      return true if dependents.include?(self)
-      dependents.any? { |dependent_transform| already_my_postrequisite?(dependent_transform) }
+    def already_my_postrequisite?(transform_id)
+      dependent_ids = TransformDependency.where(postrequisite_transform_id: transform_id).pluck(:prerequisite_transform_id)
+      return false if dependent_ids.empty?
+      return true if dependent_ids.include?(id)
+      dependent_ids.any? { |dependent_id| already_my_postrequisite?(dependent_id) }
     end
 
   end

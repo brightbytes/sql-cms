@@ -92,25 +92,24 @@ class Workflow < ApplicationRecord
 
     # Any Workflow that doesn't directly or indirectly have this Workflow already included is itself available as an includable workflow (and may already be such).
     # This is how we avoid cycles in the Workflow Dependency graph.
+    # There has to be an algorithmic way to obtain the "Sibling groups" of a DAG starting from the leaf nodes and going up, as this does ... but couldn't find it
     def available_included_workflows
       base_arel = Workflow.order(:name)
       if new_record?
         base_arel.all
       else
-        # This is grossly inefficient.  I tried to do it with SQL for the first level, and failed.  Oh well.  Refactor later.
-        eligible_workflows = base_arel.where("id <> #{id}").all
-        # Where's that graph DB when you need it?
-        eligible_workflows.reject { |eligible_workflow| already_including_me?(eligible_workflow) }
+        eligible_workflow_ids = base_arel.where("id <> #{id}").pluck(:id)
+        eligible_workflow_ids.reject { |eligible_workflow_id| already_including_me?(eligible_workflow_id) }.map { |wid| Workflow.find_by(id: wid) }.sort_by { |w| w.name.downcase }
       end
     end
 
     private
 
-    def already_including_me?(workflow)
-      dependents = workflow.included_workflows
-      return false if dependents.empty?
-      return true if dependents.include?(self)
-      dependents.any? { |dependent_workflow| already_including_me?(dependent_workflow) }
+    def already_including_me?(workflow_id)
+      dependent_ids = WorkflowDependency.where(including_workflow_id: workflow_id).pluck(:included_workflow_id)
+      return false if dependent_ids.empty?
+      return true if dependent_ids.include?(id)
+      dependent_ids.any? { |dependent_id| already_including_me?(dependent_id) }
     end
 
   end
