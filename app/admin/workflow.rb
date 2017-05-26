@@ -64,27 +64,11 @@ ActiveAdmin.register Workflow do
       end
     end
 
-    # FIXME - PARTIALIZE THE FOLLOWING AND THE CUSTOMER WORKFLOW PANEL
+    render partial: 'admin/workflow/workflow_panel',
+           locals: { panel_name: 'Included Workflows', workflows: workflow.included_workflows.order(:name).to_a }
 
-    included_workflows = workflow.included_workflows.order(:name).to_a
-    unless included_workflows.empty?
-      panel 'Included Workflows' do
-        table_for(included_workflows) do
-          column(:name) { |workflow| auto_link(workflow) }
-          column(:slug)
-        end
-      end
-    end
-
-    including_workflows = resource.including_workflows.order(:name).to_a
-    unless including_workflows.empty?
-      panel 'Including Workflows' do
-        table_for(including_workflows) do
-          column(:name) { |workflow| auto_link(workflow) }
-          column(:slug)
-        end
-      end
-    end
+    render partial: 'admin/workflow/workflow_panel',
+           locals: { panel_name: 'Including Workflows', workflows: resource.including_workflows.order(:name).to_a }
 
     render partial: 'admin/workflow/transform_panel',
            locals: { panel_name: 'Independent Transforms', transforms: resource.transforms.independent.to_a.sort_by(&:interpolated_name) }

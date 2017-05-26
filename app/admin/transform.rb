@@ -38,13 +38,6 @@ ActiveAdmin.register Transform do
       row :updated_at
     end
 
-    # FIXME - MOVE THIS INTO THE BLOCK BELOW ...
-    # sidebar("Actions", only: :show, if: -> { resource.importing? && !resource.s3_import_file.s3_file_exists? }) do
-    #   ul do
-    #     li link_to("Upload File to S3")
-    #   end
-    # end
-
     if transform.importing? || transform.exporting?
       workflow_configurations = resource.workflow_configurations.includes(:customer).order('customers.slug, workflows.slug').to_a
       unless workflow_configurations.empty?
@@ -62,7 +55,13 @@ ActiveAdmin.register Transform do
             end
             column :s3_file_path { |wc| wc.s3_file_path }
             column :s3_file_name { |wc| transform.s3_file_name }
-            column :s3_file_exists? { |wc| yes_no(transform.s3_import_file(wc).s3_file_exists?, yes_color: :green, no_color: :red) } if transform.importing?
+            if transform.importing?
+              column :s3_file_exists? { |wc| yes_no(transform.s3_import_file(wc).s3_file_exists?, yes_color: :green, no_color: :red) }
+              # FIXME - IMPLEMENT!!!
+              # unless transform.s3_import_file(wc).s3_file_exists?
+              #   column :action { |wc| li link_to("Upload File to S3") }
+              # end
+            end
           end
         end
       end
@@ -88,8 +87,8 @@ ActiveAdmin.register Transform do
 
     panel 'Prerequisite Transform Dependencies' do
 
-      # FIXME - If ever we can get dependencies created with the Transform, this should add params here
-      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.workflow_id))
+      # FIXME - HANDLE postrequisite_transform_id ON THE RECEIVING END AT SOME POINT: WILL REQUIRE PRESERVING THROUGH WHOLE FLOW, INCLUDING ERROR CASES
+      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.workflow_id, postrequisite_transform_id: resource.id))
 
       prereqs = resource.prerequisite_dependencies.includes(:prerequisite_transform).to_a.sort_by { |td| td.prerequisite_transform.interpolated_name }
       unless prereqs.empty?
@@ -103,8 +102,7 @@ ActiveAdmin.register Transform do
 
     panel 'Postrequisite Transforms Dependencies' do
 
-      # FIXME - If ever we can get dependencies created with the Transform, this should add params here
-      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.workflow_id))
+      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.workflow_id, prerequisite_transform_id: resource.id))
 
       postreqs = resource.postrequisite_dependencies.includes(:postrequisite_transform).to_a.sort_by { |td| td.postrequisite_transform.interpolated_name }
       unless postreqs.empty?
@@ -149,7 +147,8 @@ ActiveAdmin.register Transform do
     # We need the workflow id and we need to know that it won't change before we can present the list of allowed dependencies within the current workflow.
     if f.object.persisted? || workflow_id_param_val
       inputs 'Dependencies' do
-        input :prerequisite_transforms, as: :check_boxes, collection: f.object.available_prerequisite_transforms
+        prereq_id = params[:prerequisite_transform_id].to_i
+        input :prerequisite_transforms, as: :check_boxes, collection: f.object.available_prerequisite_transforms.map { |t| [t.name, t.id, checked: (t.id == prereq_id)] }
       end
     end
 

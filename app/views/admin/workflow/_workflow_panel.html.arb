@@ -1,0 +1,8 @@
+unless workflows.empty?
+  panel panel_name do
+    table_for(workflows) do
+      column(:name) { |workflow| auto_link(workflow) }
+      column(:slug)
+    end
+  end
+end
