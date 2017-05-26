@@ -99,7 +99,7 @@ class Workflow < ApplicationRecord
         base_arel.all
       else
         eligible_workflow_ids = base_arel.where("id <> #{id}").pluck(:id)
-        eligible_workflow_ids.reject { |eligible_workflow_id| already_including_me?(eligible_workflow_id) }.map { |wid| Workflow.find_by(id: wid) }.sort_by { |w| w.name.downcase }
+        Workflow.where(id: eligible_workflow_ids.reject { |eligible_workflow_id| already_including_me?(eligible_workflow_id) }).sort_by { |w| w.name.downcase }
       end
     end
 

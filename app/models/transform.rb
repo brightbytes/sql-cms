@@ -181,7 +181,7 @@ class Transform < ApplicationRecord
         base_arel.all
       else
         eligible_transform_ids = base_arel.where("id <> #{id}").pluck(:id)
-        eligible_transform_ids.reject { |eligible_transform_id| already_my_postrequisite?(eligible_transform_id) }.map { |tid| Transform.find_by(id: tid) }.sort_by { |t| t.interpolated_name.downcase }
+        Transform.where(id: eligible_transform_ids.reject { |eligible_transform_id| already_my_postrequisite?(eligible_transform_id) }).sort_by { |t| t.interpolated_name.downcase }
       end
     end
 
