@@ -19,10 +19,7 @@ ActiveAdmin.register WorkflowConfiguration do
     column(:workflow_configuration, sortable: 'workflows.slug,customers.slug') { |workflow_configuration| auto_link(workflow_configuration) }
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
-    # These budge-out the display too much.
-    # column :s3_region_name
-    # column :s3_bucket_name
-    # column :s3_file_path
+    column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
   end
 
   show do

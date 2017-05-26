@@ -18,6 +18,7 @@ module ApplicationHelper
   end
 
   def human_status(obj)
+    return nil unless obj
     case
     when obj.running_or_crashed?
       "<span style='color: blue'>Running</span>".html_safe
