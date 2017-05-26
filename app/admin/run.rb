@@ -72,6 +72,14 @@ ActiveAdmin.register Run do
     send_data resource.schema_dump, filename: "#{resource.schema_name}.sql"
   end
 
+  config.add_action_item :dump_execution_plan, only: :show, if: proc { !resource.running_or_crashed? } do
+    link_to("Dump Execution Plan", dump_execution_plan_run_path(resource), method: :put)
+  end
+
+  member_action :dump_execution_plan, method: :put do
+    send_data JSON.pretty_generate(resource.execution_plan.as_json), filename: "#{resource.schema_name}.json"
+  end
+
   # config.add_action_item :nuke_failed_steps_and_rerun, only: :show, if: proc { resource.failed? } do
   #   link_to(
   #     "Nuke Failed Steps and Rerun",
