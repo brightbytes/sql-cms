@@ -43,7 +43,8 @@ module ApplicationHelper
   # JSON stuff
 
   def pretty_print_as_json(json)
-    JSON.pretty_generate(json.as_json).gsub(/\"(.+)\":/, '\1:').gsub("\n", "<br />").html_safe if json.present?
+    # All the screwing-around with `\\r?\\n` is so that multi-line JSON attribute values end up being broken into multiple lines in the display
+    JSON.pretty_generate(json).gsub(/\"(.+)\":/, '\1:').gsub(/"(.+\\r?\\n)/, '"\\r\\n\1').gsub(/\\r?\\n/, "<br />").html_safe if json.present?
   end
 
   def sql_newlines_to_array(hash)
