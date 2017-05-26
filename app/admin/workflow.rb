@@ -43,6 +43,8 @@ ActiveAdmin.register Workflow do
       table_for(resource.workflow_configurations.includes(:customer).order('customers.slug')) do
         column(:name) { |workflow_configuration| auto_link(workflow_configuration) }
         column(:customer) { |workflow_configuration| auto_link(workflow_configuration.customer) }
+        column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
+        # These are kinda clutter
         column :s3_region_name
         column :s3_bucket_name
         column :s3_file_path
