@@ -16,7 +16,7 @@ ActiveAdmin.register WorkflowConfiguration do
   config.sort_order = ''
 
   index(download_links: false) do
-    column(:workflow_configuration) { |workflow_configuration| auto_link(workflow_configuration) }
+    column(:workflow_configuration, sortable: 'workflows.slug,customers.slug') { |workflow_configuration| auto_link(workflow_configuration) }
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
     # These budge-out the display too much.
