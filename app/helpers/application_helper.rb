@@ -1,4 +1,4 @@
-# FIXME - AA DOESN'T AUTO-RELOAD THIS FILE
+# FIXME - AA DOESN'T AUTO-RELOAD THIS FILE, AND IT'S ABSOLUTELY KILLING ME THAT GOOGLE & STACK OVERFLOW ARE NO HELP!!!!!!!!!!
 module ApplicationHelper
 
   def yes_no(val, options = {})
@@ -30,9 +30,14 @@ module ApplicationHelper
   end
 
   def human_notification_status(run)
+    return nil unless run
     status = run.notification_status.titleize
     color = (status == 'Sent' ? :green : :blue)
     "<span style='color: #{color}'>#{status}</span>".html_safe
+  end
+
+  def human_duration(o)
+    Time.at(o.duration_seconds).getutc.strftime("%H:%M:%S") if o
   end
 
   # JSON stuff
@@ -40,11 +45,6 @@ module ApplicationHelper
   def pretty_print_as_json(json)
     JSON.pretty_generate(json.as_json).gsub(/\"(.+)\":/, '\1:').gsub("\n", "<br />").html_safe if json.present?
   end
-
-  # Kinda lame, but whatever
-  # def pretty_print_json(json)
-  #   pretty_print_as_json(JSON.parse(json))
-  # end
 
   def sql_newlines_to_array(hash)
     hash = hash.with_indifferent_access

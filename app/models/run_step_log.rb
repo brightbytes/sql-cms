@@ -25,6 +25,8 @@
 
 class RunStepLog < ApplicationRecord
 
+  include Concerns::FinalizedRuntimeDuration
+
   # Validations
 
   validates :step_index, :step_id, presence: true
@@ -115,12 +117,6 @@ class RunStepLog < ApplicationRecord
         klass = (transform_log? ? Transform : workflow_data_quality_report_log? ? WorkflowDataQualityReport : nil)
         klass.find_by(id: step_plan[:id]) if klass
       end
-  end
-
-  # Run Step Logs are immutable after all Validations have been run, so this should be safe ... and it's quicker than creating a column for it.
-  def duration_seconds
-    end_time = (running_or_crashed? ? Time.zone.now : updated_at)
-    end_time - created_at
   end
 
 end

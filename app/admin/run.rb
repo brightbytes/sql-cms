@@ -16,7 +16,6 @@ ActiveAdmin.register Run do
     column(:workflow_configuration)
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
-    column(:creator, sortable: 'users.first_name,users.last_name')
     column(:human_status) { |run| human_status(run) }
   end
 
@@ -39,6 +38,8 @@ ActiveAdmin.register Run do
 
       row :creator
 
+      row(:duration) { human_duration(resource) }
+
       row :created_at
       row :updated_at
     end
@@ -48,7 +49,7 @@ ActiveAdmin.register Run do
       table_for(resource.run_step_logs.order('id'), sortable: true) do
         column(:step_name, sortable: :step_type) { |log| auto_link(log) }
         column(:human_status) { |log| human_status(log) }
-        column(:duration) { |log| Time.at(log.duration_seconds).getutc.strftime("%H:%M:%S") }
+        column(:duration) { |log| human_duration(log) }
         column(:json_output) do |log|
           code(pretty_print_as_json(log.step_validation_failures.presence || log.step_exceptions.presence || log.step_result.presence))
         end

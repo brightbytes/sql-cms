@@ -45,10 +45,9 @@ ActiveAdmin.register WorkflowConfiguration do
       unless runs.empty?
         table_for(runs) do
           column(:schema_name) { |run| auto_link(run) }
-          column(:creator)
-          column(:created_at)
           column(:human_status) { |run| human_status(run) }
           column(:status)
+          column(:duration) { |run| human_duration(run) }
           column(:action) do |run|
             unless run.running_or_crashed?
               link_to("Delete", run_path(run), method: :delete, data: { confirm: 'Are you sure you want to nuke this Run and all DB data associated with it?' })

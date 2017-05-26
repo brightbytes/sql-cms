@@ -35,6 +35,8 @@ class Run < ApplicationRecord
   # Consider pulling out into Service layer
   include Run::PostgresSchema
 
+  include Concerns::FinalizedRuntimeDuration
+
   auto_normalize
 
   # Validations
@@ -209,7 +211,7 @@ class Run < ApplicationRecord
     end
   end
 
-  # This is copy/pasted from lib/tasks/db_setup.rake; DRY-up sometime
+  # This constant is copy/pasted from lib/tasks/db_setup.rake; DRY-up sometime
   DB_CONFIG = YAML.load(ERB.new(File.read("#{Rails.root}/config/database.yml")).result)[Rails.env]
 
   def schema_dump
