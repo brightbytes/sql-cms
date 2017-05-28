@@ -18,6 +18,7 @@ ActiveAdmin.register Transform do
     column(:name) { |transform| auto_link(transform) }
     column(:workflow, sortable: 'workflows.slug')
     column(:runner)
+    column(:action) { |transform| link_to("Edit", edit_transform_path(transform)) }
   end
 
   show do
