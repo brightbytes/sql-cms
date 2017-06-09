@@ -1,8 +1,6 @@
-panel panel_name do
+unless transforms.empty?
+  panel panel_name do
 
-  text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, source: :workflow))
-
-  unless transforms.empty?
     show_s3_fields = transforms.any?(&:s3_file_required?)
 
     table_for(transforms) do

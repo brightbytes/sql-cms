@@ -35,33 +35,37 @@ ActiveAdmin.register Workflow do
 
       row :created_at
       row :updated_at
+
+      row('Related Action') { link_to("Create New Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow)) }
+      row('Related Action') { text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, source: :workflow)) }
     end
 
-    panel 'Workflow Configurations' do
-      text_node link_to("Create New Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow))
-
-      table_for(resource.workflow_configurations.includes(:customer).order('customers.slug')) do
-        column(:name) { |workflow_configuration| auto_link(workflow_configuration) }
-        column(:customer) { |workflow_configuration| auto_link(workflow_configuration.customer) }
-        column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
-        # These are kinda clutter
-        column :s3_region_name
-        column :s3_bucket_name
-        column :s3_file_path
-        column(:action) do |workflow_configuration|
-          text_node(
-            link_to(
-              "Edit",
-              edit_workflow_configuration_path(workflow_configuration, workflow_id: resource.id, source: :workflow)
+    configs = resource.workflow_configurations.includes(:customer).order('customers.slug')
+    unless configs.empty?
+      panel 'Workflow Configurations' do
+        table_for(configs) do
+          column(:name) { |workflow_configuration| auto_link(workflow_configuration) }
+          column(:customer) { |workflow_configuration| auto_link(workflow_configuration.customer) }
+          column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
+          # These are kinda clutter
+          column :s3_region_name
+          column :s3_bucket_name
+          column :s3_file_path
+          column(:action) do |workflow_configuration|
+            text_node(
+              link_to(
+                "Edit",
+                edit_workflow_configuration_path(workflow_configuration, workflow_id: resource.id, source: :workflow)
+              )
             )
-          )
-          text_node(' | ')
-          link_to(
-            "Delete",
-            workflow_configuration_path(workflow_configuration, source: :workflow),
-            method: :delete,
-            data: { confirm: 'Are you really sure you want to nuke this Workflow Configuration?' }
-          )
+            text_node(' | ')
+            link_to(
+              "Delete",
+              workflow_configuration_path(workflow_configuration, source: :workflow),
+              method: :delete,
+              data: { confirm: 'Are you really sure you want to nuke this Workflow Configuration?' }
+            )
+          end
         end
       end
     end
@@ -76,10 +80,13 @@ ActiveAdmin.register Workflow do
            locals: { panel_name: 'Independent Transforms', transforms: resource.transforms.independent.to_a.sort_by(&:interpolated_name) }
 
     render partial: 'admin/workflow/transform_panel',
+           locals: { panel_name: 'Dependent, Rails Migration Transforms', transforms: resource.transforms.dependent.rails_migration.to_a.sort_by(&:interpolated_name) }
+
+    render partial: 'admin/workflow/transform_panel',
            locals: { panel_name: 'Dependent, Data-Importing Transforms', transforms: resource.transforms.dependent.importing.to_a.sort_by(&:interpolated_name) }
 
     render partial: 'admin/workflow/transform_panel',
-           locals: { panel_name: 'Dependent, non-Importing/Exporting Transforms', transforms: resource.transforms.dependent.non_file_related.to_a.sort_by(&:interpolated_name) }
+           locals: { panel_name: 'Dependent, non-Importing/Exporting/RailsMigration Transforms', transforms: resource.transforms.dependent.non_file_related.not_rails_migration.to_a.sort_by(&:interpolated_name) }
 
     render partial: 'admin/workflow/transform_panel',
            locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.to_a.sort_by(&:interpolated_name) }

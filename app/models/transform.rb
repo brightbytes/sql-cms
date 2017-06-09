@@ -108,6 +108,10 @@ class Transform < ApplicationRecord
 
   scope :exporting, -> { where(runner: RunnerFactory::EXPORT_S3_FILE_RUNNERS) }
 
+  scope :rails_migration, -> { where(runner: 'RailsMigration') }
+
+  scope :not_rails_migration, -> { where.not(runner: 'RailsMigration') }
+
   scope :file_related, -> { where(runner: RunnerFactory::S3_FILE_RUNNERS) }
 
   scope :non_file_related, -> { where(runner: RunnerFactory::NON_S3_FILE_RUNNERS) }
