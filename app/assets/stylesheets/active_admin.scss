@@ -29,3 +29,7 @@ code {
 #transform_sql, #validation_sql, #data_quality_report_sql, #transform_params_yaml, #transform_validation_params_yaml, #transform_validation_transform_params_yaml, #workflow_data_quality_report_params_yaml {
   font-family: Monaco,Consolas,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace !important;
 }
+
+tr.odd:hover td, tr.even:hover td {
+  background: #d5e8ff !important;
+}

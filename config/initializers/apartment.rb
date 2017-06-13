@@ -12,6 +12,23 @@ Apartment::Adapters::PostgresqlSchemaFromSqlAdapter.class_eval %q{
 }
 
 Apartment.configure do |config|
-  config.excluded_models = %w(User PaperTrail::Version Customer Workflow Notification Transform TransformDependency Validation TransformValidation DataQualityReport WorkflowDataQualityReport Run RunStepLog)
+  config.excluded_models =
+    %w(
+      User
+      PaperTrail::Version
+      Customer
+      Workflow
+      WorkflowDependency
+      Notification
+      Transform
+      TransformDependency
+      Validation
+      TransformValidation
+      DataQualityReport
+      WorkflowDataQualityReport
+      Run
+      RunStepLog
+      )
   config.use_sql = true
+  config.persistent_schemas = ['shared_extensions']
 end

@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: workflow_dependencies
+# Table name: public.workflow_dependencies
 #
 #  id                    :integer          not null, primary key
 #  included_workflow_id  :integer          not null

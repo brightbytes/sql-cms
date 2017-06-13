@@ -9,6 +9,7 @@ default: &default
   host: <%= ENV['DB_HOST'] || 'localhost' %>
   username: <%= ENV['DB_USERNAME'] || 'postgres' %>
   password: <%= ENV['DB_PASSWORD'] || 'test123' %>
+  schema_search_path: "public,shared_extensions"
 
 development:
   <<: *default

@@ -14,6 +14,14 @@ namespace :db do
 
   task init: ['db:recreate', 'db:data:load_dump', 'db:migrate', 'db:seed', 'db:test:prepare', :spec]
 
+  desc 'Create shared_extensions Schema'
+
+  task extensions: :environment  do
+    ActiveRecord::Base.connection.execute('CREATE SCHEMA IF NOT EXISTS shared_extensions')
+    ActiveRecord::Base.connection.execute('CREATE EXTENSION IF NOT EXISTS postgres_fdw SCHEMA shared_extensions')
+    ActiveRecord::Base.connection.execute('CREATE EXTENSION IF NOT EXISTS dblink SCHEMA shared_extensions')
+  end
+
   namespace :data do
 
     FULL_DUMP_PATH = Rails.root.join("../bb_data/db_dump/sql_cms/")
@@ -48,6 +56,14 @@ namespace :db do
 
   end
 
+end
+
+Rake::Task["db:create"].enhance do
+  Rake::Task["db:extensions"].invoke
+end
+
+Rake::Task["db:test:purge"].enhance do
+  Rake::Task["db:extensions"].invoke
 end
 
 desc "One Task to rule them all, One Task to find them, One Task to bring them all, and in the Darkness bind them"
