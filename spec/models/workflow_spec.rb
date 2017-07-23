@@ -90,7 +90,7 @@ describe Workflow do
       end
 
       context "with the cheesey dependency graph" do
-        include_examples 'cheesey dependency graph'
+        include_examples 'cheesey transform dependency graph'
 
         it "should group transforms accordingly" do
           expect(workflow.ordered_transform_groups).to eq([Set.new([independent_transform, least_dependent_transform, first_child_transform]), Set.new([less_dependent_transform, another_less_dependent_transform]), Set.new([most_dependent_transform])])
@@ -98,7 +98,7 @@ describe Workflow do
       end
 
       context "with the cheesey dependency graph and extra, redundant dependencies that shouldn't change the result" do
-        include_examples 'cheesey dependency graph'
+        include_examples 'cheesey transform dependency graph'
 
         let!(:dependency_6) { create(:transform_dependency, prerequisite_transform: least_dependent_transform, postrequisite_transform: most_dependent_transform) }
         let!(:dependency_7) { create(:transform_dependency, prerequisite_transform: independent_transform, postrequisite_transform: most_dependent_transform) }
@@ -145,18 +145,21 @@ describe Workflow do
 
     context "#available_included_workflows" do
 
-    #   include_examples 'cheesey dependency graph'
+      include_examples 'cheesey workflow dependency graph'
 
-      pending "should return the correct list of includables in all cases" # do
+      it "should return the correct list of includables in all cases" do
 
-    #     expect(Set.new(most_dependent_transform.available_prerequisite_transforms)).to eq(Set.new([independent_transform, first_child_transform, less_dependent_transform, another_less_dependent_transform, least_dependent_transform]))
-    #     expect(Set.new(first_child_transform.available_prerequisite_transforms)).to eq(Set.new([independent_transform, less_dependent_transform, another_less_dependent_transform, least_dependent_transform]))
-    #     expect(Set.new(less_dependent_transform.available_prerequisite_transforms)).to eq(Set.new([independent_transform, first_child_transform, another_less_dependent_transform, least_dependent_transform]))
-    #     expect(Set.new(another_less_dependent_transform.available_prerequisite_transforms)).to eq(Set.new([independent_transform, first_child_transform, less_dependent_transform, least_dependent_transform]))
-    #     expect(Set.new(least_dependent_transform.available_prerequisite_transforms)).to eq(Set.new([independent_transform, first_child_transform]))
-        #     expect(Set.new(independent_transform.available_prerequisite_transforms)).to eq(Set.new([most_dependent_transform, first_child_transform, less_dependent_transform, another_less_dependent_transform, least_dependent_transform]))
+        expect(Set.new(parent_workflow.available_included_workflows)).to eq(Set.new([child_workflow_1, child_workflow_2, grandchild_workflow_2_1, great_grandchild_workflow_2_1_1, independent_workflow]))
 
-      # end
+        expect(Set.new(child_workflow_1.available_included_workflows)).to eq(Set.new([child_workflow_2, grandchild_workflow_2_1, great_grandchild_workflow_2_1_1, independent_workflow]))
+
+        expect(Set.new(child_workflow_2.available_included_workflows)).to eq(Set.new([child_workflow_1, grandchild_workflow_2_1, great_grandchild_workflow_2_1_1, independent_workflow]))
+
+        expect(Set.new(grandchild_workflow_2_1.available_included_workflows)).to eq(Set.new([child_workflow_1, great_grandchild_workflow_2_1_1, independent_workflow]))
+
+        expect(Set.new(great_grandchild_workflow_2_1_1.available_included_workflows)).to eq(Set.new([child_workflow_1, independent_workflow]))
+
+      end
 
     end
 

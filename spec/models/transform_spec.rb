@@ -176,7 +176,7 @@ describe Transform do
 
     context "#available_prerequisite_transforms" do
 
-      include_examples 'cheesey dependency graph'
+      include_examples 'cheesey transform dependency graph'
 
       it "should return the correct list of prerequisites in all cases" do
         expect(Set.new(most_dependent_transform.available_prerequisite_transforms)).to eq(Set.new([independent_transform, first_child_transform, less_dependent_transform, another_less_dependent_transform, least_dependent_transform]))

@@ -1,4 +1,4 @@
-shared_examples 'cheesey dependency graph' do
+shared_examples 'cheesey transform dependency graph' do
 
   let!(:workflow_configuration) { create(:workflow_configuration) }
 
@@ -27,7 +27,7 @@ end
 
 shared_examples 'a workflow serialized into a run' do
 
-  include_examples 'cheesey dependency graph'
+  include_examples 'cheesey transform dependency graph'
 
   let!(:workflow_data_quality_report_1) { create(:workflow_data_quality_report, workflow: workflow, data_quality_report: DataQualityReport.table_count) }
   let!(:workflow_data_quality_report_2) { create(:workflow_data_quality_report, workflow: workflow, data_quality_report: DataQualityReport.table_count) }
@@ -38,4 +38,26 @@ shared_examples 'a workflow serialized into a run' do
   let!(:run) do
     workflow_configuration.runs.create!(creator: creator, execution_plan: workflow_configuration.serialize_and_symbolize)
   end
+end
+
+shared_examples 'cheesey workflow dependency graph' do
+
+  let!(:workflow_configuration) { create(:workflow_configuration) }
+
+  let!(:parent_workflow) { workflow_configuration.workflow }
+
+  let!(:child_workflow_1) { create(:workflow) }
+  let!(:included_dependency_1) { create(:workflow_dependency, included_workflow: child_workflow_1, including_workflow: parent_workflow) }
+
+  let!(:child_workflow_2) { create(:workflow) }
+  let!(:included_dependency_2) { create(:workflow_dependency, included_workflow: child_workflow_2, including_workflow: parent_workflow) }
+
+  let!(:grandchild_workflow_2_1) { create(:workflow) }
+  let!(:included_dependency_2_1) { create(:workflow_dependency, included_workflow: grandchild_workflow_2_1, including_workflow: child_workflow_2) }
+
+  let!(:great_grandchild_workflow_2_1_1) { create(:workflow) }
+  let!(:included_dependency_2_1_1) { create(:workflow_dependency, included_workflow: great_grandchild_workflow_2_1_1, including_workflow: grandchild_workflow_2_1) }
+
+  let!(:independent_workflow) { create(:workflow) }
+
 end
