@@ -33,6 +33,7 @@ shared_examples 'yaml helper methods' do
     end
     expect(subject.interpolated_sql).to eq("SELECT bar FROM ('check', 'this', 'out')")
     expect(subject.interpolated_name).to eq("Silly bar, check, this, out, dude")
+    expect(subject.to_s).to eq("Silly bar, check, this, out, dude")
 
     expect(subject.class.interpolate(string: sql, params: subject.params, quote_arrays: true)).to eq("SELECT bar FROM ('check', 'this', 'out')")
     expect(subject.class.interpolate(string: name, params: subject.params, quote_arrays: false)).to eq("Silly bar, check, this, out, dude")
@@ -42,6 +43,7 @@ shared_examples 'yaml helper methods' do
       subject.params = {}
       expect(subject.interpolated_sql).to eq(sql)
       expect(subject.interpolated_name).to eq(name)
+      expect(subject.to_s).to eq(name)
     end
   end
 

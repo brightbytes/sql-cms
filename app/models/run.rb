@@ -203,23 +203,27 @@ class Run < ApplicationRecord
   end
 
   # This is only useful in Development for debugging runner code, hence the lack of a test for it.
-  def nuke_failed_steps_and_rerun!
-    if failed?
-      run_step_logs.failed.delete_all
-      update_attributes(notification_status: 'unsent', status: status.sub(/^started/, 'unstarted'))
-      RunManagerJob.perform_later(id)
-    end
-  end
+  # ... and, now it's no longer actually useful ... nuke soon ...
+  # def nuke_failed_steps_and_rerun!
+  #   if failed?
+  #     run_step_logs.failed.delete_all
+  #     update_attributes(notification_status: 'unsent', status: status.sub(/^started/, 'unstarted'))
+  #     RunManagerJob.perform_later(id)
+  #   end
+  # end
 
   # This constant is copy/pasted from lib/tasks/db_setup.rake; DRY-up sometime
-  DB_CONFIG = YAML.load(ERB.new(File.read("#{Rails.root}/config/database.yml")).result)[Rails.env]
+  def db_config
+    @db_config ||= YAML.load(ERB.new(File.read("#{Rails.root}/config/database.yml")).result)[Rails.env]
+  end
 
   def schema_dump
     common_switches = "--schema-only --schema=#{schema_name}"
     if Rails.env.production?
       infix ='$DATABASE_URL'
     else
-      username, database, password = DB_CONFIG["username"], DB_CONFIG["database"], DB_CONFIG["password"]
+      puts db_config['database']
+      username, database, password = db_config["username"], db_config["database"], db_config["password"]
       infix = "--username #{username} --dbname #{database} --no-password"
       prefix = "PGPASSWORD=#{password}"
     end

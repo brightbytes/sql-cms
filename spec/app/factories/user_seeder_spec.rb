@@ -3,7 +3,7 @@ describe UserSeeder do
   describe "#seed" do
 
     it "should idempotently create some users" do
-      # Fucking DatabaseCleaner doesn't work
+      # DatabaseCleaner doesn't work :-(
       User.delete_all
       expect(User.count).to eq(0)
       expect { UserSeeder.seed }.to_not raise_error

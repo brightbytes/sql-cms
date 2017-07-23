@@ -336,5 +336,24 @@ describe Run do
       end
     end
 
+    describe "#schema_dump" do
+      let!(:run) { create(:run) }
+
+      it "shouldn't puke - sorry, not going to validate it in any other way" do
+        run.create_schema
+        # quietly b/c shelling out - as this method does - doesn't allow pg_dump to see the schema, even though it exists, resulting in:
+        #   "pg_dump: No matching schemas were found"
+        expect { quietly { run.schema_dump } }.to_not raise_error
+      end
+    end
+
+    describe "#duration_seconds" do
+      let!(:run) { create(:run) }
+
+      it "should return how long the Run took" do
+        expect(run.duration_seconds).to be > 0.0
+      end
+    end
+
   end
 end

@@ -104,4 +104,13 @@ describe RunStepLog do
 
     end
   end
+
+  describe "#duration_seconds" do
+    let!(:run_step_log) { create(:run_step_log) }
+
+    it "should return how long the Run took" do
+      expect(run_step_log.duration_seconds).to be > 0.0
+    end
+  end
+
 end
