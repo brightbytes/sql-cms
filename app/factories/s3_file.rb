@@ -24,26 +24,28 @@ class S3File
     @s3_file_name = atts[:s3_file_name]
   end
 
-  def s3_file_extension
-    @s3_file_extension ||=
-      if s3_file_name.present?
-        if match = /.+\.(.+)$/.match(s3_file_name)
-          match[1].tap(&:downcase!)
-        end
-      end
-  end
+  # Didn't end up using this stuff ...
 
-  TSV = 'tsv'
+  # def s3_file_extension
+  #   @s3_file_extension ||=
+  #     if s3_file_name.present?
+  #       if match = /.+\.(.+)$/.match(s3_file_name)
+  #         match[1].tap(&:downcase!)
+  #       end
+  #     end
+  # end
 
-  def tsv?
-    s3_file_extension == TSV
-  end
+  # TSV = 'tsv'
 
-  CSV = 'csv'
+  # def tsv?
+  #   s3_file_extension == TSV
+  # end
 
-  def csv?
-    s3_file_extension == CSV
-  end
+  # CSV = 'csv'
+
+  # def csv?
+  #   s3_file_extension == CSV
+  # end
 
   def to_s
     "'s3://#{s3_bucket_name}/#{s3_file_path_and_name}' in region #{s3_region_name}"
