@@ -149,6 +149,8 @@ describe Workflow do
 
       it "should return the correct list of includables in all cases" do
 
+        expect(Set.new(Workflow.new.available_included_workflows)).to eq(Set.new([parent_workflow, child_workflow_1, child_workflow_2, grandchild_workflow_2_1, great_grandchild_workflow_2_1_1, independent_workflow]))
+
         expect(Set.new(parent_workflow.available_included_workflows)).to eq(Set.new([child_workflow_1, child_workflow_2, grandchild_workflow_2_1, great_grandchild_workflow_2_1_1, independent_workflow]))
 
         expect(Set.new(child_workflow_1.available_included_workflows)).to eq(Set.new([child_workflow_2, grandchild_workflow_2_1, great_grandchild_workflow_2_1_1, independent_workflow]))

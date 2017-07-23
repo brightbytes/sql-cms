@@ -140,10 +140,6 @@ class Transform < ApplicationRecord
       runner == 'AutoLoad'
     end
 
-    def copy_from?
-      runner == 'CopyFrom'
-    end
-
     def defaults_runner?
       runner&.in?(RunnerFactory::DEFAULTS_RUNNERS)
     end

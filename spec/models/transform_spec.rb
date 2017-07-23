@@ -170,8 +170,17 @@ describe Transform do
       end
     end
 
-    context "Methods returning an S3File" do
-
+    context "S3 Import File method" do
+      it "should return a correctly-initialized S3 Import File" do
+        w = create(:workflow)
+        wc = create(:workflow_configuration, workflow: w, s3_file_path: 'some/file/path')
+        t = create(:transform, workflow: w, runner: 'CopyFrom', s3_file_name: 'foobar.csv')
+        file = t.s3_import_file(wc)
+        expect(file.s3_region_name).to eq(wc.s3_region_name)
+        expect(file.s3_bucket_name).to eq(wc.s3_bucket_name)
+        expect(file.s3_file_path).to eq(wc.s3_file_path)
+        expect(file.s3_file_name).to eq(t.s3_file_name)
+      end
     end
 
     context "#available_prerequisite_transforms" do
@@ -179,6 +188,7 @@ describe Transform do
       include_examples 'cheesey transform dependency graph'
 
       it "should return the correct list of prerequisites in all cases" do
+        expect(Set.new(Transform.new(workflow: workflow).available_prerequisite_transforms)).to eq(Set.new([most_dependent_transform, independent_transform, first_child_transform, less_dependent_transform, another_less_dependent_transform, least_dependent_transform]))
         expect(Set.new(most_dependent_transform.available_prerequisite_transforms)).to eq(Set.new([independent_transform, first_child_transform, less_dependent_transform, another_less_dependent_transform, least_dependent_transform]))
         expect(Set.new(first_child_transform.available_prerequisite_transforms)).to eq(Set.new([independent_transform, less_dependent_transform, another_less_dependent_transform, least_dependent_transform]))
         expect(Set.new(less_dependent_transform.available_prerequisite_transforms)).to eq(Set.new([independent_transform, first_child_transform, another_less_dependent_transform, least_dependent_transform]))
