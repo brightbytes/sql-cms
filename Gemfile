@@ -85,7 +85,7 @@ group :test do
 end
 
 group :staging, :qa, :production do
-  # Heroku - avoid deprecation warnings.  Grouped because it fucks up logging in Dev.
+  # Heroku - avoid deprecation warnings.  Grouped because it screws up logging in Dev.
   gem 'rails_12factor'
 end
 

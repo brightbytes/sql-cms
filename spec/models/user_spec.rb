@@ -53,7 +53,7 @@ describe User do
       end
     end
 
-    it "should not allow email addresses with semicolons in them (Devise's piece-of-shit email address validator does)" do
+    it "should not allow email addresses with semicolons in them (Devise's lame email address validator does)" do
       expect(build(:user, email: "foo;bar@nowhere.com")).to_not be_valid
     end
 
@@ -77,15 +77,15 @@ describe User do
 
     context "metaprogrammed methods" do
       it "should have 1 memoized user, and a flush method" do
-        expect(User.aaron).to be_nil
+        expect(User.admin).to be_nil
         expect { UserSeeder.seed }.to_not raise_error
 
-        aaron = User.aaron
-        expect(aaron).to be_a(User)
-        expect(User.instance_variable_get(:"@aaron")).to eq(aaron)
+        admin = User.admin
+        expect(admin).to be_a(User)
+        expect(User.instance_variable_get(:"@admin")).to eq(admin)
 
         User.flush_cache
-        expect(User.instance_variable_get(:"@aaron")).to be_nil
+        expect(User.instance_variable_get(:"@admin")).to be_nil
       end
     end
 

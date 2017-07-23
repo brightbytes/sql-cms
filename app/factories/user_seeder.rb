@@ -14,9 +14,9 @@ module UserSeeder
 
   USERS = [
     {
-      email: 'aaron@brightbytes.net',
-      first_name: 'Aaron',
-      last_name: 'Cohen'
+      email: 'admin@example.com',
+      first_name: 'Admin',
+      last_name: 'User'
     }
   ]
 

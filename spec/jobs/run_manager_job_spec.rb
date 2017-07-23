@@ -2,7 +2,7 @@ describe RunManagerJob do
 
   describe "#perform" do
 
-    let!(:creator) { create(:user, email: 'aaron@brightbytes.net') }
+    let!(:creator) { create(:user, email: 'admin@example.com') }
 
     context "using the Demo Workflow and S3 file stubs" do
       before { WorkflowSeeder.seed }

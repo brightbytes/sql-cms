@@ -17,7 +17,7 @@ module WorkflowSeeder
         customer: CustomerSeeder.demo_customer,
         s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files'
       )
-      workflow_configuration.notifications.first_or_create!(user: User.where(email: 'aaron@brightbytes.net').first)
+      # workflow_configuration.notifications.first_or_create!(user: User.where(email: 'admin@example.com').first)
       create_demo_workflow!
     end
   end
@@ -385,7 +385,7 @@ module WorkflowSeeder
       SQL
     )
 
-    # We have no validation of ^^ because we don't give a shit.  ^^ exists as an example of a "data format-conversion" Map Transform only.
+    # We have no validation of ^^ because we don't care.  ^^ exists as an example of a "data format-conversion" Map Transform only.
 
     create_demo_dependency!(prerequisite_transform: school_mappings_initial_map_transform, postrequisite_transform: school_mappings_map_transform)
 
