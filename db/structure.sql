@@ -5,13 +5,6 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
---
--- Name: shared_extensions; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA shared_extensions;
-
-
 SET search_path = public, pg_catalog;
 
 SET default_tablespace = '';
@@ -1183,7 +1176,7 @@ ALTER TABLE ONLY transform_dependencies
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "public", "shared_extensions";
+SET search_path TO public,shared_extensions;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20170112005400'),
