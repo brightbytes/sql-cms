@@ -1,8 +1,7 @@
 class Class
 
-  # Older Gems that haven't been updated for Rails 5.1 depend on this.
-  # It didn't need to be removed, merely deprecated.
-  # Thanks for making it very difficult to upgrade apps, Rails Core Team
+  # Older gems that haven't been updated for Rails 5.1 depend on this.
+  # It didn't need to be removed, merely deprecated, since the change makes it very difficult to upgrade apps with dependencies on 5.1 gems
   def alias_method_chain(target, feature)
     # Strip out punctuation on predicates, bang or writer methods since
     # e.g. target?_without_feature is not a valid method name.
