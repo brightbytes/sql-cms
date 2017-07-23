@@ -14,29 +14,30 @@ namespace :db do
 
   task init: ['db:recreate', 'db:data:load_dump', 'db:migrate', 'db:seed', 'db:test:prepare', :spec]
 
-  desc 'Create the shared_extensions schema, whose contents may be used by any Run'
+  # Don't care to do this right now.
+  # desc 'Create the shared_extensions schema, whose contents may be used by any Run'
 
-  task extensions: :environment  do
-    # FIXME - COME UP WITH A BETTER WAY OF CONDITIONALIZING THIS CONFIG
-    if ENV['CREATE_FDW'] # Gated so that this only goes down for my installation.
-      host = ENV['FDW_HOST']
-      port = ENV['FDW_PORT']
-      dbname = ENV['FDW_DBNAME']
-      user = ENV['FDW_USER']
-      password = ENV['FDW_PASSWORD']
-      [
-        'CREATE SCHEMA IF NOT EXISTS shared_extensions',
-        'CREATE EXTENSION IF NOT EXISTS postgres_fdw SCHEMA shared_extensions',
-        'CREATE EXTENSION IF NOT EXISTS dblink SCHEMA shared_extensions',
-      ].each { |sql| ActiveRecord::Base.connection.execute(sql) }
-      [
-        "CREATE SERVER foreign_server FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '#{host}', port '#{port}', dbname '#{dbname}', sslmode 'require')",
-        "CREATE USER MAPPING FOR PUBLIC SERVER foreign_server OPTIONS (user '#{user}', password '#{password}')"
-      ].each do |sql|
-        Apartment::Tenant.switch('shared_extensions') { Apartment.connection.transaction { Apartment.connection.execute(sql) } }
-      end
-    end
-  end
+  # task extensions: :environment  do
+  #   # FIXME - COME UP WITH A BETTER WAY OF CONDITIONALIZING THIS CONFIG
+  #   if ENV['CREATE_FDW'] # Gated so that this only goes down for my installation.
+  #     host = ENV['FDW_HOST']
+  #     port = ENV['FDW_PORT']
+  #     dbname = ENV['FDW_DBNAME']
+  #     user = ENV['FDW_USER']
+  #     password = ENV['FDW_PASSWORD']
+  #     [
+  #       'CREATE SCHEMA IF NOT EXISTS shared_extensions',
+  #       'CREATE EXTENSION IF NOT EXISTS postgres_fdw SCHEMA shared_extensions',
+  #       'CREATE EXTENSION IF NOT EXISTS dblink SCHEMA shared_extensions',
+  #     ].each { |sql| ActiveRecord::Base.connection.execute(sql) }
+  #     [
+  #       "CREATE SERVER foreign_server FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '#{host}', port '#{port}', dbname '#{dbname}', sslmode 'require')",
+  #       "CREATE USER MAPPING FOR PUBLIC SERVER foreign_server OPTIONS (user '#{user}', password '#{password}')"
+  #     ].each do |sql|
+  #       Apartment::Tenant.switch('shared_extensions') { Apartment.connection.transaction { Apartment.connection.execute(sql) } }
+  #     end
+  #   end
+  # end
 
   namespace :data do
 
@@ -74,13 +75,13 @@ namespace :db do
 
 end
 
-Rake::Task["db:create"].enhance do
-  Rake::Task["db:extensions"].invoke
-end
+# Rake::Task["db:create"].enhance do
+#   Rake::Task["db:extensions"].invoke
+# end
 
-Rake::Task["db:test:purge"].enhance do
-  Rake::Task["db:extensions"].invoke
-end
+# Rake::Task["db:test:purge"].enhance do
+#   Rake::Task["db:extensions"].invoke
+# end
 
 desc "One Task to rule them all, One Task to find them, One Task to bring them all, and in the Darkness bind them"
 task one_ring: 'db:init'
