@@ -12,7 +12,7 @@ class ExecutionPlan
         if merged_included_workflow_h
           # Then, we change the including_plan_h so that all merged Transform Groups come before the including_workflow's Transform Groups
           reorder_workflow_transform_groups!(including_plan_h, merged_included_workflow_h)
-          # And, we just merge Data Quality Reports, since no order is required, yet
+          # And, we just merge Data Quality Reports, since no ordering is required (except in the UI, which demands alphabetical; dealt with in View)
           merge_workflow_data_quality_reports!(including_plan_h, merged_included_workflow_h)
         end
       end
@@ -55,7 +55,7 @@ class ExecutionPlan
         (0..num_iterations).each do |i|
           included_ordered_transform_groups = included_plan_h[:ordered_transform_groups][i]
           if included_ordered_transform_groups.present?
-            including_plan_h[:ordered_transform_groups][i] ||= Set.new
+            including_plan_h[:ordered_transform_groups][i] ||= []
             including_plan_h[:ordered_transform_groups][i] += included_ordered_transform_groups
           end
         end

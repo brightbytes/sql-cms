@@ -17,7 +17,10 @@ module WorkflowSeeder
         customer: CustomerSeeder.demo_customer,
         s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files'
       )
-      # workflow_configuration.notifications.first_or_create!(user: User.where(email: 'admin@example.com').first)
+      # FIXME - This block shouldn't be here, but it results in more testing via RunManager spec, so I'm leaving it for now.
+      if user = User.first
+        workflow_configuration.notifications.first_or_create!(user: user)
+      end
       create_demo_workflow!
     end
   end
