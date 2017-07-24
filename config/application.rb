@@ -28,11 +28,8 @@ module SqlCms
     # like if you have constraints or database-specific column types
     config.active_record.schema_format = :sql
 
-    # Seems to be automatic now ...
-    # config.autoload_paths += ["#{config.root}/app/validators/"]
-    # config.autoload_paths += ["#{config.root}/app/factories/"]
-
-    config.eager_load_paths += ["#{config.root}/app/validators", "#{config.root}/app/factories"]
+    # app/models/factories b/c app/factories conflicted with FactoryGirl's spec/factories
+    config.eager_load_paths += ["#{config.root}/app/validators", "#{config.root}/app/models/factories"]
 
     config.active_job.queue_adapter = :sidekiq
   end
