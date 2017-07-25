@@ -36,8 +36,10 @@ ActiveAdmin.register Workflow do
       row :created_at
       row :updated_at
 
-      row('Related Action') { link_to("Create New Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow)) }
-      row('Related Action') { text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.id, source: :workflow)) }
+      row('Action') { link_to("Create New Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow)) }
+      row('Action') { link_to("Create New Transform", new_transform_path(workflow_id: resource.id, source: :workflow)) }
+      row('Action') { link_to("Create New Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id)) }
+
     end
 
     configs = resource.workflow_configurations.includes(:customer).order('customers.slug')
@@ -91,12 +93,9 @@ ActiveAdmin.register Workflow do
     render partial: 'admin/workflow/transform_panel',
            locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.to_a.sort_by(&:interpolated_name) }
 
-    panel 'Data Quality Reports' do
-
-      text_node link_to("Create New Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
-
-      reports = resource.workflow_data_quality_reports.includes(:data_quality_report).to_a.sort_by(&:interpolated_name).to_a
-      unless reports.empty?
+    reports = resource.workflow_data_quality_reports.includes(:data_quality_report).to_a.sort_by(&:interpolated_name).to_a
+    unless reports.empty?
+      panel 'Data Quality Reports' do
         table_for(reports) do
           column(:workflow_data_quality_report) { |wdqr| auto_link(wdqr) }
           column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql }

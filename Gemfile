@@ -17,6 +17,7 @@ gem 'rails'
 
 # DB
 gem "pg" # Postgres
+gem 'activerecord5-redshift-adapter'
 gem 'immigrant' # FK constraints
 gem 'postgres-copy' # bulk import
 gem 'postgresql_cursor' # postgres cursors!!

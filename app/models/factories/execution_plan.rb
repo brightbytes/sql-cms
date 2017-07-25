@@ -109,4 +109,8 @@ class ExecutionPlan
     workflow_data_quality_reports&.map { |h| h.fetch(:id, nil) }
   end
 
+  def use_redshift?
+    execution_plan[:redshift]
+  end
+
 end

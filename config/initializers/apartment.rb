@@ -30,5 +30,5 @@ Apartment.configure do |config|
       RunStepLog
       )
   config.use_sql = true
-  config.persistent_schemas = ['shared_extensions']
+  # config.persistent_schemas = ['shared_extensions']
 end

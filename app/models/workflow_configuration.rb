@@ -10,6 +10,7 @@
 #  updated_at     :datetime         not null
 #  customer_id    :integer
 #  s3_file_path   :string
+#  redshift       :boolean          default(FALSE), not null
 #
 # Indexes
 #

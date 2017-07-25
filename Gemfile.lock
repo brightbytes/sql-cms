@@ -88,6 +88,9 @@ GEM
       activemodel (= 5.1.0)
       activesupport (= 5.1.0)
       arel (~> 8.0)
+    activerecord5-redshift-adapter (1.0)
+      activerecord (~> 5.0)
+      pg (>= 0.18)
     activesupport (5.1.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (~> 0.7)
@@ -372,6 +375,7 @@ PLATFORMS
 DEPENDENCIES
   active_model_serializers (~> 0.10.0)
   activeadmin!
+  activerecord5-redshift-adapter
   acts_as_fu
   annotate!
   apartment
@@ -425,4 +429,4 @@ RUBY VERSION
    ruby 2.4.1p111
 
 BUNDLED WITH
-   1.14.6
+   1.15.1

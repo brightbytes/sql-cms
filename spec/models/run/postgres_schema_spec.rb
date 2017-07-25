@@ -6,15 +6,15 @@ describe Run::PostgresSchema do
     it "should allow listing, creation, and deletion of schemas" do
       run = create(:run)
       schema_name = run.schema_name
-      expect(Run.list_schemas).to_not include(schema_name)
+      expect(Run.list_schemata).to_not include(schema_name)
       expect(run.schema_exists?).to eq(false)
 
       run.create_schema
-      expect(Run.list_schemas).to include(schema_name)
+      expect(Run.list_schemata).to include(schema_name)
       expect(run.schema_exists?).to eq(true)
 
       run.drop_schema
-      expect(Run.list_schemas).to_not include(schema_name)
+      expect(Run.list_schemata).to_not include(schema_name)
       expect(run.schema_exists?).to eq(false)
     end
 
@@ -51,6 +51,7 @@ describe Run::PostgresSchema do
 
     it "should allow Rails Migrations to be run in the schema" do
       run = create(:run)
+      run.create_schema
       run.eval_in_schema("create_table(:silly) { |t| t.string :stringy }")
       run.execute_in_schema("INSERT INTO silly (id, stringy) VALUES (DEFAULT, 'FOOBAR!'), (DEFAULT, 'BARFOO!')")
       ar_result = run.select_all_in_schema("SELECT * FROM silly ORDER BY id")

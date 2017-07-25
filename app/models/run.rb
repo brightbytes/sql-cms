@@ -26,12 +26,6 @@
 # The point of this class is to execute a Workflow in an isolated namespace (think "separate DB context")
 class Run < ApplicationRecord
 
-  # You gotta Run, Run, Run, Run, Run
-  # Take a drag or two.
-  # Run, Run, Run, Run, Run,
-  # Gypsy death and you
-  # Say what to do.
-
   # Consider pulling out into Service layer
   include Run::PostgresSchema
 
@@ -51,7 +45,7 @@ class Run < ApplicationRecord
 
   after_create :generate_schema_name
 
-  def generate_schema_name
+  private def generate_schema_name
     update_attribute(:schema_name, "#{workflow_configuration}_run_#{id}")
   end
 
@@ -114,7 +108,7 @@ class Run < ApplicationRecord
 
   delegate :transform_group, :transform_group_transform_ids, :transform_plan,
            :workflow_data_quality_reports, :workflow_data_quality_report_plan, :workflow_data_quality_report_ids,
-           to: :execution_plan_object
+           :use_redshift?, to: :execution_plan_object
 
   def transform_group_successful?(step_index)
     return nil if execution_plan.blank?
