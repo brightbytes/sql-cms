@@ -8,14 +8,12 @@ module Run::PostgresSchema
   extend ActiveSupport::Concern
 
   def schema_exists?(in_postgres = true)
-    self.class.in_db_context(in_postgres) do
-      self.class.list_schemata(in_postgres).include?(schema_name)
-    end
+    self.class.list_schemata(in_postgres).include?(schema_name)
   end
 
   def create_schema(in_postgres = true)
     self.class.in_db_context(in_postgres) do
-      unless schema_exists?(in_postgres = true)
+      unless schema_exists?(in_postgres)
         with_connection_reset_on_error do
           # Putting this inside a transaction prevents the connection from being hosed by SQL error
           transaction { Apartment::Tenant.create(schema_name) }
@@ -26,7 +24,7 @@ module Run::PostgresSchema
 
   def drop_schema(in_postgres = true)
     self.class.in_db_context(in_postgres) do
-      if schema_exists?(in_postgres = true)
+      if schema_exists?(in_postgres)
         with_connection_reset_on_error do
           # Putting this inside a transaction prevents the connection from being hosed by SQL error
           transaction { Apartment::Tenant.drop(schema_name) }
