@@ -1177,7 +1177,7 @@ ALTER TABLE ONLY transform_dependencies
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "public", "shared_extensions";
+SET search_path TO public,shared_extensions;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20170112005400'),

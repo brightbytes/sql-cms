@@ -51,12 +51,16 @@ class Run < ApplicationRecord
 
   after_create :generate_schema_name
 
-  def generate_schema_name
+  private def generate_schema_name
     update_attribute(:schema_name, "#{workflow_configuration}_run_#{id}")
   end
 
   # From Run::PostgresSchema; consider removing to Observer or Service
-  after_destroy :drop_schema
+  after_destroy :drop_schema_from_db
+
+  private def drop_schema_from_db
+    drop_schema(!workflow_configuration.redshift?)
+  end
 
   # Associations
 

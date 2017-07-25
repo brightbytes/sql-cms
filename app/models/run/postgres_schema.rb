@@ -6,33 +6,39 @@ module Run::PostgresSchema
 
   extend ActiveSupport::Concern
 
-  def schema_exists?
-    self.class.list_schemas.include?(schema_name)
+  def schema_exists?(in_postgres = true)
+    in_db_context(in_postgres) do
+      self.class.list_schemas.include?(schema_name)
+    end
   end
 
-  def create_schema
-    unless schema_exists?
-      with_connection_reset_on_error do
-        # Putting this inside a transaction prevents the connection from being hosed by SQL error
-        transaction { Apartment::Tenant.create(schema_name) }
+  def create_schema(in_postgres = true)
+    in_db_context(in_postgres) do
+      unless schema_exists?(in_postgres = true)
+        with_connection_reset_on_error do
+          # Putting this inside a transaction prevents the connection from being hosed by SQL error
+          transaction { Apartment::Tenant.create(schema_name) }
+        end
       end
     end
-    nil
   end
 
-  def drop_schema
-    if schema_exists?
-      with_connection_reset_on_error do
-        # Putting this inside a transaction prevents the connection from being hosed by SQL error
-        transaction { Apartment::Tenant.drop(schema_name) }
+  def drop_schema(in_postgres = true)
+    in_db_context(in_postgres) do
+      if schema_exists?(in_postgres = true)
+        with_connection_reset_on_error do
+          # Putting this inside a transaction prevents the connection from being hosed by SQL error
+          transaction { Apartment::Tenant.drop(schema_name) }
+        end
       end
     end
-    nil
   end
 
-  def execute_in_schema(sql)
-    with_connection_reset_on_error do
-      in_schema_context { Apartment.connection.execute(sql) }
+  def execute_in_schema(sql, in_postgres: true)
+    in_db_context(in_postgres) do
+      with_connection_reset_on_error do
+        in_schema_context { Apartment.connection.execute(sql) }
+      end
     end
   end
 
@@ -40,12 +46,14 @@ module Run::PostgresSchema
 
   # Also, if you're the sort who loves reading about lowest-level methods available on a .raw_connection for Postgres, see http://deveiate.org/code/pg/PG/Connection.html
 
-  def copy_from_in_schema(sql:, enumerable:)
-    with_connection_reset_on_error do
-      in_schema_context do
-        Apartment.connection.raw_connection.copy_data(sql) do
-          enumerable.each do |line|
-            Apartment.connection.raw_connection.put_copy_data(line) unless line.blank?
+  def copy_from_in_schema(sql:, enumerable:, in_postgres: true)
+    in_db_context(in_postgres) do
+      with_connection_reset_on_error do
+        in_schema_context do
+          Apartment.connection.raw_connection.copy_data(sql) do
+            enumerable.each do |line|
+              Apartment.connection.raw_connection.put_copy_data(line) unless line.blank?
+            end
           end
         end
       end
@@ -55,66 +63,88 @@ module Run::PostgresSchema
   # A streaming COPY per-table would be the best way to get data out, by which I mean something like this from the CL:
   #   psql <fin_pipeline_connection> -c "\COPY source_pipeline_table TO STDOUT ..." | psql <fin_app_db_connection> -c "\COPY target_fin_app_table FROM STDIN ..."
   # Short of that, this will have to do.
-  def copy_to_in_schema(sql:, writeable_io:)
-    with_connection_reset_on_error do
-      in_schema_context do
-        Apartment.connection.raw_connection.copy_data(sql) do
-          while line = Apartment.connection.raw_connection.get_copy_data
-            writeable_io.puts(line)
+  def copy_to_in_schema(sql:, writeable_io:, in_postgres: true)
+    in_db_context(in_postgres) do
+      with_connection_reset_on_error do
+        in_schema_context do
+          Apartment.connection.raw_connection.copy_data(sql) do
+            while line = Apartment.connection.raw_connection.get_copy_data
+              writeable_io.puts(line)
+            end
           end
         end
       end
     end
   end
 
-  def eval_in_schema(rails_migration)
-    with_connection_reset_on_error do
-      in_schema_context do
-        Apartment.connection.instance_eval(rails_migration)
+  def eval_in_schema(rails_migration, in_postgres: true)
+    in_db_context(in_postgres) do
+      with_connection_reset_on_error do
+        in_schema_context do
+          Apartment.connection.instance_eval(rails_migration)
+        end
       end
     end
   end
 
   # These next 5 are useful in tests and for debugging failed Runs (in addition to some of them being used by the system)
 
-  def select_all_in_schema(sql)
-    with_connection_reset_on_error do
-      in_schema_context { Apartment.connection.select_all(sql) }
+  def select_all_in_schema(sql, in_postgres: true)
+    in_db_context(in_postgres) do
+      with_connection_reset_on_error do
+        in_schema_context { Apartment.connection.select_all(sql) }
+      end
     end
   end
 
-  def select_rows_in_schema(sql)
-    with_connection_reset_on_error do
-      in_schema_context { Apartment.connection.select_rows(sql) }
+  def select_rows_in_schema(sql, in_postgres: true)
+    in_db_context(in_postgres) do
+      with_connection_reset_on_error do
+        in_schema_context { Apartment.connection.select_rows(sql) }
+      end
     end
   end
 
-  def select_one_in_schema(sql)
-    with_connection_reset_on_error do
-      in_schema_context { Apartment.connection.select_one(sql) }
+  def select_one_in_schema(sql, in_postgres: true)
+    in_db_context(in_postgres) do
+      with_connection_reset_on_error do
+        in_schema_context { Apartment.connection.select_one(sql) }
+      end
     end
   end
 
-  def select_values_in_schema(sql)
-    with_connection_reset_on_error do
-      in_schema_context { Apartment.connection.select_values(sql) }
+  def select_values_in_schema(sql, in_postgres: true)
+    in_db_context(in_postgres) do
+      with_connection_reset_on_error do
+        in_schema_context { Apartment.connection.select_values(sql) }
+      end
     end
   end
 
-  def select_value_in_schema(sql)
-    with_connection_reset_on_error do
-      in_schema_context { Apartment.connection.select_value(sql) }
+  def select_value_in_schema(sql, in_postgres: true)
+    in_db_context(in_postgres) do
+      with_connection_reset_on_error do
+        in_schema_context { Apartment.connection.select_value(sql) }
+      end
     end
   end
 
   private
 
-  def in_db_context
-    
-  ensure
-    
+  def in_db_context(in_postgres)
+    if in_postgres
+      yield
+    else
+      begin
+        old_config = ActiveRecord::Base.connection_config
+        ActiveRecord::Base.establish_connection(:redshift)
+        yield
+      ensure
+        ActiveRecord::Base.establish_connection(old_config)
+      end
+    end
   end
-  
+
   def in_schema_context
     Apartment::Tenant.switch(schema_name.presence) do # nil => public
       # Putting this inside a transaction prevents the connection from being hosed by SQL error
@@ -125,13 +155,9 @@ module Run::PostgresSchema
   def with_connection_reset_on_error
     yield
   rescue
-    reset_connection!
-    raise
-  end
-
-  # The Rails postgres adaptor's connection becomes unusable after ANY error, hence it needs to be reset.  FML.
-  def reset_connection!
+    # The Rails postgres adaptor's connection becomes unusable after ANY error, hence it needs to be reset.  FML.
     Apartment::Tenant.reset
+    raise
   end
 
   module ClassMethods

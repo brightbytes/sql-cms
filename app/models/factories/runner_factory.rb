@@ -87,12 +87,12 @@ module RunnerFactory
             end
             #{indexes_s}
           SQL
-          run.eval_in_schema(migration_s)
+          run.eval_in_schema(migration_s, in_postgres: !run.workflow_configuration.redshift?)
 
           header_s = header_a.join(', ')
           sql = "COPY #{table_name} (#{header_s}) FROM STDIN WITH CSV"
 
-          run.copy_from_in_schema(sql: sql, enumerable: stream)
+          run.copy_from_in_schema(sql: sql, enumerable: stream, in_postgres: !run.workflow_configuration.redshift?)
 
         ensure
           csv_wrapped_stream.close # not sure this is actually required
@@ -109,7 +109,7 @@ module RunnerFactory
 
     def run(run:, plan_h:)
       # NOTE: params are discarded due to the heavy use of symbols in Rails Migrations
-      run.eval_in_schema(plan_h[:sql])
+      run.eval_in_schema(plan_h[:sql], in_postgres: !run.workflow_configuration.redshift?)
     end
   end
 
@@ -130,7 +130,7 @@ module RunnerFactory
       url = s3_file.s3_presigned_url
       raise "Unable to locate #{s3_file}!" unless url
 
-      open(url) { |stream| run.copy_from_in_schema(sql: plan_h[:interpolated_sql], enumerable: stream) }
+      open(url) { |stream| run.copy_from_in_schema(sql: plan_h[:interpolated_sql], enumerable: stream, in_postgres: !run.workflow_configuration.redshift?) }
     end
   end
 
@@ -140,7 +140,7 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      run.execute_in_schema(plan_h[:interpolated_sql])
+      run.execute_in_schema(plan_h[:interpolated_sql], in_postgres: !run.workflow_configuration.redshift?)
     end
   end
 
@@ -161,7 +161,7 @@ module RunnerFactory
 
       # Tragically, we can't use IO.pipe b/c AWS needs to know the file size in advance so as to chunk the data when appropriate
       Tempfile.open(s3_file.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
-        run.copy_to_in_schema(sql: plan_h[:interpolated_sql], writeable_io: stream).tap do
+        run.copy_to_in_schema(sql: plan_h[:interpolated_sql], writeable_io: stream, in_postgres: !run.workflow_configuration.redshift?).tap do
           stream.rewind
           s3_file.upload(stream)
         end
@@ -186,7 +186,7 @@ module RunnerFactory
 
     def run(run:, transform_validation_h:)
       transform_validation_sql = transform_validation_h[:interpolated_sql]
-      if ids = run.select_values_in_schema(transform_validation_sql).presence
+      if ids = run.select_values_in_schema(transform_validation_sql, in_postgres: !run.workflow_configuration.redshift?).presence
         {
           failed_validation_name: transform_validation_h[:interpolated_name],
           failed_validation_sql: transform_validation_sql,
@@ -202,7 +202,7 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      run.select_all_in_schema(plan_h[:interpolated_sql])&.to_hash
+      run.select_all_in_schema(plan_h[:interpolated_sql], in_postgres: !run.workflow_configuration.redshift?)&.to_hash
     end
   end
 
