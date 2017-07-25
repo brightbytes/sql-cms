@@ -56,11 +56,7 @@ class Run < ApplicationRecord
   end
 
   # From Run::PostgresSchema; consider removing to Observer or Service
-  after_destroy :drop_schema_from_db
-
-  private def drop_schema_from_db
-    drop_schema(!use_redshift?)
-  end
+  after_destroy :drop_schema
 
   # Associations
 

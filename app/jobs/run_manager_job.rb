@@ -24,7 +24,7 @@ class RunManagerJob < ApplicationJob
 
     when 'unstarted'
       # It's inconsistent that this is done here rather than a child job ... but, since this should be very fast, I prefer to skip the polling-frequency wait.
-      run.create_schema(!run.use_redshift?)
+      run.create_schema
       run.update_attribute(:status, "unstarted_ordered_transform_groups[0]")
       manage_state_machine(run) # ah, the glory of a brief affair with a recursive call
 

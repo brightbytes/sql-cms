@@ -12,7 +12,7 @@ module Run::PostgresSchema
   end
 
   def create_schema
-    unless schema_exists?(use_redshift?)
+    unless schema_exists?
       self.class.in_db_context(use_redshift?) do
         with_connection_reset_on_error do
           # Putting this inside a transaction prevents the connection from being hosed by SQL error
@@ -23,7 +23,7 @@ module Run::PostgresSchema
   end
 
   def drop_schema
-    if schema_exists?(use_redshift?)
+    if schema_exists?
       self.class.in_db_context(use_redshift?) do
         with_connection_reset_on_error do
           # Putting this inside a transaction prevents the connection from being hosed by SQL error
@@ -149,16 +149,14 @@ module Run::PostgresSchema
 
     LIST_SCHEMATA_SQL = "SELECT nspname FROM pg_catalog.pg_namespace"
 
-    def list_schemata(in_postgres = true)
-      in_db_context(in_postgres) do
+    def list_schemata(use_redshift = false)
+      in_db_context(use_redshift) do
         Apartment.connection.select_values(LIST_SCHEMATA_SQL)
       end
     end
 
-    def in_db_context(in_postgres = true)
-      if in_postgres
-        yield
-      else
+    def in_db_context(use_redshift = true)
+      if use_redshift
         begin
           old_config = ActiveRecord::Base.connection_config
           ActiveRecord::Base.establish_connection(:redshift)
@@ -166,6 +164,8 @@ module Run::PostgresSchema
         ensure
           ActiveRecord::Base.establish_connection(old_config)
         end
+      else
+        yield
       end
     end
 
