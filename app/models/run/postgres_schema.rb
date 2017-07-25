@@ -109,6 +109,12 @@ module Run::PostgresSchema
 
   private
 
+  def in_db_context
+    
+  ensure
+    
+  end
+  
   def in_schema_context
     Apartment::Tenant.switch(schema_name.presence) do # nil => public
       # Putting this inside a transaction prevents the connection from being hosed by SQL error

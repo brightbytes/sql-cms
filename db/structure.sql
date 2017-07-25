@@ -463,7 +463,8 @@ CREATE TABLE workflow_configurations (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     customer_id integer,
-    s3_file_path character varying
+    s3_file_path character varying,
+    redshift boolean DEFAULT false NOT NULL
 );
 
 
@@ -1176,7 +1177,7 @@ ALTER TABLE ONLY transform_dependencies
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO public,shared_extensions;
+SET search_path TO "public", "shared_extensions";
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20170112005400'),
@@ -1192,6 +1193,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170504001059'),
 ('20170509204400'),
 ('20170510010559'),
-('20170517030342');
+('20170517030342'),
+('20170725015832');
 
 

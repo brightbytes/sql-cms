@@ -4,7 +4,7 @@ ActiveAdmin.register WorkflowConfiguration do
 
   actions :all
 
-  permit_params :workflow_id, :customer_id, :s3_region_name, :s3_bucket_name, :s3_file_path, notified_user_ids: []
+  permit_params :workflow_id, :customer_id, :redshift, :s3_region_name, :s3_bucket_name, :s3_file_path, notified_user_ids: []
 
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
@@ -19,6 +19,7 @@ ActiveAdmin.register WorkflowConfiguration do
     column(:workflow_configuration, sortable: 'workflows.slug,customers.slug') { |workflow_configuration| auto_link(workflow_configuration) }
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
+    boolean_column(:redshift)
     column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
   end
 
@@ -28,6 +29,8 @@ ActiveAdmin.register WorkflowConfiguration do
 
       row :workflow
       row :customer
+
+      row :redshift
 
       row :s3_region_name
       row :s3_bucket_name
@@ -92,6 +95,8 @@ ActiveAdmin.register WorkflowConfiguration do
     inputs 'Details' do
       input :customer, as: :select, collection: customers_with_single_select, include_blank: !customer_id_from_param
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: !workflow_id_param_val
+
+      input :redshift, as: :select, include_blank: false
 
       input :s3_region_name, as: :string # This should be a drop-down
       input :s3_bucket_name, as: :string
