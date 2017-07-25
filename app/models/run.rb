@@ -26,12 +26,6 @@
 # The point of this class is to execute a Workflow in an isolated namespace (think "separate DB context")
 class Run < ApplicationRecord
 
-  # You gotta Run, Run, Run, Run, Run
-  # Take a drag or two.
-  # Run, Run, Run, Run, Run,
-  # Gypsy death and you
-  # Say what to do.
-
   # Consider pulling out into Service layer
   include Run::PostgresSchema
 

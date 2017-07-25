@@ -29,6 +29,8 @@ module Run::PostgresSchema
     end
   end
 
+  # FIXME - THIS DOES NOT WORK WITH THE REDSHIFT ADAPTER BECAUSE ANY `create_table` STATEMENT PRODUCES THE ERROR `wrong number of arguments (given 3, expected 2)`
+  #         (OTHER STATEMENTS WORK FINE.)  THIS IS UNDOUBTEDLY A BUG IN THE REDSHIFT GEM, THOUGH I HAVEN'T VERIFIED BY ATTEMPTING TO WRITE MIGRATIONS INDEPENDENTLY.
   def execute_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
       in_schema_context { Apartment.connection.execute(sql) }
