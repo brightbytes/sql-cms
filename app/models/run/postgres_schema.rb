@@ -31,8 +31,6 @@ module Run::PostgresSchema
   end
 
   def execute_in_schema(sql)
-    create_schema # no-op if it already exists
-
     with_connection_reset_on_error do
       in_schema_context { Apartment.connection.execute(sql) }
     end
@@ -70,8 +68,6 @@ module Run::PostgresSchema
   end
 
   def eval_in_schema(rails_migration)
-    create_schema # no-op if it already exists
-
     with_connection_reset_on_error do
       in_schema_context do
         Apartment.connection.instance_eval(rails_migration)
@@ -82,40 +78,30 @@ module Run::PostgresSchema
   # These next 5 are useful in tests and for debugging failed Runs (in addition to some of them being used by the system)
 
   def select_all_in_schema(sql)
-    raise "Schema #{schema_name} doesn't exist." unless schema_exists?
-
     with_connection_reset_on_error do
       in_schema_context { Apartment.connection.select_all(sql) }
     end
   end
 
   def select_rows_in_schema(sql)
-    raise "Schema #{schema_name} doesn't exist." unless schema_exists?
-
     with_connection_reset_on_error do
       in_schema_context { Apartment.connection.select_rows(sql) }
     end
   end
 
   def select_one_in_schema(sql)
-    raise "Schema #{schema_name} doesn't exist." unless schema_exists?
-
     with_connection_reset_on_error do
       in_schema_context { Apartment.connection.select_one(sql) }
     end
   end
 
   def select_values_in_schema(sql)
-    raise "Schema #{schema_name} doesn't exist." unless schema_exists?
-
     with_connection_reset_on_error do
       in_schema_context { Apartment.connection.select_values(sql) }
     end
   end
 
   def select_value_in_schema(sql)
-    raise "Schema #{schema_name} doesn't exist." unless schema_exists?
-
     with_connection_reset_on_error do
       in_schema_context { Apartment.connection.select_value(sql) }
     end

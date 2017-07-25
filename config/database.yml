@@ -1,20 +1,32 @@
 default: &default
-  adapter: postgresql
   encoding: unicode
   # For details on connection pooling, see rails configuration guide
   # http://guides.rubyonrails.org/configuring.html#database-pooling
   # NOTE - THIS IS SET HIGHER THAN THE USUAL RAILS DEFAULT SOLELY FOR SIDEKIQ
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 60 } %>
   timeout: 5000
+  schema_search_path: "public,shared_extensions" # FIXME: may need to create shared_extensions in Redshift too
+
+postgres: &postgres
+  <<: *default
+  adapter: postgresql
   host: <%= ENV['DB_HOST'] || 'localhost' %>
   username: <%= ENV['DB_USERNAME'] || 'postgres' %>
   password: <%= ENV['DB_PASSWORD'] || 'test123' %>
-  schema_search_path: "public,shared_extensions"
 
 development:
-  <<: *default
+  <<: *postgres
   database: sql_cms_development
 
 test:
-  <<: *default
+  <<: *postgres
   database: sql_cms_test<%= ENV['TEST_ENV_NUMBER'] %>
+
+redshift:
+  <<: *default
+  adapter: redshift
+  host: <%= ENV['REDSHIFT_HOST'] %>
+  port: <%= ENV['REDSHIFT_PORT'] %> # could use a glass myself right now
+  username: <%= ENV['REDSHIFT_USER'] %>
+  password: <%= ENV['REDSHIFT_PASSWORD'] %>
+  database: <%= ENV['REDSHIFT_DATABASE'] %>
