@@ -59,7 +59,7 @@ class Run < ApplicationRecord
   after_destroy :drop_schema_from_db
 
   private def drop_schema_from_db
-    drop_schema(!workflow_configuration.redshift?)
+    drop_schema(!use_redshift?)
   end
 
   # Associations
@@ -118,7 +118,7 @@ class Run < ApplicationRecord
 
   delegate :transform_group, :transform_group_transform_ids, :transform_plan,
            :workflow_data_quality_reports, :workflow_data_quality_report_plan, :workflow_data_quality_report_ids,
-           to: :execution_plan_object
+           :use_redshift?, to: :execution_plan_object
 
   def transform_group_successful?(step_index)
     return nil if execution_plan.blank?

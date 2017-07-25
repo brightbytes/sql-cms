@@ -6,15 +6,15 @@ describe Run::PostgresSchema do
     it "should allow listing, creation, and deletion of schemas" do
       run = create(:run)
       schema_name = run.schema_name
-      expect(Run.list_schemas).to_not include(schema_name)
+      expect(Run.list_schemata).to_not include(schema_name)
       expect(run.schema_exists?).to eq(false)
 
       run.create_schema
-      expect(Run.list_schemas).to include(schema_name)
+      expect(Run.list_schemata).to include(schema_name)
       expect(run.schema_exists?).to eq(true)
 
       run.drop_schema
-      expect(Run.list_schemas).to_not include(schema_name)
+      expect(Run.list_schemata).to_not include(schema_name)
       expect(run.schema_exists?).to eq(false)
     end
 

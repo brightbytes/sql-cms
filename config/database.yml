@@ -5,7 +5,6 @@ default: &default
   # NOTE - THIS IS SET HIGHER THAN THE USUAL RAILS DEFAULT SOLELY FOR SIDEKIQ
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 60 } %>
   timeout: 5000
-  schema_search_path: "public,shared_extensions" # FIXME: may need to create shared_extensions in Redshift too
 
 postgres: &postgres
   <<: *default
@@ -13,6 +12,7 @@ postgres: &postgres
   host: <%= ENV['DB_HOST'] || 'localhost' %>
   username: <%= ENV['DB_USERNAME'] || 'postgres' %>
   password: <%= ENV['DB_PASSWORD'] || 'test123' %>
+  # schema_search_path: "public,shared_extensions"
 
 development:
   <<: *postgres
@@ -30,3 +30,4 @@ redshift:
   username: <%= ENV['REDSHIFT_USER'] %>
   password: <%= ENV['REDSHIFT_PASSWORD'] %>
   database: <%= ENV['REDSHIFT_DATABASE'] %>
+  # schema_search_path: "public" # AFAIK, Redshift doesn't support extensions
