@@ -14,10 +14,8 @@ module Run::PostgresSchema
   def create_schema
     unless schema_exists?
       self.class.in_db_context(use_redshift?) do
-        with_connection_reset_on_error do
-          # Putting this inside a transaction prevents the connection from being hosed by SQL error
-          transaction { Apartment::Tenant.create(schema_name) }
-        end
+        # Putting this inside a transaction prevents the connection from being hosed by SQL error
+        transaction { Apartment::Tenant.create(schema_name) }
       end
     end
   end
@@ -25,19 +23,15 @@ module Run::PostgresSchema
   def drop_schema
     if schema_exists?
       self.class.in_db_context(use_redshift?) do
-        with_connection_reset_on_error do
-          # Putting this inside a transaction prevents the connection from being hosed by SQL error
-          transaction { Apartment::Tenant.drop(schema_name) }
-        end
+        # Putting this inside a transaction prevents the connection from being hosed by SQL error
+        transaction { Apartment::Tenant.drop(schema_name) }
       end
     end
   end
 
   def execute_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      with_connection_reset_on_error do
-        in_schema_context { Apartment.connection.execute(sql) }
-      end
+      in_schema_context { Apartment.connection.execute(sql) }
     end
   end
 
@@ -47,12 +41,10 @@ module Run::PostgresSchema
 
   def copy_from_in_schema(sql:, enumerable:)
     self.class.in_db_context(use_redshift?) do
-      with_connection_reset_on_error do
-        in_schema_context do
-          Apartment.connection.raw_connection.copy_data(sql) do
-            enumerable.each do |line|
-              Apartment.connection.raw_connection.put_copy_data(line) unless line.blank?
-            end
+      in_schema_context do
+        Apartment.connection.raw_connection.copy_data(sql) do
+          enumerable.each do |line|
+            Apartment.connection.raw_connection.put_copy_data(line) unless line.blank?
           end
         end
       end
@@ -64,12 +56,10 @@ module Run::PostgresSchema
   # Short of that, this will have to do.
   def copy_to_in_schema(sql:, writeable_io:)
     self.class.in_db_context(use_redshift?) do
-      with_connection_reset_on_error do
-        in_schema_context do
-          Apartment.connection.raw_connection.copy_data(sql) do
-            while line = Apartment.connection.raw_connection.get_copy_data
-              writeable_io.puts(line)
-            end
+      in_schema_context do
+        Apartment.connection.raw_connection.copy_data(sql) do
+          while line = Apartment.connection.raw_connection.get_copy_data
+            writeable_io.puts(line)
           end
         end
       end
@@ -78,10 +68,8 @@ module Run::PostgresSchema
 
   def eval_in_schema(rails_migration)
     self.class.in_db_context(use_redshift?) do
-      with_connection_reset_on_error do
-        in_schema_context do
-          Apartment.connection.instance_eval(rails_migration)
-        end
+      in_schema_context do
+        Apartment.connection.instance_eval(rails_migration)
       end
     end
   end
@@ -90,41 +78,31 @@ module Run::PostgresSchema
 
   def select_all_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      with_connection_reset_on_error do
-        in_schema_context { Apartment.connection.select_all(sql) }
-      end
+      in_schema_context { Apartment.connection.select_all(sql) }
     end
   end
 
   def select_rows_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      with_connection_reset_on_error do
-        in_schema_context { Apartment.connection.select_rows(sql) }
-      end
+      in_schema_context { Apartment.connection.select_rows(sql) }
     end
   end
 
   def select_one_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      with_connection_reset_on_error do
-        in_schema_context { Apartment.connection.select_one(sql) }
-      end
+      in_schema_context { Apartment.connection.select_one(sql) }
     end
   end
 
   def select_values_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      with_connection_reset_on_error do
-        in_schema_context { Apartment.connection.select_values(sql) }
-      end
+      in_schema_context { Apartment.connection.select_values(sql) }
     end
   end
 
   def select_value_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      with_connection_reset_on_error do
-        in_schema_context { Apartment.connection.select_value(sql) }
-      end
+      in_schema_context { Apartment.connection.select_value(sql) }
     end
   end
 
@@ -133,11 +111,11 @@ module Run::PostgresSchema
   def in_schema_context
     Apartment::Tenant.switch(schema_name.presence) do # nil => public
       # Putting this inside a transaction prevents the connection from being hosed by SQL error
-      transaction { yield }
+      with_apartment_reset_on_error { transaction { yield } }
     end
   end
 
-  def with_connection_reset_on_error
+  def with_apartment_reset_on_error
     yield
   rescue
     # The Rails postgres adaptor's connection becomes unusable after ANY error, hence it needs to be reset.  FML.
@@ -158,11 +136,10 @@ module Run::PostgresSchema
     def in_db_context(use_redshift = true)
       if use_redshift
         begin
-          old_config = ActiveRecord::Base.connection_config
-          ActiveRecord::Base.establish_connection(:redshift)
+          Apartment.establish_connection(:redshift)
           yield
         ensure
-          ActiveRecord::Base.establish_connection(old_config)
+          Apartment.establish_connection(Rails.env.to_sym)
         end
       else
         yield
