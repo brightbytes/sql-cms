@@ -127,21 +127,38 @@ module Run::PostgresSchema
       end
     end
 
-    def in_db_context(use_redshift = true)
+    # def in_db_context(use_redshift = true)
+    #   if use_redshift
+    #     begin
+    #       # See https://github.com/influitive/apartment/pull/266 as to why doing this isn't threadsafe in sidekiq.
+    #       # The only viable solution at this time is to run all redshift queries serially, which I'll have to do in RunManagerJob.  Bah.
+    #       Apartment.establish_connection(:redshift)
+    #       yield
+    #     ensure
+    #       # Ditto above comment about lack of thread safety. PITA. :-(
+    #       Apartment.establish_connection(Rails.env.to_sym)
+    #     end
+    #   else
+    #     yield
+    #   end
+    # end
+
+    def in_db_context(use_redshift = false)
+      # See https://github.com/influitive/apartment/pull/266 as to why using establish_connection isn't threadsafe in sidekiq.
+      # This solution isn't threadsafe either. I tried creating a pool on-the-fly too in a branch.  No dice.
+      # The only viable solution at this time is to run all redshift queries serially, which I'll have to do in RunManagerJob.  Bah.
       if use_redshift
         begin
-          # See https://github.com/influitive/apartment/pull/266 as to why doing this isn't threadsafe in sidekiq.
-          # The only viable solution at this time is to run all redshift queries serially, which I'll have to do in RunManagerJob.  Bah.
-          Apartment.establish_connection(:redshift)
+          Apartment.connection_class = RedshiftConnection
           yield
         ensure
-          # Ditto above comment about lack of thread safety. PITA. :-(
-          Apartment.establish_connection(Rails.env.to_sym)
+          Apartment.connection_class = ActiveRecord::Base
         end
       else
         yield
       end
     end
+
 
   end
 
