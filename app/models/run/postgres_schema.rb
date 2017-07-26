@@ -42,7 +42,8 @@ module Run::PostgresSchema
   # Also, if you're the sort who loves reading about lowest-level methods available on a .raw_connection for Postgres, see http://deveiate.org/code/pg/PG/Connection.html
 
   def copy_from_in_schema(sql:, enumerable:)
-    self.class.in_db_context(use_redshift?) do
+    raise "This method is not available for use in Redshift." if use_redshift?
+    self.class.in_db_context(false) do
       in_schema_context do
         Apartment.connection.raw_connection.copy_data(sql) do
           enumerable.each do |line|
@@ -57,7 +58,8 @@ module Run::PostgresSchema
   #   psql <fin_pipeline_connection> -c "\COPY source_pipeline_table TO STDOUT ..." | psql <fin_app_db_connection> -c "\COPY target_fin_app_table FROM STDIN ..."
   # Short of that, this will have to do.
   def copy_to_in_schema(sql:, writeable_io:)
-    self.class.in_db_context(use_redshift?) do
+    raise "This method is not available for use in Redshift." if use_redshift?
+    self.class.in_db_context(false) do
       in_schema_context do
         Apartment.connection.raw_connection.copy_data(sql) do
           while line = Apartment.connection.raw_connection.get_copy_data

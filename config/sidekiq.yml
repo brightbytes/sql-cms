@@ -2,7 +2,6 @@
 :concurrency: 25
 :queues:
   - default
-  - redshift
   - mailers
 production:
   pool: 25
