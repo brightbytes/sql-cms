@@ -99,7 +99,7 @@ class WorkflowConfiguration < ApplicationRecord
   # This method should technically be a service ... but it's soooooo tiny, I just can't bring myself to make it one.
   def run!(creator)
     runs.create!(creator: creator, execution_plan: ExecutionPlan.create(self).to_hash).tap do |run|
-      RunManagerJob.perform_later(run.id)
+      RunManagerJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run.id)
     end
   end
 

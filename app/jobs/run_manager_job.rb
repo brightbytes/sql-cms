@@ -14,7 +14,7 @@ class RunManagerJob < ApplicationJob
       # FIXME - THERE'S THE POSSIBILITY THAT THIS COULD ENDLESSLY RECREATE THIS JOB FOR A GIVEN RUN IF THERE'S A BUG WITH THE RunStepLog MECHANISM;
       #         SO, THERE WILL NEED TO BE A NUMBER-OF-ITERATIONS TTL ON THIS RELOG FUNCTIONALITY, WHICH WILL REQUIRE A NEW Run FIELD
       #         HOWEVER, I HAVEN'T RUN INTO THIS ISSUE YET IN THE LAST COUPLE MONTHS, SO I'M NOT TOO WORRIED ABOUT IT
-      RunManagerJob.set(wait: POLLING_FREQUENCY).perform_later(run_id)
+      RunManagerJob.set(wait: POLLING_FREQUENCY, queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id)
     end
   end
 
@@ -31,7 +31,7 @@ class RunManagerJob < ApplicationJob
     when /unstarted_ordered_transform_groups\[(\d+)\]/
       step_index = $1.to_i
       run.transform_group_transform_ids(step_index).each do |transform_id|
-        TransformJob.perform_later(run_id: run.id, step_index: step_index, step_id: transform_id)
+        TransformJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id: run.id, step_index: step_index, step_id: transform_id)
       end
       run.update_attribute(:status, "started_ordered_transform_groups[#{step_index}]")
 
@@ -48,7 +48,7 @@ class RunManagerJob < ApplicationJob
 
     when 'unstarted_workflow_data_quality_reports'
       run.workflow_data_quality_report_ids.each do |workflow_data_quality_report_id|
-        WorkflowDataQualityReportJob.perform_later(run_id: run.id, step_id: workflow_data_quality_report_id)
+        WorkflowDataQualityReportJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id: run.id, step_id: workflow_data_quality_report_id)
       end
       run.update_attribute(:status, "started_workflow_data_quality_reports")
 

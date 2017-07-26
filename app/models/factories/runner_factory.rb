@@ -119,6 +119,8 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
+      raise "CopyFromRunner doesn't work in Redshift." if run.use_redshift?
+
       s3_file = S3File.create(
         'import',
         s3_region_name: plan_h[:s3_region_name],
@@ -150,6 +152,8 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
+      raise "CopyToRunner doesn't work in Redshift." if run.use_redshift?
+
       s3_file = S3File.create(
         'export',
         s3_region_name: plan_h[:s3_region_name],

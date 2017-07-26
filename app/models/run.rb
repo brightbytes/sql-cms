@@ -162,7 +162,7 @@ class Run < ApplicationRecord
       #  that pertain to the same target table.
       if exception.message =~ /^PG::TRDeadlockDetected/
         run_step_log.destroy
-        TransformJob.perform_later(run_id: id, step_index: step_index, step_id: step_id)
+        TransformJob.set(queue: (use_redshift? ? :redshift : :default)).perform_later(run_id: id, step_index: step_index, step_id: step_id)
         true # the return value, signifying mu (non-failure, non-success, non-running_or_crashed - just don't send notifications)
       else
         run_step_log.update_attribute(

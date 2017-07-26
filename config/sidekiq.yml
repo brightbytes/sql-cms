@@ -1,9 +1,7 @@
 ---
 :concurrency: 25
 :queues:
-  - high
   - default
-  - low
   - mailers
 production:
   pool: 25
