@@ -113,16 +113,8 @@ module Run::PostgresSchema
   def in_schema_context
     Apartment::Tenant.switch(schema_name.presence) do # nil => public
       # Putting this inside a transaction prevents the connection from being hosed by SQL error
-      with_apartment_reset_on_error { transaction { yield } }
+      transaction { yield }
     end
-  end
-
-  def with_apartment_reset_on_error
-    yield
-  rescue
-    # The Rails postgres adaptor's connection becomes unusable after ANY error, hence it needs to be reset.  FML.
-    Apartment::Tenant.reset
-    raise
   end
 
   module ClassMethods
@@ -138,9 +130,12 @@ module Run::PostgresSchema
     def in_db_context(use_redshift = true)
       if use_redshift
         begin
+          # See https://github.com/influitive/apartment/pull/266 as to why doing this isn't threadsafe in sidekiq.
+          # The only viable solution at this time is to run all redshift queries serially, which I'll have to do in RunManagerJob.  Bah.
           Apartment.establish_connection(:redshift)
           yield
         ensure
+          # Ditto above comment about lack of thread safety. PITA. :-(
           Apartment.establish_connection(Rails.env.to_sym)
         end
       else
