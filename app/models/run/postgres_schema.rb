@@ -2,7 +2,7 @@
 # This is a simple wrapper for some of the apartment gem's postgres schema manipulation methods.  It exists because I'd eventually like to replace apartment with
 #  something that I don't have to monkey-patch (see the initializer) and doesn't break `annotate -ik` (by no longer annotating indexes and FKs) such that I have to
 #  come up with an ugly hack-around.
-# FIXME - PORT TO FIRST-ORDER OBJECT, RATHER THAN HAVING AS A CONCERN, WHICH WILL INVOLVE PASSING-IN schema_name AND use_redshift?
+# FIXME - PORT TO FIRST-ORDER OBJECT, RATHER THAN HAVING AS A CONCERN, WHICH WILL INVOLVE REFACTORING use_redshift? HACK
 module Run::PostgresSchema
 
   extend ActiveSupport::Concern
