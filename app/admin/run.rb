@@ -7,16 +7,16 @@ ActiveAdmin.register Run do
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :creator, as: :select, collection: proc { User.order(:first_name, :last_name).all }
-  filter :status, as: :string
 
-  config.sort_order = 'id_desc'
+  config.sort_order = 'created_at_desc'
 
   index(download_links: false) do
     column(:schema_name, sortable: 'schema_name') { |run| auto_link(run) }
     column(:workflow_configuration)
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
-    column(:human_status) { |run| human_status(run) }
+    column(:status) { |run| human_status(run) }
+    column(:created_at)
   end
 
   show do

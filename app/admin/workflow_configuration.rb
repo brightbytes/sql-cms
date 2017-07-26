@@ -48,8 +48,9 @@ ActiveAdmin.register WorkflowConfiguration do
       unless runs.empty?
         table_for(runs) do
           column(:schema_name) { |run| auto_link(run) }
-          column(:human_status) { |run| human_status(run) }
-          column(:status)
+          column(:status) { |run| human_status(run) }
+          column(:last_step_run) { |run| run.status }
+          column(:created_at)
           column(:duration) { |run| human_duration(run) }
           column(:action) do |run|
             unless run.running_or_crashed?
