@@ -30,10 +30,15 @@ class RunManagerJob < ApplicationJob
 
     when /unstarted_ordered_transform_groups\[(\d+)\]/
       step_index = $1.to_i
-      run.transform_group_transform_ids(step_index)&.each do |transform_id|
-        TransformJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id: run.id, step_index: step_index, step_id: transform_id)
+      transform_ids = run.transform_group_transform_ids(step_index)
+      if transform_ids.present?
+        transform_ids.each do |transform_id|
+          TransformJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id: run.id, step_index: step_index, step_id: transform_id)
+        end
+        run.update_attribute(:status, "started_ordered_transform_groups[#{step_index}]")
+      else
+        run.update_attribute(:status, "unstarted_workflow_data_quality_reports")
       end
-      run.update_attribute(:status, "started_ordered_transform_groups[#{step_index}]")
 
     when /started_ordered_transform_groups\[(\d+)\]/
       step_index = $1.to_i
@@ -47,21 +52,29 @@ class RunManagerJob < ApplicationJob
       end
 
     when 'unstarted_workflow_data_quality_reports'
-      run.workflow_data_quality_report_ids&.each do |workflow_data_quality_report_id|
-        WorkflowDataQualityReportJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id: run.id, step_id: workflow_data_quality_report_id)
+      workflow_data_quality_report_ids = run.workflow_data_quality_report_ids
+      if workflow_data_quality_report_ids.present?
+        workflow_data_quality_report_ids.each do |workflow_data_quality_report_id|
+          WorkflowDataQualityReportJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id: run.id, step_id: workflow_data_quality_report_id)
+        end
+        run.update_attribute(:status, "started_workflow_data_quality_reports")
+      else
+        return finish!(run)
       end
-      run.update_attribute(:status, "started_workflow_data_quality_reports")
 
     when 'started_workflow_data_quality_reports'
-      if run.workflow_data_quality_reports_successful?
-        run.update_attribute(:status, "finished")
-        run.notify_completed!
-        return false # don't self-relog
-      end
+      return finish!(run) if run.workflow_data_quality_reports_successful?
 
     end
 
     true
   end
 
+  private
+
+  def finish!(run)
+    run.update_attribute(:status, "finished")
+    run.notify_completed!
+    return false # don't self-relog
+  end
 end
