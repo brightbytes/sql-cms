@@ -79,9 +79,11 @@ ActiveAdmin.register WorkflowConfiguration do
     render partial: 'admin/shared/history'
   end
 
-  config.add_action_item :run_workflow_configuration, only: :show, if: proc { resource.workflow.transforms.count > 0 } do
-    link_to("Run Now", run_workflow_configuration_path(resource), method: :put)
-  end
+  config.add_action_item(
+    :run_workflow_configuration,
+    only: :show,
+    if: proc { resource.workflow.transforms.count + resource.workflow.workflow_data_quality_reports.count > 0 }
+  ) { link_to("Run Now", run_workflow_configuration_path(resource), method: :put) }
 
   member_action :run, method: :put do
     run = resource.run!(current_user)
