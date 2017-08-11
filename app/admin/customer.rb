@@ -11,16 +11,18 @@ ActiveAdmin.register Customer do
 
   actions :all
 
+  permit_params :name, :slug
+
   config.add_action_item :undelete, only: :show, if: proc { resource.deleted? } do
     link_to "Undelete", undelete_customer_path(resource), method: :put
   end
 
-  permit_params :name, :slug
-
-  filter :name, as: :string
-  filter :slug, as: :string
-
   config.sort_order = 'slug_asc'
+
+  config.batch_actions = false
+
+  config.paginate = false
+  before_action :skip_sidebar!, only: :index
 
   index(download_links: false) do
     id_column
