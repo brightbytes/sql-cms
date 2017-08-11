@@ -30,7 +30,7 @@ class RunManagerJob < ApplicationJob
 
     when /unstarted_ordered_transform_groups\[(\d+)\]/
       step_index = $1.to_i
-      run.transform_group_transform_ids(step_index).each do |transform_id|
+      run.transform_group_transform_ids(step_index)&.each do |transform_id|
         TransformJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id: run.id, step_index: step_index, step_id: transform_id)
       end
       run.update_attribute(:status, "started_ordered_transform_groups[#{step_index}]")
@@ -47,7 +47,7 @@ class RunManagerJob < ApplicationJob
       end
 
     when 'unstarted_workflow_data_quality_reports'
-      run.workflow_data_quality_report_ids.each do |workflow_data_quality_report_id|
+      run.workflow_data_quality_report_ids&.each do |workflow_data_quality_report_id|
         WorkflowDataQualityReportJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id: run.id, step_id: workflow_data_quality_report_id)
       end
       run.update_attribute(:status, "started_workflow_data_quality_reports")
