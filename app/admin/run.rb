@@ -106,14 +106,13 @@ ActiveAdmin.register Run do
 
     def action_methods
       result = super
-      # Don't show the destroy button if the User is already destroyed, since a 2nd destroy will physically nuke the record
       result -= ['destroy'] if action_name == 'show' && resource.running_or_crashed?
       result
     end
 
     def destroy
       if resource.running_or_crashed?
-        flash[:alert] = "You may not destroy a Run that is currently Running"
+        flash[:alert] = "This Run is currently Running.  If you really want to destroy it, you may do so from the WorkflowConfirmations page."
         return redirect_to(:back)
       end
       super do |success, failure|
