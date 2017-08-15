@@ -134,6 +134,12 @@ ActiveAdmin.register WorkflowConfiguration do
     end
 
     def destroy
+      if resource.runs.present?
+        flash[:error] = "You must manually delete all associated Runs before deleting this WorkflowConfiguration."
+        # This no-workie:
+        # redirect_to(:back)
+        return redirect_to(workflow_configuration_path(resource))
+      end
       super do |success, failure|
         success.html do
           path =

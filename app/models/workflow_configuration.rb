@@ -79,7 +79,7 @@ class WorkflowConfiguration < ApplicationRecord
   belongs_to :customer, inverse_of: :workflow_configurations
   belongs_to :workflow, inverse_of: :workflow_configurations
 
-  has_many :runs, inverse_of: :workflow_configuration, dependent: :destroy
+  has_many :runs, inverse_of: :workflow_configuration # Deliberately no cascading delete
 
   has_many :notifications, inverse_of: :workflow_configuration, dependent: :delete_all
   has_many :notified_users, through: :notifications, source: :user
