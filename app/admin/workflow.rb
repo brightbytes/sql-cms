@@ -158,11 +158,11 @@ ActiveAdmin.register Workflow do
 
     def destroy
       # We don't pluck b/c resource.workflow_configurations is used below in the happy path
-      config_ids = resource.workflow_configurations.map(&:id)
-      if Run.where(workflow_configuration_id: config_ids).exists?
+      workflow_config_ids = resource.workflow_configurations.map(&:id)
+      if Run.where(workflow_configuration_id: workflow_config_ids).exists?
         flash[:error] = "You must manually delete all Runs associated with every associated WorkflowConfiguration before deleting this Workflow."
         # This no-workie:
-        # redirect_to(:back)
+        # return redirect_to(:back)
         return redirect_to(workflow_path(resource))
       end
       resource.workflow_configurations.each(&:destroy)
