@@ -147,9 +147,12 @@ ActiveAdmin.register Transform do
 
     # We need the workflow id and we need to know that it won't change before we can present the list of allowed dependencies within the current workflow.
     if f.object.persisted? || workflow_id_param_val
-      inputs 'Dependencies' do
-        prereq_id = params[:prerequisite_transform_id].to_i
-        input :prerequisite_transforms, as: :check_boxes, collection: f.object.available_prerequisite_transforms.map { |t| [t.name, t.id, checked: (t.id == prereq_id)] }
+      prereqs = f.object.available_prerequisite_transforms
+      if prereqs.present?
+        inputs 'Dependencies' do
+          prereq_id = params[:prerequisite_transform_id].to_i
+          input :prerequisite_transforms, as: :check_boxes, collection: prereqs.map { |t| [t.name, t.id, checked: (t.id == prereq_id)] }
+        end
       end
     end
 
