@@ -182,6 +182,7 @@ class Run < ApplicationRecord
 
   def notify_completed!
     return unless persisted?
+    # Note that this leaves :notification_status as 'unsent', which is perhaps undesireable.  Perhaps revisit.
     return unless execution_plan[:rfc_email_addresses_to_notify].present?
     # Atomically lock, to avoid dup notifications upon multiple failures
     update_count = Run.where(id: id, notification_status: 'unsent').update_all(notification_status: 'sending')

@@ -71,7 +71,7 @@ class Workflow < ApplicationRecord
   has_many :including_dependencies, class_name: 'WorkflowDependency', foreign_key: :included_workflow_id, dependent: :delete_all
   has_many :including_workflows, through: :including_dependencies, source: :including_workflow
 
-  has_many :workflow_configurations, inverse_of: :workflow
+  has_many :workflow_configurations, inverse_of: :workflow, dependent: :delete_all
 
   # Scopes
 
