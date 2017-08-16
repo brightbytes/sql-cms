@@ -16,7 +16,8 @@ module ValidationSeeder
       Validation.greater_than,
       Validation.less_than,
       Validation.non_overlapping,
-      Validation.percentage
+      Validation.percentage,
+      Validation.between
     ]
   end
 

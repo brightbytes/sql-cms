@@ -127,8 +127,15 @@ class Validation < ApplicationRecord
       )
     end
 
+    def between
+      @between ||= where(name: 'Column :table_name.:column_name is Between :min_value and :max_value').first_or_create!(
+        immutable: true,
+        sql: 'SELECT id from :table_name WHERE :column_name < :min_value OR :column_name > :max_value'
+      )
+    end
+
     def flush_cache
-      @non_null = @presence = @uniqueness = @fk = @inclusion = @integer = @integer_with_additional = @greater_than = @less_than = @non_overlapping = @percentage = nil
+      @non_null = @presence = @uniqueness = @fk = @inclusion = @integer = @integer_with_additional = @greater_than = @less_than = @non_overlapping = @percentage = @between = nil
     end
 
   end
