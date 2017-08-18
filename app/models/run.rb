@@ -46,7 +46,7 @@ class Run < ApplicationRecord
   after_create :generate_schema_name
 
   private def generate_schema_name
-    update_attribute(:schema_name, "#{workflow_configuration}_run_#{id}")
+    update_attributes(schema_name: "#{workflow_configuration}_run_#{id}")
   end
 
   # From Run::PostgresSchema; consider removing to Observer or Service
@@ -142,15 +142,15 @@ class Run < ApplicationRecord
 
       if result.present?
         if step_result = result[:step_result].presence
-          run_step_log.update_attribute(:step_result, step_result)
+          run_step_log.update_attributes(step_result: step_result)
         end
         if step_validation_failures = result[:step_validation_failures].presence
-          run_step_log.update_attribute(:step_validation_failures, step_validation_failures)
+          run_step_log.update_attributes(step_validation_failures: step_validation_failures)
           return false # signifying failure
         end
       end
 
-      run_step_log.update_attribute(:successful, true) # the return value, signifying success
+      run_step_log.update_attributes(successful: true) # the return value, signifying success
 
     rescue Exception => exception
 
@@ -165,14 +165,15 @@ class Run < ApplicationRecord
         TransformJob.set(queue: (use_redshift? ? :redshift : :default)).perform_later(run_id: id, step_index: step_index, step_id: step_id)
         true # the return value, signifying mu (non-failure, non-success, non-running_or_crashed - just don't send notifications)
       else
-        run_step_log.update_attribute(
-          :step_exceptions,
-          cause: exception.cause,
-          # This doesn't always work ...
-          class_and_message: exception.inspect,
-          # ... hence this redundant bit
-          message: exception.message,
-          backtrace: Rails.backtrace_cleaner.clean(exception.backtrace)
+        run_step_log.update_attributes(
+          step_exceptions: {
+            cause: exception.cause,
+            # This doesn't always work ...
+            class_and_message: exception.inspect,
+            # ... hence this redundant bit
+            message: exception.message,
+            backtrace: Rails.backtrace_cleaner.clean(exception.backtrace)
+          }
         )
         false # the return value, signifying failure
       end
@@ -191,9 +192,9 @@ class Run < ApplicationRecord
       begin
         UserMailer.run_completed(self).deliver_later
       rescue
-        update_attribute(:notification_status, 'unsent')
+        update_attributes(notification_status: 'unsent')
       end
-      update_attribute(:notification_status, 'sent')
+      update_attributes(notification_status: 'sent')
     end
   end
 

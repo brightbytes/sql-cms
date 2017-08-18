@@ -25,7 +25,7 @@ class RunManagerJob < ApplicationJob
     when 'unstarted'
       # It's inconsistent that this is done here rather than a child job ... but, since this should be very fast, I prefer to skip the polling-frequency wait.
       run.create_schema
-      run.update_attribute(:status, "unstarted_ordered_transform_groups[0]")
+      run.update_attributes(status: "unstarted_ordered_transform_groups[0]")
       manage_state_machine(run) # ah, the glory of a brief affair with a recursive call
 
     when /unstarted_ordered_transform_groups\[(\d+)\]/
@@ -35,9 +35,9 @@ class RunManagerJob < ApplicationJob
         transform_ids.each do |transform_id|
           TransformJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id: run.id, step_index: step_index, step_id: transform_id)
         end
-        run.update_attribute(:status, "started_ordered_transform_groups[#{step_index}]")
+        run.update_attributes(status: "started_ordered_transform_groups[#{step_index}]")
       else
-        run.update_attribute(:status, "unstarted_workflow_data_quality_reports")
+        run.update_attributes(status: "unstarted_workflow_data_quality_reports")
       end
 
     when /started_ordered_transform_groups\[(\d+)\]/
@@ -45,9 +45,9 @@ class RunManagerJob < ApplicationJob
       if run.transform_group_successful?(step_index)
         next_step_index = step_index + 1
         if run.transform_group_transform_ids(next_step_index)
-          run.update_attribute(:status, "unstarted_ordered_transform_groups[#{next_step_index}]")
+          run.update_attributes(status: "unstarted_ordered_transform_groups[#{next_step_index}]")
         else
-          run.update_attribute(:status, "unstarted_workflow_data_quality_reports")
+          run.update_attributes(status: "unstarted_workflow_data_quality_reports")
         end
       end
 
@@ -57,7 +57,7 @@ class RunManagerJob < ApplicationJob
         workflow_data_quality_report_ids.each do |workflow_data_quality_report_id|
           WorkflowDataQualityReportJob.set(queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id: run.id, step_id: workflow_data_quality_report_id)
         end
-        run.update_attribute(:status, "started_workflow_data_quality_reports")
+        run.update_attributes(status: "started_workflow_data_quality_reports")
       else
         return finish!(run)
       end
@@ -73,7 +73,7 @@ class RunManagerJob < ApplicationJob
   private
 
   def finish!(run)
-    run.update_attribute(:status, "finished")
+    run.update_attributes(status: "finished")
     run.notify_completed!
     return false # don't self-relog
   end
