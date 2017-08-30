@@ -58,9 +58,9 @@ module Concerns::ParamsHelpers
             end
             # HMMMMM - This prevents matching of a key that is a subset of another key (:some_key would match :some_key_here),
             #           and it also prevents matching a colon in the middle of a string (unlikely case, to be sure),
-            #           BUT, it may also prevent matching within a string when it's desired, hence the removal of the _ from the negative lookbehind
+            #           BUT, it may also prevent matching within a string when it's desired, hence the removal of the _ from the negative lookbehind/lookahead
             # string.gsub!(/(?<![a-zA-Z0-9_]):#{k}(?![a-zA-Z0-9_])/, v)
-            string.gsub!(/(?<![a-zA-Z0-9]):#{k}(?![a-zA-Z0-9_])/, v)
+            string.gsub!(/(?<![a-zA-Z0-9]):#{k}(?![a-zA-Z0-9])/, v)
           end
           # FIXME - MAYBE ISSUE A WARNING HERE IF string CONTAINS AN UNINTERPOLATED PARAM. OR, HANDLE IN THE UI
         end
