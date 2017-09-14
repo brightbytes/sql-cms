@@ -96,7 +96,11 @@ ActiveAdmin.register Transform do
         table_for(prereqs) do
           column(:name) { |pd| auto_link(pd.prerequisite_transform) }
           column(:runner) { |pd| pd.prerequisite_transform.runner }
-          column(:action) { |pd| link_to("Delete", transform_dependency_path(pd, source: :postrequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' }) }
+          column(:action) do |pd|
+            text_node(link_to("Edit", edit_transform_path(pd.prerequisite_transform, source: :postrequisite_transform)))
+            text_node(' | ')
+            link_to("Delete", transform_dependency_path(pd, source: :postrequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' })
+          end
         end
       end
     end
@@ -110,7 +114,11 @@ ActiveAdmin.register Transform do
         table_for(postreqs) do
           column(:name) { |pd| auto_link(pd.postrequisite_transform) }
           column(:runner) { |pd| pd.postrequisite_transform.runner }
-          column(:action) { |pd| link_to("Delete", transform_dependency_path(pd, source: :prerequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' }) }
+          column(:action) do |pd|
+            text_node(link_to("Edit", edit_transform_path(pd.postrequisite_transform, source: :prerequisite_transform)))
+            text_node(' | ')
+            link_to("Delete", transform_dependency_path(pd, source: :prerequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' })
+          end
         end
       end
     end
