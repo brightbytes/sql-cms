@@ -17,7 +17,7 @@
 
 class DataQualityReport < ApplicationRecord
 
-  auto_normalize
+  auto_normalize except: :sql
 
   # Validations
 
