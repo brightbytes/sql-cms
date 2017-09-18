@@ -12,7 +12,8 @@ module Concerns::ParamsHelpers
   def params_yaml
     # We use the raw value to avoid the crap added by converting the hash to one with indifferent access in #params, ^^
     raw_params = read_attribute(:params)
-    raw_params.to_yaml if raw_params.present?
+    # We don't need no stinkin' document separator
+    raw_params.to_yaml.sub("---\n", '') if raw_params.present?
   end
 
   def params_yaml=(val)
