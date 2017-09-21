@@ -7,7 +7,7 @@ shared_examples 'yaml helper methods' do
     YAML
     subject.params_yaml = yaml
     expect(subject.params).to eq({ 'foo' => 'bar', 'whatever' => 'dude' })
-    expect(subject.params_yaml).to eq("---\n" << yaml)
+    expect(subject.params_yaml).to eq(yaml)
   end
 
   it "should be rendered invalid upon invalid yaml being set" do
