@@ -4,7 +4,7 @@ $(function() {
     $('#transform_params_yaml_input').toggle($(this).val() != 'RailsMigration');
 
     var indexName = ['DefaultCopyFrom', 'DefaultCopyTo'].indexOf($(this).val())
-    $('#transform_name_input').toggle(indexSql === -1);
+    $('#transform_name_input').toggle(indexName === -1);
 
     var indexSql = ['AutoLoad', 'DefaultCopyFrom', 'DefaultCopyTo'].indexOf($(this).val())
     $('#transform_sql_input').toggle(indexSql === -1);
