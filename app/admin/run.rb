@@ -82,7 +82,7 @@ ActiveAdmin.register Run do
     send_data JSON.pretty_generate(resource.execution_plan).gsub(/(.+)"(.+\\r?\\n)/, '\1"\\r\\n\2').gsub(/\\r?\\n/, "\n"), filename: "#{resource.schema_name}.json"
   end
 
-  action_item only: :show, if: proc { resource.running_or_crashed? } do
+  config.add_action_item :destroy_run, only: :show, if: proc { resource.running_or_crashed? } do
     msg = "***This workflow is still running***, though it may have crashed. Are you sure you want to nuke this Run and all DB data associated with it?"
     link_to "Delete Run", { action: :destroy }, method: :delete, data: { confirm: msg }
   end

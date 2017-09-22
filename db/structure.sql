@@ -930,7 +930,8 @@ CREATE TABLE transforms (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     params jsonb,
-    s3_file_name character varying
+    s3_file_name character varying,
+    enabled boolean DEFAULT true NOT NULL
 );
 
 
@@ -2414,6 +2415,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170509204400'),
 ('20170510010559'),
 ('20170517030342'),
-('20170725015832');
+('20170725015832'),
+('20170922195727');
 
 

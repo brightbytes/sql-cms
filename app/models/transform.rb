@@ -11,6 +11,7 @@
 #  updated_at   :datetime         not null
 #  params       :jsonb
 #  s3_file_name :string
+#  enabled      :boolean          default(TRUE), not null
 #
 # Indexes
 #
@@ -24,6 +25,7 @@
 class Transform < ApplicationRecord
 
   include Concerns::ParamsHelpers
+  include Concerns::EnabledDisabledMethods
 
   auto_normalize except: :sql
 

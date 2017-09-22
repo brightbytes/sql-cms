@@ -4,7 +4,7 @@ ActiveAdmin.register Transform do
 
   actions :all
 
-  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :s3_file_name, prerequisite_transform_ids: []
+  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :s3_file_name, :enabled, prerequisite_transform_ids: []
 
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :name, as: :string
@@ -18,6 +18,7 @@ ActiveAdmin.register Transform do
     column(:name) { |transform| auto_link(transform) }
     column(:workflow, sortable: 'workflows.slug')
     column(:runner)
+    boolean_column(:enabled)
     column(:action) { |transform| link_to("Edit", edit_transform_path(transform)) }
   end
 
@@ -27,6 +28,7 @@ ActiveAdmin.register Transform do
       row :name
       row :interpolated_name if resource.params.present? && resource.name != resource.interpolated_name
       row :workflow
+      boolean_row :enabled
 
       row :runner
       row(:params) { code(pretty_print_as_json(resource.params)) }
@@ -96,10 +98,11 @@ ActiveAdmin.register Transform do
         table_for(prereqs) do
           column(:name) { |pd| auto_link(pd.prerequisite_transform) }
           column(:runner) { |pd| pd.prerequisite_transform.runner }
+          column(:transform_enabled) { |pd| yes_no(pd.prerequisite_transform.enabled?) }
           column(:action) do |pd|
-            text_node(link_to("Edit", edit_transform_path(pd.prerequisite_transform, source: :postrequisite_transform)))
+            text_node(link_to("Edit Transform", edit_transform_path(pd.prerequisite_transform, source: :postrequisite_transform)))
             text_node(' | ')
-            link_to("Delete", transform_dependency_path(pd, source: :postrequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' })
+            link_to("Delete Dependency", transform_dependency_path(pd, source: :postrequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' })
           end
         end
       end
@@ -114,10 +117,11 @@ ActiveAdmin.register Transform do
         table_for(postreqs) do
           column(:name) { |pd| auto_link(pd.postrequisite_transform) }
           column(:runner) { |pd| pd.postrequisite_transform.runner }
+          column(:transform_enabled) { |pd| yes_no(pd.postrequisite_transform.enabled?) }
           column(:action) do |pd|
-            text_node(link_to("Edit", edit_transform_path(pd.postrequisite_transform, source: :prerequisite_transform)))
+            text_node(link_to("Edit Transform", edit_transform_path(pd.postrequisite_transform, source: :prerequisite_transform)))
             text_node(' | ')
-            link_to("Delete", transform_dependency_path(pd, source: :prerequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' })
+            link_to("Delete Dependency", transform_dependency_path(pd, source: :prerequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' })
           end
         end
       end
@@ -148,6 +152,8 @@ ActiveAdmin.register Transform do
 
       show_sql_selector = ((f.object.new_record? || f.object.runner != 'AutoLoad') ? {} : { style: 'display:none' })
       input :sql, as: :text, input_html: { rows: 40 }, wrapper_html: show_sql_selector
+
+      input :enabled, hint: "Unchecking this causes this Transform to be skipped during a Run "
 
       file_display_h = (f.object.s3_file_required? ? {} : { style: 'display:none' })
       input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on Transform#show."

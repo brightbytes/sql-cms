@@ -11,6 +11,7 @@
 #  updated_at   :datetime         not null
 #  params       :jsonb
 #  s3_file_name :string
+#  enabled      :boolean          default(TRUE), not null
 #
 # Indexes
 #
