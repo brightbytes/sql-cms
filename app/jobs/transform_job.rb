@@ -7,20 +7,31 @@ class TransformJob < ApplicationJob
     run = Run.find(run_id)
 
     transform_h = run.transform_plan(step_index: step_index, transform_id: step_id)
-    transform_runner = RunnerFactory.runner_for(transform_h[:runner])
-    validation_runner = RunnerFactory.runner_for("Validation")
 
-    success = run.with_run_step_log_tracking(step_type: 'transform', step_index: step_index, step_id: step_id) do
-      result = { step_result: { rows_affected: transform_runner.run(run: run, plan_h: transform_h).cmd_tuples } }
+    if transform_h[:enabled]
 
-      step_validation_failures = transform_h[:transform_validations].map do |transform_validation_h|
-        validation_runner.run(run: run, transform_validation_h: transform_validation_h)
-      end.compact.presence
+      transform_runner = RunnerFactory.runner_for(transform_h[:runner])
+      validation_runner = RunnerFactory.runner_for("Validation")
 
-      result.tap { |h| h.merge!(step_validation_failures: step_validation_failures) if step_validation_failures }
+      success = run.with_run_step_log_tracking(step_type: 'transform', step_index: step_index, step_id: step_id) do
+        result = { step_result: { rows_affected: transform_runner.run(run: run, plan_h: transform_h).cmd_tuples } }
+
+        step_validation_failures = transform_h[:transform_validations].map do |transform_validation_h|
+          validation_runner.run(run: run, transform_validation_h: transform_validation_h)
+        end.compact.presence
+
+        result.tap { |h| h.merge!(step_validation_failures: step_validation_failures) if step_validation_failures }
+      end
+
+      run.notify_completed! unless success
+
+    else
+
+      run.with_run_step_log_tracking(step_type: 'transform', step_index: step_index, step_id: step_id) do
+        { step_result: { transform_disabled: true } }
+      end
+
     end
-
-    run.notify_completed! unless success
   end
 
 end

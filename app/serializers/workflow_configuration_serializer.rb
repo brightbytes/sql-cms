@@ -47,7 +47,7 @@ end
 
 class TransformSerializer < ActiveModel::Serializer
 
-  attributes :id, :name, :interpolated_name, :runner, :params, :sql, :interpolated_sql, :s3_file_name
+  attributes :id, :name, :interpolated_name, :runner, :enabled, :params, :sql, :interpolated_sql, :s3_file_name
 
   has_many :transform_validations
 
