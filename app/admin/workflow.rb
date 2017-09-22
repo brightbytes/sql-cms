@@ -35,11 +35,6 @@ ActiveAdmin.register Workflow do
 
       row :created_at
       row :updated_at
-
-      row('Action') { link_to("Create New Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow)) }
-      row('Action') { link_to("Create New Transform", new_transform_path(workflow_id: resource.id, source: :workflow)) }
-      row('Action') { link_to("Create New Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id)) }
-
     end
 
     configs = resource.workflow_configurations.includes(:customer).order('customers.slug')
@@ -49,10 +44,10 @@ ActiveAdmin.register Workflow do
           column(:name) { |workflow_configuration| auto_link(workflow_configuration) }
           column(:customer) { |workflow_configuration| auto_link(workflow_configuration.customer) }
           column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
-          # These are kinda clutter
-          column :s3_region_name
-          column :s3_bucket_name
-          column :s3_file_path
+          # These are kinda clutter; removing now that actions have been moved back to the sidebar
+          # column :s3_region_name
+          # column :s3_bucket_name
+          # column :s3_file_path
           column(:action) do |workflow_configuration|
             text_node(
               link_to(
@@ -114,6 +109,14 @@ ActiveAdmin.register Workflow do
     active_admin_comments
 
     render partial: 'admin/shared/history'
+  end
+
+  sidebar("Actions", only: :show) do
+    ul do
+      li link_to("Create New Transform", new_transform_path(workflow_id: resource.id, source: :workflow))
+      li link_to("Create New Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
+      li link_to("Create New Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow))
+    end
   end
 
   form do |f|

@@ -5,7 +5,8 @@ unless transforms.empty?
 
     table_for(transforms) do
       column(:name, sortable: :name) { |transform| auto_link(transform) }
-      column(:runner, sortable: :runner) { |transform| transform.runner }
+      column(:runner, sortable: :runner)
+      boolean_column(:enabled)
       if show_s3_fields
         # column(:s3_region_name) { |transform| transform.s3_region_name if transform.s3_file_required? }
         # column(:s3_bucket_name) { |transform| transform.s3_bucket_name if transform.s3_file_required? }

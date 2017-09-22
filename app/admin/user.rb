@@ -31,7 +31,6 @@ ActiveAdmin.register User, sort_order: "id_asc" do
       row(:email) { mail_to(user.email) }
       # If we add Devise confirmable
       # row(:unconfirmed_email) { mail_to(user.unconfirmed_email) }
-      # row("Enabled?") { user.enabled? ? "Yes" : "<span style='color: red'>No</span>".html_safe }
       row :reset_password_sent_at
       row :remember_created_at
       row :sign_in_count
