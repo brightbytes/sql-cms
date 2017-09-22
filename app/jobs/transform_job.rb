@@ -23,15 +23,16 @@ class TransformJob < ApplicationJob
         result.tap { |h| h.merge!(step_validation_failures: step_validation_failures) if step_validation_failures }
       end
 
-      run.notify_completed! unless success
-
     else
 
-      run.with_run_step_log_tracking(step_type: 'transform', step_index: step_index, step_id: step_id) do
+      success = run.with_run_step_log_tracking(step_type: 'transform', step_index: step_index, step_id: step_id) do
         { step_result: { transform_disabled: true } }
       end
 
     end
+
+    run.notify_completed! unless success
+
   end
 
 end
