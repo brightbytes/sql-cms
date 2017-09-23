@@ -11,6 +11,15 @@ Apartment::Adapters::PostgresqlSchemaFromSqlAdapter.class_eval %q{
   end
 }
 
+Apartment::Adapters::PostgresqlSchemaAdapter.class_eval %q{
+  def postgresql_version
+    # ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#postgresql_version is public from Rails 5.0.
+    # THIS IS THE PATCH: THIS PUKES FOR REDSHIFT
+    # Apartment.connection.send(:postgresql_version)
+    90400
+  end
+}
+
 Apartment.configure do |config|
   config.excluded_models =
     %w(
