@@ -57,9 +57,6 @@ describe Run do
       run.update_attribute(:immutable, true)
       expect { run.destroy }.to raise_error("You may not destroy an immutable Run")
       expect { run.delete }.to raise_error("You may not bypass callbacks to delete a Class.")
-      expect { run.update_attribute(:status, "/* Blah */") }.to raise_error("You may not update an immutable Run")
-      expect { run.update_attributes(status: "/* Blah */") }.to raise_error("You may not update an immutable Run")
-      expect { run.update_column(:status, "/* Blah */") }.to raise_error("You may not bypass callbacks to update a Class.")
     end
 
     context "after_create" do
