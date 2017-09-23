@@ -11,6 +11,7 @@
 #  updated_at                :datetime         not null
 #  schema_name               :string
 #  workflow_configuration_id :integer          not null
+#  immutable                 :boolean          default(FALSE), not null
 #
 # Indexes
 #
@@ -42,6 +43,9 @@ class Run < ApplicationRecord
   validates :notification_status, presence: true, inclusion: { in: NOTIFICATION_STATUSES }
 
   # Callbacks
+
+  include Concerns::ImmutableCallbacks
+  immutable :destroy
 
   after_create :generate_schema_name
 

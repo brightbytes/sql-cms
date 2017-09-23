@@ -36,6 +36,10 @@ module Concerns::ImmutableCallbacks
   end
 
   def prevent_update
-    raise("You may not update an immutable #{self.class}") if immutable_was && changed?
+    # FIXME - There are deprecation notices on immutable_was and changed?, but when all calls are updated as recommended in the deprecation notices,
+    #          the specs fail for this.  Thanks, Rails.
+    ActiveSupport::Deprecation.silence do
+      raise("You may not update an immutable #{self.class}") if immutable_was && changed?
+    end
   end
 end

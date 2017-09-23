@@ -53,9 +53,13 @@ ActiveAdmin.register WorkflowConfiguration do
           column(:created_at)
           column(:duration) { |run| human_duration(run) }
           column(:action) do |run|
-            base_message = "Are you sure you want to nuke this Run and all DB data associated with it?"
-            confirmation = "***This workflow is still running***, though it may have crashed.  " + base_message if run.running_or_crashed?
-            link_to("Delete", run_path(run), method: :delete, data: { confirm: confirmation })
+            if run.immutable?
+              text_node("Undeletable")
+            else
+              base_message = "Are you sure you want to nuke this Run and all DB data associated with it?"
+              confirmation = "***This workflow is still running***, though it may have crashed.  " + base_message if run.running_or_crashed?
+              link_to("Delete", run_path(run), method: :delete, data: { confirm: confirmation })
+            end
           end
         end
       end

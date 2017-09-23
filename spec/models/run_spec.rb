@@ -11,6 +11,7 @@
 #  updated_at                :datetime         not null
 #  schema_name               :string
 #  workflow_configuration_id :integer          not null
+#  immutable                 :boolean          default(FALSE), not null
 #
 # Indexes
 #
@@ -48,6 +49,15 @@ describe Run do
   end
 
   describe "callbacks" do
+
+    it "should be immutable when flagged as such" do
+      run = create(:run)
+      expect(run.immutable?).to eq(false)
+      expect(run.read_only?).to eq(false)
+      run.update_attribute(:immutable, true)
+      expect { run.destroy }.to raise_error("You may not destroy an immutable Run")
+      expect { run.delete }.to raise_error("You may not bypass callbacks to delete a Class.")
+    end
 
     context "after_create" do
       it "should set the schema_name" do

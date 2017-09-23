@@ -4,9 +4,12 @@ ActiveAdmin.register Run do
 
   actions :index, :show, :destroy
 
+  permit_params :immutable
+
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :creator, as: :select, collection: proc { User.order(:first_name, :last_name).all }
+  filter :immutable
 
   config.sort_order = 'created_at_desc'
 
@@ -15,6 +18,7 @@ ActiveAdmin.register Run do
     column(:workflow_configuration)
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
+    boolean_column(:immutable)
     column(:status) { |run| human_status(run) }
     column(:created_at)
   end
@@ -30,6 +34,7 @@ ActiveAdmin.register Run do
       row :workflow_configuration
       row :workflow
       row :customer
+      boolean_row :immutable
 
       row(:human_status) { human_status(resource) }
       row(:human_notification_status) { human_notification_status(resource) }
@@ -82,6 +87,28 @@ ActiveAdmin.register Run do
     send_data JSON.pretty_generate(resource.execution_plan).gsub(/(.+)"(.+\\r?\\n)/, '\1"\\r\\n\2').gsub(/\\r?\\n/, "\n"), filename: "#{resource.schema_name}.json"
   end
 
+  config.add_action_item :make_immutable, only: :show, if: proc { !resource.immutable? } do
+    link_to("Make Undeletable", make_immutable_run_path(resource), method: :put)
+  end
+
+  member_action :make_immutable, method: :put do
+    resource.immutable = true
+    resource.save!
+    flash[:notice] = "This Run is now immutable"
+    redirect_to run_path(resource)
+  end
+
+  config.add_action_item :make_mutable, only: :show, if: proc { resource.immutable? } do
+    link_to("Make Deletable", make_mutable_run_path(resource), method: :put)
+  end
+
+  member_action :make_mutable, method: :put do
+    resource.immutable = false
+    resource.save!
+    flash[:notice] = "This Run is now mutable"
+    redirect_to run_path(resource)
+  end
+
   config.add_action_item :destroy_run, only: :show, if: proc { resource.running_or_crashed? } do
     msg = "***This workflow is still running***, though it may have crashed. Are you sure you want to nuke this Run and all DB data associated with it?"
     link_to "Delete Run", { action: :destroy }, method: :delete, data: { confirm: msg }
@@ -111,7 +138,7 @@ ActiveAdmin.register Run do
 
     def action_methods
       result = super
-      result -= ['destroy'] if action_name == 'show' && resource.running_or_crashed?
+      result -= ['destroy'] if action_name == 'show' && (resource.running_or_crashed? || resource.immutable?)
       result
     end
 
