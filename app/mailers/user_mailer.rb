@@ -3,7 +3,12 @@ class UserMailer < ApplicationMailer
   helper do
     def report_headers(log)
       @report_headers ||= {}
-      @report_headers[log.id] ||= log.step_result.first.keys
+      @report_headers[log.id] ||= log.step_result.first
+    end
+
+    def report_body(log)
+      @report_body ||= {}
+      @report_body[log.id] ||= log.step_result[1..-1]
     end
   end
 

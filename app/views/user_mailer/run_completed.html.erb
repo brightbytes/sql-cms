@@ -18,20 +18,19 @@
         <h3><%= log.step_name %></h3>
         <p><%= log.step_interpolated_sql %>;</p>
 
-
         <table>
           <tr>
             <% report_headers(log).each do |header| %>
               <th><%= header %></th>
             <% end %>
           </tr>
-            <% log.step_result.each do |hash| %>
-              <tr>
-                <% report_headers(log).each do |header| %>
-                  <td><%= hash[header] %></td>
-                <% end %>
-              </tr>
-            <% end %>
+          <% report_body(log).each do |arr| %>
+            <tr>
+              <% arr.each do |elm| %>
+                <td><%= elm %></td>
+              <% end %>
+            </tr>
+          <% end %>
         </table>
 
       <% end %>

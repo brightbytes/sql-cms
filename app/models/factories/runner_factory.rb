@@ -206,7 +206,8 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      run.select_all_in_schema(plan_h[:interpolated_sql])&.to_hash
+      result = run.select_all_in_schema(plan_h[:interpolated_sql])
+      [result.columns] + result.rows
     end
   end
 
