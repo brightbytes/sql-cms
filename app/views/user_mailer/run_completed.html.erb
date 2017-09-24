@@ -16,7 +16,7 @@
       <% @run.run_step_logs.workflow_data_quality_reports.sort_by(&:step_name).each do |log| %>
 
         <h3><%= log.step_name %></h3>
-        <p><%= log.step_interpolated_sql %>;</p>
+        <%== simple_format(log.step_interpolated_sql) %>
 
         <table>
           <tr>
