@@ -55,6 +55,8 @@ describe Workflow do
     it { should have_many(:included_workflows).through(:included_dependencies) }
     it { should have_many(:including_dependencies) }
     it { should have_many(:including_workflows).through(:including_dependencies) }
+
+    it { should have_many(:workflow_interpolations) }
   end
 
   describe 'instance methods' do

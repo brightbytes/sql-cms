@@ -1168,6 +1168,38 @@ ALTER SEQUENCE workflow_dependencies_id_seq OWNED BY workflow_dependencies.id;
 
 
 --
+-- Name: workflow_interpolations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE workflow_interpolations (
+    id bigint NOT NULL,
+    workflow_id integer NOT NULL,
+    name character varying NOT NULL,
+    slug character varying NOT NULL,
+    sql character varying NOT NULL
+);
+
+
+--
+-- Name: workflow_interpolations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE workflow_interpolations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: workflow_interpolations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE workflow_interpolations_id_seq OWNED BY workflow_interpolations.id;
+
+
+--
 -- Name: workflows; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1438,6 +1470,13 @@ ALTER TABLE ONLY workflow_data_quality_reports ALTER COLUMN id SET DEFAULT nextv
 --
 
 ALTER TABLE ONLY workflow_dependencies ALTER COLUMN id SET DEFAULT nextval('workflow_dependencies_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflow_interpolations ALTER COLUMN id SET DEFAULT nextval('workflow_interpolations_id_seq'::regclass);
 
 
 --
@@ -1731,6 +1770,14 @@ ALTER TABLE ONLY workflow_data_quality_reports
 
 ALTER TABLE ONLY workflow_dependencies
     ADD CONSTRAINT workflow_dependencies_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: workflow_interpolations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY workflow_interpolations
+    ADD CONSTRAINT workflow_interpolations_pkey PRIMARY KEY (id);
 
 
 --
@@ -2217,6 +2264,27 @@ CREATE UNIQUE INDEX index_workflow_depenencies_on_independent_id_dependent_id ON
 
 
 --
+-- Name: index_workflow_interpolations_on_lowercase_name_and_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_workflow_interpolations_on_lowercase_name_and_workflow_id ON workflow_interpolations USING btree (lower((name)::text), workflow_id);
+
+
+--
+-- Name: index_workflow_interpolations_on_lowercase_slug_and_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_workflow_interpolations_on_lowercase_slug_and_workflow_id ON workflow_interpolations USING btree (lower((slug)::text), workflow_id);
+
+
+--
+-- Name: index_workflow_interpolations_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_workflow_interpolations_on_workflow_id ON workflow_interpolations USING btree (workflow_id);
+
+
+--
 -- Name: index_workflows_on_lowercase_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2348,6 +2416,14 @@ ALTER TABLE ONLY versions
 
 
 --
+-- Name: fk_rails_942a8ddbb1; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY workflow_interpolations
+    ADD CONSTRAINT fk_rails_942a8ddbb1 FOREIGN KEY (workflow_id) REFERENCES workflows(id);
+
+
+--
 -- Name: fk_rails_a46b8f09db; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2418,6 +2494,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170517030342'),
 ('20170725015832'),
 ('20170922195727'),
-('20170922233624');
+('20170922233624'),
+('20170926220845');
 
 

@@ -4,6 +4,8 @@ module Concerns::SqlSlugs
   extend ActiveSupport::Concern
 
   included do
+    include Concerns::SqlHelpers
+
     validates :slug, presence: true, uniqueness: { case_sensitive: false }
 
     validate :slug_valid_sql_identifier
