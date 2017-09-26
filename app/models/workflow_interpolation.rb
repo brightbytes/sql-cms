@@ -27,14 +27,19 @@ class WorkflowInterpolation < ApplicationRecord
 
   validates :sql, :workflow, presence: true
 
-  include Concerns::SqlSlugs
+  validates :name, presence: true, uniqueness: { case_sensitive: false, scope: :workflow_id }
+  validates :slug, presence: true, uniqueness: { case_sensitive: false, scope: :workflow_id }
 
-  validates :name, presence: true, uniqueness: { case_sensitive: false }
+  validate :slug_validity
+
+  def slug_validity
+    if slug =~ /^[^a-z]/ || slug =~ /[^a-z0-9_]/ || slug =~ /_$/
+      errors.add(:slug, "must start with a lowercase character, and otherwise be comprised only of lowercase characters, numbers, or underscores")
+    end
+  end
 
   # Associations
 
   belongs_to :workflow, inverse_of: :workflow_interpolations
-
-
 
 end

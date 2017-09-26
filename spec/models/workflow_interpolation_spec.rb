@@ -28,9 +28,20 @@ describe WorkflowInterpolation do
 
     context "with a Customer already extant" do
       let!(:subject) { create(:workflow_interpolation) }
-      # These interfere with one another.
-      # it { should validate_uniqueness_of(:name).case_insensitive.scoped_to(:workflow_id) }
-      # it { should validate_uniqueness_of(:slug).case_insensitive.scoped_to(:workflow_id) }
+      it { should validate_uniqueness_of(:name).case_insensitive.scoped_to(:workflow_id) }
+      it { should validate_uniqueness_of(:slug).case_insensitive.scoped_to(:workflow_id) }
+    end
+
+    it "should only allow valid slugs" do
+      expect(build(:workflow_interpolation, slug: "1foobar")).to_not be_valid
+      expect(build(:workflow_interpolation, slug: "foobar1")).to be_valid
+      expect(build(:workflow_interpolation, slug: "foobar_1")).to be_valid
+      expect(build(:workflow_interpolation, slug: "_foobar")).to_not be_valid
+      expect(build(:workflow_interpolation, slug: "foobar_")).to_not be_valid
+      expect(build(:workflow_interpolation, slug: "foo_bar")).to be_valid
+      expect(build(:workflow_interpolation, slug: "Foobar")).to_not be_valid
+      expect(build(:workflow_interpolation, slug: "foobaR")).to_not be_valid
+      expect(build(:workflow_interpolation, slug: "foobar")).to be_valid
     end
   end
 
