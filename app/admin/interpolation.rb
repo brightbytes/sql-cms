@@ -1,0 +1,87 @@
+ActiveAdmin.register Interpolation do
+
+  menu priority: 55
+
+  actions :all
+
+  permit_params :name, :slug, :sql
+
+  filter :name, as: :string
+  filter :slug, as: :string
+  filter :sql, as: :string
+
+  config.sort_order = 'name_asc'
+
+  index(download_links: false) do
+    column(:name) { |interpolation| auto_link(interpolation) }
+    column(:slug) { |interpolation| interpolation.slug }
+    column(:used_by_count) { |validation| validation.usage_count }
+  end
+
+  show do
+    attributes_table do
+      row :id
+      row :name
+      row :slug
+      row :usage_count
+      simple_format_row(:sql)
+      row :created_at
+      row :updated_at
+    end
+
+    transforms = resource.referencing_transforms.order(:name)
+    if transforms.present?
+      panel 'Transforms' do
+        table_for(transforms) do
+          column(:transform) { |transform| auto_link(transform) }
+          column(:runner)
+          boolean_column(:enabled)
+          column(:action) do |transform|
+            text_node(link_to("Edit", edit_transform_path(transform)))
+          end
+        end
+      end
+    end
+
+    dqrs = resource.referencing_data_quality_reports.order(:name)
+    if dqrs.present?
+      panel 'Data Quality Report' do
+        table_for(dqrs) do
+          column(:data_quality_report) { |data_quality_report| auto_link(data_quality_report) }
+          boolean_column(:immutable)
+          column(:action) do |data_quality_report|
+            text_node(link_to("Edit", edit_data_quality_report_path(data_quality_report)))
+          end
+        end
+      end
+    end
+
+    active_admin_comments
+
+    render partial: 'admin/shared/history'
+  end
+
+  form do |f|
+    inputs 'Details' do
+      input :name, as: :string
+      input :slug, as: :string
+      input :sql, as: :text
+    end
+
+    actions do
+      action(:submit)
+      cancel_link(f.object.new_record? ? interpolations_path : interpolation_path(f.object))
+    end
+  end
+
+  controller do
+
+    def action_methods
+      result = super
+      result -= ['destroy'] if action_name == 'show' && resource.usage_count > 0
+      result
+    end
+
+  end
+
+end

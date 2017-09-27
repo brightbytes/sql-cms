@@ -33,7 +33,7 @@ ActiveAdmin.register Transform do
       row :runner
       row(:params) { code(pretty_print_as_json(resource.params)) }
       simple_format_row(:sql)
-      simple_format_row(:interpolated_sql) if resource.params.present? && resource.sql != resource.interpolated_sql
+      simple_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
 
       row :s3_file_name if transform.importing? || transform.exporting?
 
