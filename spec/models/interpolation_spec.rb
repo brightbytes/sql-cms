@@ -39,4 +39,17 @@ describe Interpolation do
     end
   end
 
+  describe "callbacks" do
+    context "before_destroy" do
+      it "should prevent destruction if the Interpolation is used" do
+        interpolation = create(:interpolation)
+        transform = create(:transform, sql: ":#{interpolation.slug}")
+        expect { interpolation.destroy }.to raise_error(StandardError)
+        transform.destroy
+        interpolation.reload
+        expect { interpolation.destroy }.to_not raise_error
+      end
+    end
+  end
+
 end
