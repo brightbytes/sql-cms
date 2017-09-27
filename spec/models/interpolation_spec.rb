@@ -54,4 +54,12 @@ describe Interpolation do
     end
   end
 
+  describe "instance methods" do
+    it "should handle quotes in the interpolated sql correctly" do
+      interpolation = create(:interpolation, sql: "SELECT ':column_name'")
+      transform = create(:transform, sql: ":#{interpolation.slug}:", params: { column_name: 'whatever' })
+      expect(transform.interpolated_sql).to eq("SELECT 'whatever'")
+    end
+  end
+
 end

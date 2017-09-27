@@ -76,7 +76,6 @@ module Concerns::ParamsHelpers
       if global_interpolations.present?
         string = string.dup.tap do |s|
           global_interpolations.each_pair do |k, v|
-            v = connection.quote_string(v)
             s.gsub!(/(?<![a-zA-Z0-9]):#{k}:/, v)
           end
         end
