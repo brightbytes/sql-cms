@@ -13,6 +13,7 @@
 #  index_interpolations_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 
+# Unlike normal param-based imputations, the format of these in code begins and ends with a colon, e.g. `:impute_me:`
 class Interpolation < ApplicationRecord
 
   auto_normalize except: :sql
@@ -63,7 +64,7 @@ class Interpolation < ApplicationRecord
   end
 
   private def referencing_objs(klass)
-    klass.where("sql LIKE '%:#{slug}%'")
+    klass.where("sql LIKE '%:#{slug}:%'")
   end
 
 end

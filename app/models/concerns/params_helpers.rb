@@ -47,6 +47,9 @@ module Concerns::ParamsHelpers
     def interpolate(string:, params: nil, quote_arrays: true, use_global_interpolations: false)
       return string if string.blank?
 
+      # This occurs first so that it may contain interpolation vars.
+      string = handle_global_imputations(string) if use_global_interpolations
+
       if params.present?
         string = string.dup.tap do |s|
           params.each_pair do |k, v|
@@ -60,19 +63,6 @@ module Concerns::ParamsHelpers
         end
       end
 
-      if use_global_interpolations
-        # This strikes me as inefficent.  Oh well.
-        global_interpolations = Interpolation.pluck(:slug, :sql).to_h
-        if global_interpolations.present?
-          string = string.dup.tap do |s|
-            global_interpolations.each_pair do |k, v|
-              v = connection.quote_string(v)
-              s.gsub!(/(?<![a-zA-Z0-9]):#{k}(?![a-zA-Z0-9])/, v)
-            end
-          end
-        end
-      end
-
       # FIXME - MAYBE ISSUE A WARNING HERE IF string CONTAINS AN UNINTERPOLATED PARAM. OR, HANDLE IN THE UI
 
       string
@@ -80,7 +70,21 @@ module Concerns::ParamsHelpers
 
     private
 
-    private def coerce_param_value(v, quote_arrays)
+    def handle_global_imputations(string)
+      # This strikes me as inefficent.  Oh well.
+      global_interpolations = Interpolation.pluck(:slug, :sql).to_h
+      if global_interpolations.present?
+        string = string.dup.tap do |s|
+          global_interpolations.each_pair do |k, v|
+            v = connection.quote_string(v)
+            s.gsub!(/(?<![a-zA-Z0-9]):#{k}:/, v)
+          end
+        end
+      end
+      string
+    end
+
+    def coerce_param_value(v, quote_arrays)
       if v.is_a?(Array)
         # We assume here that the intention is for the array to be used as values, e.g. for a SQL `IN` clause.
         v = v.map { |elm| connection.quote(elm.to_s) } if quote_arrays

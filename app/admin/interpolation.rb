@@ -64,7 +64,7 @@ ActiveAdmin.register Interpolation do
   form do |f|
     inputs 'Details' do
       input :name, as: :string
-      input :slug, as: :string
+      input :slug, as: :string, hint: "Must be lowercase, start with a letter, and can contain only letters, numbers, and underscores.  Use the slug in Transforms, etc. by starting and ending with a colon. "
       input :sql, as: :text
     end
 
