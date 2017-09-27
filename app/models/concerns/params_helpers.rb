@@ -35,7 +35,7 @@ module Concerns::ParamsHelpers
   end
 
   def interpolated_sql
-    self.class.interpolate(string: sql, params: params, quote_arrays: true)
+    self.class.interpolate(string: sql, params: params, quote_arrays: true, use_global_interpolations: true)
   end
 
   def to_s
@@ -44,29 +44,52 @@ module Concerns::ParamsHelpers
   alias_method :display_name, :to_s
 
   module ClassMethods
-    def interpolate(string:, params: nil, quote_arrays: true)
-      if params.present? && string.present?
-        string.dup.tap do |string|
+    def interpolate(string:, params: nil, quote_arrays: true, use_global_interpolations: false)
+      return string if string.blank?
+
+      if params.present?
+        string = string.dup.tap do |s|
           params.each_pair do |k, v|
-            if v.is_a?(Array)
-              # We assume here that the intention is for the array to be used as values, e.g. for a SQL `IN` clause.
-              v = v.map { |elm| connection.quote(elm.to_s) } if quote_arrays
-              v = v.join(", ")
-            else
-              # ... whereas, here the intention most of the time is for the value to be used as a table name or column name,
-              #     so we only escape, and don't enclose in quotes
-              v = connection.quote_string(v.to_s)
-            end
+            v = coerce_param_value(v, quote_arrays)
             # HMMMMM - This prevents matching of a key that is a subset of another key (:some_key would match :some_key_here),
             #           and it also prevents matching a colon in the middle of a string (unlikely case, to be sure),
             #           BUT, it may also prevent matching within a string when it's desired, hence the removal of the _ from the negative lookbehind/lookahead
-            # string.gsub!(/(?<![a-zA-Z0-9_]):#{k}(?![a-zA-Z0-9_])/, v)
-            string.gsub!(/(?<![a-zA-Z0-9]):#{k}(?![a-zA-Z0-9])/, v)
+            # s.gsub!(/(?<![a-zA-Z0-9_]):#{k}(?![a-zA-Z0-9_])/, v)
+            s.gsub!(/(?<![a-zA-Z0-9]):#{k}(?![a-zA-Z0-9])/, v)
           end
-          # FIXME - MAYBE ISSUE A WARNING HERE IF string CONTAINS AN UNINTERPOLATED PARAM. OR, HANDLE IN THE UI
         end
+      end
+
+      if use_global_interpolations
+        # This strikes me as inefficent.  Oh well.
+        global_interpolations = Interpolation.pluck(:slug, :sql).to_h
+        if global_interpolations.present?
+          string = string.dup.tap do |s|
+            global_interpolations.each_pair do |k, v|
+              v = connection.quote_string(v)
+              dputs s
+              s.gsub!(/(?<![a-zA-Z0-9]):#{k}(?![a-zA-Z0-9])/, v)
+            end
+          end
+        end
+      end
+
+      # FIXME - MAYBE ISSUE A WARNING HERE IF string CONTAINS AN UNINTERPOLATED PARAM. OR, HANDLE IN THE UI
+
+      string
+    end
+
+    private
+
+    private def coerce_param_value(v, quote_arrays)
+      if v.is_a?(Array)
+        # We assume here that the intention is for the array to be used as values, e.g. for a SQL `IN` clause.
+        v = v.map { |elm| connection.quote(elm.to_s) } if quote_arrays
+        v.join(", ")
       else
-        string
+        # ... whereas, here the intention most of the time is for the value to be used as a table name or column name,
+        #     so we only escape, and don't enclose in quotes
+        connection.quote_string(v.to_s)
       end
     end
   end

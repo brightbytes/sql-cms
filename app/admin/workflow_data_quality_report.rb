@@ -14,7 +14,7 @@ ActiveAdmin.register WorkflowDataQualityReport do
       row :interpolated_name if resource.params.present? && resource.name != resource.interpolated_name
       row(:params) { code(pretty_print_as_json(resource.params)) }
       simple_format_row(:sql)
-      simple_format_row(:interpolated_sql) if resource.params.present? && resource.sql != resource.interpolated_sql
+      simple_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
       row(:data_quality_report_immutable) { yes_no(resource.data_quality_report.immutable) }
       row :created_at
       row :updated_at

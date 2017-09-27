@@ -51,12 +51,19 @@ class Interpolation < ApplicationRecord
   end
 
   def referencing_transforms
-    Transform.where("sql LIKE '%:#{slug}%'")
+    referencing_objs(Transform)
   end
 
   def referencing_data_quality_reports
-    DataQualityReport.where("sql LIKE '%:#{slug}%'")
+    referencing_objs(DataQualityReport)
   end
 
+  def referencing_validations
+    referencing_objs(Validation)
+  end
+
+  private def referencing_objs(klass)
+    klass.where("sql LIKE '%:#{slug}%'")
+  end
 
 end
