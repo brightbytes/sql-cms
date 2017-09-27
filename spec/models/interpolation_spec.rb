@@ -2,10 +2,12 @@
 #
 # Table name: interpolations
 #
-#  id   :integer          not null, primary key
-#  name :string           not null
-#  slug :string           not null
-#  sql  :string           not null
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  slug       :string           not null
+#  sql        :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 # Indexes
 #

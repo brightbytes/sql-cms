@@ -747,7 +747,9 @@ CREATE TABLE interpolations (
     id bigint NOT NULL,
     name character varying NOT NULL,
     slug character varying NOT NULL,
-    sql character varying NOT NULL
+    sql character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -2459,7 +2461,7 @@ ALTER TABLE ONLY transform_dependencies
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user",public;
+SET search_path TO "public";
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20170112005400'),
@@ -2479,6 +2481,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170725015832'),
 ('20170922195727'),
 ('20170922233624'),
-('20170926220845');
+('20170926220845'),
+('20170927014328');
 
 
