@@ -14,8 +14,18 @@ ActiveAdmin.register Validation do
 
   index(download_links: false) do
     column(:name) { |validation| auto_link(validation) }
+    column('') { |validation| link_to("Edit", edit_validation_path(validation)) unless validation.immutable? }
     boolean_column(:immutable)
     column(:used_by_count) { |validation| validation.usage_count }
+    column('') do |validation|
+      unless validation.immutable?
+        if validation.used?
+          text_node("Remove usage to Delete")
+        else
+          link_to("Delete", validation_path(validation), method: :delete, data: { confirm: "Are you really sure you want to nuke this Validation?" })
+        end
+      end
+    end
   end
 
   show do

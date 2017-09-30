@@ -44,6 +44,10 @@ class Validation < ApplicationRecord
     transform_validations.count
   end
 
+  def used?
+    usage_count > 0
+  end
+
   # Class Methods
 
   class << self

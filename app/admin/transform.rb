@@ -15,11 +15,22 @@ ActiveAdmin.register Transform do
   config.sort_order = 'name_asc'
 
   index(download_links: false) do
-    column(:name) { |transform| auto_link(transform) }
+    column(:name) do |transform|
+      text_node(auto_link(transform))
+      text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
+      text_node(link_to("Edit", edit_transform_path(transform)))
+    end
     column(:workflow, sortable: 'workflows.slug')
     column(:runner)
     boolean_column(:enabled)
-    column(:action) { |transform| link_to("Edit", edit_transform_path(transform)) }
+    column('') do |transform|
+      link_to(
+        "Delete",
+        transform_path(transform),
+        method: :delete,
+        data: { confirm: 'Are you really sure you want to nuke this Transform and all its Dependencies and TransformValidations?' }
+      )
+    end
   end
 
   show do
@@ -70,57 +81,50 @@ ActiveAdmin.register Transform do
       end
     end
 
-    panel 'Transform Validations' do
-      text_node link_to("Add New Transform Validation", new_transform_validation_path(transform_id: resource.id))
-
-      transform_validations = resource.transform_validations.includes(:validation).order('validations.name').to_a
-      unless transform_validations.empty?
+    transform_validations = resource.transform_validations.includes(:validation).order('validations.name').to_a
+    unless transform_validations.empty?
+      panel 'Transform Validations' do
         table_for(transform_validations) do
           column(:transform_validation) { |tv| auto_link(tv) }
-          column(:interpolated_sql) { |tv| tv.interpolated_sql }
-          column('Immutable?') { |tv| yes_no(tv.validation.immutable?) }
-          column(:action) do |tv|
+          column('') do |tv|
             text_node(link_to("Edit", edit_transform_validation_path(tv, source: :transform, transform_id: tv.transform_id)))
-            text_node(' | ')
+          end
+          column(:interpolated_sql) { |tv| tv.interpolated_sql }
+          column('') do |tv|
             text_node(link_to("Delete", transform_validation_path(tv), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Validation?' }))
           end
         end
       end
     end
 
-    panel 'Prerequisite Transform Dependencies' do
-
-      # FIXME - HANDLE postrequisite_transform_id ON THE RECEIVING END AT SOME POINT: WILL REQUIRE PRESERVING THROUGH WHOLE FLOW, INCLUDING ERROR CASES
-      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.workflow_id, postrequisite_transform_id: resource.id))
-
-      prereqs = resource.prerequisite_dependencies.includes(:prerequisite_transform).to_a.sort_by { |td| td.prerequisite_transform.interpolated_name }
-      unless prereqs.empty?
+    prereqs = resource.prerequisite_dependencies.includes(:prerequisite_transform).to_a.sort_by { |td| td.prerequisite_transform.interpolated_name }
+    unless prereqs.empty?
+      panel 'Prerequisite Transform Dependencies' do
         table_for(prereqs) do
           column(:name) { |pd| auto_link(pd.prerequisite_transform) }
+          column('') do |pd|
+            link_to("Edit Transform", edit_transform_path(pd.prerequisite_transform, source: :postrequisite_transform))
+          end
           column(:runner) { |pd| pd.prerequisite_transform.runner }
           column(:transform_enabled) { |pd| yes_no(pd.prerequisite_transform.enabled?) }
-          column(:action) do |pd|
-            text_node(link_to("Edit Transform", edit_transform_path(pd.prerequisite_transform, source: :postrequisite_transform)))
-            text_node(' | ')
+          column('') do |pd|
             link_to("Delete Dependency", transform_dependency_path(pd, source: :postrequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' })
           end
         end
       end
     end
 
-    panel 'Postrequisite Transforms Dependencies' do
-
-      text_node link_to("Create New Transform", new_transform_path(workflow_id: resource.workflow_id, prerequisite_transform_id: resource.id))
-
-      postreqs = resource.postrequisite_dependencies.includes(:postrequisite_transform).to_a.sort_by { |td| td.postrequisite_transform.interpolated_name }
-      unless postreqs.empty?
+    postreqs = resource.postrequisite_dependencies.includes(:postrequisite_transform).to_a.sort_by { |td| td.postrequisite_transform.interpolated_name }
+    unless postreqs.empty?
+      panel 'Postrequisite Transforms Dependencies' do
         table_for(postreqs) do
           column(:name) { |pd| auto_link(pd.postrequisite_transform) }
+          column('') do |pd|
+            link_to("Edit Transform", edit_transform_path(pd.postrequisite_transform, source: :prerequisite_transform))
+          end
           column(:runner) { |pd| pd.postrequisite_transform.runner }
           column(:transform_enabled) { |pd| yes_no(pd.postrequisite_transform.enabled?) }
-          column(:action) do |pd|
-            text_node(link_to("Edit Transform", edit_transform_path(pd.postrequisite_transform, source: :prerequisite_transform)))
-            text_node(' | ')
+          column('') do |pd|
             link_to("Delete Dependency", transform_dependency_path(pd, source: :prerequisite_transform), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Dependency?' })
           end
         end
@@ -130,6 +134,13 @@ ActiveAdmin.register Transform do
     active_admin_comments
 
     render partial: 'admin/shared/history'
+  end
+
+  sidebar("Actions", only: :show) do
+    ul do
+      li link_to("Add Transform Validation", new_transform_validation_path(transform_id: resource.id))
+      li link_to("Create New Postrequisite Transform", new_transform_path(workflow_id: resource.workflow_id, prerequisite_transform_id: resource.id))
+    end
   end
 
   # FIXME - THE INTERACTIONS IN THIS FORM ARE TOO COMPLEX. MAYBE BREAK INTO MULTIPLE FORMS?
