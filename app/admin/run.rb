@@ -17,7 +17,6 @@ ActiveAdmin.register Run do
     column(:schema_name, sortable: 'schema_name') { |run| auto_link(run) }
     column(:workflow_configuration)
     column(:workflow, sortable: 'workflows.slug')
-    column(:customer, sortable: 'customers.slug')
     boolean_column(:immutable)
     column(:status) { |run| human_status(run) }
     column(:created_at)
