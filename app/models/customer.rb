@@ -7,7 +7,6 @@
 #  slug       :string           not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  deleted_at :datetime
 #
 # Indexes
 #
@@ -21,8 +20,6 @@ class Customer < ApplicationRecord
 
   include Concerns::SqlSlugs
 
-  acts_as_paranoid
-
   auto_normalize
 
   # Validations
@@ -33,14 +30,14 @@ class Customer < ApplicationRecord
 
   has_many :workflow_configurations, inverse_of: :customer
 
-  # Scopes
-
-  scope :sans_deleted, -> { where(deleted_at: nil) }
-
   # Instance Methods
 
   def to_s
     slug
+  end
+
+  def used?
+    workflow_configurations.count > 0
   end
 
   # Class Methods

@@ -14,8 +14,16 @@ ActiveAdmin.register Interpolation do
 
   index(download_links: false) do
     column(:name) { |interpolation| auto_link(interpolation) }
+    column('') { |interpolation| link_to("Edit", edit_interpolation_path(interpolation)) }
     column(:slug) { |interpolation| interpolation.slug }
     column(:used_by_count) { |validation| validation.usage_count }
+    column('') do |interpolation|
+      if interpolation.used?
+        text_node("Currently Used")
+      else
+        link_to("Delete", interpolation_path(interpolation), method: :delete, data: { confirm: "Are you sure you want to nuke this Interpolation?" })
+      end
+    end
   end
 
   show do
@@ -34,11 +42,9 @@ ActiveAdmin.register Interpolation do
       panel 'Transforms' do
         table_for(transforms) do
           column(:transform) { |transform| auto_link(transform) }
+          column('') { |transform| text_node(link_to("Edit", edit_transform_path(transform))) }
           column(:runner)
           boolean_column(:enabled)
-          column(:action) do |transform|
-            text_node(link_to("Edit", edit_transform_path(transform)))
-          end
         end
       end
     end
@@ -78,7 +84,7 @@ ActiveAdmin.register Interpolation do
 
     def action_methods
       result = super
-      result -= ['destroy'] if action_name == 'show' && resource.usage_count > 0
+      result -= ['destroy'] if action_name == 'show' && resource.used?
       result
     end
 
