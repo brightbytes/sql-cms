@@ -16,11 +16,27 @@ ActiveAdmin.register WorkflowConfiguration do
   config.sort_order = ''
 
   index(download_links: false) do
-    column(:workflow_configuration, sortable: 'workflows.slug,customers.slug') { |workflow_configuration| auto_link(workflow_configuration) }
+    column(:workflow_configuration, sortable: 'workflows.slug,customers.slug') do |workflow_configuration|
+      text_node(auto_link(workflow_configuration))
+      text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
+      text_node(link_to("Edit", edit_workflow_configuration_path(workflow_configuration)))
+    end
     column(:workflow, sortable: 'workflows.slug')
     column(:customer, sortable: 'customers.slug')
     boolean_column(:redshift)
     column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
+    column('') do |workflow_configuration|
+      if workflow_configuration.runs.count > 0
+        text_node("Nuke Runs to Delete")
+      else
+        link_to(
+          "Delete",
+          workflow_configuration_path(workflow_configuration),
+          method: :delete,
+          data: { confirm: 'Are you really sure you want to nuke this Workflow Configuration?' }
+        )
+      end
+    end
   end
 
   show do

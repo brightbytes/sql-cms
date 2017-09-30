@@ -13,12 +13,26 @@ ActiveAdmin.register Workflow do
 
   index(download_links: false) do
     column(:name, sortable: :slug) { |workflow| auto_link(workflow) }
+    column('') { |workflow| link_to("Edit", edit_workflow_path(workflow)) }
     column :slug
     # These budge-out the display too much.
     # column :default_copy_from_sql
     # column :default_copy_from_s3_file_type
     # column :default_copy_to_sql
     # column :default_copy_to_s3_file_type
+    column('') do |workflow|
+      workflow_config_ids = workflow.workflow_configurations.pluck(:id)
+      if Run.where(workflow_configuration_id: workflow_config_ids).exists?
+        text_node("Nuke Runs to Delete")
+      else
+        link_to(
+          "Delete",
+          workflow_path(workflow),
+          method: :delete,
+          data: { confirm: 'Are you really sure you want to nuke this Workflow?' }
+        )
+      end
+    end
   end
 
   show do
@@ -52,7 +66,7 @@ ActiveAdmin.register Workflow do
           # column :s3_region_name
           # column :s3_bucket_name
           # column :s3_file_path
-          column(:action) do |workflow_configuration|
+          column('') do |workflow_configuration|
             if workflow_configuration.runs.count > 0
               text_node("Nuke Runs to Delete")
             else
@@ -134,8 +148,10 @@ ActiveAdmin.register Workflow do
       input :default_copy_to_s3_file_type, collection: Workflow::DEFAULT_S3_FILE_TYPES, include_blank: true, hint: "This will be used as the extention for the S3 file for the DefaultCopyTo Runner"
     end
 
-    inputs 'Dependencies' do
-      input :included_workflows, as: :check_boxes, collection: f.object.available_included_workflows
+    if Workflow.count > 1
+      inputs 'Dependencies' do
+        input :included_workflows, as: :check_boxes, collection: f.object.available_included_workflows
+      end
     end
 
     actions

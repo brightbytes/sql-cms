@@ -14,11 +14,8 @@ ActiveAdmin.register Customer do
   before_action :skip_sidebar!, only: :index
 
   index(download_links: false) do
-    column(:name, sortable: :name) do |customer|
-      text_node(auto_link(customer))
-      text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
-      text_node(link_to("Edit", edit_customer_path(customer)))
-    end
+    column(:name, sortable: :name) { |customer| auto_link(customer) }
+    column('') { |customer| link_to("Edit", edit_customer_path(customer)) }
     column :slug
     column('') do |customer|
       if customer.used?
@@ -54,12 +51,16 @@ ActiveAdmin.register Customer do
           column :s3_bucket_name
           column :s3_file_path
           column('') do |workflow_configuration|
-            link_to(
-              "Delete",
-              workflow_configuration_path(workflow_configuration, source: :customer),
-              method: :delete,
-              data: { confirm: 'Are you really sure you want to nuke this Workflow Configuration?' }
-            )
+            if workflow_configuration.runs.count > 0
+              text_node("Nuke Runs to Delete")
+            else
+              link_to(
+                "Delete",
+                workflow_configuration_path(workflow_configuration, source: :customer),
+                method: :delete,
+                data: { confirm: 'Are you really sure you want to nuke this Workflow Configuration?' }
+              )
+            end
           end
         end
       end
