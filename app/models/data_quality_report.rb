@@ -41,6 +41,10 @@ class DataQualityReport < ApplicationRecord
     workflow_data_quality_reports.count
   end
 
+  def used?
+    usage_count > 0
+  end
+
   # Class Methods
 
   class << self

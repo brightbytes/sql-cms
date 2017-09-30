@@ -58,7 +58,7 @@ ActiveAdmin.register TransformValidation do
 
     def destroy
       super do |success, failure|
-        success.html { redirect_to(parent_transform_path) }
+        success.html { redirect_to(params[:source] == 'validation' ? validation_path(resource.validation) : parent_transform_path) }
       end
     end
   end

@@ -126,9 +126,9 @@ ActiveAdmin.register Workflow do
 
   sidebar("Actions", only: :show) do
     ul do
-      li link_to("Create New Transform", new_transform_path(workflow_id: resource.id, source: :workflow))
-      li link_to("Create New Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
-      li link_to("Create New Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow))
+      li link_to("Create Transform", new_transform_path(workflow_id: resource.id, source: :workflow))
+      li link_to("Create Workflow Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
+      li link_to("Create Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow))
     end
   end
 

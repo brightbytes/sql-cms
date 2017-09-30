@@ -39,12 +39,15 @@ ActiveAdmin.register Validation do
       row :updated_at
     end
 
-    panel 'Transforms' do
+    panel 'Transform Validations' do
       table_for(resource.transform_validations.includes(:transform).order('transforms.name')) do
-        column(:runner) { |tv| tv.transform.runner }
         column(:transform) { |tv| auto_link(tv.transform) }
+        column(:runner) { |tv| tv.transform.runner }
         column(:transform_enabled) { |tv| yes_no(tv.transform.enabled?) }
         column(:transform_validation) { |tv| link_to(tv.interpolated_name, tv) }
+        column('') do |tv|
+          link_to("Delete", transform_validation_path(tv, source: :validation), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Validation association?' })
+        end
       end
     end
 

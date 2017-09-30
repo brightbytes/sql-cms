@@ -87,11 +87,11 @@ ActiveAdmin.register Transform do
         table_for(transform_validations) do
           column(:transform_validation) { |tv| auto_link(tv) }
           column('') do |tv|
-            text_node(link_to("Edit", edit_transform_validation_path(tv, source: :transform, transform_id: tv.transform_id)))
+            link_to("Edit", edit_transform_validation_path(tv, source: :transform, transform_id: tv.transform_id))
           end
           column(:interpolated_sql) { |tv| tv.interpolated_sql }
           column('') do |tv|
-            text_node(link_to("Delete", transform_validation_path(tv), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Validation?' }))
+            link_to("Delete", transform_validation_path(tv), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Validation?' })
           end
         end
       end

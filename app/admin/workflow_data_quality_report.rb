@@ -53,7 +53,7 @@ ActiveAdmin.register WorkflowDataQualityReport do
 
     def destroy
       super do |success, failure|
-        success.html { redirect_to(parent_workflow_path) }
+        success.html { redirect_to(params[:source] == 'data_quality_report' ? data_quality_report_path(resource.data_quality_report) : parent_workflow_path) }
       end
     end
   end

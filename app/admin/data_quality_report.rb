@@ -13,9 +13,19 @@ ActiveAdmin.register DataQualityReport do
   config.sort_order = 'name_asc'
 
   index(download_links: false) do
-    column(:name) { |dqr| auto_link(dqr) }
+    column(:name) { |data_quality_report| auto_link(data_quality_report) }
+    column('') { |data_quality_report| link_to("Edit", edit_data_quality_report_path(data_quality_report)) unless data_quality_report.immutable? }
     boolean_column(:immutable)
-    column(:used_by_count) { |dqr| dqr.usage_count }
+    column(:used_by_count) { |data_quality_report| data_quality_report.usage_count }
+    column('') do |data_quality_report|
+      unless data_quality_report.immutable?
+        if data_quality_report.used?
+          text_node("Remove usage to Delete")
+        else
+          link_to("Delete", data_quality_report_path(data_quality_report), method: :delete, data: { confirm: "Are you really sure you want to nuke this Data Quality Report?" })
+        end
+      end
+    end
   end
 
   show do
@@ -33,6 +43,9 @@ ActiveAdmin.register DataQualityReport do
       table_for(resource.workflow_data_quality_reports.includes(:workflow).order('workflows.name')) do
         column(:workflow)
         column(:workflow_data_quality_report) { |wdqr| link_to(wdqr.interpolated_name, wdqr) }
+        column('') do |wdqr|
+          link_to("Delete", workflow_data_quality_report_path(wdqr, source: :data_quality_report), method: :delete, data: { confirm: 'Are you sure you want to nuke this Workflow Data Quality Report association?' })
+        end
       end
     end
 
