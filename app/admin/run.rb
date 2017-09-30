@@ -95,7 +95,11 @@ ActiveAdmin.register Run do
     resource.immutable = true
     resource.save!
     flash[:notice] = "This Run is now immutable"
-    redirect_to run_path(resource)
+    if params[:source] = 'workflow_configuration'
+      redirect_to workflow_configuration_path(resource.workflow_configuration)
+    else
+      redirect_to run_path(resource)
+    end
   end
 
   config.add_action_item :make_mutable, only: :show, if: proc { resource.immutable? } do

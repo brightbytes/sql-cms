@@ -40,22 +40,20 @@ ActiveAdmin.register WorkflowConfiguration do
       row :updated_at
     end
 
-    panel 'Runs' do
-
-      text_node link_to("Run Now", run_workflow_configuration_path(resource), method: :put)
-
-      runs = resource.runs.includes(:creator).order(id: :desc).to_a
-      unless runs.empty?
+    runs = resource.runs.includes(:creator).order(id: :desc).to_a
+    unless runs.empty?
+      panel 'Runs' do
         table_for(runs) do
           column(:schema_name) { |run| auto_link(run) }
           column(:status) { |run| human_status(run) }
-          column(:last_step_run) { |run| run.status }
           column(:created_at)
           column(:duration) { |run| human_duration(run) }
-          column(:action) do |run|
+          column(:actions) do |run|
             if run.immutable?
               text_node("Undeletable")
             else
+              text_node(link_to("Make Undeletable", make_immutable_run_path(run, soucre: :workflow_configuration), method: :put))
+              text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
               base_message = "Are you sure you want to nuke this Run and all DB data associated with it?"
               confirmation = "***This workflow is still running***, though it may have crashed.  " + base_message if run.running_or_crashed?
               link_to("Delete", run_path(run), method: :delete, data: { confirm: confirmation })
@@ -65,15 +63,15 @@ ActiveAdmin.register WorkflowConfiguration do
       end
     end
 
-    panel 'Run Notifications' do
-
-      text_node link_to("Add New Notifications", edit_workflow_configuration_path(resource))
-
-      notifications = resource.notifications.joins(:user).order('users.first_name, users.last_name').to_a
-      unless notifications.empty?
+    notifications = resource.notifications.joins(:user).order('users.first_name, users.last_name').to_a
+    unless notifications.empty?
+      panel 'Run Notifications' do
         table_for(notifications) do
           column(:user) { |notification| auto_link(notification.user) }
-          column(:action) { |notification| link_to("Delete", notification_path(notification), method: :delete, data: { confirm: 'Are you sure you want to nuke this Notification?' }) }
+          column('Send an Email') { |notification| mail_to(notification.user.email) }
+          column(:action) do |notification|
+            link_to("Delete", notification_path(notification), method: :delete, data: { confirm: 'Are you sure you want to nuke this Notification?' })
+          end
         end
       end
     end
@@ -81,6 +79,13 @@ ActiveAdmin.register WorkflowConfiguration do
     active_admin_comments
 
     render partial: 'admin/shared/history'
+  end
+
+  sidebar("Actions", only: :show) do
+    ul do
+      li link_to("Run Now", run_workflow_configuration_path(resource), method: :put)
+      li link_to("Add New Run Notifications", edit_workflow_configuration_path(resource))
+    end
   end
 
   config.add_action_item(

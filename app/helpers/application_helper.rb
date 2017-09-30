@@ -92,6 +92,12 @@ module ApplicationHelper
     @parent_workflow_path ||= workflow_path(id: workflow_id_param_val)
   end
 
+  # Workflow Config stuff
+
+  def workflow_configuration_id_param_val
+    @workflow_configuration_id_param_val ||= resource.workflow_configuration.try(:id)
+  end
+
   # TranformValidations stuff
 
   def transform_id_param_val
