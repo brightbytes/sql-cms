@@ -48,7 +48,7 @@ ActiveAdmin.register WorkflowConfiguration do
           column(:status) { |run| human_status(run) }
           column(:created_at)
           column(:duration) { |run| human_duration(run) }
-          column(:actions) do |run|
+          column('') do |run|
             if run.immutable?
               text_node("Undeletable")
             else

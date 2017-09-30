@@ -124,6 +124,9 @@ class Transform < ApplicationRecord
 
   # Instance Methods
 
+  # It's amazing that 15 years later there's no generic way to auto-preserve params across round trips in via cookies like we did at Ofoto.  Bah.
+  attr_accessor :source
+
   concerning :Runners do
 
     def importing?

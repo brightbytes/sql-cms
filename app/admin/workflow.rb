@@ -41,7 +41,11 @@ ActiveAdmin.register Workflow do
     unless configs.empty?
       panel 'Workflow Configurations' do
         table_for(configs) do
-          column(:name) { |workflow_configuration| auto_link(workflow_configuration) }
+          column(:name) do |workflow_configuration|
+            text_node(auto_link(workflow_configuration))
+            text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
+            text_node(link_to("Edit", edit_workflow_configuration_path(workflow_configuration, workflow_id: resource.id, source: :workflow)))
+          end
           column(:customer) { |workflow_configuration| auto_link(workflow_configuration.customer) }
           column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
           # These are kinda clutter; removing now that actions have been moved back to the sidebar
@@ -49,19 +53,16 @@ ActiveAdmin.register Workflow do
           # column :s3_bucket_name
           # column :s3_file_path
           column(:action) do |workflow_configuration|
-            text_node(
+            if workflow_configuration.runs.count > 0
+              text_node("Nuke Runs to Delete")
+            else
               link_to(
-                "Edit",
-                edit_workflow_configuration_path(workflow_configuration, workflow_id: resource.id, source: :workflow)
+                "Delete",
+                workflow_configuration_path(workflow_configuration, source: :workflow),
+                method: :delete,
+                data: { confirm: 'Are you really sure you want to nuke this Workflow Configuration?' }
               )
-            )
-            text_node(' | ')
-            link_to(
-              "Delete",
-              workflow_configuration_path(workflow_configuration, source: :workflow),
-              method: :delete,
-              data: { confirm: 'Are you really sure you want to nuke this Workflow Configuration?' }
-            )
+            end
           end
         end
       end
@@ -93,12 +94,10 @@ ActiveAdmin.register Workflow do
       panel 'Data Quality Reports' do
         table_for(reports) do
           column(:workflow_data_quality_report) { |wdqr| auto_link(wdqr) }
+          column('') { |wdqr| link_to("Edit Association", edit_workflow_data_quality_report_path(wdqr, source: :workflow, workflow_id: wdqr.workflow_id)) }
           column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql }
-          column('Immutable?') { |wdqr| yes_no(wdqr.data_quality_report.immutable?) }
-          column(:action) do |wdqr|
-            text_node(link_to("Edit", edit_workflow_data_quality_report_path(wdqr, source: :workflow, workflow_id: wdqr.workflow_id)))
-            text_node(' | ')
-            text_node(link_to("Delete", workflow_data_quality_report_path(wdqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this Workflow Data Quality Report?' }))
+          column('') do |wdqr|
+            link_to("Delete Association", workflow_data_quality_report_path(wdqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this association to a Data Quality Report?' })
           end
         end
 

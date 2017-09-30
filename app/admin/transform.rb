@@ -4,7 +4,7 @@ ActiveAdmin.register Transform do
 
   actions :all
 
-  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :s3_file_name, :enabled, prerequisite_transform_ids: []
+  permit_params :name, :runner, :workflow_id, :params_yaml, :sql, :s3_file_name, :enabled, :source, prerequisite_transform_ids: []
 
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :name, as: :string
@@ -137,6 +137,7 @@ ActiveAdmin.register Transform do
     inputs 'Details' do
       # semantic_errors *f.object.errors.keys
 
+      input :source, as: :hidden, input_html: { value: params[:source] }
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
       # We make this unchangeable because it's unclear what to do with dependencies if the User changes Workflow for the Transform on the fly.
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
@@ -212,8 +213,8 @@ ActiveAdmin.register Transform do
     def update
       super do |success, failure|
         success.html do
-          # params[:source] isn't persisted from #edit to #update ... but I'll be damned if I add an attr_accessor for it on the model ... hmm
-          redirect_to(params[:source] == 'workflow' ? workflow_path(resource.workflow) : transform_path(resource))
+          # It's amazing that 15 years later there's no generic way to auto-preserve params across round trips in via cookies like we did at Ofoto.  Bah.
+          redirect_to((params[:source] || resource.source) == 'workflow' ? workflow_path(resource.workflow) : transform_path(resource))
         end
       end
     end
