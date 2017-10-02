@@ -12,6 +12,7 @@
 #  schema_name               :string
 #  workflow_configuration_id :integer          not null
 #  immutable                 :boolean          default(FALSE), not null
+#  finished_at               :datetime
 #
 # Indexes
 #

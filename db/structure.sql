@@ -854,7 +854,8 @@ CREATE TABLE runs (
     updated_at timestamp without time zone NOT NULL,
     schema_name character varying,
     workflow_configuration_id integer NOT NULL,
-    immutable boolean DEFAULT false NOT NULL
+    immutable boolean DEFAULT false NOT NULL,
+    finished_at timestamp without time zone
 );
 
 
@@ -2482,6 +2483,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170922233624'),
 ('20170926220845'),
 ('20170927014328'),
-('20170930205001');
+('20170930205001'),
+('20171002231823');
 
 

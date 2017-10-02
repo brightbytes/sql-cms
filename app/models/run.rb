@@ -12,6 +12,7 @@
 #  schema_name               :string
 #  workflow_configuration_id :integer          not null
 #  immutable                 :boolean          default(FALSE), not null
+#  finished_at               :datetime
 #
 # Indexes
 #
@@ -29,8 +30,6 @@ class Run < ApplicationRecord
 
   # Consider pulling out into Service layer
   include Run::PostgresSchema
-
-  include Concerns::FinalizedRuntimeDuration
 
   auto_normalize
 
@@ -187,6 +186,7 @@ class Run < ApplicationRecord
 
   def notify_completed!
     return unless persisted?
+    update_attributes!(finished_at: Time.zone.now)
     # Note that this leaves :notification_status as 'unsent', which is perhaps undesireable.  Perhaps revisit.
     return unless execution_plan[:rfc_email_addresses_to_notify].present?
     # Atomically lock, to avoid dup notifications upon multiple failures
@@ -228,6 +228,10 @@ class Run < ApplicationRecord
       prefix = "PGPASSWORD=#{password}"
     end
     `#{prefix} pg_dump #{infix} #{common_switches}`
+  end
+
+  def duration_seconds
+    (finished_at || Time.zone.now) - created_at
   end
 
 end
