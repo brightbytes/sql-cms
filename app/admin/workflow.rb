@@ -23,7 +23,7 @@ ActiveAdmin.register Workflow do
     column('') do |workflow|
       workflow_config_ids = workflow.workflow_configurations.pluck(:id)
       if Run.where(workflow_configuration_id: workflow_config_ids).exists?
-        text_node("Nuke Runs to Delete")
+        text_node("Nuke All Runs to Delete")
       else
         link_to(
           "Delete",
@@ -59,6 +59,8 @@ ActiveAdmin.register Workflow do
             text_node(auto_link(workflow_configuration))
             text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
             text_node(link_to("Edit", edit_workflow_configuration_path(workflow_configuration, workflow_id: resource.id, source: :workflow)))
+            text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
+            text_node(link_to("Run Now", run_workflow_configuration_path(workflow_configuration), method: :put))
           end
           column(:customer) { |workflow_configuration| auto_link(workflow_configuration.customer) }
           column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
@@ -68,7 +70,7 @@ ActiveAdmin.register Workflow do
           # column :s3_file_path
           column('') do |workflow_configuration|
             if workflow_configuration.runs.count > 0
-              text_node("Nuke Runs to Delete")
+              text_node("Nuke All Runs to Delete")
             else
               link_to(
                 "Delete",

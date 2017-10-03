@@ -224,7 +224,6 @@ ActiveAdmin.register Transform do
     def update
       super do |success, failure|
         success.html do
-          # It's amazing that 15 years later there's no generic way to auto-preserve params across round trips in via cookies like we did at Ofoto.  Bah.
           redirect_to((params[:source] || resource.source) == 'workflow' ? workflow_path(resource.workflow) : transform_path(resource))
         end
       end

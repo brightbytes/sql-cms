@@ -1144,7 +1144,7 @@ CREATE TABLE workflow_data_quality_reports (
     id integer NOT NULL,
     workflow_id integer NOT NULL,
     data_quality_report_id integer NOT NULL,
-    params jsonb NOT NULL,
+    params jsonb,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -2484,6 +2484,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170926220845'),
 ('20170927014328'),
 ('20170930205001'),
-('20171002231823');
+('20171002231823'),
+('20171003232617');
 
 

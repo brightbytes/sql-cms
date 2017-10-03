@@ -27,7 +27,7 @@ ActiveAdmin.register WorkflowConfiguration do
     column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
     column('') do |workflow_configuration|
       if workflow_configuration.runs.count > 0
-        text_node("Nuke Runs to Delete")
+        text_node("Nuke All Runs to Delete")
       else
         link_to(
           "Delete",

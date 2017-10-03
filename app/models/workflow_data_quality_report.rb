@@ -5,7 +5,7 @@
 #  id                     :integer          not null, primary key
 #  workflow_id            :integer          not null
 #  data_quality_report_id :integer          not null
-#  params                 :jsonb            not null
+#  params                 :jsonb
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #
@@ -26,8 +26,7 @@ class WorkflowDataQualityReport < ApplicationRecord
 
   # Validations
 
-  # Note that here, params can never be NULL/empty, unlike other JSONB columns.
-  validates :workflow, :data_quality_report, :params, presence: true
+  validates :workflow, :data_quality_report, presence: true
 
   # Associations
 

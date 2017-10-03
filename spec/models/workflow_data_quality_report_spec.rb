@@ -5,7 +5,7 @@
 #  id                     :integer          not null, primary key
 #  workflow_id            :integer          not null
 #  data_quality_report_id :integer          not null
-#  params                 :jsonb            not null
+#  params                 :jsonb
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #
@@ -27,7 +27,7 @@ describe WorkflowDataQualityReport do
   end
 
   describe "validations" do
-    [:workflow, :params, :data_quality_report].each do |att|
+    [:workflow, :data_quality_report].each do |att|
       it { should validate_presence_of(att) }
     end
   end
