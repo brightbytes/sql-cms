@@ -3,8 +3,6 @@ module Concerns::ParamsHelpers
 
   extend ActiveSupport::Concern
 
-  include Concerns::ValidateYaml
-
   def params
     super&.with_indifferent_access
   end
@@ -17,7 +15,7 @@ module Concerns::ParamsHelpers
   end
 
   def params_yaml=(val)
-    self.params = (val.blank? ? {} : YAML.load(val))
+    self.params = (val.blank? ? {} : YAML.safe_load(val))
   rescue
     @params_yaml_invalid = true
   end
@@ -42,6 +40,13 @@ module Concerns::ParamsHelpers
     interpolated_name
   end
   alias_method :display_name, :to_s
+
+  private def validate_yaml(attr, is_invalid)
+    if is_invalid
+      errors.delete(attr) # remove the `can't be blank` message
+      errors.add(attr, "must be valid YAML")
+    end
+  end
 
   module ClassMethods
     def interpolate(string:, params: nil, quote_arrays: true, use_global_interpolations: false)
