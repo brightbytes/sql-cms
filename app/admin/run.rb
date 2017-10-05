@@ -69,21 +69,9 @@ ActiveAdmin.register Run do
     render partial: 'admin/shared/history'
   end
 
-  config.add_action_item :dump_schema, only: :show, if: proc { !resource.running_or_crashed? } do
-    link_to("Dump Schema", dump_schema_run_path(resource), method: :put)
-  end
-
-  member_action :dump_schema, method: :put do
-    send_data resource.schema_dump, filename: "#{resource.schema_name}.sql"
-  end
-
-  config.add_action_item :dump_execution_plan, only: :show, if: proc { !resource.running_or_crashed? } do
-    link_to("Dump Execution Plan", dump_execution_plan_run_path(resource), method: :put)
-  end
-
-  member_action :dump_execution_plan, method: :put do
-    # The screwing-around with `\\r?\\n` is so that multi-line JSON attribute values end up being broken into multiple lines in the display
-    send_data JSON.pretty_generate(resource.execution_plan).gsub(/(.+)"(.+\\r?\\n)/, '\1"\\r\\n\2').gsub(/\\r?\\n/, "\n"), filename: "#{resource.schema_name}.json"
+  config.add_action_item :destroy_run, only: :show, if: proc { resource.running_or_crashed? } do
+    msg = "***This workflow is still running***, though it may have crashed. Are you sure you want to nuke this Run and all DB data associated with it?"
+    link_to "Delete Run", { action: :destroy }, method: :delete, data: { confirm: msg }
   end
 
   config.add_action_item :make_immutable, only: :show, if: proc { !resource.immutable? } do
@@ -112,9 +100,21 @@ ActiveAdmin.register Run do
     redirect_to run_path(resource)
   end
 
-  config.add_action_item :destroy_run, only: :show, if: proc { resource.running_or_crashed? } do
-    msg = "***This workflow is still running***, though it may have crashed. Are you sure you want to nuke this Run and all DB data associated with it?"
-    link_to "Delete Run", { action: :destroy }, method: :delete, data: { confirm: msg }
+  config.add_action_item :dump_schema, only: :show, if: proc { !resource.running_or_crashed? } do
+    link_to("Dump Schema", dump_schema_run_path(resource), method: :put)
+  end
+
+  member_action :dump_schema, method: :put do
+    send_data resource.schema_dump, filename: "#{resource.schema_name}.sql"
+  end
+
+  config.add_action_item :dump_execution_plan, only: :show, if: proc { !resource.running_or_crashed? } do
+    link_to("Dump Execution Plan", dump_execution_plan_run_path(resource), method: :put)
+  end
+
+  member_action :dump_execution_plan, method: :put do
+    # The screwing-around with `\\r?\\n` is so that multi-line JSON attribute values end up being broken into multiple lines in the display
+    send_data JSON.pretty_generate(resource.execution_plan).gsub(/(.+)"(.+\\r?\\n)/, '\1"\\r\\n\2').gsub(/\\r?\\n/, "\n"), filename: "#{resource.schema_name}.json"
   end
 
   # config.add_action_item :nuke_failed_steps_and_rerun, only: :show, if: proc { resource.failed? } do
