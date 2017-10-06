@@ -148,7 +148,7 @@ ActiveAdmin.register Run do
     def destroy
       super do |success, failure|
         success.html do
-          redirect_to(workflow_configuration_path(resource.workflow_configuration))
+          redirect_to(workflow_path(resource.workflow_configuration.workflow))
         end
       end
     end
