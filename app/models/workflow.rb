@@ -73,6 +73,8 @@ class Workflow < ApplicationRecord
 
   has_many :workflow_configurations, inverse_of: :workflow, dependent: :delete_all
 
+  has_many :runs, through: :workflow_configurations
+
   # Scopes
 
 

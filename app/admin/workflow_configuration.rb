@@ -56,28 +56,8 @@ ActiveAdmin.register WorkflowConfiguration do
       row :updated_at
     end
 
-    runs = resource.runs.includes(:creator).order(id: :desc).to_a
-    unless runs.empty?
-      panel 'Runs' do
-        table_for(runs) do
-          column(:schema_name) { |run| auto_link(run) }
-          column(:status) { |run| human_status(run) }
-          column(:created_at)
-          column(:duration) { |run| human_duration(run) }
-          column('') do |run|
-            if run.immutable?
-              text_node("Undeletable")
-            else
-              text_node(link_to("Make Undeletable", make_immutable_run_path(run, soucre: :workflow_configuration), method: :put))
-              text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
-              base_message = "Are you sure you want to nuke this Run and all DB data associated with it?"
-              confirmation = "***This workflow is still running***, though it may have crashed.  " + base_message if run.running_or_crashed?
-              link_to("Delete", run_path(run), method: :delete, data: { confirm: confirmation })
-            end
-          end
-        end
-      end
-    end
+    render partial: 'admin/workflow/run_panel',
+           locals: { panel_name: 'Runs', runs: resource.runs.order(id: :desc).to_a }
 
     notifications = resource.notifications.joins(:user).order('users.first_name, users.last_name').to_a
     unless notifications.empty?

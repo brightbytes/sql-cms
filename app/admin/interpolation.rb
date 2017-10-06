@@ -16,10 +16,9 @@ ActiveAdmin.register Interpolation do
     column(:name) { |interpolation| auto_link(interpolation) }
     column('') { |interpolation| link_to("Edit", edit_interpolation_path(interpolation)) }
     column(:slug) { |interpolation| interpolation.slug }
-    column(:used_by_count) { |validation| validation.usage_count }
     column('') do |interpolation|
       if interpolation.used?
-        text_node("Currently Used")
+        text_node("In Use")
       else
         link_to("Delete", interpolation_path(interpolation), method: :delete, data: { confirm: "Are you sure you want to nuke this Interpolation?" })
       end

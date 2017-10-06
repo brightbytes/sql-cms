@@ -51,6 +51,9 @@ ActiveAdmin.register Workflow do
       row :updated_at
     end
 
+    render partial: 'admin/workflow/run_panel',
+           locals: { panel_name: 'Runs', runs: resource.runs.order(id: :desc).to_a }
+
     configs = resource.workflow_configurations.includes(:customer).order('customers.slug')
     unless configs.empty?
       panel 'Workflow Configurations' do
@@ -131,6 +134,8 @@ ActiveAdmin.register Workflow do
       li link_to("Create Transform", new_transform_path(workflow_id: resource.id, source: :workflow))
       li link_to("Create Workflow Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
       li link_to("Create Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow))
+      configs = resource.workflow_configurations.to_a
+      li link_to("Run Now - for Default Configuration", run_workflow_configuration_path(configs.first), method: :put) if configs.size == 1
     end
   end
 
