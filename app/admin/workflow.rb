@@ -93,20 +93,13 @@ ActiveAdmin.register Workflow do
     render partial: 'admin/workflow/workflow_panel',
            locals: { panel_name: 'Including Workflows', workflows: resource.including_workflows.order(:name).to_a }
 
-    render partial: 'admin/workflow/transform_panel',
-           locals: { panel_name: 'Independent Transforms', transforms: resource.transforms.independent.to_a.sort_by(&:interpolated_name) }
-
-    render partial: 'admin/workflow/transform_panel',
-           locals: { panel_name: 'Dependent, Rails Migration Transforms', transforms: resource.transforms.dependent.rails_migration.to_a.sort_by(&:interpolated_name) }
-
-    render partial: 'admin/workflow/transform_panel',
-           locals: { panel_name: 'Dependent, Data-Importing Transforms', transforms: resource.transforms.dependent.importing.to_a.sort_by(&:interpolated_name) }
-
-    render partial: 'admin/workflow/transform_panel',
-           locals: { panel_name: 'Dependent, non-Importing/Exporting/RailsMigration Transforms', transforms: resource.transforms.dependent.non_file_related.not_rails_migration.to_a.sort_by(&:interpolated_name) }
-
-    render partial: 'admin/workflow/transform_panel',
-           locals: { panel_name: 'Dependent, Data-Exporting Transforms', transforms: resource.transforms.dependent.exporting.to_a.sort_by(&:interpolated_name) }
+    step_index = 0
+    plan = ExecutionPlan.create(resource.workflow_configurations.first || WorkflowConfiguration.new(workflow: resource))
+    while transform_ids = plan.transform_group_transform_ids(step_index) do
+      render partial: 'admin/workflow/transform_panel',
+             locals: { panel_name: "Transform Group #{step_index}", transforms: resource.transforms.where(id: transform_ids).to_a.sort_by(&:interpolated_name) }
+      step_index += 1
+    end
 
     reports = resource.workflow_data_quality_reports.includes(:data_quality_report).to_a.sort_by(&:interpolated_name).to_a
     unless reports.empty?
