@@ -123,4 +123,8 @@ class RunStepLog < ApplicationRecord
     end_time - created_at
   end
 
+  def step_output
+    step_validation_failures.presence || step_exceptions.presence || step_result.presence
+  end
+
 end
