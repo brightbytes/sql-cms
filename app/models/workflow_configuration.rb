@@ -26,7 +26,7 @@
 
 class WorkflowConfiguration < ApplicationRecord
 
-  auto_normalize
+  auto_normalize except: :redshift_unload_options
 
   # Validations
 

@@ -168,7 +168,7 @@ ActiveAdmin.register Transform do
       input :enabled, hint: "Unchecking this causes this Transform to be skipped during a Run "
 
       file_display_h = (f.object.s3_file_required? ? {} : { style: 'display:none' })
-      input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "This file doesn't need to exist yet; you may upload it on Transform#show."
+      input :s3_file_name, as: :string, wrapper_html: file_display_h #, hint: "This file doesn't need to exist yet; you may upload it on Transform#show."
     end
 
     # We need the workflow id and we need to know that it won't change before we can present the list of allowed dependencies within the current workflow.

@@ -4,7 +4,7 @@ ActiveAdmin.register WorkflowConfiguration do
 
   actions :all
 
-  permit_params :workflow_id, :customer_id, :redshift, :s3_region_name, :s3_bucket_name, :s3_file_path, notified_user_ids: []
+  permit_params :workflow_id, :customer_id, :redshift, :redshift_unload_options, :s3_region_name, :s3_bucket_name, :s3_file_path, notified_user_ids: []
 
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
@@ -48,7 +48,7 @@ ActiveAdmin.register WorkflowConfiguration do
       row :customer
 
       row :redshift
-      row :redshift_unload_options if resource.redshift?
+      simple_format_row(:redshift_unload_options) if resource.redshift?
 
       row :s3_region_name
       row :s3_bucket_name
@@ -107,7 +107,7 @@ ActiveAdmin.register WorkflowConfiguration do
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: !workflow_id_param_val
 
       input :redshift, as: :select, include_blank: false
-      input :redshift_unload_options, as: :string
+      input :redshift_unload_options, as: :text
 
       input :s3_region_name, as: :string # This should be a drop-down
       input :s3_bucket_name, as: :string

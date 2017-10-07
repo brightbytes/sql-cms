@@ -180,7 +180,7 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
-      raise "CopyToRunner only works in Redshift." if run.use_redshift?
+      raise "UnloadRunner only works in Redshift." unless run.use_redshift?
 
       s3_full_path = S3File.create(
         'export',

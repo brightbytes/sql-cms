@@ -91,7 +91,8 @@ class ExecutionPlan
       base_plan.merge!(
         s3_region_name: execution_plan[:s3_region_name],
         s3_bucket_name: execution_plan[:s3_bucket_name],
-        s3_file_path: execution_plan[:s3_file_path]
+        s3_file_path: execution_plan[:s3_file_path],
+        redshift_unload_options: execution_plan[:redshift_unload_options]
       ) if base_plan[:s3_file_name].present?
       base_plan.deep_symbolize_keys
     end
