@@ -8,6 +8,7 @@ ActiveAdmin.register RunStepLog do
     attributes_table do
       row :id
       row :run
+      row :workflow_configuration
       row :workflow
 
       row :step_type

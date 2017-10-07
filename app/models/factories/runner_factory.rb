@@ -3,34 +3,32 @@ module RunnerFactory
 
   extend self
 
-  # RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
-  RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo).freeze
+  RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
 
   DEFAULTS_RUNNERS = %(DefaultCopyFrom DefaultCopyTo)
 
   NEW_TRANSFORM_RUNNERS_FOR_SELECT = [
+    [' SQL', 'Sql'],
     [' Rails Migration', 'RailsMigration'],
     [' Auto-load', 'AutoLoad'],
     [' Default COPY ... FROM', 'DefaultCopyFrom'], # This is converted to the CopyFrom actual runner in a Transform callback
     [' COPY ... FROM', 'CopyFrom'],
-    [' SQL', 'Sql'],
     [' Default COPY ... TO', 'DefaultCopyTo'], # This is converted to the CopyTo actual runner in a Transform callback
-    [' COPY ... TO', 'CopyTo']
+    [' COPY ... TO', 'CopyTo'],
+    [' UNLOAD', 'Unload']
   ]
 
   RUNNERS_FOR_SELECT = [
+    [' SQL', 'Sql'],
     [' Rails Migration', 'RailsMigration'],
     [' Auto-load', 'AutoLoad'],
     [' COPY ... FROM', 'CopyFrom'],
-    [' SQL', 'Sql'],
-    [' COPY ... TO', 'CopyTo']
+    [' COPY ... TO', 'CopyTo'],
+    [' UNLOAD', 'Unload']
   ]
 
   IMPORT_S3_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
-
-  # EXPORT_S3_FILE_RUNNERS = %w(CopyTo Unload).freeze
-  EXPORT_S3_FILE_RUNNERS = %w(CopyTo).freeze
-
+  EXPORT_S3_FILE_RUNNERS = %w(CopyTo Unload).freeze
   S3_FILE_RUNNERS = (IMPORT_S3_FILE_RUNNERS + EXPORT_S3_FILE_RUNNERS).freeze
 
   NON_S3_FILE_RUNNERS = %w(RailsMigration Sql).freeze
@@ -119,6 +117,7 @@ module RunnerFactory
     extend self
 
     def run(run:, plan_h:)
+      # FIXME - ALLOW THIS TO WORK IN REDSHIFT, THOUGH OBVIOUSLY BY CONDITIONALIZING THE LAST LINES.
       raise "CopyFromRunner doesn't work in Redshift." if run.use_redshift?
 
       s3_file = S3File.create(
@@ -174,14 +173,32 @@ module RunnerFactory
   end
 
   # Redshift-specific version of CopyToRunner
-  # module UnloadRunner
+  module UnloadRunner
 
-  #   extend self
+    UNLOAD_TEMPLATE = "UNLOAD (\n%s\n) TO %s\n%s".freeze
 
-  #   def run(run:, plan_h:)
-  #     raise "Not yet implemented"
-  #   end
-  # end
+    extend self
+
+    def run(run:, plan_h:)
+      raise "UnloadRunner only works in Redshift." unless run.use_redshift?
+
+      s3_full_path = S3File.create(
+        'export',
+        s3_region_name: plan_h[:s3_region_name],
+        s3_bucket_name: plan_h[:s3_bucket_name],
+        s3_file_path: plan_h[:s3_file_path],
+        s3_file_name: plan_h[:s3_file_name],
+        run: run
+      ).to_s
+
+      sql = UNLOAD_TEMPLATE % [
+        RedshiftConnection.connection.quote(plan_h[:interpolated_sql]),
+        RedshiftConnection.connection.quote(s3_full_path),
+        plan_h[:redshift_unload_options]
+      ]
+      run.execute_in_schema(sql)
+    end
+  end
 
   # Runs TransformValidations; internal-only Runner
   module ValidationRunner

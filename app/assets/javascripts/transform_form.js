@@ -10,7 +10,7 @@ $(function() {
     $('#transform_sql_input').toggle(indexSql === -1);
 
     // var index = ['AutoLoad', 'CopyFrom', 'CopyTo', 'Unload'].indexOf($(this).val())
-    var indexS3File = ['AutoLoad', 'CopyFrom', 'CopyTo'].indexOf($(this).val())
+    var indexS3File = ['AutoLoad', 'CopyFrom', 'CopyTo', 'Unload'].indexOf($(this).val())
     $('#transform_s3_file_name_input').toggle(indexS3File !== -1);
 
   });

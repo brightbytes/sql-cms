@@ -119,7 +119,7 @@ module ApplicationHelper
         prereq_group = []
         prereqs.each { |prereq| prereq_group << prereq if prereq.id.in?(transform_ids) }
         if prereq_group.present?
-          grouped_prereqs << Transform.new(name: "***** TRANSFORM GROUP #{step_index - step_index_subtractor} *****")
+          grouped_prereqs << Transform.new(name: "_____TRANSFORM GROUP #{step_index - step_index_subtractor}_____")
           grouped_prereqs << prereq_group
         else
           step_index_subtractor += 1

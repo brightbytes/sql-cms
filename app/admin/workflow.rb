@@ -42,10 +42,10 @@ ActiveAdmin.register Workflow do
       row :name
       row :slug
 
-      row :default_copy_from_sql
-      row :default_copy_from_s3_file_type
-      row :default_copy_to_sql
-      row :default_copy_to_s3_file_type
+      row :default_copy_from_sql if resource.default_copy_from_sql
+      row :default_copy_from_s3_file_type if resource.default_copy_from_s3_file_type
+      row :default_copy_to_sql if resource.default_copy_to_sql
+      row :default_copy_to_s3_file_type if resource.default_copy_to_s3_file_type
 
       row :created_at
       row :updated_at

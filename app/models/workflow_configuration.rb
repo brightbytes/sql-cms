@@ -2,15 +2,16 @@
 #
 # Table name: workflow_configurations
 #
-#  id             :integer          not null, primary key
-#  workflow_id    :integer          not null
-#  s3_region_name :string           not null
-#  s3_bucket_name :string           not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  customer_id    :integer
-#  s3_file_path   :string
-#  redshift       :boolean          default(FALSE), not null
+#  id                      :integer          not null, primary key
+#  workflow_id             :integer          not null
+#  s3_region_name          :string           not null
+#  s3_bucket_name          :string           not null
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  customer_id             :integer
+#  s3_file_path            :string
+#  redshift                :boolean          default(FALSE), not null
+#  redshift_unload_options :text
 #
 # Indexes
 #
@@ -25,7 +26,7 @@
 
 class WorkflowConfiguration < ApplicationRecord
 
-  auto_normalize
+  auto_normalize except: :redshift_unload_options
 
   # Validations
 

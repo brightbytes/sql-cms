@@ -62,7 +62,6 @@ class Run < ApplicationRecord
   belongs_to :creator, class_name: 'User', inverse_of: :runs
 
   belongs_to :workflow_configuration, inverse_of: :runs
-
   has_one :customer, through: :workflow_configuration
   has_one :workflow, through: :workflow_configuration
 

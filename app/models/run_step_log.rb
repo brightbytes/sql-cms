@@ -44,6 +44,7 @@ class RunStepLog < ApplicationRecord
   belongs_to :run, inverse_of: :run_step_logs
 
   has_one :workflow_configuration, through: :run
+  has_one :workflow, through: :workflow_configuration
 
   # Scopes
 
