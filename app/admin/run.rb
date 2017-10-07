@@ -32,11 +32,11 @@ ActiveAdmin.register Run do
 
       row :workflow_configuration
       row :workflow
-      row :customer
-      boolean_row :immutable
+      row :customer if resource.customer
 
       row(:human_status) { human_status(resource) }
       row(:human_notification_status) { human_notification_status(resource) }
+      boolean_row :immutable
 
       row :status
 

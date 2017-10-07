@@ -45,7 +45,7 @@ ActiveAdmin.register WorkflowConfiguration do
       row :id
 
       row :workflow
-      row :customer
+      row :customer if resource.customer
 
       row :redshift
       simple_format_row(:redshift_unload_options) if resource.redshift?
