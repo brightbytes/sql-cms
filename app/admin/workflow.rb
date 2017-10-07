@@ -94,10 +94,16 @@ ActiveAdmin.register Workflow do
            locals: { panel_name: 'Including Workflows', workflows: resource.including_workflows.order(:name).to_a }
 
     step_index = 0
+    step_index_subtractor = 0
     plan = ExecutionPlan.create(resource.workflow_configurations.first || WorkflowConfiguration.new(workflow: resource))
     while transform_ids = plan.transform_group_transform_ids(step_index) do
-      render partial: 'admin/workflow/transform_panel',
-             locals: { panel_name: "Transform Group #{step_index}", transforms: resource.transforms.where(id: transform_ids).to_a.sort_by(&:interpolated_name) }
+      transforms = resource.transforms.where(id: transform_ids).to_a.sort_by(&:interpolated_name)
+      if transforms.present? # They won't be present for included workflows
+        render partial: 'admin/workflow/transform_panel',
+               locals: { panel_name: "Transform Group #{step_index - step_index_subtractor}", transforms: transforms }
+      else
+        step_index_subtractor += 1
+      end
       step_index += 1
     end
 
