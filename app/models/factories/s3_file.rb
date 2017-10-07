@@ -48,7 +48,7 @@ class S3File
   # end
 
   def to_s
-    "'s3://#{s3_bucket_name}/#{s3_file_path_and_name}' in region #{s3_region_name}"
+    "s3://#{s3_bucket_name}/#{s3_file_path_and_name}"
   end
 
   private
