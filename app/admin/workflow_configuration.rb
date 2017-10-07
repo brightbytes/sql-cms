@@ -11,6 +11,7 @@ ActiveAdmin.register WorkflowConfiguration do
   filter :s3_region_name, as: :select
   filter :s3_bucket_name, as: :select
   filter :s3_file_path, as: :select
+  filter :redshift_unload_options, as: :string
 
   # This is necessary to disable default order by id
   config.sort_order = ''
@@ -47,6 +48,7 @@ ActiveAdmin.register WorkflowConfiguration do
       row :customer
 
       row :redshift
+      row :redshift_unload_options if resource.redshift?
 
       row :s3_region_name
       row :s3_bucket_name
@@ -105,6 +107,7 @@ ActiveAdmin.register WorkflowConfiguration do
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: !workflow_id_param_val
 
       input :redshift, as: :select, include_blank: false
+      input :redshift_unload_options, as: :string
 
       input :s3_region_name, as: :string # This should be a drop-down
       input :s3_bucket_name, as: :string
