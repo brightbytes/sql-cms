@@ -108,4 +108,21 @@ module ApplicationHelper
     @parent_transform_path ||= transform_path(id: transform_id_param_val)
   end
 
+  # Transform stuff
+
+  def group_prereqs(prereqs)
+    [].tap do |grouped_prereqs|
+      step_index = 0
+      plan = ExecutionPlan.create(resource.workflow.workflow_configurations.first || WorkflowConfiguration.new(workflow: resource.workflow))
+      while transform_ids = plan.transform_group_transform_ids(step_index) do
+        prereq_group = []
+        prereqs.each { |prereq| prereq_group << prereq if prereq.id.in?(transform_ids) }
+        grouped_prereqs << Transform.new(name: "***** TRANSFORM GROUP #{step_index} *****") unless prereq_group.empty?
+        grouped_prereqs << prereq_group
+        step_index += 1
+      end
+      grouped_prereqs.flatten!
+    end
+  end
+
 end

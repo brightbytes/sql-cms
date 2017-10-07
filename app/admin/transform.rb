@@ -175,9 +175,10 @@ ActiveAdmin.register Transform do
     if f.object.persisted? || workflow_id_param_val
       prereqs = f.object.available_prerequisite_transforms
       if prereqs.present?
+        prereqs = group_prereqs(prereqs)
         inputs 'Dependencies' do
           prereq_id = params[:prerequisite_transform_id].to_i
-          input :prerequisite_transforms, as: :check_boxes, collection: prereqs.map { |t| [t.name, t.id, checked: (t.id == prereq_id)] }
+          input :prerequisite_transforms, as: :check_boxes, collection: prereqs.map { |t| [t.name, t.id, checked: (t.id == prereq_id)] }, disabled: [nil]
         end
       end
     end
