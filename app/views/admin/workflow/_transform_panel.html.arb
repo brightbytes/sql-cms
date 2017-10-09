@@ -12,7 +12,7 @@ unless transforms.empty?
         # column(:s3_region_name) { |transform| transform.s3_region_name if transform.s3_file_required? }
         # column(:s3_bucket_name) { |transform| transform.s3_bucket_name if transform.s3_file_required? }
         # column(:s3_file_path) { |transform| transform.s3_file_path if transform.s3_file_required? }
-        column(:s3_file_name) { |transform| transform.s3_file_name if transform.s3_file_required? }
+        column(:s3_file_name) { |transform| transform.interpolated_s3_file_name if transform.s3_file_required? }
         # Slows down Workflow#show page.  Damnit.
         # column(:s3_file_exists?) do |transform|
         #   if transform.importing?
