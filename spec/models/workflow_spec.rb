@@ -2,15 +2,11 @@
 #
 # Table name: public.workflows
 #
-#  id                             :integer          not null, primary key
-#  name                           :string           not null
-#  slug                           :string           not null
-#  created_at                     :datetime         not null
-#  updated_at                     :datetime         not null
-#  default_copy_from_sql          :string
-#  default_copy_from_s3_file_type :string
-#  default_copy_to_sql            :string
-#  default_copy_to_s3_file_type   :string
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  slug       :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 # Indexes
 #

@@ -1210,11 +1210,7 @@ CREATE TABLE workflows (
     name character varying NOT NULL,
     slug character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    default_copy_from_sql character varying,
-    default_copy_from_s3_file_type character varying,
-    default_copy_to_sql character varying,
-    default_copy_to_s3_file_type character varying
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -2487,6 +2483,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170930205001'),
 ('20171002231823'),
 ('20171003232617'),
-('20171007005502');
+('20171007005502'),
+('20171009190956');
 
 

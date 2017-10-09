@@ -2,15 +2,11 @@
 #
 # Table name: public.workflows
 #
-#  id                             :integer          not null, primary key
-#  name                           :string           not null
-#  slug                           :string           not null
-#  created_at                     :datetime         not null
-#  updated_at                     :datetime         not null
-#  default_copy_from_sql          :string
-#  default_copy_from_s3_file_type :string
-#  default_copy_to_sql            :string
-#  default_copy_to_s3_file_type   :string
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  slug       :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 # Indexes
 #
@@ -44,11 +40,6 @@ class Workflow < ApplicationRecord
   # Example CopyFrom defaults:
   # DEFAULT_TSV_SQL = %q{COPY :table_name FROM STDIN WITH DELIMITER E'\t' NULL ''}
   # DEFAULT_CSV_SQL = "COPY :table_name FROM STDIN WITH CSV"
-
-  DEFAULT_S3_FILE_TYPES = %w(CSV TSV)
-
-  validates :default_copy_from_s3_file_type, inclusion: { in: DEFAULT_S3_FILE_TYPES }, allow_blank: true
-  validates :default_copy_to_s3_file_type, inclusion: { in: DEFAULT_S3_FILE_TYPES }, allow_blank: true
 
   # Callbacks
 

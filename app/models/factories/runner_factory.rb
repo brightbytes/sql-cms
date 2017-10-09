@@ -5,16 +5,12 @@ module RunnerFactory
 
   RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
 
-  DEFAULTS_RUNNERS = %(DefaultCopyFrom DefaultCopyTo)
-
   NEW_TRANSFORM_RUNNERS_FOR_SELECT = [
-    [' SQL', 'Sql'],
-    [' Rails Migration', 'RailsMigration'],
     [' Auto-load', 'AutoLoad'],
-    [' Default COPY ... FROM', 'DefaultCopyFrom'], # This is converted to the CopyFrom actual runner in a Transform callback
     [' COPY ... FROM', 'CopyFrom'],
-    [' Default COPY ... TO', 'DefaultCopyTo'], # This is converted to the CopyTo actual runner in a Transform callback
     [' COPY ... TO', 'CopyTo'],
+    [' Rails Migration', 'RailsMigration'],
+    [' SQL', 'Sql'],
     [' UNLOAD', 'Unload']
   ]
 

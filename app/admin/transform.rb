@@ -165,10 +165,10 @@ ActiveAdmin.register Transform do
       show_sql_selector = ((f.object.new_record? || f.object.runner != 'AutoLoad') ? {} : { style: 'display:none' })
       input :sql, as: :text, input_html: { rows: 40 }, wrapper_html: show_sql_selector
 
-      input :enabled, hint: "Unchecking this causes this Transform to be skipped during a Run "
-
       file_display_h = (f.object.s3_file_required? ? {} : { style: 'display:none' })
       input :s3_file_name, as: :string, wrapper_html: file_display_h #, hint: "This file doesn't need to exist yet; you may upload it on Transform#show."
+
+      input :enabled, hint: "Unchecking this causes this Transform to be skipped during a Run "
     end
 
     # We need the workflow id and we need to know that it won't change before we can present the list of allowed dependencies within the current workflow.
