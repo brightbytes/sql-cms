@@ -7,11 +7,11 @@ module RunnerFactory
 
   RUNNERS_FOR_SELECT = [
     [' Auto-load', 'AutoLoad'],
-    [' COPY ... FROM', 'CopyFrom'],
-    [' COPY ... TO', 'CopyTo'],
+    [' Postgres COPY ... FROM', 'CopyFrom'],
+    [' Postgres COPY ... TO', 'CopyTo'],
     [' Rails Migration', 'RailsMigration'],
-    [' SQL', 'Sql'],
-    [' UNLOAD', 'Unload']
+    [' Redshift UNLOAD', 'Unload'],
+    [' SQL', 'Sql']
   ]
 
   IMPORT_S3_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
@@ -37,7 +37,7 @@ module RunnerFactory
         s3_region_name: plan_h[:s3_region_name],
         s3_bucket_name: plan_h[:s3_bucket_name],
         s3_file_path: plan_h[:s3_file_path],
-        s3_file_name: plan_h[:s3_file_name]
+        s3_file_name: plan_h[:interpolated_s3_file_name]
       )
 
       table_name = plan_h[:params].fetch(:table_name, nil)
@@ -94,7 +94,7 @@ module RunnerFactory
 
     def run(run:, plan_h:)
       # NOTE: params are discarded due to the heavy use of symbols in Rails Migrations
-      run.eval_in_schema(plan_h[:sql])
+      run.eval_in_schema(plan_h[:interpolated_sql])
     end
   end
 
@@ -112,7 +112,7 @@ module RunnerFactory
         s3_region_name: plan_h[:s3_region_name],
         s3_bucket_name: plan_h[:s3_bucket_name],
         s3_file_path: plan_h[:s3_file_path],
-        s3_file_name: plan_h[:s3_file_name]
+        s3_file_name: plan_h[:interpolated_s3_file_name]
       )
 
       url = s3_file.s3_presigned_url
@@ -145,7 +145,7 @@ module RunnerFactory
         s3_region_name: plan_h[:s3_region_name],
         s3_bucket_name: plan_h[:s3_bucket_name],
         s3_file_path: plan_h[:s3_file_path],
-        s3_file_name: plan_h[:s3_file_name],
+        s3_file_name: plan_h[:interpolated_s3_file_name],
         run: run
       )
 
@@ -174,7 +174,7 @@ module RunnerFactory
         s3_region_name: plan_h[:s3_region_name],
         s3_bucket_name: plan_h[:s3_bucket_name],
         s3_file_path: plan_h[:s3_file_path],
-        s3_file_name: plan_h[:s3_file_name],
+        s3_file_name: plan_h[:interpolated_s3_file_name],
         run: run
       ).to_s
 

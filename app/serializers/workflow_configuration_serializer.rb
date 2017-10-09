@@ -42,13 +42,13 @@ end
 
 class WorkflowDataQualityReportSerializer < ActiveModel::Serializer
 
-  attributes :id, :params, :name, :interpolated_name, :sql, :interpolated_sql
+  attributes :id, :params, :name, :interpolated_name, :interpolated_sql
 
 end
 
 class TransformSerializer < ActiveModel::Serializer
 
-  attributes :id, :name, :interpolated_name, :runner, :enabled, :params, :sql, :interpolated_sql, :s3_file_name
+  attributes :id, :name, :interpolated_name, :runner, :enabled, :params, :interpolated_sql, :interpolated_s3_file_name
 
   has_many :transform_validations
 
@@ -56,6 +56,6 @@ end
 
 class TransformValidationSerializer < ActiveModel::Serializer
 
-  attributes :id, :params, :name, :interpolated_name, :sql, :interpolated_sql
+  attributes :id, :params, :name, :interpolated_name, :interpolated_sql
 
 end

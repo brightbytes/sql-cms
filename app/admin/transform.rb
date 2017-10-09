@@ -46,7 +46,10 @@ ActiveAdmin.register Transform do
       simple_format_row(:sql)
       simple_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
 
-      row :s3_file_name if transform.importing? || transform.exporting?
+      if resource.importing? || resource.exporting?
+        row :s3_file_name
+        row :interpolated_s3_file_name if resource.params.present? && resource.s3_file_name != resource.interpolated_s3_file_name
+      end
 
       row :created_at
       row :updated_at

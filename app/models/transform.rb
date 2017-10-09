@@ -101,6 +101,10 @@ class Transform < ApplicationRecord
 
   attr_accessor :source
 
+  def interpolated_s3_file_name
+    self.class.interpolate(string: s3_file_name, params: params, quote_arrays: false)
+  end
+
   concerning :Runners do
 
     def importing?

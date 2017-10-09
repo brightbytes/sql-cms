@@ -37,9 +37,7 @@ class Workflow < ApplicationRecord
     errors.add(:slug, "Is not a valid SQL identifier") unless slug =~ /^[a-z_]([a-z0-9_])*$/
   end
 
-  # Example CopyFrom defaults:
-  # DEFAULT_TSV_SQL = %q{COPY :table_name FROM STDIN WITH DELIMITER E'\t' NULL ''}
-  # DEFAULT_CSV_SQL = "COPY :table_name FROM STDIN WITH CSV"
+  # NB - example TSV import: %q{COPY :table_name FROM STDIN WITH DELIMITER E'\t' NULL ''}
 
   # Callbacks
 
