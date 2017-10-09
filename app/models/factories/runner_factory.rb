@@ -5,21 +5,12 @@ module RunnerFactory
 
   RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
 
-  NEW_TRANSFORM_RUNNERS_FOR_SELECT = [
-    [' Auto-load', 'AutoLoad'],
-    [' COPY ... FROM', 'CopyFrom'],
-    [' COPY ... TO', 'CopyTo'],
-    [' Rails Migration', 'RailsMigration'],
-    [' SQL', 'Sql'],
-    [' UNLOAD', 'Unload']
-  ]
-
   RUNNERS_FOR_SELECT = [
-    [' SQL', 'Sql'],
-    [' Rails Migration', 'RailsMigration'],
     [' Auto-load', 'AutoLoad'],
     [' COPY ... FROM', 'CopyFrom'],
     [' COPY ... TO', 'CopyTo'],
+    [' Rails Migration', 'RailsMigration'],
+    [' SQL', 'Sql'],
     [' UNLOAD', 'Unload']
   ]
 

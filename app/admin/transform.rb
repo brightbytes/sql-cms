@@ -155,9 +155,8 @@ ActiveAdmin.register Transform do
 
       input :name, as: :string
 
-      runners = ((f.object.new_record? && f.object.errors.none?) ? RunnerFactory::NEW_TRANSFORM_RUNNERS_FOR_SELECT : RunnerFactory::RUNNERS_FOR_SELECT)
       # FIXME - Want these to be radio buttons, but dunno how to get the JS to work
-      input :runner, as: :select, collection: runners, input_html: { disabled: f.object.persisted? }, include_blank: false
+      input :runner, as: :select, collection: RunnerFactory::RUNNERS_FOR_SELECT, include_blank: false
 
       show_params_yaml_selector = ((f.object.new_record? || f.object.runner != 'RailsMigration') ? {} : { style: 'display:none' })
       input :params_yaml, as: :text, input_html: { rows: 10 }, wrapper_html: show_params_yaml_selector
