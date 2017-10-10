@@ -1,5 +1,5 @@
 # FIXME - AA DOESN'T AUTO-RELOAD THIS FILE, AND IT'S ABSOLUTELY KILLING ME THAT GOOGLE & STACK OVERFLOW ARE NO HELP!!!!!!!!!!
-module ::ActiveAdmin::ViewsHelper
+module ApplicationHelper
 
   def yes_no(val, options = {})
     if val

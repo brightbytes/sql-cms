@@ -1,3 +1,11 @@
+module ActiveAdmin::ViewHelpers
+  include ApplicationHelper
+end
+
+class ActiveAdmin::BaseController
+  include ApplicationHelper
+end
+
 module ActiveAdmin::Views
 
   class TableFor
