@@ -37,6 +37,12 @@ class Interpolation < ApplicationRecord
 
   # Callbacks
 
+  before_validation :maybe_set_slug_from_name
+
+  def maybe_set_slug_from_name
+    self.slug = name.downcase.sub(/^[^a-z]+/, '').gsub(/[^a-z0-9]+/, '_').sub(/_+$/, '') if slug.blank? && name.present?
+  end
+
   before_destroy :bail_out_if_used
 
   def bail_out_if_used
