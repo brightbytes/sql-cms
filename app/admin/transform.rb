@@ -42,7 +42,7 @@ ActiveAdmin.register Transform do
       boolean_row :enabled
 
       row :runner
-      row(:params) { code(pretty_print_as_json(resource.params)) }
+      simple_format_row(:params_yaml)
       simple_format_row(:sql)
       simple_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
 
