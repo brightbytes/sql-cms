@@ -162,7 +162,7 @@ class Run < ApplicationRecord
       #  aspect of the data, I can no longer argue that any performance gains adhere.
       # Plus, I might not even have a leg to stand on as regards maintainability, since in some cases complex joins would need to be copy/pasted between Transforms
       #  that pertain to the same target table.
-      if exception.message =~ /^PG::TRDeadlockDetected/ || exception.message =~ /PG::InternalError.+Serializable isolation violation/
+      if exception.message =~ /^PG::TRDeadlockDetected/ || exception.message =~ /Serializable isolation violation/
         run_step_log.destroy
         TransformJob.set(queue: (use_redshift? ? :redshift : :default)).perform_later(run_id: id, step_index: step_index, step_id: step_id)
         true # the return value, signifying mu (non-failure, non-success, non-running_or_crashed - just don't send notifications)
