@@ -1,5 +1,7 @@
 ActiveAdmin.register Transform do
 
+  includes :workflow, :transform_validations
+
   menu priority: 30
 
   actions :all
