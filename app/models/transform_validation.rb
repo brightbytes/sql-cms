@@ -40,6 +40,7 @@ class TransformValidation < ApplicationRecord
   delegate :name, :sql, to: :validation
 
   include Concerns::ParamsHelpers
+  include Concerns::InterpolationHelpers
 
   def params
     # This allows reuse of, e.g., :table_name from the associated Transform's #params

@@ -1210,7 +1210,8 @@ CREATE TABLE workflows (
     name character varying NOT NULL,
     slug character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    params jsonb
 );
 
 
@@ -2484,6 +2485,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20171002231823'),
 ('20171003232617'),
 ('20171007005502'),
-('20171009190956');
+('20171009190956'),
+('20171103181854');
 
 

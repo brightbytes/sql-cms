@@ -7,6 +7,7 @@
 #  slug       :string           not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  params     :jsonb
 #
 # Indexes
 #
@@ -22,6 +23,8 @@ class Workflow < ApplicationRecord
   include Concerns::SqlHelpers
 
   include Concerns::SqlSlugs
+
+  include Concerns::ParamsHelpers
 
   auto_normalize
 

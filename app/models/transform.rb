@@ -24,8 +24,10 @@
 
 class Transform < ApplicationRecord
 
-  include Concerns::ParamsHelpers
   include Concerns::EnabledDisabledMethods
+
+  include Concerns::ParamsHelpers
+  include Concerns::InterpolationHelpers
 
   auto_normalize except: :sql
 
@@ -91,7 +93,13 @@ class Transform < ApplicationRecord
 
   # Instance Methods
 
+  # Exclusively for the AA front-end.  Hate doing this, but it's the easiest way to preserve params across round trips.
   attr_accessor :source
+
+  def params
+    # This allows reuse of, e.g., :table_name from the associated Workflow's #params
+    (workflow&.params || {}).merge(super || {})
+  end
 
   def interpolated_s3_file_name
     self.class.interpolate(string: s3_file_name, params: params, quote_arrays: false)

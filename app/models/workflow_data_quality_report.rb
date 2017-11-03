@@ -23,6 +23,7 @@
 class WorkflowDataQualityReport < ApplicationRecord
 
   include Concerns::ParamsHelpers
+  include Concerns::InterpolationHelpers
 
   # Validations
 
@@ -38,5 +39,10 @@ class WorkflowDataQualityReport < ApplicationRecord
   # Instance Methods
 
   delegate :name, :sql, to: :data_quality_report
+
+  def params
+    # This allows reuse of, e.g., :table_name from the associated Workflow's #params
+    (workflow&.params || {}).merge(super || {})
+  end
 
 end

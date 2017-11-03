@@ -4,7 +4,7 @@ ActiveAdmin.register Workflow do
 
   actions :all
 
-  permit_params :name, :slug, included_workflow_ids: []
+  permit_params :name, :slug, :params_yaml, included_workflow_ids: []
 
   filter :name, as: :string
   filter :slug, as: :string
@@ -36,6 +36,8 @@ ActiveAdmin.register Workflow do
 
       row :name
       row :slug
+
+      simple_format_row(:params_yaml)
 
       row :created_at
       row :updated_at
@@ -134,8 +136,10 @@ ActiveAdmin.register Workflow do
 
     inputs 'Details' do
       input :name, as: :string
-      # FIXME - DON'T ALLOW IT TO BE TOO LONG!
+      # FIXME - DON'T ALLOW IT TO BE TOO LONG VIA A MODEL VALIDATION!
       input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated. And DON'T MAKE IT TOO LONG, or creating the Posgres schema will puke."
+
+      input :params_yaml, as: :text, input_html: { rows: 10 }
     end
 
     if Workflow.count > 1
