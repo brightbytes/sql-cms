@@ -43,6 +43,7 @@ ActiveAdmin.register Transform do
 
       row :runner
       simple_format_row(:params_yaml)
+      simple_format_row(:workflow_params_yaml)
       simple_format_row(:sql)
       simple_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
 
@@ -164,6 +165,9 @@ ActiveAdmin.register Transform do
 
       show_params_yaml_selector = ((f.object.new_record? || f.object.runner != 'RailsMigration') ? {} : { style: 'display:none' })
       input :params_yaml, as: :text, input_html: { rows: 10 }, wrapper_html: show_params_yaml_selector
+
+      input :workflow_params_yaml, as: :text, collection: resource.workflow.params_yaml, input_html: { disabled: true, rows: 4 }, wrapper_html: show_params_yaml_selector, hint: "These params will be reverse-merged into the params_yaml in the previous field: there's no need to type them again."
+
 
       show_sql_selector = ((f.object.new_record? || f.object.runner != 'AutoLoad') ? {} : { style: 'display:none' })
       input :sql, as: :text, input_html: { rows: 40 }, wrapper_html: show_sql_selector

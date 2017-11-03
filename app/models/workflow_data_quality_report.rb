@@ -45,4 +45,8 @@ class WorkflowDataQualityReport < ApplicationRecord
     (workflow&.params || {}).merge(super || {})
   end
 
+  def workflow_params_yaml
+    workflow&.params_yaml
+  end
+
 end

@@ -101,6 +101,10 @@ class Transform < ApplicationRecord
     (workflow&.params || {}).merge(super || {})
   end
 
+  def workflow_params_yaml
+    workflow&.params_yaml
+  end
+
   def interpolated_s3_file_name
     self.class.interpolate(string: s3_file_name, params: params, quote_arrays: false)
   end

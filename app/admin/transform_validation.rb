@@ -13,6 +13,7 @@ ActiveAdmin.register TransformValidation do
       row :validation
       row :interpolated_name if resource.params.present? && resource.name != resource.interpolated_name
       simple_format_row(:params_yaml)
+      simple_format_row(:transform_params_yaml)
       simple_format_row(:sql)
       simple_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
       row(:validation_immutable) { yes_no(resource.validation.immutable) }
@@ -30,7 +31,7 @@ ActiveAdmin.register TransformValidation do
       input :validation, as: :select, collection: Validation.order(:name).all
 
       input :params_yaml, as: :text, required: true
-      input :transform_params_yaml, as: :text, collection: [[resource.transform.params_yaml, resource.transform.id, selected: true]], input_html: { disabled: true }, hint: "These params will be reverse-merged into the params_yaml in the previous field: there's no need to type them again."
+      input :transform_params_yaml, as: :text, collection: resource.transform.params_yaml, input_html: { disabled: true }, hint: "These params will be reverse-merged into the params_yaml in the previous field: there's no need to type them again."
     end
     actions do
       action(:submit)

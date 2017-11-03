@@ -13,6 +13,7 @@ ActiveAdmin.register WorkflowDataQualityReport do
       row :data_quality_report
       row :interpolated_name if resource.params.present? && resource.name != resource.interpolated_name
       simple_format_row(:params_yaml)
+      simple_format_row(:workflow_params_yaml)
       simple_format_row(:sql)
       simple_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
       row(:data_quality_report_immutable) { yes_no(resource.data_quality_report.immutable) }
@@ -29,7 +30,9 @@ ActiveAdmin.register WorkflowDataQualityReport do
       input :workflow, as: :select, collection: [[resource_workflow.name, resource_workflow.id, selected: true]], input_html: { disabled: true }
       input :data_quality_report, as: :select, collection: DataQualityReport.order(:name).all
 
-      input :params_yaml, as: :text, required: true
+      input :params_yaml, as: :text
+
+      input :workflow_params_yaml, as: :text, collection: resource.workflow.params_yaml, input_html: { disabled: true, rows: 4 }, hint: "These params will be reverse-merged into the params_yaml in the previous field: there's no need to type them again."
     end
     actions do
       action(:submit)
