@@ -2,16 +2,17 @@
 #
 # Table name: workflow_configurations
 #
-#  id                      :integer          not null, primary key
-#  workflow_id             :integer          not null
-#  s3_region_name          :string           not null
-#  s3_bucket_name          :string           not null
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  customer_id             :integer
-#  s3_file_path            :string
-#  redshift                :boolean          default(FALSE), not null
-#  redshift_unload_options :text
+#  id                       :integer          not null, primary key
+#  workflow_id              :integer          not null
+#  s3_region_name           :string           not null
+#  s3_bucket_name           :string           not null
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  customer_id              :integer
+#  s3_file_path             :string
+#  redshift                 :boolean          default(FALSE), not null
+#  redshift_unload_options  :text
+#  postgres_copy_to_options :text
 #
 # Indexes
 #
@@ -29,7 +30,7 @@
 
 class WorkflowConfigurationSerializer < ActiveModel::Serializer
 
-  attributes :id, :workflow_id, :customer_id, :s3_region_name, :s3_bucket_name, :s3_file_path, :rfc_email_addresses_to_notify, :name, :slug, :redshift, :redshift_unload_options
+  attributes :id, :workflow_id, :customer_id, :s3_region_name, :s3_bucket_name, :s3_file_path, :rfc_email_addresses_to_notify, :name, :slug, :redshift, :redshift_unload_options, :postgres_copy_to_options
 
   attribute :ordered_transform_groups do
     # Totally ghetto: this should be automatic.  Bah.

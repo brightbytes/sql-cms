@@ -4,7 +4,7 @@ ActiveAdmin.register WorkflowConfiguration do
 
   actions :all
 
-  permit_params :workflow_id, :customer_id, :redshift, :redshift_unload_options, :s3_region_name, :s3_bucket_name, :s3_file_path, notified_user_ids: []
+  permit_params :workflow_id, :customer_id, :redshift, :redshift_unload_options, :postgres_copy_to_options, :s3_region_name, :s3_bucket_name, :s3_file_path, notified_user_ids: []
 
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
@@ -12,6 +12,7 @@ ActiveAdmin.register WorkflowConfiguration do
   filter :s3_bucket_name, as: :select
   filter :s3_file_path, as: :select
   filter :redshift_unload_options, as: :string
+  filter :postgres_copy_to_options, as: :string
 
   # This is necessary to disable default order by id
   config.sort_order = ''
@@ -48,7 +49,7 @@ ActiveAdmin.register WorkflowConfiguration do
       row :customer if resource.customer
 
       row :redshift
-      simple_format_row(:redshift_unload_options) if resource.redshift?
+      simple_format_row(resource.redshift? ? :redshift_unload_options : :postgres_copy_to_options)
 
       row :s3_region_name
       row :s3_bucket_name
@@ -108,6 +109,7 @@ ActiveAdmin.register WorkflowConfiguration do
 
       input :redshift, as: :select, include_blank: false
       input :redshift_unload_options, as: :text
+      input :postgres_copy_to_options, as: :text
 
       input :s3_region_name, as: :string # This should be a drop-down
       input :s3_bucket_name, as: :string

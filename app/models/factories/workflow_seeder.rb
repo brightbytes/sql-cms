@@ -15,7 +15,8 @@ module WorkflowSeeder
       workflow_configuration = WorkflowConfiguration.create!(
         workflow: workflow,
         customer: CustomerSeeder.demo_customer,
-        s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files'
+        s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+        postgres_copy_to_options: "WITH CSV HEADER"
       )
       # FIXME - This block shouldn't be here, but it results in more testing via RunManager spec, so I'm leaving it for now.
       if user = User.first
@@ -496,7 +497,7 @@ module WorkflowSeeder
     export_transform = create_demo_transform!(
       name: "Mapped Fact Exporter",
       runner: "CopyTo",
-      sql: "COPY (SELECT * FROM mapped_facts) TO STDOUT WITH CSV HEADER",
+      sql: "SELECT * FROM mapped_facts",
       s3_file_name: 'mapped_facts.csv'
     )
 
