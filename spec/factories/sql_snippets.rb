@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: interpolations
+# Table name: sql_snippets
 #
 #  id         :integer          not null, primary key
 #  name       :string           not null
@@ -16,9 +16,9 @@
 #
 
 FactoryGirl.define do
-  factory :interpolation do
-    sequence(:name) { |n| "Interpolation #{n}" }
-    sequence(:slug) { |n| "interpolation_slug_#{n}" }
+  factory :sql_snippet do
+    sequence(:name) { |n| "SQL Snippet #{n}" }
+    sequence(:slug) { |n| "sql_snippet_slug_#{n}" }
     sql "SELECT 1"
   end
 

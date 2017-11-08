@@ -1,4 +1,4 @@
-ActiveAdmin.register Interpolation do
+ActiveAdmin.register SqlSnippet do
 
   menu priority: 55
 
@@ -13,14 +13,14 @@ ActiveAdmin.register Interpolation do
   config.sort_order = 'name_asc'
 
   index(download_links: false) do
-    column(:name) { |interpolation| auto_link(interpolation) }
-    column('') { |interpolation| link_to("Edit", edit_interpolation_path(interpolation)) }
-    column(:slug) { |interpolation| interpolation.slug }
-    column('') do |interpolation|
-      if interpolation.used?
+    column(:name) { |sql_snippet| auto_link(sql_snippet) }
+    column('') { |sql_snippet| link_to("Edit", edit_sql_snippet_path(sql_snippet)) }
+    column(:slug)
+    column('') do |sql_snippet|
+      if sql_snippet.used?
         text_node("In Use")
       else
-        link_to("Delete", interpolation_path(interpolation), method: :delete, data: { confirm: "Are you sure you want to nuke this Interpolation?" })
+        link_to("Delete", sql_snippet_path(sql_snippet), method: :delete, data: { confirm: "Are you sure you want to nuke this SqlSnippet?" })
       end
     end
   end
@@ -74,7 +74,7 @@ ActiveAdmin.register Interpolation do
 
     actions do
       action(:submit)
-      cancel_link(f.object.new_record? ? interpolations_path : interpolation_path(f.object))
+      cancel_link(f.object.new_record? ? sql_snippets_path : sql_snippet_path(f.object))
     end
   end
 

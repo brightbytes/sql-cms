@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: interpolations
+# Table name: sql_snippets
 #
 #  id         :integer          not null, primary key
 #  name       :string           not null
@@ -16,7 +16,7 @@
 #
 
 # Unlike normal param-based imputations, the format of these in code begins and ends with a colon, e.g. `:impute_me:`
-class Interpolation < ApplicationRecord
+class SqlSnippet < ApplicationRecord
 
   auto_normalize except: :sql
 
@@ -46,7 +46,7 @@ class Interpolation < ApplicationRecord
   before_destroy :bail_out_if_used
 
   def bail_out_if_used
-    raise("You cannot nuke an Interpolation that's currently in use.") if used?
+    raise("You cannot nuke an SqlSnippet that's currently in use.") if used?
   end
 
   # Instance Methods

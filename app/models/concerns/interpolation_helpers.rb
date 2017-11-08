@@ -46,7 +46,7 @@ module Concerns::InterpolationHelpers
 
     def handle_global_imputations(string)
       # This strikes me as inefficent.  Oh well.
-      global_interpolations = Interpolation.pluck(:slug, :sql).to_h
+      global_interpolations = SqlSnippet.pluck(:slug, :sql).to_h
       if global_interpolations.present?
         string = string.dup.tap do |s|
           global_interpolations.each_pair do |k, v|

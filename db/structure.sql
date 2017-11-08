@@ -739,39 +739,6 @@ ALTER SEQUENCE data_quality_reports_id_seq OWNED BY data_quality_reports.id;
 
 
 --
--- Name: interpolations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE interpolations (
-    id bigint NOT NULL,
-    name character varying NOT NULL,
-    slug character varying NOT NULL,
-    sql character varying NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: interpolations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE interpolations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: interpolations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE interpolations_id_seq OWNED BY interpolations.id;
-
-
---
 -- Name: notifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -885,6 +852,39 @@ ALTER SEQUENCE runs_id_seq OWNED BY runs.id;
 CREATE TABLE schema_migrations (
     version character varying NOT NULL
 );
+
+
+--
+-- Name: sql_snippets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE sql_snippets (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    slug character varying NOT NULL,
+    sql character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: sql_snippets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE sql_snippets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: sql_snippets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE sql_snippets_id_seq OWNED BY sql_snippets.id;
 
 
 --
@@ -1394,13 +1394,6 @@ ALTER TABLE ONLY data_quality_reports ALTER COLUMN id SET DEFAULT nextval('data_
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY interpolations ALTER COLUMN id SET DEFAULT nextval('interpolations_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY notifications ALTER COLUMN id SET DEFAULT nextval('notifications_id_seq'::regclass);
 
 
@@ -1416,6 +1409,13 @@ ALTER TABLE ONLY run_step_logs ALTER COLUMN id SET DEFAULT nextval('run_step_log
 --
 
 ALTER TABLE ONLY runs ALTER COLUMN id SET DEFAULT nextval('runs_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY sql_snippets ALTER COLUMN id SET DEFAULT nextval('sql_snippets_id_seq'::regclass);
 
 
 --
@@ -1671,14 +1671,6 @@ ALTER TABLE ONLY data_quality_reports
 
 
 --
--- Name: interpolations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY interpolations
-    ADD CONSTRAINT interpolations_pkey PRIMARY KEY (id);
-
-
---
 -- Name: notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1708,6 +1700,14 @@ ALTER TABLE ONLY runs
 
 ALTER TABLE ONLY schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: sql_snippets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY sql_snippets
+    ADD CONSTRAINT sql_snippets_pkey PRIMARY KEY (id);
 
 
 --
@@ -2115,14 +2115,14 @@ CREATE UNIQUE INDEX index_data_quality_reports_on_lowercase_name ON data_quality
 -- Name: index_interpolations_on_lowercase_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_interpolations_on_lowercase_name ON interpolations USING btree (lower((name)::text));
+CREATE UNIQUE INDEX index_interpolations_on_lowercase_name ON sql_snippets USING btree (lower((name)::text));
 
 
 --
 -- Name: index_interpolations_on_lowercase_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_interpolations_on_lowercase_slug ON interpolations USING btree (lower((slug)::text));
+CREATE UNIQUE INDEX index_interpolations_on_lowercase_slug ON sql_snippets USING btree (lower((slug)::text));
 
 
 --
@@ -2491,6 +2491,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20171009190956'),
 ('20171103181854'),
 ('20171107014037'),
-('20171108023303');
+('20171108023303'),
+('20171108201550');
 
 
