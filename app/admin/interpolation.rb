@@ -53,10 +53,9 @@ ActiveAdmin.register Interpolation do
       panel 'Data Quality Report' do
         table_for(dqrs) do
           column(:data_quality_report) { |data_quality_report| auto_link(data_quality_report) }
+          column('') { |data_quality_report| text_node(link_to("Edit", edit_data_quality_report_path(data_quality_report))) }
           boolean_column(:immutable)
-          column(:action) do |data_quality_report|
-            text_node(link_to("Edit", edit_data_quality_report_path(data_quality_report)))
-          end
+          boolean_column(:enabled)
         end
       end
     end

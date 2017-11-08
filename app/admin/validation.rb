@@ -45,6 +45,7 @@ ActiveAdmin.register Validation do
         column(:runner) { |tv| tv.transform.runner }
         column(:transform_enabled) { |tv| yes_no(tv.transform.enabled?) }
         column(:transform_validation) { |tv| link_to(tv.interpolated_name, tv) }
+        boolean_column(:enabled)
         column('') do |tv|
           link_to("Delete", transform_validation_path(tv, source: :validation), method: :delete, data: { confirm: 'Are you sure you want to nuke this Transform Validation association?' })
         end

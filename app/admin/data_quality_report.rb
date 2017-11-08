@@ -43,6 +43,7 @@ ActiveAdmin.register DataQualityReport do
       table_for(resource.workflow_data_quality_reports.includes(:workflow).order('workflows.name')) do
         column(:workflow)
         column(:workflow_data_quality_report) { |wdqr| link_to(wdqr.interpolated_name, wdqr) }
+        boolean_column(:enabled)
         column('') do |wdqr|
           link_to("Delete", workflow_data_quality_report_path(wdqr, source: :data_quality_report), method: :delete, data: { confirm: 'Are you sure you want to nuke this Workflow Data Quality Report association?' })
         end

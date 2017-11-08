@@ -4,7 +4,7 @@ ActiveAdmin.register TransformValidation do
 
   actions :all, except: :index
 
-  permit_params :transform_id, :validation_id, :params_yaml
+  permit_params :transform_id, :validation_id, :params_yaml, :enabled
 
   show title: :interpolated_name do
     attributes_table do
@@ -12,6 +12,7 @@ ActiveAdmin.register TransformValidation do
       row :transform
       row :validation
       row :interpolated_name if resource.params.present? && resource.name != resource.interpolated_name
+      boolean_row :enabled
       simple_format_row(:params_yaml)
       simple_format_row(:transform_params_yaml)
       simple_format_row(:sql)
@@ -32,7 +33,10 @@ ActiveAdmin.register TransformValidation do
 
       input :params_yaml, as: :text, required: true
       input :transform_params_yaml, as: :text, collection: resource.transform.params_yaml, input_html: { disabled: true }, hint: "These params will be reverse-merged into the params_yaml in the previous field: there's no need to type them again."
+
+      input :enabled, hint: "Unchecking this causes this TransformValidation to be skipped during a Run "
     end
+
     actions do
       action(:submit)
       cancel_link(parent_transform_path)

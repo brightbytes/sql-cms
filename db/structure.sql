@@ -928,7 +928,8 @@ CREATE TABLE transform_validations (
     validation_id integer NOT NULL,
     params jsonb NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    enabled boolean DEFAULT true NOT NULL
 );
 
 
@@ -1148,7 +1149,8 @@ CREATE TABLE workflow_data_quality_reports (
     data_quality_report_id integer NOT NULL,
     params jsonb,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    enabled boolean DEFAULT true NOT NULL
 );
 
 
@@ -2488,6 +2490,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20171007005502'),
 ('20171009190956'),
 ('20171103181854'),
-('20171107014037');
+('20171107014037'),
+('20171108023303');
 
 

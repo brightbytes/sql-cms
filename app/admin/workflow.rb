@@ -106,6 +106,7 @@ ActiveAdmin.register Workflow do
           column(:workflow_data_quality_report) { |wdqr| auto_link(wdqr) }
           column('') { |wdqr| link_to("Edit Association", edit_workflow_data_quality_report_path(wdqr, source: :workflow, workflow_id: wdqr.workflow_id)) }
           column(:interpolated_sql) { |wdqr| wdqr.interpolated_sql }
+          boolean_column(:enabled)
           column('') do |wdqr|
             link_to("Delete Association", workflow_data_quality_report_path(wdqr, source: :workflow), method: :delete, data: { confirm: 'Are you sure you want to nuke this association to a Data Quality Report?' })
           end

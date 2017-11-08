@@ -17,7 +17,7 @@ class TransformJob < ApplicationJob
         result = { step_result: { rows_affected: transform_runner.run(run: run, plan_h: transform_h).cmd_tuples } }
 
         step_validation_failures = transform_h[:transform_validations].map do |transform_validation_h|
-          validation_runner.run(run: run, transform_validation_h: transform_validation_h)
+          validation_runner.run(run: run, transform_validation_h: transform_validation_h) if transform_validation_h[:enabled]
         end.compact.presence
 
         result.tap { |h| h.merge!(step_validation_failures: step_validation_failures) if step_validation_failures }

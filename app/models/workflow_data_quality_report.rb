@@ -8,6 +8,7 @@
 #  params                 :jsonb
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  enabled                :boolean          default(TRUE), not null
 #
 # Indexes
 #
@@ -21,6 +22,8 @@
 #
 
 class WorkflowDataQualityReport < ApplicationRecord
+
+  include Concerns::EnabledDisabledMethods
 
   include Concerns::ParamsHelpers
   include Concerns::InterpolationHelpers

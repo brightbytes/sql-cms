@@ -115,6 +115,24 @@ describe Transform do
 
   describe "instance methods" do
 
+    context "#enabled" do
+      it "should prevent the Transform from being executed" do
+        transform = create(:transform, enabled: false)
+        workflow_configuration = create(:workflow_configuration, workflow: transform.workflow)
+        run = workflow_configuration.runs.create!(creator: create(:user), execution_plan: workflow_configuration.serialize_and_symbolize)
+        Sidekiq::Testing.inline! do
+          TransformJob.perform_later(run_id: run.id, step_index: 0, step_id: transform.id)
+          run.reload
+          logs = run.run_step_logs.where(step_type: 'transform').to_a
+          log = logs.first
+          expect(log.step_exceptions).to eq(nil)
+          expect(log.step_validation_failures).to eq(nil)
+          expect(log.successful?).to eq(true)
+          expect(log.step_result).to eq({ 'transform_disabled' => true })
+        end
+      end
+    end
+
     context "#params" do
       let!(:subject) { build(:transform) }
       include_examples 'yaml helper methods'
