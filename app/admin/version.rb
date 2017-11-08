@@ -30,13 +30,13 @@ ActiveAdmin.register PaperTrail::Version do
   # Undoing a `create` will delete the object.
   sidebar("Actions", only: :show, if: proc { resource.event != 'create' }) do
     ul do
-      li link_to("Undo All Changeset Changes", revert_paper_trail_version_path(resource), method: :put)
+      li link_to("Revert Item to before this change", revert_paper_trail_version_path(resource), method: :put)
     end
   end
 
   member_action :revert, method: :put do
     resource.reify&.save!
-    flash[:notice] = "Reverted the Item per the Changeset of this Version"
+    flash[:notice] = "Reverted Item back to before this change"
     redirect_to paper_trail_version_path(resource)
   end
 end
