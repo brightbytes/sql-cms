@@ -153,7 +153,7 @@ module RunnerFactory
 
       sql = COPY_TO_TEMPLATE % [
         plan_h[:interpolated_sql],
-        plan_h[:postgres_copy_to_options]
+        plan_h[:export_transform_options]
       ]
 
       # Tragically, we can't use IO.pipe b/c AWS needs to know the file size in advance so as to chunk the data when appropriate
@@ -188,7 +188,7 @@ module RunnerFactory
       sql = UNLOAD_TEMPLATE % [
         RedshiftConnection.connection.quote(plan_h[:interpolated_sql]),
         RedshiftConnection.connection.quote(s3_full_path),
-        plan_h[:redshift_unload_options]
+        plan_h[:export_transform_options]
       ]
       run.execute_in_schema(sql)
     end

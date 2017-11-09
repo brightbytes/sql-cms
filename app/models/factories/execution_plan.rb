@@ -92,8 +92,7 @@ class ExecutionPlan
         s3_region_name: execution_plan[:s3_region_name],
         s3_bucket_name: execution_plan[:s3_bucket_name],
         s3_file_path: execution_plan[:s3_file_path],
-        redshift_unload_options: execution_plan[:redshift_unload_options],
-        postgres_copy_to_options: execution_plan[:postgres_copy_to_options],
+        export_transform_options: execution_plan[:export_transform_options],
       ) if base_plan[:interpolated_s3_file_name].present?
       base_plan.deep_symbolize_keys
     end

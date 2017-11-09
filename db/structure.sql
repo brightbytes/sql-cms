@@ -1115,8 +1115,7 @@ CREATE TABLE workflow_configurations (
     customer_id integer,
     s3_file_path character varying,
     redshift boolean DEFAULT false NOT NULL,
-    redshift_unload_options text,
-    postgres_copy_to_options text
+    export_transform_options text
 );
 
 
@@ -2492,6 +2491,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20171103181854'),
 ('20171107014037'),
 ('20171108023303'),
-('20171108201550');
+('20171108201550'),
+('20171109034556');
 
 

@@ -11,8 +11,7 @@
 #  customer_id              :integer
 #  s3_file_path             :string
 #  redshift                 :boolean          default(FALSE), not null
-#  redshift_unload_options  :text
-#  postgres_copy_to_options :text
+#  export_transform_options :text
 #
 # Indexes
 #
@@ -27,7 +26,7 @@
 
 class WorkflowConfiguration < ApplicationRecord
 
-  auto_normalize except: [:redshift_unload_options, :postgres_copy_to_options]
+  auto_normalize except: :export_transform_options
 
   # Validations
 

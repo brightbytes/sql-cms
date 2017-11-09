@@ -16,7 +16,7 @@ module WorkflowSeeder
         workflow: workflow,
         customer: CustomerSeeder.demo_customer,
         s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
-        postgres_copy_to_options: "WITH CSV HEADER"
+        export_transform_options: "WITH CSV HEADER"
       )
       # FIXME - This block shouldn't be here, but it results in more testing via RunManager spec, so I'm leaving it for now.
       if user = User.first

@@ -11,8 +11,7 @@
 #  customer_id              :integer
 #  s3_file_path             :string
 #  redshift                 :boolean          default(FALSE), not null
-#  redshift_unload_options  :text
-#  postgres_copy_to_options :text
+#  export_transform_options :text
 #
 # Indexes
 #
