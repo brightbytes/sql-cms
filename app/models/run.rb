@@ -172,8 +172,9 @@ class Run < ApplicationRecord
             cause: exception.cause,
             # This doesn't always work ...
             class_and_message: exception.inspect,
-            # ... hence this redundant bit
+            # ... hence these next 2, which *should* be returned by `exception.inspect`, but sometimes aren't, for reasons unlikely to ever become apparent
             message: exception.message,
+            class: exception.class,
             backtrace: Rails.backtrace_cleaner.clean(exception.backtrace)
           }
         )
