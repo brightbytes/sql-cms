@@ -1,6 +1,6 @@
 ActiveAdmin.register User, sort_order: "id_asc" do
 
-  menu priority: 100 # Put this at the far right of the display
+  menu priority: 100, parent: 'Admin' # Put this at the far right of the display
 
   scope "All", :with_deleted
   # For some reason, this doesn't use AR.all ...
