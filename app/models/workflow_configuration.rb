@@ -12,6 +12,7 @@
 #  s3_file_path             :string
 #  redshift                 :boolean          default(FALSE), not null
 #  export_transform_options :text
+#  import_transform_options :text
 #
 # Indexes
 #
@@ -26,7 +27,7 @@
 
 class WorkflowConfiguration < ApplicationRecord
 
-  auto_normalize except: :export_transform_options
+  auto_normalize except: [:import_transform_options, :export_transform_options]
 
   # Validations
 

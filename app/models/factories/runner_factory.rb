@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Produces runner modules that execute the supplied plan hash.
 module RunnerFactory
 
@@ -101,12 +102,13 @@ module RunnerFactory
   # Imports a table from a data file
   module CopyFromRunner
 
+    POSTGRES_COPY_FROM_TEMPLATE = "COPY (\n%s\n) FROM STDIN\n%s"
+
+    REDSHIFT_COPY_FROM_TEMPLATE = "COPY (\n%s\n) FROM %s\n%s"
+
     extend self
 
     def run(run:, plan_h:)
-      # FIXME - ALLOW THIS TO WORK IN REDSHIFT, THOUGH OBVIOUSLY BY CONDITIONALIZING THE LAST LINES.
-      raise "CopyFromRunner doesn't work in Redshift." if run.use_redshift?
-
       s3_file = S3File.create(
         'import',
         s3_region_name: plan_h[:s3_region_name],
@@ -115,10 +117,26 @@ module RunnerFactory
         s3_file_name: plan_h[:interpolated_s3_file_name]
       )
 
-      url = s3_file.s3_presigned_url
-      raise "Unable to locate #{s3_file}!" unless url
+      target_expression = params[:table_name].to_s
+      target_expression += " (#{params[:column_list]})" if params[:column_list]
 
-      open(url) { |stream| run.copy_from_in_schema(sql: plan_h[:interpolated_sql], enumerable: stream) }
+      if run.redshift?
+        s3_full_path = s3_file.to_s
+        sql = REDSHIFT_COPY_FROM_TEMPLATE % [
+          target_expression,
+          RedshiftConnection.connection.quote(s3_full_path),
+          plan_h[:import_transform_options]
+        ]
+        run.execute_in_schema(sql)
+      else
+        url = s3_file.s3_presigned_url
+        raise "Unable to locate #{s3_file}!" unless url
+        sql = POSTGRES_COPY_FROM_TEMPLATE % [
+          target_expression,
+          plan_h[:import_transform_options]
+        ]
+        open(url) { |stream| run.copy_from_in_schema(sql: sql, enumerable: stream) }
+      end
     end
   end
 

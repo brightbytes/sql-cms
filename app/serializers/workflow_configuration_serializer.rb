@@ -12,6 +12,7 @@
 #  s3_file_path             :string
 #  redshift                 :boolean          default(FALSE), not null
 #  export_transform_options :text
+#  import_transform_options :text
 #
 # Indexes
 #
@@ -29,7 +30,7 @@
 
 class WorkflowConfigurationSerializer < ActiveModel::Serializer
 
-  attributes :id, :workflow_id, :customer_id, :s3_region_name, :s3_bucket_name, :s3_file_path, :rfc_email_addresses_to_notify, :name, :slug, :redshift, :export_transform_options
+  attributes :id, :workflow_id, :customer_id, :s3_region_name, :s3_bucket_name, :s3_file_path, :rfc_email_addresses_to_notify, :name, :slug, :redshift, :import_transform_options, :export_transform_options
 
   attribute :ordered_transform_groups do
     # Totally ghetto: this should be automatic.  Bah.
