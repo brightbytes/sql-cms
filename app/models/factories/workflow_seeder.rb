@@ -16,6 +16,7 @@ module WorkflowSeeder
         workflow: workflow,
         customer: CustomerSeeder.demo_customer,
         s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+        import_transform_options: "WITH CSV HEADER",
         export_transform_options: "WITH CSV HEADER"
       )
       # FIXME - This block shouldn't be here, but it results in more testing via RunManager spec, so I'm leaving it for now.
@@ -259,7 +260,10 @@ module WorkflowSeeder
     staging_facts_loader_transform = create_demo_transform!(
       name: "BOCES 9035 fact table loader",
       runner: "CopyFrom",
-      sql: "COPY staging_facts (boces_id, admin_unit, school_code, fund_code, location_code, sre_code, program_code, object_source_code, job_class_code, grant_code, amount_cents) FROM STDIN WITH CSV HEADER",
+      params: {
+        table_name: 'staging_facts',
+        column_list: '(boces_id, admin_unit, school_code, fund_code, location_code, sre_code, program_code, object_source_code, job_class_code, grant_code, amount_cents)'
+      },
       s3_file_name: 'boces_9035_sample.csv'
     )
 

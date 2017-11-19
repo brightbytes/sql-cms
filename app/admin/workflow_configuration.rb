@@ -4,7 +4,7 @@ ActiveAdmin.register WorkflowConfiguration do
 
   actions :all
 
-  permit_params :workflow_id, :customer_id, :redshift, :export_transform_options, :s3_region_name, :s3_bucket_name, :s3_file_path, notified_user_ids: []
+  permit_params :workflow_id, :customer_id, :redshift, :import_transform_options, :export_transform_options, :s3_region_name, :s3_bucket_name, :s3_file_path, notified_user_ids: []
 
   filter :workflow, as: :select, collection: proc { Workflow.order(:slug).all }
   filter :customer, as: :select, collection: proc { Customer.order(:slug).all }
@@ -12,6 +12,7 @@ ActiveAdmin.register WorkflowConfiguration do
   filter :s3_bucket_name, as: :select
   filter :s3_file_path, as: :select
   filter :export_transform_options, as: :string
+  filter :import_transform_options, as: :string
 
   # This is necessary to disable default order by id
   config.sort_order = ''
@@ -48,6 +49,7 @@ ActiveAdmin.register WorkflowConfiguration do
       row :customer if resource.customer
 
       row :redshift
+      simple_format_row(:import_transform_options)
       simple_format_row(:export_transform_options)
 
       row :s3_region_name
@@ -107,6 +109,7 @@ ActiveAdmin.register WorkflowConfiguration do
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: !workflow_id_param_val
 
       input :redshift, as: :select, include_blank: false
+      input :import_transform_options, as: :text
       input :export_transform_options, as: :text
 
       input :s3_region_name, as: :string # This should be a drop-down

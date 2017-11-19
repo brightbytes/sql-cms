@@ -12,6 +12,7 @@
 #  s3_file_path             :string
 #  redshift                 :boolean          default(FALSE), not null
 #  export_transform_options :text
+#  import_transform_options :text
 #
 # Indexes
 #

@@ -42,7 +42,7 @@ describe Transform do
 
     it "should require the presence of the s3_file_name for all RunnerFactory::S3_FILE_RUNNERS" do
       RunnerFactory::S3_FILE_RUNNERS.each do |runner|
-        t = build(:transform, runner: runner)
+        t = build(:transform, runner: runner, params: { table_name: 'whatever' })
         expect(t).to_not be_valid
         expect(t.errors[:s3_file_name]).to_not eq(nil)
         expect(t.errors[:supplied_s3_url]).to_not eq(nil)
@@ -175,7 +175,7 @@ describe Transform do
       it "should return a correctly-initialized S3 Import File" do
         w = create(:workflow)
         wc = create(:workflow_configuration, workflow: w, s3_file_path: 'some/file/path')
-        t = create(:transform, workflow: w, runner: 'CopyFrom', s3_file_name: 'foobar.csv')
+        t = create(:transform, workflow: w, runner: 'CopyFrom', s3_file_name: 'foobar.csv', params: { table_name: 'whatever' })
         file = t.s3_import_file(wc)
         expect(file.s3_region_name).to eq(wc.s3_region_name)
         expect(file.s3_bucket_name).to eq(wc.s3_bucket_name)
