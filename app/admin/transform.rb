@@ -172,7 +172,7 @@ ActiveAdmin.register Transform do
       input :workflow_params_yaml, as: :text, collection: resource.workflow.params_yaml, input_html: { disabled: true, rows: 4 }, wrapper_html: show_params_yaml_selector, hint: "These params will be reverse-merged into the params_yaml in the previous field: there's no need to type them again."
 
 
-      show_sql_selector = ((f.object.new_record? || f.object.runner != 'AutoLoad') ? {} : { style: 'display:none' })
+      show_sql_selector = ((f.object.new_record? || !f.object.runner.in?(['AutoLoad', 'CopyFrom'])) ? {} : { style: 'display:none' })
       input :sql, as: :text, input_html: { rows: 40 }, wrapper_html: show_sql_selector
 
       file_display_h = (f.object.s3_file_required? ? {} : { style: 'display:none' })
