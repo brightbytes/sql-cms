@@ -8,11 +8,11 @@ module RunnerFactory
 
   RUNNERS_FOR_SELECT = [
     [' Auto-load', 'AutoLoad'],
-    [' Postgres COPY ... FROM', 'CopyFrom'],
-    [' Postgres COPY ... TO', 'CopyTo'],
+    [' COPY ... FROM', 'CopyFrom'],
     [' Rails Migration', 'RailsMigration'],
-    [' Redshift UNLOAD', 'Unload'],
-    [' SQL', 'Sql']
+    [' SQL', 'Sql'],
+    [' Postgres COPY ... TO', 'CopyTo'],
+    [' Redshift UNLOAD', 'Unload']
   ]
 
   IMPORT_S3_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
