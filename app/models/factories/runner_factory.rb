@@ -102,9 +102,9 @@ module RunnerFactory
   # Imports a table from a data file
   module CopyFromRunner
 
-    POSTGRES_COPY_FROM_TEMPLATE = "COPY (\n%s\n) FROM STDIN\n%s"
+    POSTGRES_COPY_FROM_TEMPLATE = "COPY\n%s\n FROM STDIN\n%s"
 
-    REDSHIFT_COPY_FROM_TEMPLATE = "COPY (\n%s\n) FROM %s\n%s"
+    REDSHIFT_COPY_FROM_TEMPLATE = "COPY\n%s\n FROM %s\n%s"
 
     extend self
 
@@ -117,10 +117,11 @@ module RunnerFactory
         s3_file_name: plan_h[:interpolated_s3_file_name]
       )
 
-      target_expression = params[:table_name].to_s
-      target_expression += " (#{params[:column_list]})" if params[:column_list]
+      target_expression = plan_h[:params]&.fetch(:table_name, nil)&.to_s
+      column_list = plan_h[:params]&.fetch(:column_list, nil)&.to_s
+      target_expression += " #{column_list}" if column_list
 
-      if run.redshift?
+      if run.use_redshift?
         s3_full_path = s3_file.to_s
         sql = REDSHIFT_COPY_FROM_TEMPLATE % [
           target_expression,

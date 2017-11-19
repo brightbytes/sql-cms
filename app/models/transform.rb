@@ -47,7 +47,9 @@ class Transform < ApplicationRecord
   validate :table_name_param_present, if: :importing?
 
   def table_name_param_present
-    errors.add(:params, "must specify a table_name") if params['table_name'].blank?
+    # This really, really shouldn't be necessary b/c the params super does the with_indifferent_access ... but it is.  :-(
+    table_name = params.with_indifferent_access[:table_name]
+    errors.add(:params, "must specify a table_name") if table_name.blank?
   end
 
   # Callbacks
