@@ -54,8 +54,10 @@ ActiveAdmin.register Workflow do
             text_node(auto_link(workflow_configuration))
             text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
             text_node(link_to("Edit", edit_workflow_configuration_path(workflow_configuration, workflow_id: resource.id, source: :workflow)))
-            text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
-            text_node(link_to("Run Now", run_workflow_configuration_path(workflow_configuration), method: :put))
+            if resource.transforms.count + resource.workflow_data_quality_reports.count > 0
+              text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
+              text_node(link_to("Run Now", run_workflow_configuration_path(workflow_configuration), method: :put))
+            end
           end
           column(:customer) { |workflow_configuration| auto_link(workflow_configuration.customer) }
           column(:last_run_status) { |workflow_configuration| human_status(workflow_configuration.runs.order(:id).last) }
@@ -126,8 +128,10 @@ ActiveAdmin.register Workflow do
       li link_to("Create Transform", new_transform_path(workflow_id: resource.id, source: :workflow))
       li link_to("Create Workflow Data Quality Report", new_workflow_data_quality_report_path(workflow_id: resource.id))
       li link_to("Create Workflow Configuration", new_workflow_configuration_path(workflow_id: resource.id, source: :workflow))
-      configs = resource.workflow_configurations.to_a
-      li link_to("Run Now - for Default Configuration", run_workflow_configuration_path(configs.first), method: :put) if configs.size == 1
+      if resource.transforms.count + resource.workflow_data_quality_reports.count > 0
+        configs = resource.workflow_configurations.to_a
+        li link_to("Run Now - for Default Configuration", run_workflow_configuration_path(configs.first), method: :put) if configs.size == 1
+      end
     end
   end
 

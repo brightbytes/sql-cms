@@ -83,7 +83,9 @@ ActiveAdmin.register WorkflowConfiguration do
 
   sidebar("Actions", only: :show) do
     ul do
-      li link_to("Run Now", run_workflow_configuration_path(resource), method: :put)
+      if resource.workflow.transforms.count + resource.workflow.workflow_data_quality_reports.count > 0
+        li link_to("Run Now", run_workflow_configuration_path(resource), method: :put)
+      end
       li link_to("Add New Run Notifications", edit_workflow_configuration_path(resource))
     end
   end
