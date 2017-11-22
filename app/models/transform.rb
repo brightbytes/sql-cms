@@ -15,7 +15,8 @@
 #
 # Indexes
 #
-#  index_transforms_on_lowercase_name  (lower((name)::text)) UNIQUE
+#  index_transforms_on_lowercase_name_and_workflow_id  (lower((name)::text), workflow_id) UNIQUE
+#  index_transforms_on_workflow_id                     (workflow_id)
 #
 # Foreign Keys
 #
@@ -35,7 +36,7 @@ class Transform < ApplicationRecord
 
   validates :sql, :workflow, presence: true
 
-  validates :name, presence: true, uniqueness: { case_sensitive: false }
+  validates :name, presence: true, uniqueness: { scope: :workflow_id, case_sensitive: false }
 
   validates :runner, presence: true, inclusion: { in: RunnerFactory::RUNNERS }
 

@@ -15,7 +15,8 @@
 #
 # Indexes
 #
-#  index_transforms_on_lowercase_name  (lower((name)::text)) UNIQUE
+#  index_transforms_on_lowercase_name_and_workflow_id  (lower((name)::text), workflow_id) UNIQUE
+#  index_transforms_on_workflow_id                     (workflow_id)
 #
 # Foreign Keys
 #
@@ -35,7 +36,7 @@ describe Transform do
 
     context "with a transform already extant" do
       let!(:subject) { create(:transform) }
-      it { should validate_uniqueness_of(:name).case_insensitive }
+      it { should validate_uniqueness_of(:name).scoped_to(:workflow_id).case_insensitive }
     end
 
     it { should validate_inclusion_of(:runner).in_array(RunnerFactory::RUNNERS) }

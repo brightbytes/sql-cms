@@ -1021,10 +1021,17 @@ CREATE INDEX index_transform_validations_on_validation_id ON transform_validatio
 
 
 --
--- Name: index_transforms_on_lowercase_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_transforms_on_lowercase_name_and_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_transforms_on_lowercase_name ON transforms USING btree (lower((name)::text));
+CREATE UNIQUE INDEX index_transforms_on_lowercase_name_and_workflow_id ON transforms USING btree (lower((name)::text), workflow_id);
+
+
+--
+-- Name: index_transforms_on_workflow_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_transforms_on_workflow_id ON transforms USING btree (workflow_id);
 
 
 --
@@ -1288,6 +1295,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20171108023303'),
 ('20171108201550'),
 ('20171109034556'),
-('20171118040033');
+('20171118040033'),
+('20171122051217');
 
 
