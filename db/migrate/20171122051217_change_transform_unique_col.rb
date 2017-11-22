@@ -2,7 +2,7 @@ class ChangeTransformUniqueCol < ActiveRecord::Migration[5.1]
   def up
     remove_index :transforms, name: :index_transforms_on_lowercase_name
     execute "CREATE UNIQUE INDEX index_transforms_on_lowercase_name_and_workflow_id ON transforms USING btree (lower(name), workflow_id)"
-    # OMFG, can't believe I just now noticed this was missing.  Time for an immigrant checkup ...
+    # OMFG, can't believe I just now noticed this was missing.
     add_index :transforms, :workflow_id
   end
 
