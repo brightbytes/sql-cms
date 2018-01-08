@@ -67,6 +67,16 @@ describe DataQualityReport do
       end
     end
 
+    context "#used?" do
+      it "should return true iff a workflow_data_quality_report is defined for the data_quality_report" do
+        dqr = create(:data_quality_report)
+        expect(dqr.used?).to eq(false)
+        create(:workflow_data_quality_report, data_quality_report: dqr)
+        dqr.reload
+        expect(dqr.used?).to eq(true)
+      end
+    end
+
   end
 
 end

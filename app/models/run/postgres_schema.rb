@@ -132,7 +132,8 @@ module Run::PostgresSchema
     def in_db_context(use_redshift = false)
       # See https://github.com/influitive/apartment/pull/266 as to why using establish_connection isn't threadsafe in sidekiq.
       # This solution isn't threadsafe either. I tried creating a pool on-the-fly too in a branch.  No dice.
-      # The only viable solution at this time is to run all redshift queries serially, which I'll have to do in RunManagerJob.  Bah.
+      # The only viable solution at this time is to run all redshift queries serially, which is accomplished by having 1 sidekiq thread
+      #  per Heroku dyno.  Another alternative would be to revert to Delayed::Job, but I'd rather not deal.
       if use_redshift
         begin
           # This works just as well:

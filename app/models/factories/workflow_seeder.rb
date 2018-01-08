@@ -15,7 +15,7 @@ module WorkflowSeeder
       workflow_configuration = WorkflowConfiguration.create!(
         workflow: workflow,
         customer: CustomerSeeder.demo_customer,
-        s3_file_path: 'fake_customer/demo_workflow_version_1',
+        s3_file_path: 'fake_customer/demo_workflow',
         import_transform_options: "WITH CSV HEADER",
         export_transform_options: "WITH CSV HEADER"
       )

@@ -52,5 +52,15 @@ describe Customer do
         expect(subject.to_s).to eq(subject.slug)
       end
     end
+
+    context "#used?" do
+      it "should return true iff a workflow_configuration is defined for the customer" do
+        customer = create(:customer)
+        expect(customer.used?).to eq(false)
+        create(:workflow_configuration, customer: customer)
+        customer.reload
+        expect(customer.used?).to eq(true)
+      end
+    end
   end
 end

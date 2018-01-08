@@ -68,6 +68,16 @@ describe Validation do
       end
     end
 
+    context "#used?" do
+      it "should return true iff a transform_validation is defined for the validation" do
+        validation = create(:validation)
+        expect(validation.used?).to eq(false)
+        create(:transform_validation, validation: validation)
+        validation.reload
+        expect(validation.used?).to eq(true)
+      end
+    end
+
   end
 
 end
