@@ -19,7 +19,7 @@
 #  fk_rails_...  (workflow_id => workflows.id)
 #
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :notification do
     association :user
     association :workflow_configuration

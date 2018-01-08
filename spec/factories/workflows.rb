@@ -14,7 +14,7 @@
 #  index_workflows_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :workflow do
     sequence(:name) { |n| "Workflow #{n}" }
   end

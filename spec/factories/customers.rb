@@ -15,7 +15,7 @@
 #  index_customers_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :customer do
     sequence(:name) { FFaker::Name.name }

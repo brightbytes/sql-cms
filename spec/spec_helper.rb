@@ -1,7 +1,7 @@
 require 'simplecov'
 SimpleCov.start
 
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 require 'paper_trail/frameworks/rspec'
 
 ENV["RAILS_ENV"] ||= 'test'
@@ -46,7 +46,7 @@ RSpec.configure do |config|
 
   config.before(:each, versioning: true) { PaperTrail.enabled = true }
 
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
 
   config.before(:each) do
     # Globally stub S3 access in import files

@@ -1,5 +1,5 @@
 
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :validation do
     sequence(:name) { |n| "Validation #{n}" }

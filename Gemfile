@@ -111,7 +111,7 @@ gem "newrelic_rpm"
 gem 'inherited_resources', github: 'activeadmin/inherited_resources' # required to install AA with Rails 5
 gem 'activeadmin', github: 'activeadmin'
 
-gem 'factory_girl_rails'
+gem 'factory_bot_rails'
 gem 'ffaker'
 
 # For prompting users in scripts

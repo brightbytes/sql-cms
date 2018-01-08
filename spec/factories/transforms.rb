@@ -25,7 +25,7 @@
 #
 
 
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :transform do
     sequence(:name) { |n| "Transform #{n}" }

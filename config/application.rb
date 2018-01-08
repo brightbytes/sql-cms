@@ -28,7 +28,7 @@ module SqlCms
     # like if you have constraints or database-specific column types
     config.active_record.schema_format = :sql
 
-    # app/models/factories b/c app/factories conflicted with FactoryGirl's spec/factories in Dev :-(
+    # app/models/factories b/c app/factories conflicted with FactoryBot's spec/factories in Dev :-(
     config.eager_load_paths += ["#{config.root}/app/models/factories"]
 
     config.active_job.queue_adapter = :sidekiq

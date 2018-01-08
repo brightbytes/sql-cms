@@ -25,7 +25,7 @@
 #  fk_rails_...  (workflow_id => workflows.id)
 #
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :workflow_configuration do
     association :workflow
     s3_bucket_name "my-favorite-bucket"

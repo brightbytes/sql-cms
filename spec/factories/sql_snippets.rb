@@ -15,7 +15,7 @@
 #  index_interpolations_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :sql_snippet do
     sequence(:name) { |n| "SQL Snippet #{n}" }
     sequence(:slug) { |n| "sql_snippet_slug_#{n}" }
