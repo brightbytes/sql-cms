@@ -1263,7 +1263,7 @@ ALTER TABLE ONLY transform_dependencies
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "public";
+SET search_path TO "$user",public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20170112005400'),

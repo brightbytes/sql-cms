@@ -176,7 +176,7 @@ module RunnerFactory
       ]
 
       # Tragically, we can't use IO.pipe b/c AWS needs to know the file size in advance so as to chunk the data when appropriate
-      Tempfile.open(s3_file.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
+      Tempfile.open(s3_file.s3_file_name.split('/').last, Dir.tmpdir, mode: IO::RDWR) do |stream|
         run.copy_to_in_schema(sql: sql, writeable_io: stream).tap do
           stream.rewind
           s3_file.upload(stream)

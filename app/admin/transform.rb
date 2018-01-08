@@ -176,7 +176,7 @@ ActiveAdmin.register Transform do
       input :sql, as: :text, input_html: { rows: 40 }, wrapper_html: show_sql_selector
 
       file_display_h = (f.object.s3_file_required? ? {} : { style: 'display:none' })
-      input :s3_file_name, as: :string, wrapper_html: file_display_h #, hint: "This file doesn't need to exist yet; you may upload it on Transform#show."
+      input :s3_file_name, as: :string, wrapper_html: file_display_h, hint: "You may specify a file path separated by backslashes here, if desired"
 
       input :enabled, hint: "Unchecking this causes this Transform to be skipped during a Run "
     end

@@ -15,7 +15,7 @@ module WorkflowSeeder
       workflow_configuration = WorkflowConfiguration.create!(
         workflow: workflow,
         customer: CustomerSeeder.demo_customer,
-        s3_file_path: 'fake_customer/demo_workflow_version_1/source_data_files',
+        s3_file_path: 'fake_customer/demo_workflow_version_1',
         import_transform_options: "WITH CSV HEADER",
         export_transform_options: "WITH CSV HEADER"
       )
@@ -48,7 +48,7 @@ module WorkflowSeeder
         },
         indexed_columns: [:clarity_org_id, :co_org_id]
       },
-      s3_file_name: 'boces_mappings.csv'
+      s3_file_name: 'source_data_files/boces_mappings.csv'
     )
 
     create_demo_transform_validation!(
@@ -80,7 +80,7 @@ module WorkflowSeeder
         },
         indexed_columns: [:clarity_org_id, :co_org_id]
       },
-      s3_file_name: 'district_mappings.csv'
+      s3_file_name: 'source_data_files/district_mappings.csv'
     )
 
     create_demo_transform_validation!(
@@ -112,7 +112,7 @@ module WorkflowSeeder
         },
         indexed_columns: [:clarity_org_id, :co_org_id]
       },
-      s3_file_name: 'school_mappings.csv'
+      s3_file_name: 'source_data_files/school_mappings.csv'
     )
 
     create_demo_transform_validation!(
@@ -143,7 +143,7 @@ module WorkflowSeeder
           fund_high_val: :integer
         }
       },
-      s3_file_name: 'fund_mappings.csv'
+      s3_file_name: 'source_data_files/fund_mappings.csv'
     )
 
     create_demo_transform_validation!(
@@ -264,7 +264,7 @@ module WorkflowSeeder
         table_name: 'staging_facts',
         column_list: '(boces_id, admin_unit, school_code, fund_code, location_code, sre_code, program_code, object_source_code, job_class_code, grant_code, amount_cents)'
       },
-      s3_file_name: 'boces_9035_sample.csv'
+      s3_file_name: 'source_data_files/boces_9035_sample.csv'
     )
 
     create_demo_dependency!(prerequisite_transform: staging_facts_table_transform, postrequisite_transform: staging_facts_loader_transform)
