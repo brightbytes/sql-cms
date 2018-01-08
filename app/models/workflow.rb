@@ -18,7 +18,7 @@
 class Workflow < ApplicationRecord
 
   # This class represents a particular configuration of an SQL Workflow at a particular point in time.
-  # Its name and slug case-insensitively unique, here and in the DB.
+  # Its name and slug are case-insensitively unique, here and in the DB.
 
   include Concerns::SqlHelpers
 
@@ -107,7 +107,6 @@ class Workflow < ApplicationRecord
     end
 
   end
-
 
   # Yeah, I could have done this via https://ruby-doc.org/stdlib-2.4.1/libdoc/tsort/rdoc/TSort.html
   # But, it's so much more satisfying to figure it out all by myself ...

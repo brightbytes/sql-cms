@@ -75,6 +75,26 @@ class RunManagerJob < ApplicationJob
   def finish!(run)
     run.update_attributes(status: "finished")
     run.notify_completed!
+    dump_execution_plan!(run) if run.exported_to_s3?
     return false # don't self-relog
+  end
+
+  # Arguably, this should be optional ... but personally I like to always have it.
+  def dump_execution_plan!(run)
+    plan_h = run.execution_plan
+    s3_file = S3File.create(
+      'export',
+      s3_region_name: plan_h[:s3_region_name],
+      s3_bucket_name: plan_h[:s3_bucket_name],
+      s3_file_path: plan_h[:s3_file_path],
+      s3_file_name: "#{run.name}_execution_plan.json",
+      run: run
+    )
+    # Tragically, we can't use IO.pipe b/c AWS needs to know the file size in advance so as to chunk the data when appropriate
+    Tempfile.open(s3_file.s3_file_name, Dir.tmpdir, mode: IO::RDWR) do |stream|
+      stream.write(run.execution_plan_dump)
+      stream.rewind
+      s3_file.upload(stream)
+    end
   end
 end

@@ -222,12 +222,23 @@ class Run < ApplicationRecord
     if Rails.env.production?
       infix ='$DATABASE_URL'
     else
-      puts db_config['database']
       username, database, password = db_config["username"], db_config["database"], db_config["password"]
       infix = "--username #{username} --dbname #{database} --no-password"
       prefix = "PGPASSWORD=#{password}"
     end
     `#{prefix} pg_dump #{infix} #{common_switches}`
+  end
+
+  def execution_plan_dump
+    JSON.pretty_generate(execution_plan).tap do |s|
+      # This screwing-around with `\\r?\\n` is so that multi-line JSON attribute values end up being broken into multiple lines in the display
+      s.gsub!(/(.+)"(.+\\r?\\n)/, '\1"\\r\\n\2')
+      s.gsub!(/\\r?\\n/, "\n")
+    end
+  end
+
+  def exported_to_s3?
+    run_step_logs.transforms.any? { |log| log.step_plan[:runner].in?(RunnerFactory::EXPORT_S3_FILE_RUNNERS) }
   end
 
   def duration_seconds

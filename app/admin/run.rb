@@ -113,8 +113,7 @@ ActiveAdmin.register Run do
   end
 
   member_action :dump_execution_plan, method: :put do
-    # The screwing-around with `\\r?\\n` is so that multi-line JSON attribute values end up being broken into multiple lines in the display
-    send_data JSON.pretty_generate(resource.execution_plan).gsub(/(.+)"(.+\\r?\\n)/, '\1"\\r\\n\2').gsub(/\\r?\\n/, "\n"), filename: "#{resource.schema_name}.json"
+    send_data resource.execution_plan_dump, filename: "#{resource.schema_name}.json"
   end
 
   # config.add_action_item :nuke_failed_steps_and_rerun, only: :show, if: proc { resource.failed? } do
