@@ -52,7 +52,7 @@ class SqlSnippet < ApplicationRecord
   # Instance Methods
 
   def usage_count
-    referencing_transforms.count + referencing_data_quality_reports.count
+    referencing_transforms.count + referencing_data_quality_reports.count + referencing_validations.count
   end
 
   def used?
