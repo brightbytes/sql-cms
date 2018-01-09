@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This is a combination of a self-relogging (i.e. polling) job and a state machine for managing the execution of a Run.
 # As such, I suppose it complects separate concerns.  Oh well.
 class RunManagerJob < ApplicationJob
@@ -13,7 +15,7 @@ class RunManagerJob < ApplicationJob
       # Self-relog unless the state machine has finished.
       # FIXME - THERE'S THE POSSIBILITY THAT THIS COULD ENDLESSLY RECREATE THIS JOB FOR A GIVEN RUN IF THERE'S A BUG WITH THE RunStepLog MECHANISM;
       #         SO, THERE WILL NEED TO BE A NUMBER-OF-ITERATIONS TTL ON THIS RELOG FUNCTIONALITY, WHICH WILL REQUIRE A NEW Run FIELD
-      #         HOWEVER, I HAVEN'T RUN INTO THIS ISSUE YET IN THE LAST COUPLE MONTHS, SO I'M NOT TOO WORRIED ABOUT IT
+      #         HOWEVER, I HAVEN'T EVER RUN INTO THIS ISSUE, SO I'M NOT TOO WORRIED ABOUT IT
       RunManagerJob.set(wait: POLLING_FREQUENCY, queue: (run.use_redshift? ? :redshift : :default)).perform_later(run_id)
     end
   end
@@ -87,7 +89,7 @@ class RunManagerJob < ApplicationJob
       s3_region_name: plan_h[:s3_region_name],
       s3_bucket_name: plan_h[:s3_bucket_name],
       s3_file_path: plan_h[:s3_file_path],
-      s3_file_name: "#{run.name}_execution_plan.json",
+      s3_file_name: "execution_plan.json",
       run: run
     )
     # Tragically, we can't use IO.pipe b/c AWS needs to know the file size in advance so as to chunk the data when appropriate
