@@ -108,9 +108,8 @@ gem "newrelic_rpm"
 # gem "sentry-raven"
 
 # Admin
-# gem 'inherited_resources', github: 'activeadmin/inherited_resources' # required to install AA with Rails 5
 # Pinning to 1.1.0 because 1.2.x and 2.0.x break all delete links and all colorization of labels; no time to debug
-gem 'activeadmin', '~>1.1.0'#, github: 'activeadmin'
+gem 'activeadmin', '~>1.1.0'
 
 gem 'factory_bot_rails'
 gem 'ffaker'
