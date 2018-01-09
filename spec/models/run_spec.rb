@@ -298,6 +298,7 @@ describe Run do
         expect(status.running_or_crashed?).to eq(false)
         expect(status.step_exceptions).to eq(nil)
         expect(status.step_validation_failures).to eq(failures_h)
+        expect(status.step_output).to eq(failures_h)
       end
 
       it "should create a new RunStepLog for the Run and add exception details when an exception is raised" do
@@ -320,6 +321,7 @@ describe Run do
         expect(errors['message']).to eq("Boom!")
         expect(errors['backtrace']).to_not be_empty
         expect(status.step_validation_failures).to eq(nil)
+        expect(status.step_output).to eq(errors)
       end
 
       it "should not create a RunStepLog when a deadlock exception is raised, and instead queue up a new TransformJob" do
