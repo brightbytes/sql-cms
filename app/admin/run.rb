@@ -48,7 +48,7 @@ ActiveAdmin.register Run do
       row :updated_at
     end
 
-    MAX_STEP_OUTPUT_SIZE = 1000
+    MAX_STEP_OUTPUT_SIZE = 1000 unless defined?(MAX_STEP_OUTPUT_SIZE)
 
     panel 'Run Step Logs' do
       sort = params[:order].try(:gsub, '_asc', ' ASC').try(:gsub, '_desc', ' DESC') || :name
