@@ -1,13 +1,4 @@
 GIT
-  remote: git://github.com/ctran/annotate_models.git
-  revision: f2a4b2ad6f461497e46fbf507bd7216f457e9ca6
-  ref: f2a4b2ad6f461497e46fbf507bd7216f457e9ca6
-  specs:
-    annotate (2.7.1)
-      activerecord (>= 3.2, < 6.0)
-      rake (>= 10.4)
-
-GIT
   remote: https://github.com/plataformatec/devise.git
   revision: 3080e9e018f3a6f5171837ea6ad2fbfcaf43af8e
   branch: master
@@ -82,6 +73,9 @@ GEM
     acts_as_fu (0.0.9)
       activerecord
       sqlite3
+    annotate (2.7.2)
+      activerecord (>= 3.2, < 6.0)
+      rake (>= 10.4, < 13.0)
     apartment (2.1.0)
       activerecord (>= 3.1.2, < 6.0)
       parallel (>= 0.7.1)
@@ -888,7 +882,7 @@ DEPENDENCIES
   activeadmin (~> 1.1.0)
   activerecord5-redshift-adapter
   acts_as_fu
-  annotate!
+  annotate
   apartment
   aws-sdk
   brakeman

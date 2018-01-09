@@ -21,22 +21,17 @@ gem 'activerecord5-redshift-adapter'
 gem 'immigrant' # FK constraints
 gem 'postgres-copy' # bulk import
 gem 'postgresql_cursor' # postgres cursors!!
-# Commented out because it doesn't work with Rails 5.1
-# gem 'acts_as_paranoid' # logical delete
 gem 'paranoia' # logical delete
+# Remove this, and replace by wrapping all queries with `SET search_path=` expressions
 gem 'apartment' # multi-tenancy (i.e. Postgres Schemas)
 
 gem 'active_model_serializers', '~> 0.10.0'
 
 gem 'fast_blank' # for fast calls to String#blank? and String#present?
 
-# K/V store
-# gem "redis"
-
 # Versioning
 gem 'paper_trail'
 
-# AWS ... duh :-)
 gem 'aws-sdk'
 
 group :development, :test do
@@ -44,8 +39,7 @@ group :development, :test do
   gem 'thin' # appserver
   gem 'foreman' # another appserver
 
-  # This newer, unreleased version fixes model annotations of funky indexes, and (unlike an earlier ref) doesn't break route annotation.
-  gem 'annotate', github: 'ctran/annotate_models', ref: "f2a4b2ad6f461497e46fbf507bd7216f457e9ca6"
+  gem 'annotate' # annotations of model files and routes file
 
   gem 'pry-rails'
 
@@ -81,7 +75,6 @@ group :test do
   gem 'database_cleaner'
   gem 'timecop'
 
-  # gem 'fakeredis'
   gem 'connection_pool'
 end
 
