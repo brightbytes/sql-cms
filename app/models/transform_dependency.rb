@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: public.transform_dependencies
+# Table name: transform_dependencies
 #
 #  id                         :integer          not null, primary key
 #  prerequisite_transform_id  :integer          not null

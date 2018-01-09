@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: public.notifications
+# Table name: notifications
 #
 #  id                        :integer          not null, primary key
 #  user_id                   :integer          not null
@@ -15,6 +15,7 @@
 # Foreign Keys
 #
 #  fk_rails_...  (user_id => users.id)
+#  fk_rails_...  (workflow_configuration_id => workflow_configurations.id)
 #
 
 describe Notification do

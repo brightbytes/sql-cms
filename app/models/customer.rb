@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: public.customers
+# Table name: customers
 #
 #  id         :integer          not null, primary key
 #  name       :string           not null
