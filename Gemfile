@@ -6,7 +6,7 @@ gem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'
 
 # Use Puma as the app server
 # gem 'puma', '~> 3.0'
-# Or maybe not, since Rails isn't threadsafe ...
+# FIXME: Or maybe not, since Rails isn't threadsafe; revisit at some point ...
 gem "unicorn" # app server
 
 gem 'rails'
@@ -22,9 +22,11 @@ gem 'immigrant' # FK constraints
 gem 'postgres-copy' # bulk import
 gem 'postgresql_cursor' # postgres cursors!!
 gem 'paranoia' # logical delete
+
 # Remove this, and replace by wrapping all queries with `SET search_path=` expressions
 gem 'apartment' # multi-tenancy (i.e. Postgres Schemas)
 
+# Why is this pinned?
 gem 'active_model_serializers', '~> 0.10.0'
 
 gem 'fast_blank' # for fast calls to String#blank? and String#present?
@@ -83,15 +85,18 @@ group :staging, :qa, :production do
   gem 'rails_12factor'
 end
 
+# Admin
+# Pinning to 1.1.0 because 1.2.x and 2.0.x break all delete links and all colorization of labels; no time to debug
+gem 'activeadmin', '~>1.1.0'
+
 # Authentication
-gem 'devise', git: 'https://github.com/plataformatec/devise.git', branch: 'master'
+gem 'devise'
 gem 'devise-async'
 
 # Authorization
 gem "cancan"
 
 # Async
-# gem "daemons"
 gem "sidekiq"
 
 # Monitoring
@@ -100,17 +105,13 @@ gem "newrelic_rpm"
 # Exception reporting
 # gem "sentry-raven"
 
-# Admin
-# Pinning to 1.1.0 because 1.2.x and 2.0.x break all delete links and all colorization of labels; no time to debug
-gem 'activeadmin', '~>1.1.0'
-
 gem 'factory_bot_rails'
 gem 'ffaker'
 
 # For prompting users in scripts
 gem "highline"
 
-# For lightweight requests to remote resources when ActiveResource is overkill
+# For lightweight requests to remote resources when ActiveResource is overkill - which sadly is most of the time
 # gem 'rest-client'
 
 # Use SCSS for stylesheets
