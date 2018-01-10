@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: public.runs
+# Table name: runs
 #
 #  id                        :integer          not null, primary key
 #  creator_id                :integer          not null

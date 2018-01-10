@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # == Schema Information
 #
-# Table name: public.validations
+# Table name: validations
 #
 #  id         :integer          not null, primary key
 #  name       :string           not null

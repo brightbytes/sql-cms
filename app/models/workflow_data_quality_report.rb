@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: public.workflow_data_quality_reports
+# Table name: workflow_data_quality_reports
 #
 #  id                     :integer          not null, primary key
 #  workflow_id            :integer          not null

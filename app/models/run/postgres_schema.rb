@@ -1,8 +1,6 @@
 # frozen_string_literal: true
-# This is a simple wrapper for some of the apartment gem's postgres schema manipulation methods.  It exists because I'd eventually like to replace apartment with
-#  something that I don't have to monkey-patch (see the initializer) and doesn't break `annotate -ik` (by no longer annotating indexes and FKs) such that I have to
-#  come up with an ugly hack-around.
-# FIXME - PORT TO FIRST-ORDER OBJECT, RATHER THAN HAVING AS A CONCERN, WHICH WILL INVOLVE REFACTORING use_redshift? HACK
+# This is a simple Run mixin for manipulating postgres/redshift schemas.
+# FIXME - PORT TO FIRST-ORDER OBJECT, RATHER THAN HAVING AS A CONCERN. THAT WILL INVOLVE REFACTORING use_redshift? HACK
 module Run::PostgresSchema
 
   extend ActiveSupport::Concern
@@ -15,7 +13,7 @@ module Run::PostgresSchema
     unless schema_exists?
       self.class.in_db_context(use_redshift?) do
         # Putting this inside a transaction prevents the connection from being hosed by SQL error
-        transaction { Apartment::Tenant.create(schema_name) }
+        transaction { connection.execute(%{CREATE SCHEMA "#{schema_name}"}) }
       end
     end
   end
@@ -24,14 +22,14 @@ module Run::PostgresSchema
     if schema_exists?
       self.class.in_db_context(use_redshift?) do
         # Putting this inside a transaction prevents the connection from being hosed by SQL error
-        transaction { Apartment::Tenant.drop(schema_name) }
+        transaction { connection.execute(%{DROP SCHEMA "#{schema_name}" CASCADE}) }
       end
     end
   end
 
   def execute_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      in_schema_context { Apartment.connection.execute(sql) }
+      in_schema_context { connection.execute(sql) }
     end
   end
 
@@ -43,9 +41,9 @@ module Run::PostgresSchema
     raise "This method is not available for use in Redshift." if use_redshift?
     self.class.in_db_context(false) do
       in_schema_context do
-        Apartment.connection.raw_connection.copy_data(sql) do
+        connection.raw_connection.copy_data(sql) do
           enumerable.each do |line|
-            Apartment.connection.raw_connection.put_copy_data(line) unless line.blank?
+            connection.raw_connection.put_copy_data(line) unless line.blank?
           end
         end
       end
@@ -59,8 +57,8 @@ module Run::PostgresSchema
     raise "This method is not available for use in Redshift." if use_redshift?
     self.class.in_db_context(false) do
       in_schema_context do
-        Apartment.connection.raw_connection.copy_data(sql) do
-          while line = Apartment.connection.raw_connection.get_copy_data
+        connection.raw_connection.copy_data(sql) do
+          while line = connection.raw_connection.get_copy_data
             writeable_io.puts(line)
           end
         end
@@ -72,9 +70,7 @@ module Run::PostgresSchema
   #         (OTHER STATEMENTS WORK FINE.)  THIS IS UNDOUBTEDLY A BUG IN THE REDSHIFT GEM, THOUGH I HAVEN'T VERIFIED BY ATTEMPTING TO WRITE MIGRATIONS INDEPENDENTLY.
   def eval_in_schema(rails_migration)
     self.class.in_db_context(use_redshift?) do
-      in_schema_context do
-        Apartment.connection.instance_eval(rails_migration)
-      end
+      in_schema_context { connection.instance_eval(rails_migration) }
     end
   end
 
@@ -82,41 +78,51 @@ module Run::PostgresSchema
 
   def select_all_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      in_schema_context { Apartment.connection.select_all(sql) }
+      in_schema_context { connection.select_all(sql) }
     end
   end
 
   def select_rows_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      in_schema_context { Apartment.connection.select_rows(sql) }
+      in_schema_context { connection.select_rows(sql) }
     end
   end
 
   def select_one_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      in_schema_context { Apartment.connection.select_one(sql) }
+      in_schema_context { connection.select_one(sql) }
     end
   end
 
   def select_values_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      in_schema_context { Apartment.connection.select_values(sql) }
+      in_schema_context { connection.select_values(sql) }
     end
   end
 
   def select_value_in_schema(sql)
     self.class.in_db_context(use_redshift?) do
-      in_schema_context { Apartment.connection.select_value(sql) }
+      in_schema_context { connection.select_value(sql) }
     end
   end
 
   private
 
+  # I still need this in 2018?  Really??!
+  def connection
+    self.class.connection
+  end
+
+  def set_search_path!(schema)
+    connection.execute("SET search_path TO '#{schema}';")
+  end
+
   def in_schema_context
-    Apartment::Tenant.switch(schema_name.presence) do # nil => public
-      # Putting this inside a transaction prevents the connection from being hosed by SQL error
-      transaction { yield }
-    end
+    raise "This Run lacks a schema_name!" unless schema_name.present?
+    set_search_path!(schema_name)
+    yield
+  ensure
+    set_search_path!('public')
   end
 
   module ClassMethods
@@ -125,25 +131,20 @@ module Run::PostgresSchema
 
     def list_schemata(use_redshift = false)
       in_db_context(use_redshift) do
-        Apartment.connection.select_values(LIST_SCHEMATA_SQL)
+        connection.select_values(LIST_SCHEMATA_SQL)
       end
     end
 
     def in_db_context(use_redshift = false)
-      # See https://github.com/influitive/apartment/pull/266 as to why using establish_connection isn't threadsafe in sidekiq.
-      # This solution isn't threadsafe either. I tried creating a pool on-the-fly too in a branch.  No dice.
+      # Sadly, establish_connection isn't threadsafe in sidekiq. I tried creating a pool on-the-fly too in a branch.  No dice.
       # The only viable solution at this time is to run all redshift queries serially, which is accomplished by having 1 sidekiq thread
       #  per Heroku dyno.  Another alternative would be to revert to Delayed::Job, but I'd rather not deal.
       if use_redshift
         begin
-          # This works just as well:
-          # Apartment.establish_connection(:redshift)
-          Apartment.connection_class = RedshiftConnection
+          establish_connection(:redshift)
           yield
         ensure
-          # This works just as well:
-          # Apartment.establish_connection(Rails.env.to_sym)
-          Apartment.connection_class = ActiveRecord::Base
+          establish_connection(Rails.env.to_sym)
         end
       else
         yield

@@ -1,12 +1,13 @@
 # == Schema Information
 #
-# Table name: public.workflows
+# Table name: workflows
 #
 #  id         :integer          not null, primary key
 #  name       :string           not null
 #  slug       :string           not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  params     :jsonb
 #
 # Indexes
 #

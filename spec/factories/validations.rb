@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: validations
+#
+#  id         :integer          not null, primary key
+#  name       :string           not null
+#  immutable  :boolean          default(FALSE), not null
+#  sql        :text             not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+# Indexes
+#
+#  index_validations_on_lowercase_name  (lower((name)::text)) UNIQUE
+#
+
 
 FactoryBot.define do
 

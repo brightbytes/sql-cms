@@ -1,29 +1,27 @@
 # == Schema Information
 #
-# Table name: public.transforms
+# Table name: transforms
 #
-#  id             :integer          not null, primary key
-#  name           :string           not null
-#  runner         :string           default("Sql"), not null
-#  workflow_id    :integer          not null
-#  sql            :text             not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  params         :jsonb
-#  s3_region_name :string
-#  s3_bucket_name :string
-#  s3_file_path   :string
-#  s3_file_name   :string
+#  id           :integer          not null, primary key
+#  name         :string           not null
+#  runner       :string           default("Sql"), not null
+#  workflow_id  :integer          not null
+#  sql          :text             not null
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  params       :jsonb
+#  s3_file_name :string
+#  enabled      :boolean          default(TRUE), not null
 #
 # Indexes
 #
-#  index_transforms_on_lowercase_name  (lower((name)::text)) UNIQUE
+#  index_transforms_on_lowercase_name_and_workflow_id  (lower((name)::text), workflow_id) UNIQUE
+#  index_transforms_on_workflow_id                     (workflow_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (workflow_id => workflows.id)
 #
-
 
 FactoryBot.define do
 

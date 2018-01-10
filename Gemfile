@@ -23,9 +23,6 @@ gem 'postgres-copy' # bulk import
 gem 'postgresql_cursor' # postgres cursors!!
 gem 'paranoia' # logical delete
 
-# Remove this, and replace by wrapping all queries with `SET search_path=` expressions
-gem 'apartment' # multi-tenancy (i.e. Postgres Schemas)
-
 # Why is this pinned?
 gem 'active_model_serializers', '~> 0.10.0'
 

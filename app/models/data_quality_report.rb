@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # == Schema Information
 #
-# Table name: public.data_quality_reports
+# Table name: data_quality_reports
 #
 #  id         :integer          not null, primary key
 #  name       :string           not null

@@ -3,7 +3,6 @@
 
 require_relative 'config/application'
 
-Apartment.db_migrate_tenants = false
 Rails.application.load_tasks
 
 begin
