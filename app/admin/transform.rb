@@ -17,6 +17,7 @@ ActiveAdmin.register Transform do
   config.sort_order = 'name_asc'
 
   index(download_links: false) do
+    selectable_column if Workflow.count > 1
     column(:name) do |transform|
       text_node(auto_link(transform))
       text_node('&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;'.html_safe)
@@ -199,6 +200,15 @@ ActiveAdmin.register Transform do
       path = (params[:source] == 'workflow' ? workflow_path(params[:workflow_id]) : f.object.new_record? ? transforms_path : transform_path(f.object))
       cancel_link(path)
     end
+  end
+
+  # We already have this as a link, and I don't really want it as a batch action
+  batch_action :destroy, false
+
+  batch_action :move, form: -> { { workflow_id: Workflow.pluck(:name, :id) } }, if: proc { Workflow.count > 1 }, confirm: "Are you sure you want to move the selected transforms?" do |ids, inputs|
+    # We do these individually for the sake of the callback to nuke the dependencies
+    Transform.transaction { Transform.find(ids).each { |transform| transform.update_attributes!(workflow_id: inputs[:workflow_id]) } }
+    redirect_to transforms_path, notice: "Moved #{ids.size} Transforms."
   end
 
   controller do
