@@ -113,6 +113,7 @@ class Transform < ApplicationRecord
   # Instance Methods
 
   # Exclusively for the AA front-end.  Hate doing this, but it's the easiest way to preserve params across round trips.
+  # I'm sure there's a better way in Rails today, but I'm apparently too lame to google it.
   attr_accessor :source
 
   def params
@@ -126,6 +127,14 @@ class Transform < ApplicationRecord
 
   def interpolated_s3_file_name
     self.class.interpolate(string: s3_file_name, params: params, quote_arrays: false)
+  end
+
+  def copy_to(new_workflow_or_workflow_id)
+    new_workflow_id = (new_workflow_or_workflow_id.is_a?(Workflow) ? new_workflow_or_workflow_id.id : new_workflow_or_workflow_id)
+    dup.tap do |new_transform|
+      new_transform.workflow_id = new_workflow_id
+      new_transform.save!
+    end
   end
 
   concerning :Runners do

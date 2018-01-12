@@ -141,7 +141,7 @@ describe Transform do
   describe "instance methods" do
 
     context "#enabled" do
-      it "should prevent the Transform from being executed" do
+      it "should prevent the Transform from being executed when false" do
         transform = create(:transform, enabled: false)
         workflow_configuration = create(:workflow_configuration, workflow: transform.workflow)
         run = workflow_configuration.runs.create!(creator: create(:user), execution_plan: workflow_configuration.serialize_and_symbolize)
@@ -161,6 +161,17 @@ describe Transform do
     context "#params" do
       let!(:subject) { build(:transform) }
       include_examples 'yaml helper methods'
+    end
+
+    context "#copy_to" do
+      it "should copy the Transform as a new Transform for the specified Workflow" do
+        transform = create(:transform)
+        new_workflow = create(:workflow)
+        new_transform = transform.copy_to(new_workflow)
+        expect(new_transform.persisted?).to be(true)
+        expect(new_transform.attributes.except('id', 'workflow_id', 'created_at', 'updated_at')).to eq(transform.attributes.except('id', 'workflow_id', 'created_at', 'updated_at'))
+        expect(new_transform.workflow).to eq(new_workflow)
+      end
     end
 
     context "runner-type methods" do

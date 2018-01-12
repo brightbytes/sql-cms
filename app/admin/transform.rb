@@ -211,6 +211,12 @@ ActiveAdmin.register Transform do
     redirect_to transforms_path, notice: "Moved #{ids.size} Transforms."
   end
 
+  batch_action :copy, form: -> { { workflow_id: Workflow.pluck(:name, :id) } }, if: proc { Workflow.count > 1 }, confirm: "Are you sure you want to copy the selected transforms?" do |ids, inputs|
+    # We do these individually for the sake of the callback to nuke the dependencies
+    Transform.transaction { Transform.find(ids).each { |transform| transform.copy_to(inputs[:workflow_id]) } }
+    redirect_to transforms_path, notice: "Copied #{ids.size} Transforms."
+  end
+
   controller do
 
     def scoped_collection
