@@ -142,9 +142,9 @@ ActiveAdmin.register Workflow do
     inputs 'Details' do
       input :name, as: :string
       # FIXME - DON'T ALLOW IT TO BE TOO LONG VIA A MODEL VALIDATION!
-      input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated. And DON'T MAKE IT TOO LONG, or creating the Posgres schema will puke."
+      input :slug, as: :string, hint: "Leave the slug blank if you want it to be auto-generated. And DON'T MAKE IT TOO LONG, or creating the schema will puke."
 
-      input :params_yaml, as: :text, input_html: { rows: 10 }
+      input :params_yaml, as: :text, input_html: { rows: 10 }, hint: "All child Transforms, TransformValidations, and WorkflowDataQualityReports will inherit these as (overridable) default params"
     end
 
     if Workflow.count > 1

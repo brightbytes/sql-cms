@@ -98,6 +98,30 @@ describe Transform do
         expect(transform.s3_file_name).to eq(nil)
       end
 
+      it "should add the sql-dynamically-generated message for import Transforms when no sql is provided" do
+        RunnerFactory::IMPORT_S3_FILE_RUNNERS.each do |runner|
+          transform = build(:transform, runner: runner, sql: "")
+          transform.valid?
+          expect(transform.sql).to eq(Transform::SQL_DYNAMICALLY_GENERATED_MSG)
+        end
+      end
+
+      it "should nuke all transform dependencies when changing a transform's workflow" do
+        new_workflow = create(:workflow)
+
+        td = create(:transform_dependency)
+        t = td.prerequisite_transform
+        t.workflow = new_workflow
+        expect(t.save).to eq(true)
+        expect(TransformDependency.find_by(id: td.id)).to eq(nil)
+
+        td = create(:transform_dependency)
+        t = td.postrequisite_transform
+        t.workflow = new_workflow
+        expect(t.save).to eq(true)
+        expect(TransformDependency.find_by(id: td.id)).to eq(nil)
+      end
+
     end
 
   end

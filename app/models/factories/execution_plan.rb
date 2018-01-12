@@ -1,3 +1,4 @@
+# Creates a JSON representation of a Workflow Configuration, for use as an immutable description of a Run
 class ExecutionPlan
 
   class << self

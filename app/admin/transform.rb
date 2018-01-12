@@ -158,7 +158,8 @@ ActiveAdmin.register Transform do
 
       input :source, as: :hidden, input_html: { value: params[:source] }
       input :workflow_id, as: :hidden, input_html: { value: workflow_id_param_val }
-      # We make this unchangeable because it's unclear what to do with dependencies if the User changes Workflow for the Transform on the fly.
+      # We make this unchangeable because it's the available dependencies list on this page would need to change if the User updated the Workflow,
+      #  and there's no way my JS skills are up to that task.
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: params[:workflow_id].blank?, input_html: { disabled: f.object.persisted? }
 
       input :name, as: :string
