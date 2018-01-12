@@ -1,8 +1,28 @@
 # sql-cms
 
-The purpose of this application is to allow ETL SQL Developers and SQL Analysts to create Workflows of interdependent SQL Transforms that are parallelized at runtime to convert a set of pre-existing import files on S3 into a set of newly-generated export files on S3.  Essentially, this is a SQL-based approach to the T in ETL.
+## What is it?
 
-A Workflow may be Run multiple times, and each time the system will deposit its export files in a new, namespaced S3 "directory". Every Run occurs within a newly-created Postgres schema that may be examined afterwards, and removed as a whole when it is no longer necessary.
+sql-cms is a standalone application that stores and runs Workflows comprised of SQL-based Transforms, Validations, and Data Quality Reports.
+
+When run, a Workflow creates a new Postgres/Redshift schema for the Run, and in that schema may execute DDL, load data files from S3, transform the loaded data via DML, validate the transformed data, and export new data files back out to S3.
+
+## So what?
+
+The organization of SQL expressions in a Workflow CMS that namespaces operations into Postgres/Redshift schemas confers the following benefits:
+
+- A given Workflow may be associated with multiple Customers, each having their own source S3 data files, and that data will proceed through identical processing steps.
+
+- The user-specified dependency DAG of Transforms within a Workflow allows all sibling Transforms to be executed in parallel.
+
+- Similarly, Workflows themselves may also depend upon other Workflows, with the DAG thus defined also permitting parallel execution of Transforms and Data Quality Reports. Furthermore, due to their composability, a given Workflow's Transforms and Data Quality Reports may be reused by any number of other Workflows.
+
+- Because its results exist inside a Postgres/Redshift schema, the data produced by a given Workflow Run may be referenced by any other Workflow.  This is useful when source S3 data files are huge: create a Workflow that loads the data, Run it once, and then create a separate Workflow that Transforms the loaded data simply by prefixing the table(s) with the schema name.
+
+## Now what?
+
+ 
+
+
 
 The following entities exist in the **public** Postgres schema, and together they realize the application:
 
