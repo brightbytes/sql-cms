@@ -2,25 +2,27 @@
 
 ## What is it?
 
-sql-cms is a standalone application that stores and runs Workflows comprised of SQL-based Transforms, Validations, and Data Quality Reports.
+sql-cms is a standalone application that stores and runs Workflows comprised of SQL-based Transforms, Transform Validations, and Data Quality Reports.
 
-When run, a Workflow creates a new Postgres/Redshift schema for the Run, and in that schema may execute DDL, load data files from S3, transform the loaded data via DML, validate the transformed data, and export new data files back out to S3.
+When run, a Workflow creates a new Postgres/Redshift schema for the Run, and in that schema may execute DDL, load data files from S3, transform the loaded data via DML, validate the transformed data using SQL, and export new data files back out to S3.
 
 ## So what?
 
-The organization of SQL expressions in a Workflow CMS that namespaces operations into Postgres/Redshift schemas confers the following benefits:
+The organization of SQL expressions in a Workflow CMS that namespaces operations into Postgres/Redshift schemas and under S3 prefixes confers the following benefits:
 
-- A given Workflow may be associated with multiple Customers, each having their own source S3 data files, and that data will proceed through identical processing steps.
+- A given Workflow may be associated with multiple Customers, each having their own source S3 data files, and that data will proceed through identical processing steps at runtime.
 
-- The user-specified dependency DAG of Transforms within a Workflow allows all sibling Transforms to be executed in parallel.
+- The user-specified dependency DAG of Transforms within a Workflow allows all sibling Transforms (siblings in the leaf-to-parent direction) and all Data Quality Reports to be executed in parallel.
 
 - Similarly, Workflows themselves may also depend upon other Workflows, with the DAG thus defined also permitting parallel execution of Transforms and Data Quality Reports. Furthermore, due to their composability, a given Workflow's Transforms and Data Quality Reports may be reused by any number of other Workflows.
 
-- Because its results exist inside a Postgres/Redshift schema, the data produced by a given Workflow Run may be referenced by any other Workflow.  This is useful when source S3 data files are huge: create a Workflow that loads the data, Run it once, and then create a separate Workflow that Transforms the loaded data simply by prefixing the table(s) with the schema name.
+- Because it is stored in the context of a Postgres/Redshift schema, the data produced by a given Workflow Run may be referenced by any other Workflow Run.  This is useful when source S3 data files are huge: create a Workflow that loads the data, Run it once, and then create separate Workflows that Transform the loaded data by referencing schema-prefixed table names.
+
+
 
 ## Now what?
 
- 
+
 
 
 
@@ -70,13 +72,35 @@ The following entities exist in the **public** Postgres schema, and together the
 
 - **RunStepLog**: A per-Run record of the execution of a single Transform or DataQualityReport that in success cases stores the result of running the SQL, in failure cases stores TransformValidation failures, or - when the Step raises an Exception - the error details.
 
+
+- params
+- sql snippets
+- redshift
+
+
+## FAQ
+
+Q: Why isn't this repo a gem?
+
+A: It is quicker for me to make changes and deploy them by keeping this as an application for now. That is, I need to use and change this application relatively frequently, and I'd rather not deal with the extra steps of releasing a new version of a gem and updating the app to us it for every change I make. However, there is probably tooling that would automate CD of this repo as a gem: once I have a chance to figure it out, this repo will become a gem.
+
+
+
+
+
 ## Run Management
 
 This application uses Sidekiq via Active::Job for parallelization of Runs, Transform groups, and DataQualityReports.  Details may be found in `app/jobs/`.
 
 ## Demo Workflow
 
-This application comes with a somewhat lame Demo Workflow that was ported from an ancestral app.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide a few examples of how to use this system.
+This application comes with a rather lame Demo Workflow that was ported from an ancestral app.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide a few examples of how to use this system.
+
+A rake task is provided for uploading the demo files to s3; you may use it as follows:
+
+```
+rake demo:upload_to_s3['s3://bucket/path/you/want/']
+```
 
 ## Heroku Deployment
 
@@ -100,6 +124,7 @@ You'll want to configure the same environment variables on Heroku as you do for 
 
     ```
     PORT=3000
+    # The next 3 are primarily for Heroku
     RACK_ENV=development
     LANG='en_US.UTF-8'
     TZ='US/Pacific' # Or whatever
