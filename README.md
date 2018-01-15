@@ -78,29 +78,27 @@ The following entities exist in the **public** Postgres schema, and together the
 - dump repo: in rake tasks section
 
 
-## FAQ
-
-Q: Why isn't this repo a gem?
-
-A: It is quicker for me to make changes and deploy them by keeping this as an application for now. That is, I need to use and change this application relatively frequently, and I'd rather not deal with the extra steps of releasing a new version of a gem and updating the app to us it for every change I make. However, there is probably tooling that would automate CD of this repo as a gem: once I have a chance to figure it out, this repo will become a gem.
-
-
-
-
-
 ## Run Management
 
-This application uses Sidekiq via Active::Job for parallelization of Runs, Transform groups, and DataQualityReports.  Details may be found in `app/jobs/`.
+This application uses Sidekiq via Active::Job for parallelization of Runs, Transform groups, and DataQualityReports.
+
+To monitor Sidekiq locally or once deployed, click on Admin | Sidekiq in the application.
 
 ## Demo Workflow
 
-This application comes with a rather lame Demo Workflow that was ported from an ancestral app.  There, it was a pre-requirement-specification Demo Workflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide a few limited examples of how to use this system, and also serves to quickly validate that a production application is set up correctly.
+This application comes with a rather pathetic Demo Workflow that was ported from an ancestral app.
 
-A rake task is provided for uploading the demo files to s3; you may use it as follows:
+In that application too, it was a pre-requirement-specification Demo Workflow intended to be sufficiently complex for basic validation and testing.
+
+In and of itself, it's meaningless, but it does provide a few limited examples of how to use this system, and is also used by the test suite.
+
+Furthermore, after seeding into a production application, it may be used to quickly validate that the deployment succeeded.  For that purpose, a rake task is provided for uploading the demo files to s3; its usage is as follows:
 
 ```
-rake demo:upload_to_s3['s3://bucket/path/you/want/']
+rake demo:upload_to_s3['s3://bucket/path/to/files/']
 ```
+
+Note that the WorkflowConfiguration for the Demo Workflow will need to be configured with the corresponding s3_bucket_name and s3_file_path.
 
 ## Heroku Deployment
 
@@ -115,8 +113,6 @@ You'll want to configure the same environment variables on Heroku as you do for 
 ## Running Workflows on Redshift
 
 
-
-## [Future plans](https://github.com/brightbytes/sql-cms/wiki/Future-Plans)
 
 ## [Environment Setup for local development](https://github.com/brightbytes/sql-cms/wiki/Local-Dev-Env-Setup)
 
@@ -193,3 +189,13 @@ You'll want to configure the same environment variables on Heroku as you do for 
   # Start sidekiq in another terminal tab
   sidekiq
   ```
+
+## FAQ
+
+Q: Why isn't this repo a gem?
+
+A: It is quicker for me to make changes and deploy them by keeping this as an application for now. That is, I need to use and change this application relatively frequently, and I'd rather not deal with the extra steps of releasing a new version of a gem and updating the app to us it for every change I make. However, there is probably tooling that would automate CD of this repo as a gem: once I have a chance to figure it out, this repo will become a gem.
+
+Q: What new features will this app acquire?
+
+A: [Future plans](https://github.com/brightbytes/sql-cms/wiki/Future-Plans)
