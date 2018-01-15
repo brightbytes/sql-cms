@@ -80,7 +80,7 @@ The following entities exist in the **public** Postgres schema, and together the
 
 ## Run Management
 
-This application uses Sidekiq via Active::Job for parallelization of Runs, Transform groups, and DataQualityReports.
+This application uses Sidekiq via Active::Job for parallelization of Runs, Transforms, and DataQualityReports.
 
 To monitor Sidekiq locally or once deployed, click on Admin | Sidekiq in the application.
 
@@ -90,11 +90,12 @@ This application comes with a rather pathetic Demo Workflow that was ported from
 
 In that application too, it was a pre-requirement-specification Demo Workflow intended to be sufficiently complex for basic validation and testing.
 
-In and of itself, it's meaningless, but it does provide a few limited examples of how to use this system, and is also used by the test suite.
+In and of itself, it's meaningless, but it does provide a few limited examples of how to use this system, and is itself also used by the test suite.
 
-Furthermore, after seeding into a production application, it may be used to quickly validate that the deployment succeeded.  For that purpose, a rake task is provided for uploading the demo files to s3; its usage is as follows:
+Furthermore, after seeding into a production application, it may be used to quickly validate that the application is working.  For that purpose, a rake task is provided for uploading the demo files to s3; its usage is as follows:
 
 ```
+# For this to succeed, the AWS Commandline tools must be installed locally
 rake demo:upload_to_s3['s3://bucket/path/to/files/']
 ```
 
@@ -102,13 +103,75 @@ Note that the WorkflowConfiguration for the Demo Workflow will need to be config
 
 ## Heroku Deployment
 
-There are a number of rake tasks in `lib/tasks/heroku.rake` for managing a Heroku deployment.
+There are 5 rake tasks in `lib/tasks/heroku.rake` for managing a Heroku deployment:
 
-To deploy to Heroku, you'll need 3 AddOns: Postgres, Redis (for Sidekiq), and SendGrid.
+```
+# Turn on Heroku maint mode
+heroku:maint:on
 
-You'll only need one 1x Sidekiq Worker dyno if all Workflows will be run on Postgres.  However, to also run Workflows on Redshift, you'll need a 2nd Worker Heroku Resource pool of ~4 1x Sidekiq Worker dynos
+# Turn off Heroku maint mode
+heroku:maint:off
 
-You'll want to configure the same environment variables on Heroku as you do for your local setup, [here](#env_vars)
+# Deploy to Herou using the eponymous .git/config repo
+heroku:deploy
+
+# Download the production DB locally
+heroku:download
+
+# Upload a downloaded production DB into the Dev ENV
+heroku:upload:development
+```
+
+To deploy to Heroku, you'll need 3 Heroku AddOns: Postgres, Redis (for Sidekiq), and SendGrid.
+
+You'll only need one 1x Sidekiq Worker dyno if all Workflows will be run on Postgres.  However, to also run Workflows on Redshift, you'll need a 2nd Worker Heroku Resource pool of circa 4 1x Sidekiq Worker dynos
+
+You'll want to configure many - though not all - of the same environment variables on Heroku as you do for your local setup. I set the following on my Herkou app:
+
+```
+# These are required
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+
+# These are optional
+DEFAULT_S3_BUCKET=
+DEFAULT_S3_REGION=
+
+# Rails requires these
+DEVISE_SECRET_KEY=
+SECRET_KEY_BASE=
+
+# Heroku recommends these
+ERROR_PAGE_URL=
+MAINTENANCE_PAGE_URL=
+
+# Required for User Auth and the Notification email
+MAIL_SENDER='no-reply@somewhere.com'
+
+# App URL
+PRODUCTION_HOST=
+
+# Just set these
+RACK_ENV=production
+RAILS_ENV=production
+
+# Not sure if these came automatically or if I set them
+RAILS_LOG_TO_STDOUT=enabled
+RAILS_SERVE_STATIC_FILES=enabled
+
+# I've been setting these forever; not sure they're actually required anymore
+LANG='en_US.UTF-8'
+TZ='US/Pacific'
+
+# Only set these if you need to run Workflows on Redshift
+REDSHIFT_HOST=
+REDSHIFT_PORT=
+REDSHIFT_USER=
+REDSHIFT_PASSWORD=
+REDSHIFT_DATABASE=
+```
+
+Note that the above excludes ENV vars set up by the 3 Heroku AddOns.
 
 ## Running Workflows on Redshift
 
@@ -131,7 +194,7 @@ You'll want to configure the same environment variables on Heroku as you do for 
     DEFAULT_S3_REGION='us-west-2'
     DEFAULT_S3_BUCKET=<your preferred default bucket here>
 
-    MAIL_SENDER='someone@somewhere.com'
+    MAIL_SENDER='no-reply@somewhere.com'
 
     # Only set this if you deploy somewhere
     PRODUCTION_HOST='your-app-name.herokuapp.com'
@@ -142,10 +205,6 @@ You'll want to configure the same environment variables on Heroku as you do for 
     # You must supply these. (Most folks already have these set up globally in their env.)
     AWS_ACCESS_KEY_ID=<your access ID here>
     AWS_SECRET_ACCESS_KEY=<your secret access key here>
-
-    # I have these globally in my ENV, and they may be necessary for something I haven't run into yet ... but I suspect not
-    AWS_ACCOUNT_ID=<your account ID here>
-    AWS_REGION="us-west-2"
 
     # Only set these if you need to run Workflows on Redshift
     REDSHIFT_HOST=
