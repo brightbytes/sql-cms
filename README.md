@@ -75,7 +75,7 @@ The following entities exist in the **public** Postgres schema, and together the
 
 - params
 - sql snippets
-- redshift
+- dump repo: in rake tasks section
 
 
 ## FAQ
@@ -94,7 +94,7 @@ This application uses Sidekiq via Active::Job for parallelization of Runs, Trans
 
 ## Demo Workflow
 
-This application comes with a rather lame Demo Workflow that was ported from an ancestral app.  There, it also was a pre-requirement-specification Demo Wokrflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide a few examples of how to use this system.
+This application comes with a rather lame Demo Workflow that was ported from an ancestral app.  There, it was a pre-requirement-specification Demo Workflow intended to be sufficiently complex to test the application.  In and of itself, it's meaningless, but it does provide a few limited examples of how to use this system, and also serves to quickly validate that a production application is set up correctly.
 
 A rake task is provided for uploading the demo files to s3; you may use it as follows:
 
@@ -108,9 +108,13 @@ There are a number of rake tasks in `lib/tasks/heroku.rake` for managing a Herok
 
 To deploy to Heroku, you'll need 3 AddOns: Postgres, Redis (for Sidekiq), and SendGrid.
 
-You'll only need 1 Sidekiq Worker dyno, but I've made mine a 2X - not because I know it needs to be, but rather just because I suspect more memory would be better.
+You'll only need one 1x Sidekiq Worker dyno if all Workflows will be run on Postgres.  However, to also run Workflows on Redshift, you'll need a 2nd Worker Heroku Resource pool of ~4 1x Sidekiq Worker dynos
 
 You'll want to configure the same environment variables on Heroku as you do for your local setup, [here](#env_vars)
+
+## Running Workflows on Redshift
+
+
 
 ## [Future plans](https://github.com/brightbytes/sql-cms/wiki/Future-Plans)
 
@@ -124,7 +128,6 @@ You'll want to configure the same environment variables on Heroku as you do for 
 
     ```
     PORT=3000
-    # The next 3 are primarily for Heroku
     RACK_ENV=development
     LANG='en_US.UTF-8'
     TZ='US/Pacific' # Or whatever
@@ -137,6 +140,9 @@ You'll want to configure the same environment variables on Heroku as you do for 
     # Only set this if you deploy somewhere
     PRODUCTION_HOST='your-app-name.herokuapp.com'
 
+    # Only set this if you want to store a large quantity of seed data as a binary image (in a separate repository, of course)
+    SEED_DATA_DUMP_REPO='/path/to/seed/data/dump/repo'
+
     # You must supply these. (Most folks already have these set up globally in their env.)
     AWS_ACCESS_KEY_ID=<your access ID here>
     AWS_SECRET_ACCESS_KEY=<your secret access key here>
@@ -144,6 +150,13 @@ You'll want to configure the same environment variables on Heroku as you do for 
     # I have these globally in my ENV, and they may be necessary for something I haven't run into yet ... but I suspect not
     AWS_ACCOUNT_ID=<your account ID here>
     AWS_REGION="us-west-2"
+
+    # Only set these if you need to run Workflows on Redshift
+    REDSHIFT_HOST=
+    REDSHIFT_PORT=
+    REDSHIFT_USER=
+    REDSHIFT_PASSWORD=
+    REDSHIFT_DATABASE=
     ```
 
 2) Reset your environment and load Postgres with the Demo Workflow

@@ -17,6 +17,7 @@ module HerokuTaskHelper
 
   def heroku_run(*cmds)
     # Heroku Toolbelt uses Ruby 1.9, which requires clearing the RUBYOPT var ...
+    # FIXME - IS THIS STILL NECESSARY TODAY?
     run(*cmds.map { |cmd| cmd =~ /heroku/ ? "export RUBYOPT='' && #{cmd}" : cmd })
   end
 

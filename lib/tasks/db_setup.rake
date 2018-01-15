@@ -2,6 +2,8 @@
 
 require "#{Rails.root}/lib/tasks/task_helper"
 
+require 'dotenv/tasks'
+
 namespace :db do
 
   include TaskHelper
@@ -16,47 +18,67 @@ namespace :db do
 
   namespace :data do
 
-    FULL_DUMP_PATH = Rails.root.join("../bb_data/db_dump/sql_cms/")
-    FULL_DUMP_PATH_AND_FILE = FULL_DUMP_PATH + "dump.Fc"
-    DB_CONFIG = YAML.load(ERB.new(File.read("#{Rails.root}/config/database.yml")).result)[Rails.env]
+    # Need this to use the ENV var :-(
+    module PathHelpers
 
-    desc "Dumps the local dev DB to the designated location in the bb_data repo, for later use by db:data:load"
+      extend self
 
-    task dump: :environment do
-      raise "This task is only for use in a development environment" unless Rails.env.development?
+      def env_var_present?
+        dump_repo.present?
+      end
 
-      if File.exists?(FULL_DUMP_PATH)
-        dputs "Dumping PostgreSQL for the SQL CMS Application ..."
-        run("PGPASSWORD=#{DB_CONFIG["password"]} pg_dump --clean --oids --format=custom --no-password --username #{DB_CONFIG["username"]} --dbname #{DB_CONFIG["database"]} --host #{DB_CONFIG["host"]} --no-owner --file #{FULL_DUMP_PATH_AND_FILE}")
-      else
-        raise "You can't dump your local DB because #{FULL_DUMP_PATH} doesn't exist."
+      def full_dump_path
+        @full_dump_path ||= Rails.root.join(dump_repo, 'sql_cms')
+      end
+
+      def full_dump_path_and_file
+        @full_dump_path_an_file ||= "#{full_dump_path}/dump.Fc".gsub(/\/{2,}/, '/')
+      end
+
+      private def dump_repo
+        ENV['SEED_DATA_DUMP_REPO'].presence
       end
     end
 
-    desc "Loads tables from the bb_data dump file"
+    DB_CONFIG = YAML.load(ERB.new(File.read("#{Rails.root}/config/database.yml")).result)[Rails.env]
 
-    task load_dump: :environment do
+    desc "Dumps the local dev DB to the `sql_cms` directory in the ENV['SEED_DATA_DUMP_REPO'] repo, for later use by db:data:load"
+
+    task dump: [:environment, :dotenv] do
       raise "This task is only for use in a development environment" unless Rails.env.development?
 
-      if File.exists?(FULL_DUMP_PATH_AND_FILE)
-        dputs "Loading PostgreSQL for SQL CMS Application ..."
-        run("PGPASSWORD=#{DB_CONFIG["password"]} pg_restore -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} #{FULL_DUMP_PATH_AND_FILE}")
+      if PathHelpers.env_var_present?
+        if File.exists?(PathHelpers.full_dump_path)
+          dputs "Dumping PostgreSQL for the SQL CMS Application ..."
+          run("PGPASSWORD=#{DB_CONFIG["password"]} pg_dump --clean --oids --format=custom --no-password --username #{DB_CONFIG["username"]} --dbname #{DB_CONFIG["database"]} --host #{DB_CONFIG["host"]} --no-owner --file #{PathHelpers.full_dump_path_and_file}")
+        else
+          raise "Unable to dump your local DB because '#{PathHelpers.full_dump_path}' doesn't exist."
+        end
       else
-        dputs "Skipping load of dumpfile, since it doesn't exist."
+        raise "The env var SEED_DATA_DUMP_REPO is not defined."
+      end
+    end
+
+    desc "Loads tables from a dump file in the `sql_cms` directory in the ENV['SEED_DATA_DUMP_REPO'] repo"
+
+    task load_dump: [:environment, :dotenv] do
+      raise "This task is only for use in a development environment" unless Rails.env.development?
+
+      if PathHelpers.env_var_present?
+        if File.exists?(PathHelpers.full_dump_path_and_file)
+          dputs "Loading PostgreSQL for SQL CMS Application ..."
+          run("PGPASSWORD=#{DB_CONFIG["password"]} pg_restore -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} #{PathHelpers.full_dump_path_and_file}")
+        else
+          dputs "Skipping dumpfile load because it doesn't exist at '#{PathHelpers.full_dump_path_and_file}'"
+        end
+      else
+        dputs "Skipping dumpfile load because the env var SEED_DATA_DUMP_REPO is not defined."
       end
     end
 
   end
 
 end
-
-# Rake::Task["db:create"].enhance do
-#   Rake::Task["db:extensions"].invoke
-# end
-
-# Rake::Task["db:test:purge"].enhance do
-#   Rake::Task["db:extensions"].invoke
-# end
 
 desc "One Task to rule them all, One Task to find them, One Task to bring them all, and in the Darkness bind them"
 task one_ring: 'db:init'
