@@ -6,39 +6,35 @@ sql-cms is a standalone application that stores and runs Workflows comprised of 
 
 When run, a Workflow creates a new Postgres/Redshift schema for the Run, and in that schema may execute DDL, load data files from S3, transform the loaded data via DML, validate the transformed data using SQL, and export new data files back out to S3.
 
+For later examination, the system tracks the result of every step of the Run - be that result a count of affected rows, a Validation failure, or an Exception - as a RunStepLog.  Furthermore, the app uses, retains, and dumps to S3 the complete immutable JSON Execution Plan for each Run, again for later examination.
+
 ## So what?
 
-The organization of SQL expressions in a Workflow CMS that namespaces operations into Postgres/Redshift schemas and under S3 prefixes confers the following benefits:
+The organization of SQL expressions in a Workflow CMS that at runtime namespaces its operations in Postgres/Redshift schemas and under S3 prefixes named for the Run confers the following benefits:
 
 - A given Workflow may be associated with multiple Customers, each having their own source S3 data files, and that data will proceed through identical processing steps at runtime.
 
-- The user-specified dependency DAG of Transforms within a Workflow allows all sibling Transforms (siblings in the leaf-to-parent direction) and all Data Quality Reports to be executed in parallel.
+- The user-specified dependency DAG of Transforms within a Workflow allows the app to execute in parallel all sibling Transforms (in the leaf-to-parent direction) and all Data Quality Reports.
 
-- Similarly, Workflows themselves may also depend upon other Workflows, with the DAG thus defined also permitting parallel execution of Transforms and Data Quality Reports. Furthermore, due to their composability, a given Workflow's Transforms and Data Quality Reports may be reused by any number of other Workflows.
+- Similarly, Workflows themselves may also depend upon other Workflows, with the DAG thus defined also permitting the application to execute Transforms and Data Quality Reports in parallel. Furthermore, due to their composability, a given Workflow's Transforms and Data Quality Reports may be reused/rerun as a unit by any number of other Workflows.
 
-- Because it is stored in the context of a Postgres/Redshift schema, the data produced by a given Workflow Run may be referenced by any other Workflow Run.  This is useful when source S3 data files are huge: create a Workflow that loads the data, Run it once, and then create separate Workflows that Transform the loaded data by referencing schema-prefixed table names.
+- Because it is stored in the context of a Postgres/Redshift schema, the data produced by a given Workflow Run may be referenced by any other Workflow Run.  This is particularly useful when source S3 data files are huge. In such cases, one may create a Workflow that loads the data, Run it once, and then create separate Workflows that Transform and Report on the loaded data by referencing schema-prefixed table names.
 
+- Another advantage of Postgres/Redshift schemas is that they serve as a context for examining data and debugging Workflow SQL after a Run, simply by setting the Postgres/Redshift SEARCH_PATH to the schema for the Run.
 
+- An end-User of this application need have no programming knowledge whatsoever: only a basic knowledge of SQL and minimal acquaintence with ETL is required.
 
 ## Now what?
 
+To begin exploration of the application on your local machine, see [Local Project Setup](#project_setup) below, and try to get the [Demo Workflow](#demo_workflow) running.
 
 
 
+## sql-cms concepts and entities
 
-The following entities exist in the **public** Postgres schema, and together they realize the application:
+All application entities exist in the **public** Postgres schema.  The following notes concern the intended purposes of the application entities:
 
-- **User**: An Analyst possessing basic knowledge of SQL, or an ETL SQL Developer.  No knowledge of programming is required to use this application: only knowledge of SQL.
-
-- **Customer**: The Customer with which a WorkflowConfiguration may be associated
-
-- **Workflow**: A named collection of the following, each via a `has_many` relationship:
-
-  - Various types of SQL Transform and their TransformDependencies and TransformValidations and their Validations
-
-  - DataQualityReports, via WorkflowDataQualityReports
-
-  - Other Workflows, via WorkflowDependency
+- **Workflow**
 
 - **WorkflowConfiguration**: Stores the S3 working directory and an optional Customer association; it `has_many`:
 
@@ -75,8 +71,9 @@ The following entities exist in the **public** Postgres schema, and together the
 
 - params
 - sql snippets
-- dump repo: in rake tasks section
+- more atomic, less deadlocking
 
+- dump repo: in rake tasks section
 
 ## Run Management
 
@@ -84,7 +81,7 @@ This application uses Sidekiq via Active::Job for parallelization of Runs, Trans
 
 To monitor Sidekiq locally or once deployed, click on Admin | Sidekiq in the application.
 
-## Demo Workflow
+## <a name="demo_workflow">Demo Workflow</a>
 
 This application comes with a rather pathetic Demo Workflow that was ported from an ancestral app.
 
@@ -124,7 +121,7 @@ heroku:upload:development
 
 To deploy to Heroku, you'll need 3 Heroku AddOns: Postgres, Redis (for Sidekiq), and SendGrid.
 
-You'll only need one 1x Sidekiq Worker dyno if all Workflows will be run on Postgres.  However, to also run Workflows on Redshift, you'll need a 2nd Worker Heroku Resource pool of circa 4 1x Sidekiq Worker dynos
+You'll only need one 1x Sidekiq Worker dyno if all Workflows will be run on Postgres.  However, to also run Workflows on Redshift, you'll need a 2nd Worker Heroku Resource pool of circa four 1x Sidekiq Worker dynos
 
 You'll want to configure many - though not all - of the same environment variables on Heroku as you do for your local setup. I set the following on my Herkou app:
 
@@ -175,13 +172,23 @@ Note that the above excludes ENV vars set up by the 3 Heroku AddOns.
 
 ## Running Workflows on Redshift
 
+Configuring the application to run on Redshift requires the following steps:
 
+1) Set the 5 Redshift-related environment variables.  (Coming soon a future release, all these but the password will be encapsulated by an entity manipulable in the application, though the password will still need to be set by an environment variable.)
+
+2) Enable the `worker_redshift` Heroku Worker Resource that is defined in this application's `Procfile`, and set the number of 1X dynos to the level of parallelism desired.  (Mine is currently set to 4.)
+
+Configuring a Workflow to run on Redshift requires the following steps:
+
+1) Create a WorkflowConfiguration with the `Redshift?` attribute flagged.
+
+2) If importing from and/or exporting to S3, in the same WorkflowConfiguration be sure to set at least the appropriate `CREDENTIALS 'aws_iam_role=arn:aws:iam::...'` in the Import Transform Options and/or Export Transform Options fields.
 
 ## [Environment Setup for local development](https://github.com/brightbytes/sql-cms/wiki/Local-Dev-Env-Setup)
 
-## Local Project Setup
+## <a name="project_setup">Local Project Setup</a>
 
-1) <a name="env_vars"></a>Add environment variables
+1) Add environment variables
 
   * Create a .env file in your sql-cms project folder with the following contents; it will be automatically used by the `dotenv` gem:
 
@@ -249,12 +256,12 @@ Note that the above excludes ENV vars set up by the 3 Heroku AddOns.
   sidekiq
   ```
 
-## FAQ
+## FAQ (that I ask of myself, to be clear)
 
 Q: Why isn't this repo a gem?
 
 A: It is quicker for me to make changes and deploy them by keeping this as an application for now. That is, I need to use and change this application relatively frequently, and I'd rather not deal with the extra steps of releasing a new version of a gem and updating the app to us it for every change I make. However, there is probably tooling that would automate CD of this repo as a gem: once I have a chance to figure it out, this repo will become a gem.
 
-Q: What new features will this app acquire?
+Q: What new features does this app need?
 
 A: [Future plans](https://github.com/brightbytes/sql-cms/wiki/Future-Plans)
