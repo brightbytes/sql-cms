@@ -28,52 +28,47 @@ The organization of SQL expressions in a Workflow CMS that at runtime namespaces
 
 To begin exploration of the application on your local machine, see [Local Project Setup](#project_setup) below, and try to get the [Demo Workflow](#demo_workflow) running.
 
+Or, skim the following section for a preview of the central application concepts ...
 
+## Entities and Concepts
 
-## sql-cms concepts and entities
-
-All application entities exist in the **public** Postgres schema.  The following notes concern the intended purposes of the application entities:
-
-- **Workflow**
-
-- **WorkflowConfiguration**: Stores the S3 working directory and an optional Customer association; it `has_many`:
-
-  - Notifications
-
-  - Runs and their RunStepLogs
-
-- **Notification**: An association of a Workflow with a User for the purpose of notifying the User whenenever a Run of that Workflow successfully or unsuccessfully completes.
-
-- **Transform**: A named, optionally-parametrized SQL query, some types of which must be associated with an S3 file, and that specifies one of the following Runners for the SQL:
-
-  - **RailsMigrationRunner**: Evals the contents of the sql field as a Ruby Migration (because hand-writing boilerplate DDL sucks); supports every feature that Rails Migrations support.  If preferred, SQL Analysts uncomfortable with Ruby code may use the generic **SqlRunner** described below to author DDL ... though I'd recommend learning Rails Migration syntax, because it's much more convenient.
-
-  - **CopyFromRunner**: Requires specification a file to be imported from S3, and requires that its sql field be a `COPY ... FROM STDIN ...` type of SQL statement
-
-  - **SqlRunner**: Allows its sql field to be any type of DDL statement (CREATE) or DML statement (INSERT, UPDATE, DELETE, but not SELECT, since that would be pointless) other than those that read from or write to S3 files (COPY).
-
-  - **CopyToRunner**: Requires specification of an s3 file location to which to export data, and requires that its sql field be a `COPY ... TO STDOUT ...` type of SQL statement
-
-  - **AutoLoadRunner**: Requires only the specification of a file to be imported from S3 and a :table_name param, and introspects on the file's header, creates a table with string columns based upon the sql-identifier-coerced version of the headers, and loads the table from the file.  Accepts a :name_type_map param to create the indicated columns as the indicated types, e.g. { params: { name_type_map: { my_column: :integer } } }.  Also accepts an :indexed_columns param with an array of columns to index.  At this time, additional features are deliberately not supported: if a more-complex scenario is required, define a `RailsMigrationRunner` transform and a `CopyFromRunner` transform.
-
-- **TransformDependency**: An association of one Transform with another where the Prerequisite Transform must be run before the Postrequisite Transform.  Every Workflow has a TransformDependency-based DAG that is resolved at Run-time into a list of groups of Transforms, where each Transform in a given group may be run in parallel with all other Transforms in that group.
-
-- **TransformValidation**: An association of a Transform to a parameterized Validation that specifies the parameters required for the Validation.  When a TransformValidation fails, the system fails its associated Transform, and execution halts in failure after that Transform's group completes execution.
-
-- **Validation**: A named, reusable, manditorily-parametrized SQL SELECT statement that validates the result of a Transform via an intermediating TransformValidation's params, e.g. to verify that all rows in a table have a value for a given column, are unique, reference values in another table, etc.  Similar in intent to Rails Validations.  Upon failure, returns the IDs of all invalid rows.
-
-- **DataQualityReport**: A named, reusable, manditorily-parametrized SQL SELECT statement the system runs via an intermediating WorkflowDataQualityReport's params after all Transforms have completed.  The system will store the tabular Report data returned by the SQL, and also include that data in a Notification email that is sent after a successful Run.
-
-- **Run**: A record of the postgres-schema_name (useful for debugging/examining data), current status, and execution_plan of a given Run of a Workflow.  When a User creates a Run for a Workflow, the system serializes the Workflow and **all** its dependent objects into the Run#execution_plan field, and execution of the Run proceeds against that field.  This allows a Workflow to be changed at any time without affecting any current Runs.
-
-- **RunStepLog**: A per-Run record of the execution of a single Transform or DataQualityReport that in success cases stores the result of running the SQL, in failure cases stores TransformValidation failures, or - when the Step raises an Exception - the error details.
+All sql-cms entities exist in the **public** Postgres schema.  Whereas, all entities produced by Runs exist in Postgres or Redshift schemas named after the Workflow and (optionally) Customer for the Run.
 
 
 - params
-- sql snippets
-- more atomic, less deadlocking
 
-- dump repo: in rake tasks section
+
+The following notes concern the intended purposes of the high-level application entities:
+
+- **Workflow**: A Workflow may comprise Transforms and their associated Validations and Data Quality Reports.  A Workflow may also include other Workflows to be run as a prerequisite.
+
+- **WorkflowConfiguration**: A WorkflowConfiguration must be defined and associated with a Workflow - and optionally associated with a Customer - for the system to create and execute Runs.  For Workflows that import from and/or export to S3, the WorkflowConfiguration must define an S3 region, bucket, and (optionally) file path, as well as import Transform options for the Workflow's Postgres/Redshift CopyFrom Transforms and export Transform options for Workflow's Postgres CopyTo Transforms or Redshift Unload statements. A WorkflowConfiguration may optionally specify Users to notify upon success or failure of a Run.
+
+- **Transform**: A named, optionally-parametrized SQL query, some types of which must be associated with an S3 file, that specifies the prerequisite Transforms it depends upon and utilizes one of the following Runners for the SQL:
+
+  - **RailsMigrationRunner**: Evals the contents of the sql field as a Ruby Migration (because hand-writing boilerplate DDL is a hassle); supports every feature that Rails Migrations support.  If preferred, those uncomfortable with Ruby code may use the generic **SqlRunner** described below to author DDL.  Sadly, this runner does not currently work with the Rails 5 Redshift gem.
+
+  - **CopyFromRunner**: Requires specification a file to be imported from S3.  Its Import Transform Options may be specified in the WorkflowConfiguration.  Works for both Postgres and Redshift, the latter of which requires at least the specification of `CREDENTIALS` in the Import Transform Options.
+
+  - **SqlRunner**: Allows its sql field to be any type of DDL or DML statement other than those that read from or write to S3 files.  Multiple SQL statements may appear in this field, if they are separated by a comma.  However, one should avoid multiple DML statements appearing in the same Transform for the following reasons:
+
+    - It prevents the parallelism that could be achieved by defining a chain of prerequisite Transforms
+
+    - If multiple Transforms contain multiple statements, it becomes more likely that two or more of them will deadlock
+
+  - **CopyToRunner**: Requires specification of a base s3 prefix to which to export data, after which will appear an infix named after the Run.  Works only for Postgres only.
+
+  - **UnloadRunner**: Requires specification of a base s3 prefix to which to export data, after which will appear an infix named after the Run.  Works only for Redshift, which requires at least the specification of `CREDENTIALS` in the Import Transform Options.
+
+  - **AutoLoadRunner**: Requires only the specification of a file to be imported from S3 and a :table_name param. It introspects on the file's header, creates a table with string columns based upon the sql-identifier-coerced version of the headers, and loads the table from the file.  Accepts a :name_type_map param to create the indicated columns as the indicated types.  Also accepts an :indexed_columns param with an array of columns to index.  At this time, additional features are deliberately not supported because they are not required.
+
+- **Validation**: A named, reusable SQL SELECT statement that validates the result of a Transform using an intermediating TransformValidation's params (if any), e.g. to verify that all rows in a table have a value for a given column, are unique, reference values in another table, etc.  Similar in intent to Rails Validations.  Upon failure, returns the IDs of all invalid rows, for manual inspection in the schema. Note that the SQL SELECT statement must be written so as to return the ids of rows that violate the Validation. When associated with a Transform, a failure will cause execution to halt after that Transform's group completes execution.
+
+- **DataQualityReport**: A named, reusable SQL SELECT statement the system runs using an intermediating WorkflowDataQualityReport's params (if any) after all Transforms have completed.  The system will store the tabular Report data returned by the SQL, and also include that data in any Notification email(s) sent after a successful Run.
+
+- **Run**: A record of the postgres-schema_name (useful for debugging/examining data), current status, and execution_plan of a given Run of a Workflow.  When a User creates a Run for a WorkflowConfiguration, the system serializes the WorkflowConfiguration, its Workflow, and **all** objects that depend upon the Workflow into the `Run#execution_plan` field, and execution of the Run proceeds using that Execution Plan.  This allows a Workflow to be changed at any time without affecting any current Runs, and also preserves a record of the SQL that produced the Run results.
+
+- **SqlSnippet**: A SQL Snippet is a fragment of SQL that may be reused in multiple Transforms by referencing its slug surrounded a colon on either side, e.g. `:slug_here:`. The system will interpolate the Snippet into the Transform SQL when generating an ExecutionPlan. Snippets may themselves contain parameter refernces, which will be resolved as described above *after* Snippet interpolation.
 
 ## Run Management
 
@@ -256,7 +251,19 @@ Configuring a Workflow to run on Redshift requires the following steps:
   sidekiq
   ```
 
-## FAQ (that I ask of myself, to be clear)
+4) If your local environment requires a large amount of seed data, or if you just get sick of watching the migrations flash by when running `rake one_ring`, do the following:
+
+  - Set up another git repo and clone it as a directory-sibling of the `sql-cms` repo, and create a subdirectory in that repo named `sql_cms`.
+
+  - Set the ENV var `SEED_DATA_DUMP_REPO=` in your `.env` file to point to the new repo.
+
+  - Run `rake one_ring` - which will invoke your `db:seed` task - and then run `rake db:data:dump` to create a Postgres dumpfile in the new repo
+
+  - Ensure that your `db:seed` task checks whether it needs to generate data, and doesn't proceed if not.
+
+  - Check in and push the new dump; future runs of `rake one_ring` will use it intead of running seeds.
+
+## FAQ (that I frequently ask myself, to be clear)
 
 Q: Why isn't this repo a gem?
 
