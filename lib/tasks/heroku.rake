@@ -35,7 +35,7 @@ namespace :heroku do
       if File.exists?(DOWNLOAD_DUMPFILE)
         run("pg_restore --clean --no-acl --no-owner -h localhost -U postgres -d sql_cms_development #{DOWNLOAD_DUMPFILE}")
       else
-        raise "You must first run `rake heroku` before you can upload to dev."
+        raise "You must first run `rake heroku:download` before you can upload to dev."
       end
     end
 
@@ -57,8 +57,7 @@ namespace :heroku do
       end
     end
 
-    # I got your cyclomatic complexity <crotch-grab>right here</crotch_grab>, baby!
-    def check_git_status! # rubocop:disable Metrics/CyclomaticComplexity
+    def check_git_status!
       puts "Running `git fetch` ... "
       `git fetch`
       if `git log ..origin/#{current_branch}`.present?
@@ -78,6 +77,13 @@ namespace :heroku do
     def exit_with_message(msg)
       puts "\n#{msg}\n"
       exit(0)
+    end
+
+    def current_branch
+      cmd = 'git branch 2> /dev/null | sed -e \'/^[^*]/d\' -e \'s/* \(.*\)/\1/\''
+      result = `#{cmd}`
+      raise "Unable to get the current branch name" if result.blank?
+      result.strip
     end
 
   end
@@ -127,6 +133,7 @@ namespace :heroku do
 
     def run_migrations?
       sha = last_release_sha
+      # You can occasionally get false positives off this when an old migration is tweaked, but it's rare enough that it doesn't matter
       `git diff #{sha} db/migrate`.present?
     end
 

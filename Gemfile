@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 ruby "2.4.1"
 
-gem 'dotenv-rails', groups: [:development, :test], require: 'dotenv/rails-now'
+gem 'dotenv-rails', require: 'dotenv/rails-now'
 
 # Use Puma as the app server
 # gem 'puma', '~> 3.0'
