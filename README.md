@@ -28,15 +28,20 @@ The organization of SQL expressions in a Workflow CMS that at runtime namespaces
 
 To begin exploration of the application on your local machine, see [Local Project Setup](#project_setup) below, and try to get the [Demo Workflow](#demo_workflow) running.
 
-Or, skim the following section for a preview of the central application concepts ...
+Or, skim the following sections for a preview of the central application concepts, and use cases for the application.
 
 ## Entities and Concepts
 
 All sql-cms entities exist in the **public** Postgres schema.  Whereas, all entities produced by Runs exist in Postgres or Redshift schemas named after the Workflow and (optionally) Customer for the Run.
 
+Workflows, Transforms, TransformValidations, and WorkflowDataQualityReports all have a 'Params YML' field that may be used to specify params interpolated into SQL queries.  Workflow params may be overridden by Transform params and WorkflowDataQualityReport params, and Transform params may be overridden by TransformValidation params.  The expected format for params is as a YML hash, e.g.:
 
-- params
+```
+table_name: table_name_goes_here
+column_name: column_name_goes_here
+```
 
+Parameterization allows Validations and DataQualityReports to be easily reused by multiple Transforms and Workflows, respectively. It also allows SQL Snippets with parameter references to be reused in multiple Transforms.  And, it allows param defaults to be specified at the Workflow level.
 
 The following notes concern the intended purposes of the high-level application entities:
 
@@ -69,6 +74,14 @@ The following notes concern the intended purposes of the high-level application 
 - **Run**: A record of the postgres-schema_name (useful for debugging/examining data), current status, and execution_plan of a given Run of a Workflow.  When a User creates a Run for a WorkflowConfiguration, the system serializes the WorkflowConfiguration, its Workflow, and **all** objects that depend upon the Workflow into the `Run#execution_plan` field, and execution of the Run proceeds using that Execution Plan.  This allows a Workflow to be changed at any time without affecting any current Runs, and also preserves a record of the SQL that produced the Run results.
 
 - **SqlSnippet**: A SQL Snippet is a fragment of SQL that may be reused in multiple Transforms by referencing its slug surrounded a colon on either side, e.g. `:slug_here:`. The system will interpolate the Snippet into the Transform SQL when generating an ExecutionPlan. Snippets may themselves contain parameter refernces, which will be resolved as described above *after* Snippet interpolation.
+
+## Use cases
+
+I have used this application in two major efforts at BrightBytes:
+
+1) Defining the T portion of an ETL of monthly, per-customer data updates. The Workflow loads the Extract from S3, Transforms it into a format amenable for loading into a Data Warehouse whose schema I designed in the process of writing the Workflow Transforms, and exports the results to S3.
+
+2) Defining one Workflow for loading from S3 and another directly-dependent (through schema-referencing) Workflow for normalizing, cleaning, scaling, (primitively-)imputing, and storing a ML feature repository; additional Workflows export to S3 row & column subsets of the repository as Training/Test/Validation data sets for my deep-learning models to chew on.
 
 ## Run Management
 
