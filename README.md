@@ -34,7 +34,7 @@ Or, skim the following sections for a preview of the central application concept
 
 All sql-cms entities exist in the **public** Postgres schema.  Whereas, all entities produced by Runs exist in Postgres or Redshift schemas named after the Workflow and (optionally) Customer for the Run.
 
-Workflows, Transforms, TransformValidations, and WorkflowDataQualityReports all have a 'Params YML' field that may be used to specify parameters that the system will interpolate into their associated SQL queries.  Workflow params may be overridden by Transform params and WorkflowDataQualityReport params, and Transform params may be overridden by TransformValidation params.  With the sole exception of the [AutoLoadRunner](auto_load_runner), the expected format for all params is as a YML hash, e.g.:
+Workflows, Transforms, TransformValidations, and WorkflowDataQualityReports all have a 'Params YML' field that may be used to specify parameters that the system will interpolate into their associated SQL queries.  Workflow params may be overridden by Transform params and WorkflowDataQualityReport params, and Transform params may be overridden by TransformValidation params.  With the sole exception of the [AutoLoadRunner](#auto_load_runner), the expected format for all params is as a YML hash, e.g.:
 
 ```
 table_name: table_name_goes_here
@@ -131,7 +131,7 @@ To deploy to Heroku, you'll need 3 Heroku AddOns: Postgres, Redis (for Sidekiq),
 
 You'll only need one 1x Sidekiq Worker dyno if all Workflows will be run on Postgres.
 
-However, to also run Workflows on Redshift, you'll need a 2nd Worker Heroku Resource of circa four 1x Sidekiq Worker dynos; see [Running Workflows on Redshift](redshift_support) for more.
+However, to also run Workflows on Redshift, you'll need a 2nd Worker Heroku Resource of circa four 1x Sidekiq Worker dynos; see [Running Workflows on Redshift](#redshift_support) for more.
 
 You'll want to configure many - though not all - of the same environment variables on Heroku as you do for your local setup. I set the following on my Herkou app:
 
@@ -196,7 +196,9 @@ Configuring a Workflow to run on Redshift requires the following steps:
 
 2) If importing from and/or exporting to S3, in the same WorkflowConfiguration be sure to set at least the appropriate `CREDENTIALS 'aws_iam_role=arn:aws:iam::...'` in the Import Transform Options and/or Export Transform Options fields.
 
-## [Environment Setup for local development](https://github.com/brightbytes/sql-cms/wiki/Local-Dev-Env-Setup)
+## Environment Setup for local development
+
+See [Local Dev Env Setup](https://github.com/brightbytes/sql-cms/wiki/Local-Dev-Env-Setup) if you are new to setting up your machine to work on a Rails app.
 
 ## <a name="project_setup">Local Project Setup</a>
 
