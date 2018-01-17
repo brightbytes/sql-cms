@@ -58,7 +58,7 @@ ActiveAdmin.register DataQualityReport do
   form do |f|
     inputs 'Details' do
       input :name, as: :string
-      input :sql, as: :text
+      input :sql, as: :text, hint: "The system will store the tabular results returned by the final SELECT statement in this field, and email them to Users if the WorkflowConfiguration is so configured."
       input :immutable, input_html: { disabled: f.object.immutable? }, hint: "Checking this indicates that this Data Quality Report should not and can not be altered"
     end
 

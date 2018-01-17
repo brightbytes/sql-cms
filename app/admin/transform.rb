@@ -169,7 +169,7 @@ ActiveAdmin.register Transform do
       input :runner, as: :select, collection: RunnerFactory::RUNNERS_FOR_SELECT, include_blank: false
 
       show_params_yaml_selector = ((f.object.new_record? || f.object.runner != 'RailsMigration') ? {} : { style: 'display:none' })
-      input :params_yaml, as: :text, input_html: { rows: 10 }, wrapper_html: show_params_yaml_selector
+      input :params_yaml, as: :text, input_html: { rows: 10 }, wrapper_html: show_params_yaml_selector, hint: 'The params in this YAML hash will be interpolated into the Transform SQL'
 
       input :workflow_params_yaml, as: :text, collection: resource.workflow.params_yaml, input_html: { disabled: true, rows: 4 }, wrapper_html: show_params_yaml_selector, hint: "These params will be reverse-merged into the params_yaml in the previous field: there's no need to type them again."
 
@@ -188,7 +188,7 @@ ActiveAdmin.register Transform do
       prereqs = f.object.available_prerequisite_transforms
       if prereqs.present?
         prereqs = group_prereqs(prereqs)
-        inputs 'Dependencies' do
+        inputs 'Depended-Upon Transforms' do
           prereq_id = params[:prerequisite_transform_id].to_i
           input :prerequisite_transforms, as: :check_boxes, collection: prereqs.map { |t| [t.name, t.id, checked: (t.id == prereq_id)] }, disabled: [nil]
         end

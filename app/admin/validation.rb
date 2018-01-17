@@ -60,8 +60,8 @@ ActiveAdmin.register Validation do
   form do |f|
     inputs 'Details' do
       input :name, as: :string
-      input :sql, as: :text
-      input :immutable, input_html: { disabled: f.object.immutable? }, hint: "Checking this indicates that this Validation should not and can not be altered"
+      input :sql, as: :text, hint: "This SQL needs to return the ids of rows that FAIL the Validation."
+      input :immutable, input_html: { disabled: f.object.immutable? }, hint: "Checking this indicates that this Validation should not and can not be altered."
     end
 
     actions do

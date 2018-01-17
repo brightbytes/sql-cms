@@ -107,19 +107,20 @@ ActiveAdmin.register WorkflowConfiguration do
     # semantic_errors *f.object.errors.keys
 
     inputs 'Details' do
-      input :customer, as: :select, collection: customers_with_single_select, include_blank: !customer_id_from_param
+      input :customer, as: :select, collection: customers_with_single_select, include_blank: !customer_id_from_param, hint: 'Optional'
       input :workflow, as: :select, collection: workflows_with_single_select, include_blank: !workflow_id_param_val
 
-      input :redshift, as: :select, include_blank: false
-      input :import_transform_options, as: :text
-      input :export_transform_options, as: :text
+      input :redshift, as: :select, include_blank: false, hint: 'Run the Workflow on Redshift?'
+      input :import_transform_options, as: :text, hint: 'This will be append as the suffix of all CopyFrom Transforms in the Workflow'
+      input :export_transform_options, as: :text, hint: 'This will be append as the suffix of all Postgres CopyTo or Redshift Unload Transforms in the Workflow'
 
-      input :s3_region_name, as: :string # This should be a drop-down
-      input :s3_bucket_name, as: :string
-      input :s3_file_path, as: :string
+      # This should be a drop-down
+      input :s3_region_name, as: :string, hint: 'Required. The S3 region name for all file-importing and file-exporting Transforms in the Workflow.'
+      input :s3_bucket_name, as: :string, hint: 'Required. The S3 bucket name for all file-importing and file-exporting Transforms in the Workflow.'
+      input :s3_file_path, as: :string, hint: 'Optional. The common S3 file path for all file-importing and file-exporting Transforms in the Workflow.'
     end
 
-    inputs 'Run Notifications' do
+    inputs 'Users to Email Run Notifications' do
       # The preselect doesn't work, for obvious reasons
       input :notified_users, as: :check_boxes, collection: User.all.order('users.first_name, users.last_name')
     end
