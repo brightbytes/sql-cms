@@ -52,7 +52,7 @@ class Run < ApplicationRecord
     update_attributes(schema_name: "#{workflow_configuration}_run_#{id}")
   end
 
-  # From Run::PostgresSchema; consider removing to Observer or Service
+  # From Run::PostgresSchema; consider removing to Observer/Service
   after_destroy :drop_schema
 
   # Associations
@@ -160,8 +160,6 @@ class Run < ApplicationRecord
       #  an option to implement field-lock or at least column-lock semantics, since Oracle did a couple decades ago. However, neither Postgres nor Redshift do.
       # So, while I can still argue that writing Transforms on a column-by-column basis makes them easier to maintain because each Transform only concerns a single
       #  aspect of the data, I can no longer argue that any performance gains adhere.
-      # Plus, I might not even have a leg to stand on as regards maintainability, since in some cases complex joins would need to be copy/pasted between Transforms
-      #  that pertain to the same target table.
       if exception.message =~ /^PG::TRDeadlockDetected/ || exception.message =~ /Serializable isolation violation/
         run_step_log.destroy
         TransformJob.set(queue: (use_redshift? ? :redshift : :default)).perform_later(run_id: id, step_index: step_index, step_id: step_id)
