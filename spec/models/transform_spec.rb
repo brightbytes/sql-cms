@@ -39,10 +39,10 @@ describe Transform do
       it { should validate_uniqueness_of(:name).scoped_to(:workflow_id).case_insensitive }
     end
 
-    it { should validate_inclusion_of(:runner).in_array(RunnerFactory::RUNNERS) }
+    it { should validate_inclusion_of(:runner).in_array(Transform::RUNNERS) }
 
-    it "should require the presence of the s3_file_name for all RunnerFactory::S3_FILE_RUNNERS" do
-      RunnerFactory::S3_FILE_RUNNERS.each do |runner|
+    it "should require the presence of the s3_file_name for all Transform::S3_FILE_RUNNERS" do
+      Transform::S3_FILE_RUNNERS.each do |runner|
         t = build(:transform, runner: runner, params: { table_name: 'whatever' })
         expect(t).to_not be_valid
         expect(t.errors[:s3_file_name]).to_not eq(nil)
@@ -99,7 +99,7 @@ describe Transform do
       end
 
       it "should add the sql-dynamically-generated message for import Transforms when no sql is provided" do
-        RunnerFactory::IMPORT_S3_FILE_RUNNERS.each do |runner|
+        Transform::IMPORT_S3_FILE_RUNNERS.each do |runner|
           transform = build(:transform, runner: runner, sql: "")
           transform.valid?
           expect(transform.sql).to eq(Transform::SQL_DYNAMICALLY_GENERATED_MSG)
@@ -176,32 +176,32 @@ describe Transform do
 
     context "runner-type methods" do
       it "should have an #importing? method" do
-        RunnerFactory::IMPORT_S3_FILE_RUNNERS.each do |runner|
+        Transform::IMPORT_S3_FILE_RUNNERS.each do |runner|
           expect(build(:transform, runner: runner).importing?).to eq(true)
         end
-        (RunnerFactory::RUNNERS - RunnerFactory::IMPORT_S3_FILE_RUNNERS).each do |runner|
+        (Transform::RUNNERS - Transform::IMPORT_S3_FILE_RUNNERS).each do |runner|
           expect(build(:transform, runner: runner).importing?).to eq(false)
         end
       end
       it "should have an #exporting? method" do
-        RunnerFactory::EXPORT_S3_FILE_RUNNERS.each do |runner|
+        Transform::EXPORT_S3_FILE_RUNNERS.each do |runner|
           expect(build(:transform, runner: runner).exporting?).to eq(true)
         end
-        (RunnerFactory::RUNNERS - RunnerFactory::EXPORT_S3_FILE_RUNNERS).each do |runner|
+        (Transform::RUNNERS - Transform::EXPORT_S3_FILE_RUNNERS).each do |runner|
           expect(build(:transform, runner: runner).exporting?).to eq(false)
         end
       end
       it "should have an #s3_file_required? method" do
-        RunnerFactory::S3_FILE_RUNNERS.each do |runner|
+        Transform::S3_FILE_RUNNERS.each do |runner|
           expect(build(:transform, runner: runner).s3_file_required?).to eq(true)
         end
-        (RunnerFactory::RUNNERS - RunnerFactory::S3_FILE_RUNNERS).each do |runner|
+        (Transform::RUNNERS - Transform::S3_FILE_RUNNERS).each do |runner|
           expect(build(:transform, runner: runner).s3_file_required?).to eq(false)
         end
       end
       it "should have an #auto_load? method" do
         expect(build(:transform, runner: 'AutoLoad').auto_load?).to eq(true)
-        (RunnerFactory::RUNNERS - ['AutoLoad']).each do |runner|
+        (Transform::RUNNERS - ['AutoLoad']).each do |runner|
           expect(build(:transform, runner: runner).auto_load?).to eq(false)
         end
       end

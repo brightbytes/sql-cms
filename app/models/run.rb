@@ -238,7 +238,7 @@ class Run < ApplicationRecord
   end
 
   def exported_to_s3?
-    run_step_logs.transforms.any? { |log| log.step_plan[:runner].in?(RunnerFactory::EXPORT_S3_FILE_RUNNERS) }
+    run_step_logs.transforms.any? { |log| log.step_plan[:runner].in?(Transform::EXPORT_S3_FILE_RUNNERS) }
   end
 
   def duration_seconds

@@ -38,9 +38,17 @@ class Transform < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { scope: :workflow_id, case_sensitive: false }
 
-  validates :runner, presence: true, inclusion: { in: RunnerFactory::RUNNERS }
+  RUNNERS = %w(RailsMigration AutoLoad CopyFrom Sql CopyTo Unload).freeze
 
-  JOINED_S3_FILE_RUNNERS = RunnerFactory::S3_FILE_RUNNERS.join(',').freeze
+  IMPORT_S3_FILE_RUNNERS = %w(AutoLoad CopyFrom).freeze
+  EXPORT_S3_FILE_RUNNERS = %w(CopyTo Unload).freeze
+  S3_FILE_RUNNERS = (IMPORT_S3_FILE_RUNNERS + EXPORT_S3_FILE_RUNNERS).freeze
+
+  NON_S3_FILE_RUNNERS = %w(RailsMigration Sql).freeze
+
+  validates :runner, presence: true, inclusion: { in: RUNNERS }
+
+  JOINED_S3_FILE_RUNNERS = S3_FILE_RUNNERS.join(',').freeze
   S3_ATTRIBUTES_PRESENT_ERROR_MSG = "is required for runners of type: #{JOINED_S3_FILE_RUNNERS}".freeze
 
   validates :s3_file_name, presence: { message: S3_ATTRIBUTES_PRESENT_ERROR_MSG }, if: :s3_file_required?
@@ -94,17 +102,17 @@ class Transform < ApplicationRecord
 
   # Scopes
 
-  scope :importing, -> { where(runner: RunnerFactory::IMPORT_S3_FILE_RUNNERS) }
+  scope :importing, -> { where(runner: IMPORT_S3_FILE_RUNNERS) }
 
-  scope :exporting, -> { where(runner: RunnerFactory::EXPORT_S3_FILE_RUNNERS) }
+  scope :exporting, -> { where(runner: EXPORT_S3_FILE_RUNNERS) }
 
   scope :rails_migration, -> { where(runner: 'RailsMigration') }
 
   scope :not_rails_migration, -> { where.not(runner: 'RailsMigration') }
 
-  scope :file_related, -> { where(runner: RunnerFactory::S3_FILE_RUNNERS) }
+  scope :file_related, -> { where(runner: S3_FILE_RUNNERS) }
 
-  scope :non_file_related, -> { where(runner: RunnerFactory::NON_S3_FILE_RUNNERS) }
+  scope :non_file_related, -> { where(runner: NON_S3_FILE_RUNNERS) }
 
   scope :independent, -> { where("NOT EXISTS (SELECT 1 FROM transform_dependencies WHERE postrequisite_transform_id = transforms.id)") }
 
@@ -140,15 +148,15 @@ class Transform < ApplicationRecord
   concerning :Runners do
 
     def importing?
-      runner&.in?(RunnerFactory::IMPORT_S3_FILE_RUNNERS)
+      runner&.in?(IMPORT_S3_FILE_RUNNERS)
     end
 
     def exporting?
-      runner&.in?(RunnerFactory::EXPORT_S3_FILE_RUNNERS)
+      runner&.in?(EXPORT_S3_FILE_RUNNERS)
     end
 
     def s3_file_required?
-      runner&.in?(RunnerFactory::S3_FILE_RUNNERS)
+      runner&.in?(S3_FILE_RUNNERS)
     end
 
     def auto_load?
