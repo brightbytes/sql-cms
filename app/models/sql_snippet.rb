@@ -72,7 +72,7 @@ class SqlSnippet < ApplicationRecord
   end
 
   private def referencing_objs(klass)
-    klass.where("sql LIKE '%:#{slug}:%'")
+    klass.where(["sql LIKE ?", "%:#{slug}:%"])
   end
 
 end

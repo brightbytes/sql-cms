@@ -12,8 +12,9 @@ module Run::PostgresSchema
   def create_schema
     unless schema_exists?
       self.class.in_db_context(use_redshift?) do
+        escaped_schema = ActiveRecord::Base.connection.quote_string(schema_name)
         # Putting this inside a transaction prevents the connection from being hosed by SQL error
-        transaction { connection.execute(%{CREATE SCHEMA "#{schema_name}"}) }
+        transaction { connection.execute("CREATE SCHEMA #{escaped_schema}") }
       end
     end
   end
@@ -21,8 +22,9 @@ module Run::PostgresSchema
   def drop_schema
     if schema_exists?
       self.class.in_db_context(use_redshift?) do
+        escaped_schema = ActiveRecord::Base.connection.quote_string(schema_name)
         # Putting this inside a transaction prevents the connection from being hosed by SQL error
-        transaction { connection.execute(%{DROP SCHEMA "#{schema_name}" CASCADE}) }
+        transaction { connection.execute("DROP SCHEMA #{escaped_schema} CASCADE") }
       end
     end
   end
@@ -113,8 +115,8 @@ module Run::PostgresSchema
     self.class.connection
   end
 
-  def set_search_path!(schema)
-    connection.execute("SET search_path TO '#{schema}';")
+  def set_search_path!(search_path_schema)
+    connection.execute(ActiveRecord::Base.send(:sanitize_sql_array, ["SET search_path TO ?", search_path_schema]))
   end
 
   def in_schema_context
