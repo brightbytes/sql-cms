@@ -66,6 +66,10 @@ namespace :db do
 
       if PathHelpers.env_var_present?
         if File.exists?(PathHelpers.full_dump_path_and_file)
+          dputs "Attempting to pull latest from bb_data repo ..."
+          # If this fails, the error will be output to console.  And, it will be an expected failure testing a newly-generated dumpfile
+          run("cd #{PathHelpers.full_dump_path} && git pull")
+
           dputs "Loading PostgreSQL for SQL CMS Application ..."
           run("PGPASSWORD=#{DB_CONFIG["password"]} pg_restore -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} #{PathHelpers.full_dump_path_and_file}")
         else
