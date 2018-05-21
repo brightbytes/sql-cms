@@ -205,9 +205,9 @@ ActiveAdmin.register Transform do
   # We already have this as a link, and I don't really want it as a batch action
   batch_action :destroy, false
 
-  batch_action :move, form: -> { { workflow_id: Workflow.pluck(:name, :id) } }, if: proc { Workflow.count > 1 }, confirm: "Are you sure you want to move the selected transforms?" do |ids, inputs|
+  batch_action :move, form: -> { { workflow: Workflow.pluck(:name, :id) } }, if: proc { Workflow.count > 1 }, confirm: "Are you sure you want to move the selected transforms?" do |ids, inputs|
     # We do these individually for the sake of the callback to nuke the dependencies
-    Transform.transaction { Transform.find(ids).each { |transform| transform.update_attributes!(workflow_id: inputs[:workflow_id]) } }
+    Transform.transaction { Transform.find(ids).each { |transform| transform.update_attributes!(workflow_id: inputs[:workflow]) } }
     redirect_to transforms_path, notice: "Moved #{ids.size} Transforms."
   end
 
