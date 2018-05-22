@@ -6,9 +6,9 @@ class PaperTrail::Version < ActiveRecord::Base
   include PaperTrail::VersionConcern
 
   if defined?(Rails::Console)
-    PaperTrail.whodunnit = "#{`whoami`.strip}: console"
+    PaperTrail.request.whodunnit = "#{`whoami`.strip}: console"
   elsif File.basename($PROGRAM_NAME) == "rake"
-    PaperTrail.whodunnit = "#{`whoami`.strip}: rake #{ARGV.join ' '}"
+    PaperTrail.request.whodunnit = "#{`whoami`.strip}: rake #{ARGV.join ' '}"
   end
 
   # Associations
@@ -38,8 +38,8 @@ module PaperTrail::CleanupHook
   end
 
   def cleanup_paper_trail_info
-    ::PaperTrail.whodunnit = nil
-    ::PaperTrail.controller_info = nil
+    ::PaperTrail.request.whodunnit = nil
+    ::PaperTrail.request.controller_info = nil
   end
 end
 
