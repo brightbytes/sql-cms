@@ -31,7 +31,7 @@ ActiveAdmin.register SqlSnippet do
       row :name
       row :slug
       row :usage_count
-      simple_format_row(:sql)
+      code_format_row(:sql)
       row :created_at
       row :updated_at
     end

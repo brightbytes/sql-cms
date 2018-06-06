@@ -37,7 +37,7 @@ ActiveAdmin.register Workflow do
       row :name
       row :slug
 
-      simple_format_row(:params_yaml)
+      code_format_row(:params_yaml)
 
       row :created_at
       row :updated_at

@@ -49,8 +49,8 @@ ActiveAdmin.register WorkflowConfiguration do
       row :customer if resource.customer
 
       row :redshift
-      simple_format_row(:import_transform_options)
-      simple_format_row(:export_transform_options)
+      code_format_row(:import_transform_options)
+      code_format_row(:export_transform_options)
 
       row :s3_region_name
       row :s3_bucket_name

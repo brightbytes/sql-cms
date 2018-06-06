@@ -45,10 +45,10 @@ ActiveAdmin.register Transform do
       boolean_row :enabled
 
       row :runner
-      simple_format_row(:params_yaml)
-      simple_format_row(:workflow_params_yaml)
-      simple_format_row(:sql)
-      simple_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
+      code_format_row(:params_yaml)
+      code_format_row(:workflow_params_yaml)
+      code_format_row(:sql)
+      code_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
 
       if resource.importing? || resource.exporting?
         row :s3_file_name

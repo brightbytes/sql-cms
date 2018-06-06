@@ -13,10 +13,10 @@ ActiveAdmin.register TransformValidation do
       row :validation
       row :interpolated_name if resource.params.present? && resource.name != resource.interpolated_name
       boolean_row :enabled
-      simple_format_row(:params_yaml)
-      simple_format_row(:transform_params_yaml)
-      simple_format_row(:sql)
-      simple_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
+      code_format_row(:params_yaml)
+      code_format_row(:transform_params_yaml)
+      code_format_row(:sql)
+      code_format_row(:interpolated_sql) if resource.sql != resource.interpolated_sql
       row(:validation_immutable) { yes_no(resource.validation.immutable) }
       row :created_at
       row :updated_at

@@ -127,3 +127,6 @@ gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
 # Pin thor to stop an annoying jbuilder error from appearing:
 gem 'thor', '0.19.1'
+
+# Colorize sql
+gem 'rouge'

@@ -163,6 +163,10 @@ class Transform < ApplicationRecord
       runner == 'AutoLoad'
     end
 
+    def rails_migration?
+      runner == 'RailsMigration'
+    end
+
   end
 
   concerning :S3Files do

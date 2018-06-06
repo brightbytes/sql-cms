@@ -41,10 +41,27 @@ module ActiveAdmin::Views
       end
     end
 
-    def simple_format_row(attribute)
+    # def simple_format_row(attribute)
+    #   row(attribute) do |model|
+    #     if val = model.send(attribute)
+    #       code(val)
+    #     end
+    #   end
+    # end
+
+    def code_format_row(attribute)
       row(attribute) do |model|
         if val = model.send(attribute)
-          code(val)
+          # See https://github.com/jneen/rouge
+          html_formatter = Rouge::Formatters::HTMLInline.new(Rouge::Themes::IgorPro)
+          if attribute =~ /sql|options/
+            lexer_class = ((model.is_a?(Transform) && model.rails_migration?) ? Rouge::Lexers::Ruby : Rouge::Lexers::SQL)
+          elsif attribute =~ /yaml/
+            lexer_class = Rouge::Lexers::YAML
+          else
+            raise "Unsupported attribute '#{attribute}' on model class '#{model.class}'"
+          end
+          code(html_formatter.format(lexer_class.new.lex(val)).html_safe)
         end
       end
     end

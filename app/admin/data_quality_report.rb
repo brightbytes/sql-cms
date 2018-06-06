@@ -34,7 +34,7 @@ ActiveAdmin.register DataQualityReport do
       row :name
       row :immutable
       row :usage_count
-      simple_format_row(:sql)
+      code_format_row(:sql)
       row :created_at
       row :updated_at
     end
