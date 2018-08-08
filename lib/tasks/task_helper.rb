@@ -16,8 +16,9 @@ module TaskHelper
         puts "DRY RUN ONLY"
         puts cmd_s
       else
-        with_timing(cmd_s) { `#{cmd}` || raise("System call failed: #{cmd.inspect}") }
-        raise "System call failed: #{cmd.inspect}" unless $?.success?
+        with_timing(cmd_s) { `#{cmd}` || raise("System call failed: #{cmd.inspect}") }.tap do
+          raise "System call failed: #{cmd.inspect}" unless $?.success?
+        end
       end
     end
     result.last.try(:strip) unless dry_run
