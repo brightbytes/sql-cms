@@ -8,12 +8,12 @@ namespace :heroku do
 
     task on: :environment do
       puts "Turning on maintenance mode ..."
-      heroku_run("heroku maintenance:on && heroku scale worker=0")
+      heroku_run("heroku maintenance:on && heroku ps:scale web=0 worker=0 worker_redshift=0")
     end
 
     task off: :environment do
       puts "Turning off maintenance mode ..."
-      heroku_run("heroku maintenance:off && heroku scale worker=1")
+      heroku_run("heroku maintenance:off && heroku ps:scale web=1 worker=1 worker_redshift=4")
     end
 
   end

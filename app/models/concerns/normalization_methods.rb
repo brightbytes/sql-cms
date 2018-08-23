@@ -29,8 +29,13 @@ module Concerns::NormalizationMethods
           (n == :email || n.in?(addl_email_attrs)) ? normalize_email_attr(n) : normalize_attr(n)
         end
       end
-    rescue ActiveRecord::StatementInvalid => e
+
+    rescue ActiveRecord::NoDatabaseError => e
       # This is for rake one_ring, which pukes if att methods are defined when the DB doesn't exist yet
+      raise unless e.message =~ /database .+ does not exist/
+
+    rescue ActiveRecord::StatementInvalid => e
+      # This is for rake one_ring, which pukes if att methods are defined when the tables don't exist yet
       raise unless e.message =~ /PG::UndefinedTable/
 
     # This proved unnecessary after the initial deployment.  Keeping here as a note.
