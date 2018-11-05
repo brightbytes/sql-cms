@@ -35,7 +35,7 @@ FactoryBot.define do
 
   factory :run_step_log do
     association :run
-    step_type "workflow_data_quality_report"
+    step_type  { "workflow_data_quality_report" }
     sequence(:step_id)
   end
 

@@ -21,7 +21,7 @@
 #  fk_rails_...  (workflow_id => workflows.id)
 #
 
-describe WorkflowDataQualityReport do
+describe WorkflowDataQualityReport, type: :model do
 
   describe 'versioned by PaperTrail' do
     it { is_expected.to be_versioned }

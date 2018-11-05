@@ -14,7 +14,7 @@
 #  index_customers_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 
-describe Customer do
+describe Customer, type: :model do
 
   let!(:subject) { create(:customer) }
 

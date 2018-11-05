@@ -15,7 +15,7 @@
 #  index_validations_on_lowercase_name  (lower((name)::text)) UNIQUE
 #
 
-describe Validation do
+describe Validation, type: :model do
 
   describe 'versioned by PaperTrail' do
     it { is_expected.to be_versioned }

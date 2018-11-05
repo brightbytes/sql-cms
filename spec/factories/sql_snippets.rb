@@ -19,7 +19,7 @@ FactoryBot.define do
   factory :sql_snippet do
     sequence(:name) { |n| "SQL Snippet #{n}" }
     sequence(:slug) { |n| "sql_snippet_slug_#{n}" }
-    sql "SELECT 1"
+    sql { "SELECT 1" }
   end
 
 end

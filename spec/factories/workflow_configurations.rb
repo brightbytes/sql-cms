@@ -28,6 +28,6 @@
 FactoryBot.define do
   factory :workflow_configuration do
     association :workflow
-    s3_bucket_name "my-favorite-bucket"
+    s3_bucket_name { "my-favorite-bucket" }
   end
 end

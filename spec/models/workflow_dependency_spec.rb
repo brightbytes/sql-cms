@@ -13,7 +13,7 @@
 #  index_workflow_depenencies_on_independent_id_dependent_id  (included_workflow_id,including_workflow_id) UNIQUE
 #
 
-describe WorkflowDependency do
+describe WorkflowDependency, type: :model do
 
   describe 'versioned by PaperTrail' do
     it { is_expected.to be_versioned }

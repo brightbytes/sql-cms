@@ -23,7 +23,7 @@
 #  fk_rails_...  (workflow_id => workflows.id)
 #
 
-describe Transform do
+describe Transform, type: :model do
 
   describe 'versioned by PaperTrail' do
     it { is_expected.to be_versioned }

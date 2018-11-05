@@ -25,7 +25,7 @@
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
 #
 
-describe User do
+describe User, type: :model do
 
   let!(:user) { create(:user) }
 

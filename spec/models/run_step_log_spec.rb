@@ -23,7 +23,7 @@
 #  fk_rails_...  (run_id => runs.id)
 #
 
-describe RunStepLog do
+describe RunStepLog, type: :model do
 
   describe 'versioned by PaperTrail' do
     it { is_expected.to be_versioned }

@@ -25,7 +25,7 @@
 #  fk_rails_...  (workflow_configuration_id => workflow_configurations.id)
 #
 
-describe Run do
+describe Run, type: :model do
 
   # Having this in `spec_helper.rb` breaks other tests in this suite.  However, it's necessary here for defining `ApplicationJob.queue_adapter`'s enqueued_jobs method.
   # ... and that's necessary in turn because Sidekiq's #jobs method is unavailable with ActiveJob.  Fun!

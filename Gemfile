@@ -5,7 +5,7 @@ ruby "2.4.1"
 gem 'dotenv-rails', require: 'dotenv/rails-now'
 
 # Use Puma as the app server
-# gem 'puma', '~> 3.0'
+# gem 'puma'
 # FIXME: Or maybe not, since Rails isn't threadsafe; revisit at some point ...
 gem "unicorn" # app server
 
@@ -23,8 +23,7 @@ gem 'postgres-copy' # bulk import
 gem 'postgresql_cursor' # postgres cursors!!
 gem 'paranoia' # logical delete
 
-# Why is this pinned?
-gem 'active_model_serializers', '~> 0.10.0'
+gem 'active_model_serializers'
 
 gem 'fast_blank' # for fast calls to String#blank? and String#present?
 
@@ -40,7 +39,7 @@ group :development, :test do
 
   gem 'annotate' # annotations of model files and routes file
 
-  gem 'pry-rails'
+  # gem 'pry-rails'
 
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
@@ -48,15 +47,13 @@ end
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> anywhere in the code.
-  gem 'web-console', '>= 3.3.0'
-  gem 'listen', '~> 3.0.5'
+  gem 'web-console'
+  gem 'listen'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
-  gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'spring-watcher-listen'
 
   # gem 'slack-notifier'
-
-  # gem 'rubocop'
 
   gem 'brakeman'
 end
@@ -69,7 +66,7 @@ group :test do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'rspec-mocks'
-  gem 'shoulda'
+  gem 'shoulda-matchers'
 
   gem 'database_cleaner'
   gem 'timecop'

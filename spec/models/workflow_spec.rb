@@ -15,7 +15,7 @@
 #  index_workflows_on_lowercase_slug  (lower((slug)::text)) UNIQUE
 #
 
-describe Workflow do
+describe Workflow, type: :model do
 
   describe 'versioned by PaperTrail' do
     it { is_expected.to be_versioned }

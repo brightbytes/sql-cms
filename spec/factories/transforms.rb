@@ -27,8 +27,8 @@ FactoryBot.define do
 
   factory :transform do
     sequence(:name) { |n| "Transform #{n}" }
-    runner 'Sql'
-    sequence(:sql)  { |n| "SELECT 1" }
+    runner { 'Sql' }
+    sequence(:sql)  { |n| "SELECT #{n}" }
     association :workflow
   end
 
