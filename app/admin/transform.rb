@@ -75,13 +75,13 @@ ActiveAdmin.register Transform do
               text_node(wc.s3_bucket_name)
               text_node(error_msg) if transform.importing? && !transform.s3_import_file(wc).s3_object_valid?
             end
-            column :s3_file_path
-            column :s3_file_name { |wc| transform.interpolated_s3_file_name }
+            column(:s3_file_path)
+            column(:s3_file_name) { |wc| transform.interpolated_s3_file_name }
             if transform.importing?
-              column :s3_file_exists? { |wc| yes_no(transform.s3_import_file(wc).s3_file_exists?, yes_color: :green, no_color: :red) }
+              column(:s3_file_exists?) { |wc| yes_no(transform.s3_import_file(wc).s3_file_exists?, yes_color: :green, no_color: :red) }
               # FIXME - IMPLEMENT!!!
               # unless transform.s3_import_file(wc).s3_file_exists?
-              #   column :action { |wc| li link_to("Upload File to S3") }
+              #   column(:action) { |wc| li link_to("Upload File to S3") }
               # end
             end
           end

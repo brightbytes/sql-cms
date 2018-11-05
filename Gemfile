@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby "2.4.1"
+ruby "2.5.0"
 
 gem 'dotenv-rails', require: 'dotenv/rails-now'
 
@@ -30,7 +30,7 @@ gem 'fast_blank' # for fast calls to String#blank? and String#present?
 # Versioning
 gem 'paper_trail'
 
-gem 'aws-sdk'
+gem 'aws-sdk-s3'
 
 group :development, :test do
 
