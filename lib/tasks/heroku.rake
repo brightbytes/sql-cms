@@ -80,10 +80,7 @@ namespace :heroku do
     end
 
     def current_branch
-      cmd = 'git branch 2> /dev/null | sed -e \'/^[^*]/d\' -e \'s/* \(.*\)/\1/\''
-      result = `#{cmd}`
-      raise "Unable to get the current branch name" if result.blank?
-      result.strip
+      `git rev-parse --abbrev-ref HEAD`&.strip.tap { |result| raise "Unable to get the current branch name" if result.blank? }
     end
 
   end
@@ -133,8 +130,14 @@ namespace :heroku do
 
     def run_migrations?
       sha = last_release_sha
-      # You can occasionally get false positives off this when an old migration is tweaked, but it's rare enough that it doesn't matter
-      `git diff #{sha} db/migrate`.present?
+      containing_branches = `git br --contains #{sha}`
+      if containing_branches.blank? || containing_branches =~ /malformed object/
+        dputs red_font("The commit deployed by the previous release no longer exists, presumably due to overly-aggressive squashing.\nSo, you now need to suss whether or not migrations should be run after deployment, and manually run them if so.\nYou may determine who deployed the missing release commit via `heroku releases`, and follow up with that individual.")
+        false
+      else
+        # We don't want to run migrations if old migration files were edited; we only want to run it when new migration files were added since the last release
+        `git diff #{sha} db/migrate | grep 'new file mode'`.present?
+      end
     end
 
     def open_in_browser
