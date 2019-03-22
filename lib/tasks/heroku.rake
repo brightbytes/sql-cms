@@ -43,7 +43,7 @@ namespace :heroku do
 
   task deploy: :environment do
     GitChecker.check_git_status!
-    GitChecker.check_access!
+    GitChecker.check_heroku_access!
     Deployer.deploy!
   end
 
@@ -51,22 +51,31 @@ namespace :heroku do
 
     extend self
 
-    def check_access!
+    def check_heroku_access!
       if heroku_run("heroku info 2>&1") =~ /You do not have access/i
-        exit_with_message("You do not have access to the SQL CMS application!")
+        exit_with_message("You do not have access to the SQL CMS Heroku application!")
       end
     end
 
     def check_git_status!
-      puts "Running `git fetch` ... "
-      `git fetch`
+      quietly { `git fetch` }
+
       if `git log ..origin/#{current_branch}`.present?
-        exit(0) unless ask("There are new commits on the remote branch 'origin/#{current_branch}'. Are you sure you want to proceed?")
+        exit_with_message(<<~MESSAGE)
+          There are new commits on the remote branch 'origin/#{current_branch}'.
+          You almost certainly need to include them in this deployment.
+          Aborting so you can verify that `git pull` is the appropriate thing to do.
+        MESSAGE
       end
+
       status_msg_a = `git status`.split(/(?:\n+)/)
       if status_msg_a[1] =~ /your.branch.is.ahead/i
-        exit(0) unless ask("You have local, committed changes that have not been pushed to the remote.  Are you sure you want to proceed?")
+        exit_with_message(<<~MESSAGE)
+          You have local, committed changes on the branch '#{current_branch}' that have not been pushed to its remote, but that will be deployed.
+          Therefore, please either push those changes to the '#{current_branch}' remote so that CI can run, or else uncommit and stash them.
+        MESSAGE
       end
+
       unless status_msg_a.last =~ /nothing to commit/i
         exit(0) unless ask("You have local, uncommitted changes.  Are you sure you want to proceed?")
       end
@@ -90,28 +99,20 @@ namespace :heroku do
     extend self
 
     def deploy!
-      run_migrations = run_migrations?
-
-      exit(0) if run_migrations && !ask("There are new migrations to run.  If you proceed,\n\n*** YOU WILL INCUR SITE DOWNTIME!!! ***\n\nDo you wish to proceed?", important: true)
-
-      enter_maint_mode = run_migrations || ask("Would you like to turn on maintenance mode even though you don't have any migrations to run?", show_abort_message: false)
-
-      if enter_maint_mode
-        stay_in_maint_mode = ask('Would you like to stay in maintenance mode after deployment, e.g. to run some rake tasks?', show_abort_message: false)
-        Rake::Task["heroku:maint:on"].invoke
+      if run_migrations = run_migrations?
+        if ask("There are new migrations to run.  If you proceed,\n\n*** YOU WILL INCUR SITE DOWNTIME!!! ***\n\nDo you wish to proceed?", important: true)
+          Rake::Task["heroku:maint:on"].invoke
+        else
+          exit(0)
+        end
       end
 
       push_release!
 
-      # The restart is necessary to not have the web server gag
-      heroku_run("heroku run --size=Performance rake db:migrate && heroku restart") if run_migrations
-
-      if enter_maint_mode
-        if stay_in_maint_mode
-          dputs "********** NOTE: YOU ARE STILL IN MAINTENANCE MODE, AND MUST MANUALLY DISABLE IT VIA `rake heroku:maint:off` **********"
-        else
-          Rake::Task["heroku:maint:off"].invoke
-        end
+      if run_migrations
+        # The restart is necessary to not have the web server gag
+        heroku_run("heroku run --size=performance-m rake db:migrate && heroku restart")
+        Rake::Task["heroku:maint:off"].invoke
       end
 
       open_in_browser
@@ -145,7 +146,6 @@ namespace :heroku do
       sleep 2 # because removing maint mode takes a couple seconds to propagate
       heroku_run("heroku open")
     end
-
 
   end
 end
