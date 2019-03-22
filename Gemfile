@@ -22,6 +22,8 @@ gem 'immigrant' # FK constraints
 gem 'postgres-copy' # bulk import
 gem 'postgresql_cursor' # postgres cursors!!
 gem 'paranoia' # logical delete
+# A Rails bug causes lossage unless this is specified.  Should go away with 5.2 upgrade.
+gem "sqlite3", "~> 1.3.6"
 
 gem 'active_model_serializers'
 
