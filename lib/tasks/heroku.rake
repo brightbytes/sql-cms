@@ -33,6 +33,8 @@ namespace :heroku do
 
     task development: :environment do
       if File.exists?(DOWNLOAD_DUMPFILE)
+        # So that we can load locally even if the remote schema differs
+        Rake::Task['db:recreate'].invoke
         run("pg_restore --clean --no-acl --no-owner -h localhost -U postgres -d sql_cms_development #{DOWNLOAD_DUMPFILE}")
       else
         raise "You must first run `rake heroku:download` before you can upload to dev."
