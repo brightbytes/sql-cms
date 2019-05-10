@@ -1,19 +1,19 @@
-require "#{Rails.root}/lib/tasks/heroku_task_helper"
+require "#{Rails.root}/lib/tasks/task_helper"
 
 namespace :heroku do
 
-  include HerokuTaskHelper
+  include TaskHelper
 
   namespace :maint do
 
     task on: :environment do
       puts "Turning on maintenance mode ..."
-      heroku_run("heroku maintenance:on && heroku ps:scale web=0 worker=0 worker_redshift=0")
+      ShellCommand.run("heroku maintenance:on && heroku ps:scale web=0 worker=0 worker_redshift=0")
     end
 
     task off: :environment do
       puts "Turning off maintenance mode ..."
-      heroku_run("heroku maintenance:off && heroku ps:scale web=1 worker=1 worker_redshift=4")
+      ShellCommand.run("heroku maintenance:off && heroku ps:scale web=1 worker=1 worker_redshift=4")
     end
 
   end
@@ -24,8 +24,10 @@ namespace :heroku do
 
     puts "Backing up the production DB and downloading that latest backup ..."
 
-    heroku_run("heroku pg:backups:capture")
-    heroku_run("heroku pg:backups:download -o #{DOWNLOAD_DUMPFILE}")
+    ShellCommand.run(
+      "heroku pg:backups:capture",
+      "heroku pg:backups:download -o #{DOWNLOAD_DUMPFILE}"
+    )
 
   end
 
@@ -35,7 +37,7 @@ namespace :heroku do
       if File.exists?(DOWNLOAD_DUMPFILE)
         # So that we can load locally even if the remote schema differs
         Rake::Task['db:recreate'].invoke
-        run("pg_restore --clean --no-acl --no-owner -h localhost -U postgres -d sql_cms_development #{DOWNLOAD_DUMPFILE}")
+        ShellCommand.run("pg_restore --clean --no-acl --no-owner -h localhost -U postgres -d sql_cms_development #{DOWNLOAD_DUMPFILE}")
       else
         raise "You must first run `rake heroku:download` before you can upload to dev."
       end
@@ -54,7 +56,7 @@ namespace :heroku do
     extend self
 
     def check_heroku_access!
-      if heroku_run("heroku info 2>&1") =~ /You do not have access/i
+      if ShellCommand.run("heroku info 2>&1", quietly: true) =~ /You do not have access/i
         exit_with_message("You do not have access to the SQL CMS Heroku application!")
       end
     end
@@ -113,7 +115,7 @@ namespace :heroku do
 
       if run_migrations
         # The restart is necessary to not have the web server gag
-        heroku_run("heroku run --size=performance-m rake db:migrate && heroku restart")
+        ShellCommand.run("heroku run --size=performance-m rake db:migrate && heroku restart")
         Rake::Task["heroku:maint:off"].invoke
       end
 
@@ -128,7 +130,7 @@ namespace :heroku do
     end
 
     def last_release_sha
-      heroku_run("heroku releases | grep Deploy | head -n 1 | awk '{print $3}'")
+      ShellCommand.run("heroku releases | grep Deploy | head -n 1 | awk '{print $3}'", quietly: true)
     end
 
     def run_migrations?
@@ -146,7 +148,7 @@ namespace :heroku do
     def open_in_browser
       puts "Opening the site for inspection ..."
       sleep 2 # because removing maint mode takes a couple seconds to propagate
-      heroku_run("heroku open")
+      `heroku open`
     end
 
   end

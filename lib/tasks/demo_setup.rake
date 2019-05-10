@@ -16,7 +16,7 @@ namespace :demo do
     s3_url += '/' unless s3_url.ends_with?('/')
 
     Dir.glob(File.join(Rails.root, "spec/fixtures/files/source_data_files/*.csv")).each do |source_file|
-      run("aws s3 cp #{source_file} #{s3_url}source_data_files/")
+      ShellCommand.run("aws s3 cp #{source_file} #{s3_url}source_data_files/")
     end
 
   end
