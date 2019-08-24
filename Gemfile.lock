@@ -188,7 +188,7 @@ GEM
     multi_json (1.13.1)
     newrelic_rpm (6.2.0.354)
     nio4r (2.3.1)
-    nokogiri (1.10.1)
+    nokogiri (1.10.4)
       mini_portile2 (~> 2.4.0)
     orm_adapter (0.5.0)
     paper_trail (10.2.1)
@@ -399,4 +399,4 @@ RUBY VERSION
    ruby 2.5.0p0
 
 BUNDLED WITH
-   1.17.1
+   1.17.3
