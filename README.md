@@ -1,5 +1,7 @@
 # sql-cms
 
+**Currently (Early 2020), this repository is not used anywhere.**
+
 ## What is it?
 
 sql-cms is a standalone application that stores and runs Workflows comprised of SQL-based Transforms, Transform Validations, and Data Quality Reports.
