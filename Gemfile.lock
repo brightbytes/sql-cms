@@ -203,7 +203,7 @@ GEM
       responders
     postgresql_cursor (0.6.2)
       activerecord (>= 3.1.0)
-    rack (2.0.8)
+    rack (2.2.3)
     rack-protection (2.0.5)
       rack
     rack-test (1.1.0)
