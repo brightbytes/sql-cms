@@ -5,26 +5,13 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
-
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: active_admin_comments; Type: TABLE; Schema: public; Owner: -
@@ -48,6 +35,7 @@ CREATE TABLE public.active_admin_comments (
 --
 
 CREATE SEQUENCE public.active_admin_comments_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -92,6 +80,7 @@ CREATE TABLE public.customers (
 --
 
 CREATE SEQUENCE public.customers_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -125,6 +114,7 @@ CREATE TABLE public.data_quality_reports (
 --
 
 CREATE SEQUENCE public.data_quality_reports_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -156,6 +146,7 @@ CREATE TABLE public.notifications (
 --
 
 CREATE SEQUENCE public.notifications_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -194,6 +185,7 @@ CREATE TABLE public.run_step_logs (
 --
 
 CREATE SEQUENCE public.run_step_logs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -232,6 +224,7 @@ CREATE TABLE public.runs (
 --
 
 CREATE SEQUENCE public.runs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -305,6 +298,7 @@ CREATE TABLE public.transform_dependencies (
 --
 
 CREATE SEQUENCE public.transform_dependencies_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -339,6 +333,7 @@ CREATE TABLE public.transform_validations (
 --
 
 CREATE SEQUENCE public.transform_validations_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -376,6 +371,7 @@ CREATE TABLE public.transforms (
 --
 
 CREATE SEQUENCE public.transforms_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -419,6 +415,7 @@ CREATE TABLE public.users (
 --
 
 CREATE SEQUENCE public.users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -452,6 +449,7 @@ CREATE TABLE public.validations (
 --
 
 CREATE SEQUENCE public.validations_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -488,6 +486,7 @@ CREATE TABLE public.versions (
 --
 
 CREATE SEQUENCE public.versions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -560,6 +559,7 @@ CREATE TABLE public.workflow_data_quality_reports (
 --
 
 CREATE SEQUENCE public.workflow_data_quality_reports_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -591,6 +591,7 @@ CREATE TABLE public.workflow_dependencies (
 --
 
 CREATE SEQUENCE public.workflow_dependencies_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -624,6 +625,7 @@ CREATE TABLE public.workflows (
 --
 
 CREATE SEQUENCE public.workflows_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE

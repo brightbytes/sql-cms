@@ -50,7 +50,7 @@ namespace :db do
       if PathHelpers.env_var_present?
         if File.exists?(PathHelpers.full_dump_path)
           dputs "Dumping PostgreSQL for the SQL CMS Application ..."
-          ShellCommand.run("PGPASSWORD=#{DB_CONFIG["password"]} pg_dump --clean --oids --format=custom --no-password --username #{DB_CONFIG["username"]} --dbname #{DB_CONFIG["database"]} --host #{DB_CONFIG["host"]} --no-owner --file #{PathHelpers.full_dump_path_and_file}")
+          ShellCommand.run("PGPASSWORD=#{DB_CONFIG["password"]} pg_dump --clean --format=custom --no-password --username #{DB_CONFIG["username"]} --dbname #{DB_CONFIG["database"]} --no-owner --no-privileges --file #{PathHelpers.full_dump_path_and_file}")
         else
           raise "Unable to dump your local DB because '#{PathHelpers.full_dump_path}' doesn't exist."
         end
@@ -67,11 +67,14 @@ namespace :db do
       if PathHelpers.env_var_present?
         if File.exists?(PathHelpers.full_dump_path_and_file)
           dputs "Attempting to pull latest from bb_data repo ..."
-          # If this fails, the error will be output to console.  And, it will be an expected failure testing a newly-generated dumpfile
-          ShellCommand.run("cd #{PathHelpers.full_dump_path} && git pull", quietly: true)
+          ShellCommand.run("cd #{PathHelpers.full_dump_path} && git pull --ff-only", continue_on_fail: true)
 
           dputs "Loading PostgreSQL for SQL CMS Application ..."
-          ShellCommand.run("PGPASSWORD=#{DB_CONFIG["password"]} pg_restore -Fc -w -U #{DB_CONFIG["username"]} -d #{DB_CONFIG["database"]} -h #{DB_CONFIG["host"]} #{PathHelpers.full_dump_path_and_file}")
+          begin
+            ShellCommand.run("PGPASSWORD=#{DB_CONFIG["password"]} pg_restore --no-owner --format=custom --no-password --username #{DB_CONFIG["username"]} --dbname #{DB_CONFIG["database"]} #{PathHelpers.full_dump_path_and_file}")
+          rescue => e
+            dputs "ERROR: Restoring the dump failed, undoubtedly due to a PG version mismatch; the error was:\n#{e}"
+          end
         else
           dputs "Skipping dumpfile load because it doesn't exist at '#{PathHelpers.full_dump_path_and_file}'"
         end

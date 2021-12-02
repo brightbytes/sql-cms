@@ -4,7 +4,9 @@ module Concerns::ParamsHelpers
   extend ActiveSupport::Concern
 
   def params
-    super&.with_indifferent_access
+    # This used to work; not sure what happened
+    # super&.with_indifferent_access
+    self[:params]&.with_indifferent_access
   end
 
   def params_yaml
