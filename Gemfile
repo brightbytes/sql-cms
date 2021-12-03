@@ -9,7 +9,7 @@ gem 'dotenv-rails', require: 'dotenv/rails-now'
 # FIXME: Or maybe not, since Rails isn't threadsafe; revisit at some point ...
 gem "unicorn" # app server
 
-gem 'rails'
+gem 'rails', '~>5.2'
 # gem 'acts_as_list'
 
 # bundle exec rake doc:rails generates the API under doc/api.
@@ -83,8 +83,9 @@ group :staging, :qa, :production do
 end
 
 # Admin
+# FIXME: VERIFY THIS IS NO LONGER A PROBLEM:
 # Pinning to 1.1.0 because 1.2.x and 2.0.x break all delete links and all colorization of labels; no time to debug
-gem 'activeadmin', '~>1.1.0'
+gem 'activeadmin'
 
 # Authentication
 gem 'devise'
