@@ -68,8 +68,11 @@ module RunnerFactory
           run.eval_in_schema(migration_s)
 
           header_s = header_a.join(', ')
-          sql = "COPY #{table_name} (#{header_s}) FROM STDIN WITH CSV"
+          sql = "COPY #{table_name} (#{header_s}) FROM STDIN WITH CSV HEADER"
 
+          # Ruby 2.6 appears to have changed the implementation of CSV to chomp-through more of the file than just the header.
+          # So, just in case, we rewind the stream
+          stream.rewind
           run.copy_from_in_schema(sql: sql, enumerable: stream)
 
         ensure

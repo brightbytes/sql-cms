@@ -41,6 +41,7 @@ module Run::PostgresSchema
 
   def copy_from_in_schema(sql:, enumerable:)
     raise "This method is not available for use in Redshift." if use_redshift?
+
     self.class.in_db_context(false) do
       in_schema_context do
         connection.raw_connection.copy_data(sql) do
@@ -57,6 +58,7 @@ module Run::PostgresSchema
   # Short of that, this will have to do.
   def copy_to_in_schema(sql:, writeable_io:)
     raise "This method is not available for use in Redshift." if use_redshift?
+
     self.class.in_db_context(false) do
       in_schema_context do
         connection.raw_connection.copy_data(sql) do
