@@ -18,6 +18,10 @@ namespace :db do
 
   namespace :data do
 
+    def puke_unless_dev!
+      raise "This task is only for use in a development environment" unless Rails.env.in?(%w[development test])
+    end
+
     # Need this to use the ENV var :-(
     module PathHelpers
 
@@ -45,14 +49,20 @@ namespace :db do
     desc "Dumps the local dev DB to the `sql_cms` directory in the ENV['SEED_DATA_DUMP_REPO'] repo, for later use by db:data:load"
 
     task dump: [:environment, :dotenv] do
-      raise "This task is only for use in a development environment" unless Rails.env.development?
+      puke_unless_dev!
 
       if PathHelpers.env_var_present?
-        if File.exists?(PathHelpers.full_dump_path)
+        dump_path = PathHelpers.full_dump_path
+        if File.exists?(dump_path)
           dputs "Dumping PostgreSQL for the SQL CMS Application ..."
-          ShellCommand.run("PGPASSWORD=#{DB_CONFIG["password"]} pg_dump --clean --format=custom --no-password --username #{DB_CONFIG["username"]} --dbname #{DB_CONFIG["database"]} --no-owner --no-privileges --file #{PathHelpers.full_dump_path_and_file}")
+          username = DB_CONFIG["username"]
+          password = DB_CONFIG["password"]
+          host = DB_CONFIG["host"]
+          database = DB_CONFIG["database"]
+          file = PathHelpers.full_dump_path_and_file
+          ShellCommand.run("PGPASSWORD=#{password} pg_dump --clean --format=custom --no-owner --no-privileges --host #{host} --username #{username} --dbname #{database} --file #{file}")
         else
-          raise "Unable to dump your local DB because '#{PathHelpers.full_dump_path}' doesn't exist."
+          raise "Unable to dump your local DB because '#{dump_path}' doesn't exist."
         end
       else
         raise "The env var SEED_DATA_DUMP_REPO is not defined."
@@ -62,21 +72,26 @@ namespace :db do
     desc "Loads tables from a dump file in the `sql_cms` directory in the ENV['SEED_DATA_DUMP_REPO'] repo"
 
     task load_dump: [:environment, :dotenv] do
-      raise "This task is only for use in a development environment" unless Rails.env.development?
+      puke_unless_dev!
 
       if PathHelpers.env_var_present?
-        if File.exists?(PathHelpers.full_dump_path_and_file)
+        file = PathHelpers.full_dump_path_and_file
+        if File.exists?(file)
           dputs "Attempting to pull latest from bb_data repo ..."
           ShellCommand.run("cd #{PathHelpers.full_dump_path} && git pull --ff-only", continue_on_fail: true)
 
           dputs "Loading PostgreSQL for SQL CMS Application ..."
+          username = DB_CONFIG["username"]
+          password = DB_CONFIG["password"]
+          host = DB_CONFIG["host"]
+          database = DB_CONFIG["database"]
           begin
-            ShellCommand.run("PGPASSWORD=#{DB_CONFIG["password"]} pg_restore --no-owner --format=custom --no-password --username #{DB_CONFIG["username"]} --dbname #{DB_CONFIG["database"]} #{PathHelpers.full_dump_path_and_file}")
+            ShellCommand.run("PGPASSWORD=#{password} pg_restore --no-owner --format=custom --host #{host} --username #{username} --dbname #{database} #{file}")
           rescue => e
-            dputs "ERROR: Restoring the dump failed, undoubtedly due to a PG version mismatch; the error was:\n#{e}"
+            dputs "ERROR: Restoring the dump failed, probably due to a PG version mismatch; the error was:\n#{e}"
           end
         else
-          dputs "Skipping dumpfile load because it doesn't exist at '#{PathHelpers.full_dump_path_and_file}'"
+          dputs "Skipping dumpfile load because it doesn't exist at '#{file}'"
         end
       else
         dputs "Skipping dumpfile load because the env var SEED_DATA_DUMP_REPO is not defined."
